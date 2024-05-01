@@ -196,8 +196,16 @@ export class ContactsController {
     catch(error)
     {
       throw new BadRequestException(error.message);
-    }    
-    return await this.contactsService.createContact(data.orgId, data.createContactDto);
+    }   
+    try
+    {
+      
+      return await this.contactsService.createContact(data.orgId, data.createContactDto);
+    } 
+    catch(error)
+    {
+      return error;
+    }
   }
 
   @MessagePattern({cmd: 'UPDATE_CONTACT'})

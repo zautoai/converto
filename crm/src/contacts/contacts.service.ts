@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { FilterDto } from 'src/common/dtos/filter.dto';
 import { CustomFieldParent } from 'src/common/enum/enums';
 import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
@@ -135,7 +135,10 @@ export class ContactsService {
       },
       { _defaultFields: {}, _customFields: {} },
     );
-
+    const existingContact = await this.getContactByEmail(orgId,  createContactDto.email);
+    if (existingContact) {
+      throw new BadRequestException('Contact already exists');
+    }
     const contact = await prisma.contact.create({
       data: {
         ..._defaultFields,
@@ -271,6 +274,22 @@ export class ContactsService {
       code: 204,
       success: true,
       message: 'Contact deleted successfully',
+    };
+  }
+
+  async getContactByEmail(orgId: string, email: string) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    const contact = await prisma.contact.findFirst({
+      where: { email },
+    });
+    if (!contact) {
+      throw new NotFoundException('Contact not found');
+    }
+    return {
+      code: 200,
+      success: true,
+      message: 'Contact fetched successfully',
+      data: contact,
     };
   }
 
