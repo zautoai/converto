@@ -181,14 +181,14 @@ export class NavService implements OnDestroy {
 		{
 			title: 'Calendar (Events)', icon: 'fa-solid fa-calendar-check', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/calendar-events', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
-		{
-			headTitle: 'CRM',
-			show:false,
-			roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		},
-		{
-			title: 'Hubspot', icon: 'fa fa-hubspot', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/hubspot', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		},
+		// {
+		// 	headTitle: 'CRM',
+		// 	show:false,
+		// 	roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+		// },
+		// {
+		// 	title: 'Hubspot', icon: 'fa fa-hubspot', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/hubspot', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+		// },
 		{
 			headTitle: 'DATA MANAGEMENT',
 			show:false,

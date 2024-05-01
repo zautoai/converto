@@ -28,7 +28,7 @@ export class NotificationService {
   }
 
   showInfo(message:string){
-    this.toastr.info(message,'Info',{
+    this.toastr.show(message,'Info',{
       timeOut: 3000,
       positionClass: 'toast-top-center',
     })
