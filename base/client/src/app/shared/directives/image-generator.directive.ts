@@ -10,12 +10,7 @@ export class ImageGeneratorDirective implements OnInit, OnChanges{
   canvas!: HTMLCanvasElement;
 
   colors: string[] = [
-    '#C798FF',
-    "#D8AAFF",
-    '#B085FF',
-    '#7C29D8',
-    '#6A1EBF',
-    '#5813A6',
+    '#828181',
   ];
 
   constructor(private el: ElementRef, private renderer: Renderer2) {}
