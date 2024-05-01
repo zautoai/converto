@@ -1,0 +1,4 @@
+client/src/environments/ merge=ours
+DockerFile merge=ours
+docker-compose.yml merge=ours
+.github/* merge=ours

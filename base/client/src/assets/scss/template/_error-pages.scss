@@ -1,0 +1,71 @@
+.about-img {
+	// background: linear-gradient(rgba(112, 64, 165, 0.3), rgba(112, 64, 165, 0.3)), url('../images/about4.jpg');
+	background-size: cover;
+	background-position: center;
+}
+
+.login-img {
+	color: $color;
+	height: 100%;
+	width: 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	display: inline-table;
+}
+
+.construction-img {
+	// background: url('../images/construction.jpg');
+	background-size: cover;
+}
+
+.construction .btn.btn-icon {
+	width: 50px;
+	height: 50px;
+	text-align: center;
+	padding: 0;
+	background: transparent;
+	font-size: 20px;
+	color: #fff;
+	margin: 0 3px;
+}
+
+.error-page {
+	.display-1 {
+		font-size: 10.5rem;
+		margin-top: 0px;
+	}
+
+	position: relative;
+}
+
+@media (max-width: 480px) {
+	.error-page .display-1 {
+		font-size: 8.5rem !important;
+		text-align: center;
+		margin-right: 2px;
+	}
+
+	.construction .display-5 {
+		font-size: 1.5rem;
+	}
+}
+
+@media (max-width: 320px) {
+	.error-page .display-1 {
+		font-size: 6.5rem !important;
+		text-align: center;
+	}
+
+	.construction .btn.btn-icon {
+		width: 40px !important;
+		height: 40px !important;
+		border-radius: 50%;
+		text-align: center;
+		padding: 0;
+		background: transparent;
+		font-size: 16px;
+		color: #fff;
+		margin: 0 2px !important;
+	}
+}

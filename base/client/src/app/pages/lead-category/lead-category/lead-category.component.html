@@ -1,0 +1,232 @@
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="card-title"><i class="fe fe-award"></i> Lead Categories</h5>
+                <div>
+                    <button class="btn btn-outline-primary btn-sm me-3" (click)="openCreateLeadCategory()"><i
+                            class="fe fe-plus"></i>
+                        Create Category</button>
+                    <!-- <button class="btn btn-sm btn-outline-primary" (click)="openFilterCanvas()"><i class="fe fe-filter"></i> Filters</button> -->
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="input-group right-line p-2">
+                            <input type="search" class="form-control" placeholder="Search e.g: Name, Status, Date"
+                                [(ngModel)]="searchTerm" (input)="onSearchTermChange($event)" />
+                            <button class="btn btn-outline-primary"><i class="fe fe-search"></i></button>
+                        </div>
+                        
+                        <ul class="leadCategory-container right-line  fixed-vh " #scrollContainer>
+                            <ng-container *ngIf="!leadCategoryList?.data">
+                                <li>
+                                    <ngx-skeleton-loader count="3"
+                                        [theme]="{ 'border-radius': '0', height: '100px'}"></ngx-skeleton-loader>
+                                </li>
+                            </ng-container>
+                            <ng-container *ngIf="leadCategoryList?.data">
+                                <li class="leadCategory-card" *ngFor="let leadCategory of leadCategoryList?.data"
+                                    (click)="selectLeadCategory(leadCategory)"
+                                    [ngClass]="{'active':(selectedLeadCategory && selectedLeadCategory?.id == leadCategory?.id)}">
+                                    <div class="row">
+                                        <div class="col-9 text-truncate">
+                                            <h5 class="title">{{leadCategory.title}}</h5>
+                                            <p class="description text-truncate">{{leadCategory.description}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-9 text-truncate">
+                                            <div class="date">
+                                                <div><b>Created</b></div>
+                                                <div>{{leadCategory.createdAt | date:'dd/MM/yyyy'}}</div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </li>
+                            </ng-container>
+                        </ul>
+                    </div>
+                    <div class="col-lg-9">
+                        <div *ngIf="selectedLeadCategory" class="fixed-vh">
+                            <dl class="leadCategory">
+                                <div class="d-flex justify-content-end">
+                                    <!-- <span (click)="toggleStatus()"
+                                        [attr.aria-expanded]="(selectedLeadCategory?.status == 'ACTIVE')"
+                                        class="custom-switch-indicator me-3"></span>
+                                    <input type="checkbox" class="custom-switch-input" name="custom-switch-checkbox"> -->
+                                    <div ngbDropdown class="d-inline-block">
+                                        <a href="javascript:void(0)" class="text-muted" id="dropdownBasic1"
+                                            ngbDropdownToggle>
+                                            <i class="fe fe-more-horizontal"></i>
+                                        </a>
+                                        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                            <button ngbDropdownItem (click)="openEditLeadCategory()"><i
+                                                    class="fa fa-edit"></i> Edit</button>
+                                            <div class="dropdown-divider"></div>
+                                            <button ngbDropdownItem (click)="openDeleteLeadCategory()" class="text-danger"
+                                                *ngIf="!this.selectedLeadCategory?.isDefault"><i class="fa fa-trash"></i>
+                                                Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h3 class="detail-value">{{selectedLeadCategory?.title}}</h3>
+                                <div class="leadCategory-detail">
+                                    <dt class="detail-label">Description :</dt>
+                                    <dd class="detail-value">{{selectedLeadCategory?.description}}</dd>
+                                </div>
+                                <h3 class="detail-value">{{selectedLeadCategory?.color}}</h3>
+                                <div class="leadCategory-detail">
+                                    <dt class="detail-label">Created at :</dt>
+                                    <dd class="detail-value">{{selectedLeadCategory?.createdAt | date:'dd/MM/yyyy'}}</dd>
+                                </div>
+                                <!-- <app-leadCategory-chart #visitChart [chartTitle]="'Visits'" [type]="'bar'"></app-leadCategory-chart> -->
+                                <!-- <app-leadCategory-chart #leadChart [chartTitle]="'Leads'" [type]="'bar'"></app-leadCategory-chart> -->
+                            </dl>
+                        </div>
+                        <div *ngIf="!selectedLeadCategory"
+                            class="h-100 w-100 d-flex justify-content-center align-items-center">
+                            <span class="text-muted">Select Category for details</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #deleteLeadCategoryModal let-model>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title"><i class="fe fe-award"></i> Delete LeadCategory</h4>
+    </div>
+    <div class="modal-body">
+        Are you sure you want to delete ?
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-outline-primary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-danger" (click)="onDeleteLeadCategorySubmit()">Yes</button>
+    </div>
+</ng-template>
+
+
+
+<!-- Create leadCategory offcanvas -->
+<ng-template #createLeadCategoryOffcanvas let-offcanvas>
+    <div class="offcanvas-header">
+        <h4 class="offcanvas-title"><i class="fe fe-award"></i> Create LeadCategory</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    </div>
+    <hr class="m-0">
+    <div class="offcanvas-body">
+        <form [formGroup]="leadCategoryForm" (ngSubmit)="onCreateLeadCategorySubmit()">
+            <div class="form-group mb-3">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="Title"
+                    formControlName="title"
+                    [ngClass]="{'is-invalid':isFieldValid('title') || errorFeedback.title.length > 0}">
+                <div class="invalid-feedback">
+                    {{errorFeedback.title}}
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="description">Description</label>
+                <textarea name="description" id="description" class="form-control" placeholder="Description..." rows="5"
+                    formControlName="description"
+                    [ngClass]="{'is-invalid':(isFieldValid('description') || errorFeedback.desc.length > 0)}">
+                    </textarea>
+                <div class="invalid-feedback">
+                    {{errorFeedback.desc}}
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="primary_color" class="form-label">Color</label>
+                <ngx-colors ngx-colors-trigger name="color" id="color" (change)="onColorChange($event)"></ngx-colors>
+                <div class="invalid-feedback">
+                    {{errorFeedback.desc}}
+                </div>
+            </div>
+
+            
+
+            
+            <div class="form-group mb-3" *ngIf="leadCategoryForm.value.isOthers">
+                <label for="key">Campain Id field</label>
+                <input type="text" id="key" name="key" class="form-control mb-2" placeholder="Key"
+                    formControlName="idParam"
+                    [ngClass]="{'is-invalid':isFieldValid('idParam') || errorFeedback.key.length > 0}">
+                <input type="text" id="value" name="value" class="form-control" placeholder="Value"
+                    formControlName="idValue"
+                    [ngClass]="{'is-invalid':isFieldValid('idValue') || errorFeedback.value.length > 0}">
+            </div>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()"><i
+                        class="fa fa-times"></i>
+                    Close</button>
+                <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> Create</button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<ng-template #editLeadCategoryOffcanvas let-offcanvas>
+    <div class="offcanvas-header">
+        <h4 class="offcanvas-title"><i class="fe fe-award"></i> Edit LeadCategory</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    </div>
+    <hr class="m-0">
+    <div class="offcanvas-body">
+        <form [formGroup]="leadCategoryForm" (ngSubmit)="onEditLeadCategorySubmit()">
+            <div class="form-group mb-3">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="Title"
+                    formControlName="title"
+                    [ngClass]="{'is-invalid':isFieldValid('title') || errorFeedback.title.length > 0}">
+                <div class="invalid-feedback">
+                    {{errorFeedback.title}}
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="description">Description</label>
+                <textarea name="description" id="description" class="form-control" placeholder="Description..." rows="5"
+                    formControlName="description"
+                    [ngClass]="{'is-invalid':(isFieldValid('description') || errorFeedback.desc.length > 0)}">
+                    </textarea>
+                <div class="invalid-feedback">
+                    {{errorFeedback.desc}}
+                </div>
+            </div>
+            
+            <div class="form-group mb-3" *ngIf="leadCategoryForm.value.isOthers">
+                <label for="key">Campain Id field</label>
+                <input type="text" id="key" name="key" class="form-control mb-2" placeholder="Key"
+                    formControlName="idParam"
+                    [ngClass]="{'is-invalid':isFieldValid('idParam') || errorFeedback.key.length > 0}">
+                <input type="text" id="value" name="value" class="form-control" placeholder="Value"
+                    formControlName="idValue"
+                    [ngClass]="{'is-invalid':isFieldValid('idValue') || errorFeedback.value.length > 0}">
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()"><i
+                        class="fa fa-times"></i>
+                    Close</button>
+                <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> Update</button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<ng-template #filterOffcanvas let-offcanvas>
+    <div class="offcanvas-header">
+        <h4 class="offcanvas-title"><i class="fe fe-filter"></i> Filters</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    </div>
+    <hr class="m-0">
+    <div class="offcanvas-body">
+
+    </div>
+</ng-template>

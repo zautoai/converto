@@ -1,0 +1,39 @@
+.icons-list {
+	list-style: none;
+	margin: 0 -1px -1px 0;
+	padding: 0;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+
+	>li {
+		-ms-flex: 1 0 5rem;
+	}
+}
+
+.icons-list-wrap {
+	overflow: hidden;
+}
+
+.icons-list-item {
+	text-align: center;
+	height: 3rem;
+	width: 3rem;
+	line-height: 5rem;
+	margin: 4px;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-align: center;
+	align-items: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	border-right: 1px solid $border;
+	border-bottom: 1px solid $border;
+	border-top: 1px solid $border;
+	border-left: 1px solid $border;
+
+	i {
+		font-size: 1.2rem;
+	}
+}

@@ -1,0 +1,771 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id         String   @id @default(uuid())
+  name       String   @unique @db.VarChar(50)
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+  Users      User[]
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String?        @db.VarChar(50)
+  email         String         @unique @db.VarChar(50)
+  password      String         @db.VarChar(100)
+  roleId        String? // Updated to String
+  verified      Boolean?       @default(false)
+  createdAt     DateTime       @default(now())
+  modifiedAt    DateTime       @updatedAt
+  orgId         String? // Updated to String
+  imgUrl        String?        @db.VarChar(300)
+  org           Organization?  @relation(fields: [orgId], references: [id])
+  role          Role?          @relation(fields: [roleId], references: [id])
+  Verifications Verification[]
+  ActiveClient  ActiveClient?
+  conversations Conversation[]
+  ZautoMessages ZautoMessage[]
+
+  @@index([orgId], map: "Users_orgId_fkey")
+  @@index([roleId], map: "Users_roleId_fkey")
+}
+
+enum VerificationType {
+  VERIFYEMAIL
+  FORGOTPASSWORD
+}
+
+model Verification {
+  id         String           @id @default(uuid())
+  userId     String // Updated to String
+  token      String           @default("default") @db.VarChar(100)
+  type       VerificationType
+  createdAt  DateTime         @default(now())
+  modifiedAt DateTime         @updatedAt
+  user       User             @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "userId_Verification_fkey")
+}
+
+model Organization {
+  id         String      @id @default(uuid())
+  name       String      @default("default") @db.VarChar(50)
+  siteUrl    String?     @db.Text()
+  createdAt  DateTime    @default(now())
+  modifiedAt DateTime    @updatedAt
+  OrgAccount OrgAccount?
+
+  Agents               Agent[]
+  Users                User[]
+  Campaigns            Campaign[]
+  OrgPlatforms         OrgPlatform[]
+  LeadConfigs          LeadConfig[]
+  Sites                Site[]
+  AgentPrompts         AgentPrompt[]
+  Visitors             Visitor[]
+  Conversations        Conversation[]
+  Leads                Lead[]
+  ZautoMessages        ZautoMessage[]
+  Stages               Stage[]
+  Visits               Visit[]
+  CallToAction         CallToAction[]
+  KeyMapping           KeyMapping[]
+  OrgTool              OrgTool[]
+  ExternalApi          ExternalApi[]
+  AvailabilitySchedule AvailabilitySchedule[]
+  LeradCategory        LeadCategory[]
+  LeadCategoryMap      LeadCategoryMap[]
+}
+
+model ActiveClient {
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+  orgId  String
+
+  clientId String @unique
+
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  @@unique([userId, clientId], name: "Unique_userId_clientId")
+  @@index([userId], map: "UserId_ActiveClient_fkey")
+}
+
+model SubscriptionPlan {
+  id                String       @id @default(uuid())
+  name              String       @unique @db.VarChar(100)
+  type              String       @default("monthly") @db.VarChar(10)
+  description       String       @db.Text()
+  agentsCount       Int          @default(1) @db.Integer()
+  messageCount      Int          @default(0) @db.Integer()
+  conversationCount Int          @default(0) @db.Integer()
+  sitesCount        Int          @default(0) @db.Integer()
+  campaignCount     Int          @default(0) @db.Integer()
+  userCount         Int          @default(0) @db.Integer()
+  price             Float        @default(0)
+  createdAt         DateTime     @default(now())
+  modifiedAt        DateTime     @updatedAt
+  orgAccounts       OrgAccount[]
+}
+
+enum OrgAccountStatus {
+  ACTIVE
+  EXPAIRED
+  PENDING
+}
+
+model OrgAccount {
+  orgId          String           @unique
+  org            Organization     @relation(fields: [orgId], references: [id])
+  subscriptionId String
+  subscription   SubscriptionPlan @relation(fields: [subscriptionId], references: [id])
+  status         OrgAccountStatus
+  createdAt      DateTime         @default(now())
+  modifiedAt     DateTime         @updatedAt
+
+  @@unique([orgId, subscriptionId], name: "Unique_Org_Subscription")
+  @@index([orgId], map: "OrgId_OrgAccount_fkey")
+  @@index([subscriptionId], map: "subscriptionId_OrgAccount_fkey")
+}
+
+model Usage {
+  orgId        String   @unique
+  month        String   @db.VarChar(20)
+  year         String   @db.VarChar(10)
+  inputToken   Int      @default(0) @db.Integer()
+  ountputToken Int      @default(0) @db.Integer()
+  message      Int      @db.Integer()
+  createdAt    DateTime @default(now())
+  modifiedAt   DateTime @updatedAt
+
+  @@unique([orgId, month, year], name: "Unique_Org_Month_Year")
+  @@index([orgId], map: "OrgAccount_orgId_fkey")
+}
+
+enum ConversationType {
+  CALL
+  CHAT
+}
+
+enum SiteProcessStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum AgentStatus {
+  TRAINING
+  TRAININGFAILED
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+enum BotPosition {
+  BOTTOM_CENTER
+  BOTTOM_LEFT
+  BOTTOM_RIGHT
+}
+
+model Agent {
+  id String @id @default(uuid())
+
+  orgId String // Updated to String
+  org   Organization? @relation(fields: [orgId], references: [id])
+
+  name             String?          @unique @db.VarChar(100)
+  displayName      String           @db.VarChar(50)
+  usetools         Boolean          @default(true)
+  role             String?          @db.VarChar(100)
+  companyName      String           @db.VarChar(100)
+  companyBusiness  String?          @db.Text
+  companyValue     String?          @db.Text
+  purpouse         String?          @db.Text
+  leadInfo         String?          @db.Text
+  conversationType ConversationType @default(CHAT)
+  logoUrl          String?          @db.Text
+  welcomeMsg       String?          @db.Text
+  llmModel         String?          @db.VarChar(150)
+  useAssistant     Boolean          @default(false)
+  assistantId      String?          @db.VarChar(100)
+  siteObjUrl       String?          @db.Text
+  createdAt        DateTime         @default(now())
+  modifiedAt       DateTime         @updatedAt
+  status           AgentStatus      @default(TRAINING)
+  styles           String?          @db.Text
+  autoAnalysis     Boolean          @default(false)
+  wakeupTime       Float?           @default(5000)
+  position         BotPosition?     @default(BOTTOM_RIGHT)
+  sites            Site[]
+  AgentPrompt      AgentPrompt[]
+  Visitors         Visitor[]
+  Conversations    Conversation[]
+  Leads            Lead[]
+  LeadConfig       LeadConfig[]
+  AgentFiles       AgentFile[]
+  Campaigns        Campaign[]
+  Stages           Stage[]
+  Messages         ZautoMessage[]
+  Visits           Visit[]
+  CallToAction     CallToAction[]
+  starters         String?          @db.Text
+
+  @@unique([name, orgId], name: "Unique_Agent_Name_OrgId")
+  @@index([orgId], map: "OrgId_agent_fkey")
+}
+
+model AgentFile {
+  id         String   @id @default(uuid())
+  agentId    String // Updated to String
+  fileId     String?  @db.VarChar(150)
+  path       String?
+  fileName   String?
+  filePath   String?
+  size       Int?
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+  agent      Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId], map: "AgentId_agentFile_fkey")
+}
+
+model LeadConfig {
+  id         String        @id @default(uuid())
+  agentId    String // Updated to String
+  orgId      String? // Updated to String
+  name       Boolean       @default(false)
+  email      Boolean       @default(false)
+  mobile     Boolean       @default(false)
+  whatsapp   Boolean       @default(false)
+  createdAt  DateTime      @default(now())
+  modifiedAt DateTime      @updatedAt
+  agent      Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  org        Organization? @relation(fields: [orgId], references: [id])
+
+  @@index([orgId], map: "OrgId_leadconfig_fkey")
+  @@index([agentId], map: "AgentId_LeadConfig_fkey")
+}
+
+// ... and so on for the remaining models ...
+
+model Site {
+  id         String             @id @default(uuid())
+  agentId    String // Updated to String
+  orgId      String? // Updated to String
+  url        String             @db.VarChar(500)
+  status     SiteProcessStatus? @default(IN_PROGRESS)
+  info       String?            @db.Text
+  greeting   String?            @db.Text
+  createdAt  DateTime           @default(now())
+  modifiedAt DateTime           @updatedAt
+  agent      Agent              @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  org        Organization?      @relation(fields: [orgId], references: [id])
+
+  @@index([orgId], map: "OrgId_Site_fkey")
+  @@index([agentId], map: "AgentId_Site_fkey")
+}
+
+// Continue this pattern for all models in your schema.
+model AgentPrompt {
+  id         String        @id @default(uuid())
+  agentId    String // Updated to String
+  orgId      String? // Updated to String
+  templateId String?
+  type       String        @db.VarChar(50)
+  text       String        @db.Text
+  createdAt  DateTime      @default(now())
+  modifiedAt DateTime      @updatedAt
+  agent      Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  org        Organization? @relation(fields: [orgId], references: [id])
+
+  @@index([orgId], map: "Agentprompt_orgId_fkey")
+}
+
+model Visitor {
+  id String @id @default(uuid())
+
+  agentId String // Updated to String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  orgId String? // Updated to String
+  org   Organization? @relation(fields: [orgId], references: [id])
+
+  userAgent    String  @db.Text
+  infoJson     String  @db.Text
+  trackingInfo String? @db.Text
+
+  ipAddress String? @db.VarChar(40)
+
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  conversations Conversation[]
+  visits        Visit[]
+
+  @@index([orgId], map: "OrgId_visitor_fkey")
+  @@index([agentId], map: "AgentId_visitor_fkey")
+}
+
+model Visit {
+  id String @id @default(uuid())
+
+  agentId String // Updated to String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  orgId String // Updated to String
+  org   Organization @relation(fields: [orgId], references: [id])
+
+  visitorId String
+  visitor   Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+
+  count  Int    @default(1)
+  source String @default("site") @db.VarChar(50)
+
+  campaignId String?
+  campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  conversation Conversation?
+
+  @@index([orgId], map: "Visitor_orgId_fkey")
+  @@index([agentId], map: "Visitor_agentId_fkey")
+  @@index([visitorId], map: "Visitor_visitorId_fkey")
+  @@index([campaignId], map: "Visitor_campaignId_fkey")
+  @@index([source], map: "Visitor_source_key")
+}
+
+enum ConversationStatus {
+  ONLINE
+  OFFLINE
+}
+
+model Conversation {
+  id String @id @default(uuid())
+
+  orgId String
+  org   Organization? @relation(fields: [orgId], references: [id])
+
+  agentId String
+  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  visitorId String
+  visitor   Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+
+  campaignId String?   @db.VarChar(200)
+  campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  visitId String @unique
+  visit   Visit  @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  type             ConversationType
+  threadId         String?            @db.VarChar(150)
+  Lead             Lead?
+  messages         ZautoMessage[]
+  createdAt        DateTime           @default(now())
+  modifiedAt       DateTime           @updatedAt
+  summary          String?            @db.Text()
+  summaryUpdatedAt DateTime?          @db.Timestamp()
+  sentimental      Sentimental?
+  suggestions      String?            @db.Text()
+  taskList         String?            @db.Text()
+  potentialLevel   String?
+  status           ConversationStatus @default(OFFLINE)
+  socketId         String?            @unique() @db.VarChar(200)
+  assigneeId       String?
+  assignee         User?              @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+  aiSuspended      Boolean            @default(false)
+  isEnded          Boolean            @default(false)
+  isValid          Boolean            @default(false)
+
+  @@index([assigneeId], map: "assignee_Conversation_fkey")
+  @@index([orgId], map: "orgId_Conversation_fkey")
+  @@index([agentId], map: "agentId_Conversation_fkey")
+  @@index([campaignId], map: "campaignId_Conversation_fkey")
+  @@index([visitorId], map: "visitorId_Conversation_fkey")
+  @@index([visitId], map: "visitId_Conversation_fkey")
+}
+
+enum MessageMediaType {
+  TEXT
+  ACTIVITY
+  NAVIGATION
+  PAGE_ACTIVITY
+  ERROR
+  WARNING
+}
+
+enum Sentimental {
+  POSITIVE
+  NEGATIVE
+  NUTRAL
+}
+
+enum Vote {
+  UPVOTE
+  DOWNVOTE
+}
+
+model ZautoMessage {
+  id           String           @id @default(uuid())
+  org          Organization     @relation(fields: [orgId], references: [id])
+  orgId        String
+  agentId      String
+  agent        Agent            @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  conv         Conversation     @relation(fields: [convId], references: [id], onDelete: Cascade)
+  convId       String
+  role         String           @db.VarChar(20)
+  content      String?          @db.Text()
+  activityJson Json?
+  type         MessageMediaType @default(TEXT)
+  url          String?          @db.VarChar(500)
+  vote         Vote?
+  feedback     String?          @db.VarChar(256)
+  sentimental  Sentimental      @default(NUTRAL)
+  sentByHuman  Boolean          @default(false)
+  sentById     String?
+  sentBy       User?            @relation(fields: [sentById], references: [id], onDelete: SetNull)
+
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  @@index([orgId], map: "orgId_ZautoMessage_fkey")
+  @@index([convId], map: "convId_ZautoMessage_fkey")
+  @@index([sentById], map: "sentById_ZautoMessage_fkey")
+}
+
+enum LeadStatus {
+  REPORTING
+  CLOSEDWON
+  CLOSEDLOST
+}
+
+model Lead {
+  id           String     @id @default(uuid())
+  convId       String?    @unique
+  agentId      String? // Updated to String
+  orgId        String? // Updated to String
+  name         String?    @db.VarChar(50)
+  email        String?    @db.VarChar(50)
+  mobile       String?    @db.VarChar(15)
+  whatsapp     String?    @db.VarChar(15)
+  info         String?    @db.Text
+  crm_id       String?    @db.VarChar(100)
+  crmContactid String?    @unique
+  status       LeadStatus @default(REPORTING)
+
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  conversation Conversation? @relation(fields: [convId], references: [id], onDelete: SetNull)
+  Agent        Agent?        @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  org          Organization? @relation(fields: [orgId], references: [id])
+
+  LeadCategoryMap LeadCategoryMap[]
+
+  @@index([orgId], map: "orgId_Lead_fkey")
+  @@index([convId], map: "convId_Lead_fkey")
+  @@index([agentId], map: "agentId_Lead_fkey")
+}
+
+model LeadCategory {
+  id          String @id @default(uuid())
+  orgId       String
+  name        String
+  title       String
+  description String
+  color       String
+
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  LeadCategoryMap LeadCategoryMap[]
+
+  org Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, name], name: "LeadCategory_unique_orgId_name")
+  @@index([orgId], map: "orgId_LeadCategory_fkey")
+}
+
+model LeadCategoryMap {
+  orgId      String
+  leadId     String
+  categoryId String
+
+  org      Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  lead     Lead?         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  category LeadCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  @@unique([orgId, leadId, categoryId], name: "LeadCategory_unique_orgId_name")
+  @@index([orgId], map: "orgId_LeadCategoryMap_fkey")
+  @@index([leadId], map: "leadId_LeadCategoryMap_fkey")
+  @@index([categoryId], map: "categoryId_LeadCategoryMap_fkey")
+}
+
+enum ToolType {
+  RESTAPI
+  CRM
+  CALENDAR
+  COMMUNICATION
+}
+
+model Tool {
+  id   String   @id @default(uuid())
+  name String   @db.Text
+  type ToolType
+
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+}
+
+model Platform {
+  id          String        @id @default(uuid())
+  name        String        @unique @db.VarChar(100)
+  OrgPlatform OrgPlatform[]
+
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+}
+
+model OrgPlatform {
+  id         String  @id @default(uuid())
+  orgId      String? // Updated to String
+  platformId String? // Updated to String
+
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  platform Platform?     @relation(fields: [platformId], references: [id])
+  org      Organization? @relation(fields: [orgId], references: [id])
+
+  @@unique([orgId, platformId], name: "OrgPlatform_unique_orgId_platformId")
+}
+
+enum CampaignStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Campaign {
+  id            String         @id @default(uuid())
+  orgId         String
+  agentId       String
+  hash          String?
+  title         String         @db.VarChar(50)
+  description   String         @db.Text
+  source        String?
+  url           String?        @db.Text
+  isZauto       Boolean        @default(true)
+  idParam       String?
+  idValue       String?
+  isDefault     Boolean        @default(false)
+  isPaied       Boolean        @default(false)
+  status        CampaignStatus @default(ACTIVE)
+  startDate     DateTime       @default(now())
+  endDate       DateTime?      @db.Timestamp()
+  createdAt     DateTime       @default(now())
+  modifiedAt    DateTime       @updatedAt
+  organization  Organization?  @relation(fields: [orgId], references: [id])
+  agent         Agent?         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  Conversations Conversation[]
+  Visits        Visit[]
+
+  @@index([orgId], map: "orgId_Campaign_fkey")
+  @@index([agentId], map: "agentId_Campaign_fkey")
+}
+
+model Stage {
+  id          String   @id @default(uuid())
+  agentId     String?
+  orgId       String?
+  name        String   @db.VarChar(100)
+  instruction String   @db.Text
+  sequence    Int      @db.Integer()
+  canEdit     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @updatedAt
+
+  agent Agent?        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  org   Organization? @relation(fields: [orgId], references: [id])
+
+  @@unique([agentId, name], name: "Unique_Agent_Name")
+  @@unique([agentId, sequence], name: "Unique_Agent_Sequence")
+  @@index([agentId], map: "agentId_Stage_fkey")
+  @@index([orgId], map: "orgId_Stage_fkey")
+}
+
+model OpenAIAssistant {
+  id           String   @id @default(uuid())
+  assistantId  String   @unique
+  name         String   @unique @db.VarChar(100)
+  description  String   @db.VarChar(256)
+  instructions String   @db.Text()
+  createdAt    DateTime @default(now())
+  modifiedAt   DateTime @updatedAt
+}
+
+model OrgSMTPConfig {
+  id         String   @id @default(uuid())
+  orgId      String
+  host       String
+  port       Int
+  name       String
+  user       String
+  pass       String
+  isActive   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  @@index([orgId], map: "SMTPConfig_orgId_fkey")
+}
+
+enum CTAType {
+  CTA
+  NAVIGATOR
+  CALENDAR
+}
+
+model CallToAction {
+  id          String   @id @default(uuid())
+  agentId     String?
+  orgId       String?
+  name        String   @db.VarChar(100)
+  description String   @db.VarChar(256)
+  link        String?  @db.Text
+  type        CTAType? @default(NAVIGATOR)
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @updatedAt
+
+  agent Agent?        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  org   Organization? @relation(fields: [orgId], references: [id])
+
+  @@unique([agentId, name], name: "Unique_Agent_Name")
+  @@index([agentId], map: "Cta_agentId_fkey")
+  @@index([orgId], map: "Cta_orgId_fkey")
+}
+
+enum ExternalToolLevel {
+  USERLEVEL
+  ORGLEVEL
+}
+
+model ExternalTool {
+  id           String            @id @default(uuid())
+  name         String            @unique
+  type         ToolType
+  authUrl      String            @db.Text
+  tokenUrl     String            @db.Text
+  profileUrl   String            @db.Text
+  propertyUrl  String            @db.Text
+  clientId     String            @db.Text
+  clientSecret String            @db.Text
+  redirectUri  String            @db.Text
+  scope        String            @db.Text
+  level        ExternalToolLevel @default(ORGLEVEL)
+  createdAt    DateTime          @default(now())
+  modifiedAt   DateTime          @updatedAt
+  OrgTool      OrgTool[]
+}
+
+model OrgTool {
+  id           String        @id @default(uuid())
+  orgId        String
+  userId       String?
+  toolId       String
+  accessToken  String        @db.Text
+  refreshToken String?       @db.Text
+  expiresIn    Int
+  org          Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  externalTool ExternalTool  @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  createdAt    DateTime      @default(now())
+  modifiedAt   DateTime      @updatedAt
+  KeyMapping   KeyMapping[]
+
+  @@unique([orgId, toolId, userId], name: "Unique_toolId_userId")
+  @@index([orgId], map: "OAuth_orgId_fkey")
+}
+
+model KeyMapping {
+  id                String        @id @default(uuid())
+  orgId             String
+  orgToolId         String?
+  apiId             String?
+  fieldName         String
+  externalFieldName String
+  createdAt         DateTime      @default(now())
+  modifiedAt        DateTime      @updatedAt
+  org               Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  OrgTool           OrgTool?      @relation(fields: [orgToolId], references: [id], onDelete: Cascade)
+  ExternalApi       ExternalApi?  @relation(fields: [apiId], references: [id], onDelete: Cascade)
+
+  @@unique([orgToolId, fieldName, externalFieldName], name: "Unique_fieldName_externalFieldName")
+  @@unique([apiId, fieldName, externalFieldName], name: "Unique_api_fieldName_externalFieldName")
+}
+
+enum AuthType {
+  NONE
+  BASIC
+  TOKEN
+}
+
+enum HttpMethod {
+  GET
+  POST
+  PUT
+  DELETE
+  PATCH
+}
+
+model ExternalApi {
+  id          String        @id @default(uuid())
+  orgId       String
+  name        String
+  username    String?
+  password    String?
+  header      String?
+  token       String?
+  url         String
+  description String
+  method      HttpMethod
+  authType    AuthType
+  org         Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  modifiedAt  DateTime      @updatedAt
+  KeyMapping  KeyMapping[]
+}
+
+model AvailabilitySchedule {
+  id             String           @id @default(uuid())
+  orgId          String           @unique
+  availableDays  String           @db.Text
+  eventDuration  Int
+  calendarId     String?          @db.Text
+  createdAt      DateTime         @default(now())
+  modifiedAt     DateTime         @updatedAt
+  org            Organization?    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  availableHours availableHours[]
+}
+
+model availableHours {
+  id         String   @id @default(uuid())
+  orgId      String
+  start      String
+  end        String
+  scheduleId String
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  AvailabilitySchedule AvailabilitySchedule? @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,185 @@
+<div class="row mt-3">
+  <div class="col-12">
+    <div class="card shadow">
+      <div class="card-header d-flex justify-content-between">
+        <h5 class="card-title"><i class="fe fe-message-circle"></i> Conversations</h5>
+        <button class="btn btn-sm btn-outline-primary" (click)="openFilterCanvas()"><i class="fe fe-filter"></i>Filters</button>
+      </div>
+      <div class="card-body p-0">
+        <div class="row">
+          <!-- conversations -->
+          <div class="col-3 fixed-vh pe-0">
+            <ul class="zauto-container border-end h-100" #scrollContainer>
+              <ng-container *ngIf="!convList?.data">
+                <ngx-skeleton-loader count="3" [theme]="{ 'border-radius': '0', height: '80px'}"></ngx-skeleton-loader>
+              </ng-container>
+              <ng-container *ngIf="convList?.data">
+                <li class="zauto-card" *ngFor="let user of convList?.data" [ngClass]="{'active':(selectedConvo && user?.id == selectedConvo?.id)}" (click)="selectConvo(user)">
+                  <div class="row">
+                    <div class="col-2">
+                      <span class="avatar brround cover-image">
+                        <img [appProfilePicture]="user?.Lead?.name || 'New visitor'" class="avatar rounded-circle cover-image">
+                        <img class="avatar-status bg-{{user?.status =='ONLINE'?'green':'gray'}}">
+                      </span>
+                    </div>
+                    <div class="col-10">
+                      <div class="row">
+                        <div class="col-8 d-flex">
+                          <h5 class="text-truncate m-0" style="width: 80%;">{{user?.Lead?.name || "New visitor"}}</h5>
+                          <span class="badge bg-success-transparent text-success " *ngIf="user?.Lead">Lead</span>
+                        </div>
+                        <div class="col-4">
+                          <div class="text-muted small">{{user?.modifiedAt | moment}}</div>
+                        </div>
+                      </div>
+                      <div class="text-truncate text-muted"><i class="fe fe-award"></i> {{user?.campaign?.title || '---'}}</div>
+                      <div class="row">
+                        <div class="col-10 d-flex justify-content-start">
+                          <div class="text-truncate text-muted w-50"><i class="fe fe-map-pin"></i> {{jsonParser(user?.visitor?.trackingInfo)?.city}},{{jsonParser(user?.visitor?.trackingInfo)?.country_code}}, </div>
+                          <div class="text-truncate text-muted w-50"> <i class="fa fa-{{getPlatformIcon(user?.visit?.source).icon}}"></i> {{user?.visit?.source}}</div>
+                        </div>
+    
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ng-container>
+              
+            </ul>
+          </div>
+          <!-- chat container -->
+          <div class="col-5 fixed-vh p-0">
+            <div class="card h-100 border-0">
+              <div class="card-header">
+                <ng-container *ngIf="selectedConvo">
+                  <div class="d-flex justify-content-between w-100">
+                    <!-- profile and name -->
+                    <div class="d-flex">
+                      <div class="me-2">
+                        <span class="avatar brround cover-image">
+                          <img [appProfilePicture]="selectedConvo?.Lead?.name || 'New visitor'" class="avatar rounded-circle cover-image">
+                          <img class="avatar-status bg-{{selectedConvo?.status =='ONLINE'?'green':'gray'}}">
+                        </span>
+                      </div>
+                      <div>
+                        <h4 class="m-0">{{selectedConvo?.Lead?.name || 'New visitor'}}</h4>
+                        <div class="text-muted">{{selectedConvo?.campaign?.title || '----'}}</div>
+                      </div>
+                    </div>
+                    <!-- lead tag -->
+                    <div class="my-auto">
+                      <span class="badge bg-success-transparent text-success fs-6" *ngIf="selectedConvo?.Lead">Lead</span>
+                    </div>
+                    <!-- date and time -->
+                    <div class="text-muted my-auto"><b>Last seen :</b> {{selectedConvo?.modifiedAt | moment}}</div>
+                  </div>
+                </ng-container>
+              </div>
+              <div class="card-body h-75 p-0">
+                <app-chat-container (onGetConversation)="onGetConversation($event)"></app-chat-container>
+              </div>
+            </div>
+          </div>
+          <!-- summary container -->
+          <div class="col-4 fixed-vh ps-0">
+            <div class="left-line h-100">
+              <app-summary-container [data]="selectedConvo"></app-summary-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- filter canvas -->
+<ng-template #filterOffcanvas let-offcanvas>
+  <div class="offcanvas-header">
+    <h4 class="offcanvas-title"><i class="fe fe-filter"></i> Filters</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+  </div>
+  <hr class="m-0">
+  <div class="offcanvas-body">
+    <div class="d-flex mb-4">
+      <!-- Online only -->
+      <div class="d-flex me-3">
+        <label class="custom-control custom-checkbox mb-0">
+          <input type="checkbox" name="online-only" [checked]="onlineOnly" [(ngModel)]="onlineOnly"
+            class="custom-control-input">
+          <span class="custom-control-label">Online only</span>
+        </label>
+      </div>
+      <!-- Online only -->
+      <div class="d-flex me-3">
+        <label class="custom-control custom-checkbox mb-0">
+          <input type="checkbox" name="lead-only" [checked]="leadOnly" [(ngModel)]="leadOnly"
+            class="custom-control-input">
+          <span class="custom-control-label">Lead only</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Campaign -->
+    <div class="mb-3">
+      <label for="campaigns">Campaign</label>
+      <ng-select id="campaigns" [items]="campaigns" [(ngModel)]="selectedCampaign" bindLabel="title"
+        (change)="onFilterChange($event)">
+        <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
+          <div class="">
+            <div class="row">
+              <div class="col-6">
+                <h5 class="card-title mb-1">{{item?.title}}</h5>
+                <h6 class="mb-2 text-muted  text-truncate">{{item?.description}}</h6>
+              </div>
+              <div class="col-6 d-flex justify-content-end">
+                <div>
+                  <span class="badge badge-success" *ngIf="item?.status == 'ACTIVE'">ACTIVE</span>
+                  <span class="badge badge-danger" *ngIf="item?.status == 'INACTIVE'">INACTIVE</span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <b>Start date: </b>
+                {{item?.startDate | date:'dd/MM/yyyy'}}
+              </div>
+              <div class="col-6 d-flex justify-content-end">
+                <b>End date: </b>
+                {{item?.endDate | date:'dd/MM/yyyy'}}
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </ng-select>
+    </div>
+
+    <!-- Date range -->
+    <div class="">
+      <label for="">From date - To date</label>
+      <app-date-range-selection [value]="selectedDates"
+        (datesEvent)="onFilterDateChange($event)"></app-date-range-selection>
+    </div>
+
+
+
+    <button class="btn btn-primary btn-block" (click)="applyFilter()">Apply</button>
+  </div>
+</ng-template>
+
+<!-- tooltip templates -->
+<ng-template #popContentCamp>
+  <ng-container *ngIf="selectedCampaign">
+    <b>Title: </b>{{selectedCampaign?.title}}<br>
+    <b>Start date: </b>{{selectedCampaign?.startDate | date:'dd/MM/yyyy'}}<br>
+    <b>End date: </b>{{selectedCampaign?.endDate | date:'dd/MM/yyyy'}}
+  </ng-container>
+</ng-template>
+
+<ng-template #popContentDate>
+  <ng-container *ngIf="selectedDates">
+    <b>Start date: </b>{{selectedDates?.fromDate | date:'dd/MM/yyyy'}}<br>
+    <b>End date: </b>{{selectedDates?.toDate | date:'dd/MM/yyyy'}}
+  </ng-container>
+</ng-template>
+

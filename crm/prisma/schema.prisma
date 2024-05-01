@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DataType {
+  STRING
+  NUMBER
+  BOOLEAN
+  JSON
+}
+
+enum FieldType {
+  TEXT
+  TEXTAREA
+  EMAIL
+  NUMBER
+}
+
+enum CustomFieldParent {
+  CONTACT
+  ACCOUNT
+  ABM
+}
+
+model Info {
+  id         String   @id @default(uuid())
+  orgId      String   @unique
+  orgName    String
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+}
+
+model Tag {
+  id          String       @id @default(uuid())
+  name        String
+  title       String?
+  description String?
+  createdAt   DateTime     @default(now())
+  modifiedAt  DateTime     @updatedAt
+  contactTag  ContactTag[]
+
+  @@map("Tags")
+}
+
+model Contact {
+  id                       String                    @id @default(uuid())
+  photoUrl                 String?
+  fullName                 String?
+  firstName                String?
+  lastName                 String?
+  jobTitle                 String?
+  organizationName         String?
+  email                    String?                   @unique
+  phone                    String?
+  address                  String?
+  city                     String?
+  state                    String?
+  zip                      String?
+  country                  String?
+  website                  String?
+  socialMedia              Json?
+  notes                    String?
+  leadSource               String?
+  status                   String?
+  createdAt                DateTime                  @default(now())
+  modifiedAt               DateTime                  @updatedAt
+  contactTag               ContactTag[]
+  contactCustomFieldValues ContactCustomFieldValue[]
+}
+
+model ContactTag {
+  contact    Contact  @relation(fields: [contactId], references: [id])
+  contactId  String
+  tag        Tag      @relation(fields: [tagId], references: [id])
+  tagId      String
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+
+  @@id([contactId, tagId])
+}
+
+model ContactCustomFieldValue {
+  id            String      @id @default(uuid())
+  contact       Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  contactId     String
+  customField   CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+  customFieldId String
+  value         String
+}
+
+model CustomField {
+  id                       String                    @id @default(uuid())
+  name                     String
+  key                      String                    @unique
+  dataType                 DataType                  @default(STRING)
+  customFieldParent        CustomFieldParent
+  createdAt                DateTime                  @default(now())
+  modifiedAt               DateTime                  @updatedAt
+  contactCustomFieldValues ContactCustomFieldValue[]
+
+  @@unique([key, customFieldParent])
+}
+
+model LeadForm {
+  id            String          @id @default(uuid())
+  title         String
+  description   String?
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  modifiedAt    DateTime        @updatedAt
+  LeadFormField LeadFormField[]
+}
+
+model LeadFormField {
+  id           String    @id @default(uuid())
+  label        String
+  type         FieldType @default(TEXT)
+  contactField String
+  isRequired   Boolean   @default(true)
+  form         LeadForm  @relation(fields: [leadFormId], references: [id], onDelete: Cascade)
+  leadFormId   String
+  createdAt    DateTime  @default(now())
+  modifiedAt   DateTime  @updatedAt
+
+  @@unique([leadFormId, contactField])
+}
+
+enum accountType {
+  CUSTOMER
+  PROSPECT
+  PARTNER
+}
+
+model Account {
+  id              String       @id @default(uuid())
+  parentAccountId String?
+  photoUrl        String?
+  accountName     String
+  industry        String?
+  companySize     Int?
+  annualRevenue   Float?
+  accountType     accountType?
+  website         String?
+  address         String?
+  city            String?
+  state           String?
+  zip             String?
+  country         String?
+  phone           String?
+  email           String?
+  socialMedia     Json?
+  notes           String?
+  source          String?
+  status          String?
+  createdAt       DateTime     @default(now())
+  modifiedAt      DateTime     @updatedAt
+  parentAccount   Account?     @relation("ParentAccount", fields: [parentAccountId], references: [id])
+  subAccounts     Account[]    @relation("ParentAccount")
+}
+
+model AccountBasedMarketingTarget {
+  id                   String   @id @default(uuid())
+  photoUrl             String?
+  targetAccountName    String
+  industry             String
+  accountSize          String?
+  revenuePotential     Float?
+  decisionMakers       String[]
+  painPoints           String[]
+  buyingStage          String?
+  campaigns            String[]
+  teamMembers          String[]
+  createdAt            DateTime @default(now())
+  modifiedAt           DateTime @updatedAt
+}

@@ -1,0 +1,14 @@
+<div class="card shadow-sm h-100" >
+    <div class="card-header">
+        <h5 class="card-title">{{title}}</h5>
+    </div>
+    <div class="card-body">
+        <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart"
+                    [xaxis]="chartOptions.xaxis" [dataLabels]="chartOptions.dataLabels" [grid]="chartOptions.grid"
+                    [stroke]="chartOptions.stroke">
+        </apx-chart>
+    </div>
+</div>
+<ng-container *ngIf="isLoading">
+    <ngx-skeleton-loader count="1" [theme]="{ 'border-radius': '10px', height: '24rem'}"></ngx-skeleton-loader>
+</ng-container>

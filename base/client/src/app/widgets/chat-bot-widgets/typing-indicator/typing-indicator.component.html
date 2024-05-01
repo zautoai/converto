@@ -1,0 +1,9 @@
+<div class="d-flex justify-content-start">
+    <div class="msg_img">
+        <img [src]="avatar?.logoUrl ||GLOBAL_IMAGES.default_avatar_image" class="rounded-circle user_img_msg" alt="avatar">
+    </div>
+    <div class="msg_cotainer mt-5 start pb-0">
+        <div [ngStyle]="{ 'font-size.px': fontSize }"><i [appMarkdown]="typingText" [animationSpeed]="50"></i></div>
+    </div>
+
+</div>

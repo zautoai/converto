@@ -1,0 +1,144 @@
+
+  <div class="row mt-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fe fe-eye commonClass text-primary"></i> Visitors
+          </h3>
+        </div>
+        <div class="card-body p-0">
+          <div class="row p-0">
+            <div class="col-lg-3 m-0 pe-0">
+              <ul class="scroll-container-v fixed-vh right-line" #scrollContainer >
+                <ng-container *ngIf="!visitersList.data">
+                  <li>
+                    <ngx-skeleton-loader count="5" [theme]="{'border-radius': '0', height: '50px'}"></ngx-skeleton-loader>
+                  </li>
+                </ng-container>
+                <ng-container *ngIf="visitersList?.data">
+                  <li class="zauto-card" *ngFor="let visitor of visitersList.data" (click)="selectVisitor(visitor)"
+                  [ngClass]="{'active':(selectedVisitor && selectedVisitor?.id == visitor?.id)}">
+                    <div class="row">
+                      <div class="col-6">
+                        <div><i class="fe fe-map-pin"></i> {{jsonParse(visitor?.trackingInfo)?.city || '---'}}, {{jsonParse(visitor?.trackingInfo)?.country_name || '---'}}
+                          <img *ngIf="jsonParse(visitor?.trackingInfo)?.flag" src="{{jsonParse(visitor?.trackingInfo)?.flag}}" alt="flag"
+                                width="15">
+                        </div>
+                      </div>
+                      <div class="col-6 d-flex justify-content-end">
+                        <div>{{visitor?.createdAt| moment}}</div>
+                      </div>
+                    </div>
+                  </li>
+                </ng-container>
+              </ul>
+            </div>
+            <div class="col-lg-9 m-0">
+              <ng-container *ngIf="selectedVisitor">
+                <div class="fixed-vh d-flex">
+                  <div class="w-50 right-line scroll-container-v h-100">
+                    <ng-container *ngIf="isVisitorLoading">
+                      <table class="table table-borderless">
+                        <tbody>
+                          <tr>
+                            <td><ngx-skeleton-loader [theme]="{width:'30%'}"></ngx-skeleton-loader></td>
+                            <td><ngx-skeleton-loader [theme]="{width:'60%'}"></ngx-skeleton-loader></td>
+                          </tr>
+                          <tr>
+                            <td><ngx-skeleton-loader [theme]="{width:'40%'}"></ngx-skeleton-loader></td>
+                            <td><ngx-skeleton-loader [theme]="{width:'75%'}"></ngx-skeleton-loader></td>
+                          </tr>
+                          <tr>
+                            <td><ngx-skeleton-loader [theme]="{width:'55%'}"></ngx-skeleton-loader></td>
+                            <td><ngx-skeleton-loader [theme]="{width:'45%'}"></ngx-skeleton-loader></td>
+                          </tr>
+                          <tr>
+                            <td><ngx-skeleton-loader [theme]="{width:'70%'}"></ngx-skeleton-loader></td>
+                            <td><ngx-skeleton-loader [theme]="{width:'35%'}"></ngx-skeleton-loader></td>
+                          </tr>
+                          <tr>
+                            <td><ngx-skeleton-loader [theme]="{width:'20%'}"></ngx-skeleton-loader></td>
+                            <td><ngx-skeleton-loader [theme]="{width:'90%'}"></ngx-skeleton-loader></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </ng-container>
+                    <ng-container *ngIf="!isVisitorLoading">
+                      <div class="p-2">
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <td><b>City :</b></td>
+                              <td>{{jsonParse(selectedVisitor?.trackingInfo)?.city || '---'}}</td>
+                            </tr>
+                            <tr>
+                              <td><b>Region :</b></td>
+                              <td>{{jsonParse(selectedVisitor?.trackingInfo)?.region || '---'}}</td>
+                            </tr>
+                            <tr>
+                              <td><b>Country :</b></td>
+                              <td>{{jsonParse(selectedVisitor?.trackingInfo)?.country_name || '---'}} 
+                                <img *ngIf="jsonParse(selectedVisitor?.trackingInfo)?.flag" src="{{jsonParse(selectedVisitor?.trackingInfo)?.flag}}" alt="flag"
+                                width="20"></td>
+                            </tr>
+                            <tr>
+                              <td><b>Time zone :</b></td>
+                              <td>{{jsonParse(selectedVisitor?.trackingInfo)?.time_zone?.name || '---'}}</td>
+                            </tr>
+                            <tr>
+                              <td><b>Time offset :</b></td>
+                              <td>{{jsonParse(selectedVisitor?.trackingInfo)?.time_zone?.offset || '---'}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <div class="card" style="background-color: #8080ff2d;">
+                          <div class="card-body">
+                            <h5>Total visit count : {{sumOfCounts(selectedVisitor?.visits)}}</h5>
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                  <div class="w-50 scroll-container-v h-100">
+                    <ul class="p-2">
+                      <ng-container *ngIf="isVisitorLoading">
+                        <ngx-skeleton-loader count="3" [theme]="{'border-radius':'20px',height:'80px'}"></ngx-skeleton-loader>
+                      </ng-container>
+                      <ng-container *ngIf="!isVisitorLoading">
+                        <li *ngFor="let visit of selectedVisitor?.visits">
+                          <div class="card" style="background-color: #8080ff2d;">
+                            <div class="card-body p-3">
+                              <div class="row">
+                                <div class="col-5 text-truncate">
+                                  <i class="fa fa-{{getPlatformIcon(visit?.source).icon}}"></i> {{visit?.source || '---'}} <br>
+                                  <i class="fe fe-award"></i> {{visit?.campaign?.title || '---'}}
+                                </div>
+                                <div class="col-5 text-truncate">
+                                  <div class="my-3">
+                                    {{visit?.createdAt | date:'dd/MM/yyyy hh:mm a'}}
+                                  </div>
+                                </div>
+                                <div class="col-2 text-truncate text-center">
+                                  <h4 class="my-3">{{visit?.count || 'NA'}}</h4>
+                                </div>
+                              </div>
+                            </div>
+                          </div> 
+                        </li>
+                      </ng-container>
+                    </ul>
+                  </div>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="!selectedVisitor">
+                <div class="h-100 d-flex justify-content-center align-items-center">
+                  <span class="text-muted">Select vititor for more details</span>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

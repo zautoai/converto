@@ -1,0 +1,26 @@
+<ng-container *ngIf="showLoader">
+    <ngx-skeleton-loader count="1" [theme]="{'border-radius': '10px', height: '400%'}"></ngx-skeleton-loader>
+</ng-container>
+<ng-container *ngIf="!showLoader">
+    <div class="card shadow" style="height: 97%;">
+        <div class="card-header border-bottom">
+            <h5 class="card-title"><i class="fe fe-{{icon}}"></i> {{title}}</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-scroll">
+                <li class="clearfix row mb-3 mx-0" *ngFor="let item of listData">
+                    <div class="col-10">
+                        <div class="float-start text-truncate">
+                            <h5 class="mb-0 "><i class="fa fa-{{getPlatformIcon(item?.source).icon}}"></i> {{item?.source}}</h5>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="float-end">
+                            <h5 class="font-weight-bold mb-0 text-primary">{{item?.count}}</h5>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</ng-container>

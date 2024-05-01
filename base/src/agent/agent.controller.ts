@@ -1,0 +1,354 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, HttpCode, Req, Header, UnauthorizedException, UseInterceptors, HttpException, HttpStatus, UploadedFile, ConflictException, NotFoundException } from '@nestjs/common';
+import { AgentService } from './agent.service';
+import { UpdateAgentDto } from './dto/update-agent.dto';
+import { Agent } from './entities/agent.entity';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ResponseDTO } from 'src/common/dto/response.dto';
+import { NameAvailability, NameCheckDto } from './dto/namecheck.dto';
+import { SYSTEM_CONST, ZAUTO_ORG } from 'src/common/constants/system.constants';
+import { Roles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { extname } from 'path';
+import { diskStorage } from 'multer';
+import { ZautoRequest } from 'src/common/models/request.model';
+import * as sharp from 'sharp';
+import { Multer } from 'multer';
+import { StaticFileService } from 'src/common/services/static.service';
+import { VisitorService } from 'src/visitor/visitor.service';
+import { SourceQuery } from './entities/source.entity';
+import { CreateAvatarDto } from './dto/create-avatar.dto';
+import { AvatarQueueService } from './worker/avatar-queue.service';
+import { IPTrackingService } from 'src/common/services/iptracking.service';
+import { OrganizationsService } from 'src/organizations/organizations.service';
+import { DemandGenService } from 'src/demand-gen/demand-gen.service';
+import { TrackingDto } from './dto/tracking.dto';
+import { TrackingService } from './tracking.service';
+
+@ApiTags('Agents')
+@Controller('api/agents')
+export class AgentController {
+  
+  constructor(private readonly agentsService: AgentService,
+    private readonly staticService: StaticFileService,
+    private readonly visitorService: VisitorService,
+    private readonly queueService: AvatarQueueService, 
+    private readonly iptrackingService: IPTrackingService,
+    private readonly orgService: OrganizationsService,
+    private readonly demandGenService: DemandGenService,
+    private readonly trackingService:TrackingService) {}
+
+    async addVisitor(agentId: string, query: any, request: Request, orgId?: string) {
+      try {
+        let visitor = await this.visitorService.findById(query.visitor)
+        if(!visitor) {
+          const ipaddress = request.headers['x-forwarded-for'];
+          console.log(ipaddress)
+          const ipData = await this.iptrackingService.getIPData(ipaddress);
+          const headers = request.headers;
+          delete headers['Authorization']
+          delete headers['Proxy-Authorization']
+          const visitorObj = {
+            agentId: agentId,
+            infoJson: JSON.stringify(headers),
+            userAgent: headers['user-agent'],
+            orgId: orgId,
+            ipAddress: ipaddress,
+            trackingInfo: JSON.stringify(ipData)
+          };
+          visitor = await this.visitorService.create(visitorObj, orgId);
+        } 
+        if(!query.utm_campaign && Object.keys(query).length > 1){
+          const thirdPartyCampaign = await this.demandGenService.processCampaign(orgId,agentId,query);
+          if(thirdPartyCampaign)
+          {
+            query.utm_campaign = thirdPartyCampaign.id;
+          }
+        }
+        
+        if(!query.utm_campaign && Object.keys(query).length > 1) {
+          const campaign = await this.agentsService.getCampaignByParam(orgId, Object.keys(query), query);
+          if(campaign) {
+            query.utm_campaign = campaign.id
+          }
+        }
+        if(!query.utm_campaign) {
+          const defaultCampign = await this.agentsService.getDefaultCampaign(orgId);
+          query.utm_campaign = defaultCampign.id
+        }
+        const visit = await this.visitorService.createOrUpdateVisit({
+          orgId: orgId,
+          agentId: agentId,
+          campaignId: query.utm_campaign,
+          source: query.source,
+          visitorId: visitor.id
+        });
+        return {
+          visit,
+          visitor
+        }
+        
+      } catch(error) {
+        console.error(error)
+      }
+    }
+
+  // @Post()
+  // @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @ApiBearerAuth()
+  // @ApiBody({ type: CreateAgentDto })
+  // @ApiCreatedResponse({type: Agent})
+  // async create(@Body() createAgentDto: CreateAgentDto, @Req() zautoRequest: ZautoRequest) {
+  //   if(zautoRequest.user && zautoRequest.user.org) {
+  //     createAgentDto.orgId = zautoRequest.user.org.id;
+  //     return await this.agentsService.create(createAgentDto);
+  //   } else throw new UnauthorizedException('Unauthorised access.')
+  // }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiQuery({ name: 'page', description: 'Page number.', required: false })
+  @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
+  @ApiOkResponse({
+    type: ResponseDTO<Agent>
+  })
+  async findAll(@Query() paginationDto: PaginationDto, @Req() zautoRequest: ZautoRequest) {
+    if(zautoRequest.user && zautoRequest.user.org && zautoRequest.user.org.name == ZAUTO_ORG) {
+      console.log(zautoRequest.user.org.name)
+      return await this.agentsService.findAll(paginationDto);
+    } else {
+      return await this.agentsService.findAllByOrg(paginationDto, zautoRequest.user.org.id);
+    }
+  }
+
+  @Get(':id')
+  @ApiQuery({ name: 'source', description: 'Source of the visit', required: false })
+  @ApiQuery({ name: 'campaign', description: 'Campaign for the visit', required: false })
+  @ApiOkResponse({
+    type: Agent
+  })
+  async findOne(@Query() sourceQuery: any, @Param('id') id: string, @Req() request: Request) {
+    const agent = await this.agentsService.findOne(id);
+    if(sourceQuery.source) {
+      const visitorData = await this.addVisitor(id, sourceQuery, request, agent.orgId);
+      return {
+        ...agent, visitor: visitorData.visitor, visit: visitorData.visit, 
+      }
+    } else return agent;
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: UpdateAgentDto })
+  @ApiOkResponse({type: Agent})
+  async update(@Param('id') id: string, @Body() updateAgentDto: UpdateAgentDto) {
+    return await this.agentsService.update(id, updateAgentDto);
+  }
+
+  @Patch(':id/styles')
+  @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: UpdateAgentDto })
+  @ApiOkResponse({type: Agent})
+  async updateStyle(@Param('id') id: string, @Body() stylesObj: any) {
+    return await this.agentsService.updateStyles(id, stylesObj);
+  }
+
+  @Patch(':id/leadInfo')
+  @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: UpdateAgentDto })
+  @ApiOkResponse({type: Agent})
+  async updateLeadInfo(@Param('id') id: string, @Body() leadInfoObj: any) {
+    return await this.agentsService.updateLeadInfo(id, leadInfoObj.leadInfo);
+  }
+
+  @Patch(':id/starters')
+  @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: UpdateAgentDto })
+  @ApiOkResponse({type: Agent})
+  async updateStarters(@Param('id') id: string, @Body() startersObj: any) {
+    return await this.agentsService.updateStarters(id, startersObj.starters);
+  }
+
+  @Delete(':id')
+  @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiNoContentResponse()
+  @HttpCode(204)
+  async remove(@Param('id') id: string) {
+    return await this.agentsService.remove(id);
+  }
+
+  @Post('availability')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: NameCheckDto })
+  @ApiOkResponse({type: NameAvailability})
+  async isNameAvailable(@Body() nameCheckDto: NameCheckDto) {
+    const isExist = await this.agentsService.isNameExists(nameCheckDto.name);
+    return new NameAvailability(nameCheckDto.name, !isExist);
+  }
+
+  @Post(':id/logo')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './public/images',
+      filename: (req, file, callback) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = extname(file.originalname.toLowerCase());
+        callback(null, `${file.fieldname}-${uniqueSuffix}${extension}`);
+      },
+    }),
+    fileFilter: (req, file, callback) => {
+      // Filtering the file to be an image
+      if (!file.originalname.match(/\.(jpg|jpeg|png|gif|PNG)$/)) {
+        return callback(new HttpException('Only image files are allowed!', HttpStatus.BAD_REQUEST), false);
+      }
+      callback(null, true);
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
+    },
+  }))
+  async uploadProfilePic(@UploadedFile() file: Multer.File, @Param('id') id: string) { 
+    try {
+      // Use sharp to compress and optionally resize the image
+      const outputPath = `./public/images/compressed-${file.filename}`;
+      await sharp(file.path)
+        .resize(800) // Resize to width of 800 pixels, maintaining aspect ratio
+        .toFormat('jpeg') // Convert to JPEG for compression
+        .jpeg({ quality: 50 }) // Set the quality of the image
+        .toFile(outputPath);
+
+      await this.staticService.deleteExistingFile(file.path);
+      const imgUrl = `${process.env.HOST_URL}/images/compressed-${file.filename}`
+      await this.agentsService.updateLogo(id, imgUrl);
+
+      return {
+        message: 'File uploaded and compressed successfully.',
+        file: {
+          originalName: file.originalname,
+          filename: file.filename,
+          size: file.size,
+          mimeType: file.mimetype,
+          path: imgUrl,
+        },
+      };
+    } catch (error) {
+      console.error(error);
+      
+      throw new HttpException('Error processing image', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post("launchAvatar")
+  @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: CreateAvatarDto })
+  @ApiCreatedResponse({type: Agent})
+  async launchAvatar(@Body() createAvatarDto: CreateAvatarDto, @Req() zautoRequest: ZautoRequest) {
+    if(zautoRequest.user && zautoRequest.user.org) {
+      const avatarName = createAvatarDto.displayName.replaceAll(" ", "_").toLowerCase().trim();
+      const avatarExists = await this.agentsService.isNameExists(avatarName);
+      if(avatarExists) {
+        throw new ConflictException('Avatar Name already taken.');
+      } else {
+        const org = await this.orgService.updateOrgWith(zautoRequest.user.org.id, createAvatarDto.companyName, createAvatarDto.companySite);
+        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.user.org.id);
+        if(orgAvatar) {
+          throw new ConflictException('Avatar already launched. Only one avatar can be created per Organization.');
+        }
+        const avatar = await this.agentsService.launchAvatarWithAssistant(createAvatarDto, zautoRequest.user.org.id as string);
+        await this.queueService.addTaskToQueue({
+          name: 'launchAvatar',
+          id: avatar.id,
+          dto: createAvatarDto,
+          org: org,
+        });
+        return avatar;
+      }
+      
+    } else throw new UnauthorizedException('Unauthorised access.')
+  }
+
+  @Get("retryAvatarLaunch")
+  @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiCreatedResponse({type: Agent})
+  async retryAvatarLaunch(@Req() zautoRequest: ZautoRequest) {
+    if(zautoRequest.user && zautoRequest.user.org) {
+      const org = await this.orgService.findOne(zautoRequest.user.org.id);
+      if(org) {
+        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.user.org.id);
+        if(orgAvatar) {
+          const createAvatarDto  = {
+            displayName: orgAvatar.displayName,
+            companyName: org.name,
+            companySite: org.siteUrl
+          }
+          await this.agentsService.remove(orgAvatar.id);
+          const avatar = await this.agentsService.launchAvatarWithAssistant(createAvatarDto, zautoRequest.user.org.id as string);
+          await this.queueService.addTaskToQueue({
+            name: 'launchAvatar',
+            id: avatar.id,
+            dto: createAvatarDto,
+            org: zautoRequest.user.org,
+          });
+          return avatar;
+        }
+        
+      } else throw new NotFoundException('Organization not found.');
+    } else throw new UnauthorizedException('Unauthorised access.')
+  }
+
+  @Get('widget/:agentId')
+  @Header('Content-Type', 'application/javascript')
+  async embedding(@Param('agentId') agentId: string)
+  {
+    if(agentId.includes('.js'))
+    {
+      agentId = agentId.replace('.js','');
+      return await this.agentsService.getEmbedding(agentId);
+    }
+    else
+    {
+      throw new NotFoundException("Agent not found");
+    }
+  }
+
+  @Get('widget/standalone/:agentId')
+  @Header('Content-Type', 'application/javascript')
+  async standaloneEmbedding(@Param('agentId') agentId: string)
+  {
+    if(agentId.includes('.js'))
+    {
+      agentId = agentId.replace('.js','');
+      return await this.agentsService.getEmbedding(agentId,true);
+    }
+    else
+    {
+      throw new NotFoundException("Agent not found");
+    }
+  }
+
+  @Post(':agentId/track/:convId')
+  async websiteTracking(@Param('agentId') agentId: string,@Param('convId') convId: string,@Body() trackingDto:TrackingDto)
+  {
+    return await this.trackingService.addTracking(agentId, convId, trackingDto);
+  }
+}

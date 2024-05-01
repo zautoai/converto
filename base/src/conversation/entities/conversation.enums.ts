@@ -1,0 +1,10 @@
+
+
+export enum MessageMediaType {
+    TEXT='TEXT',
+    ACTIVITY='ACTIVITY',
+    NAVIGATION='NAVIGATION',
+    PAGE_ACTIVITY='PAGE_ACTIVITY',
+    ERROR='ERROR',
+    WARNING='WARNING'
+}

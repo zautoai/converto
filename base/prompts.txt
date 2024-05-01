@@ -1,0 +1,13 @@
+Company Info.
+--------------
+
+Provide Following information in the given  json formate from the user provided website link
+{
+companyName:  Name of the company
+companyBusiness:  What business the company is doing  as a detailed summary
+company Value: What value the company is giving as  a detailed summary
+contactInfo: {
+  email: email id of the company
+  phone: phone number of the company, if multiple then it should be array of string
+}
+}

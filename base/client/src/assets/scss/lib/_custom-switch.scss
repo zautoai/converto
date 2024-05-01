@@ -1,0 +1,216 @@
+.custom-switch {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	-ms-flex-align: center;
+	align-items: center;
+	margin: 0;
+}
+
+.custom-switch-input {
+	position: absolute;
+	z-index: -1;
+	opacity: 0;
+}
+
+.custom-switches-stacked {
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-direction: column;
+	flex-direction: column;
+
+	.custom-switch {
+		margin-bottom: .5rem;
+	}
+}
+
+.custom-switch-indicator {
+	display: inline-block;
+	height: 1.25rem;
+	width: 2.25rem;
+	background: #e9ecef;
+	border-radius: 50px;
+	position: relative;
+	vertical-align: bottom;
+	border: 1px solid $border;
+	transition: .3s border-color, .3s background-color;
+
+	&:before {
+		content: '';
+		position: absolute;
+		height: calc(1.25rem - 4px);
+		width: calc(1.25rem - 4px);
+		top: 1px;
+		left: 1px;
+		background: #fff;
+		border-radius: 50%;
+		transition: .3s left;
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+	}
+}
+
+.custom-switch-input {
+	&:checked~.custom-switch-indicator:before {
+		left: calc(1rem + 1px);
+	}
+
+	&:focus~.custom-switch-indicator {
+		box-shadow: 0 0 0 2px rgba(98, 58, 162, 0.25);
+		border-color: $primary;
+	}
+}
+
+.custom-switch-description {
+	margin-left: .5rem;
+	color: #6e7687;
+	transition: .3s color;
+}
+
+.custom-switch-input:checked~.custom-switch-description {
+	color: #495057;
+}
+
+.custom-switch {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	-ms-flex-align: center;
+	align-items: center;
+	margin: 0;
+}
+
+.custom-switch-input {
+	position: absolute;
+	z-index: -1;
+	opacity: 0;
+}
+
+.custom-switches-stacked {
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-direction: column;
+	flex-direction: column;
+
+	.custom-switch {
+		margin-bottom: .5rem;
+	}
+}
+
+.custom-switch-indicator {
+	display: inline-block;
+	height: 1.25rem;
+	width: 2.25rem;
+	background: #e9ecef;
+	border-radius: 50px;
+	position: relative;
+	vertical-align: bottom;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	transition: .3s border-color, .3s background-color;
+
+	&:before {
+		content: '';
+		position: absolute;
+		height: calc(1.25rem - 4px);
+		width: calc(1.25rem - 4px);
+		top: 1px;
+		left: 1px;
+		background: #fff;
+		border-radius: 50%;
+		transition: .3s left;
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+	}
+}
+
+.custom-switch-input {
+	&:checked~.custom-switch-indicator:before {
+		left: calc(1rem + 1px);
+	}
+
+	&:focus~.custom-switch-indicator {
+		box-shadow: none;
+	}
+}
+
+.custom-switch-description {
+	margin-left: .5rem;
+	color: #6e7687;
+	transition: .3s color;
+}
+
+.custom-switch-input:checked~.custom-switch-description {
+	color: #495057;
+}
+
+.custom-switch-indicator-lg {
+    display: inline-block;
+    height: 1.5rem;
+    width: 3rem;
+    background: #e9ecef;
+    border-radius: 50px;
+    position: relative;
+    vertical-align: bottom;
+    border: 1px solid $border;
+    transition: .3s border-color, .3s background-color;
+
+    &:before {
+        content: '';
+        position: absolute;
+        height: calc(1.5rem - 4px);
+        width: calc(1.5rem - 4px);
+        top: 1px;
+        left: 1px;
+        background: $white;
+        border-radius: 50%;
+        transition: .3s left;
+        box-shadow: 0 1px 2px 0 $black-4;
+    }
+}
+
+.custom-switch-input:checked~.custom-switch-indicator-lg:before {
+    left: calc(1.46rem + 1px);
+}
+
+.custom-switch-indicator-xl {
+    display: inline-block;
+    height: 2rem;
+    width: 4rem;
+    background: #e9ecef;
+    border-radius: 50px;
+    position: relative;
+    vertical-align: bottom;
+    border: 1px solid $border;
+    transition: .3s border-color, .3s background-color;
+
+    &:before {
+        content: '';
+        position: absolute;
+        height: calc(2rem - 4px);
+        width: calc(2rem - 4px);
+        top: 1px;
+        left: 1px;
+        background: $white;
+        border-radius: 50%;
+        transition: .3s left;
+        box-shadow: 0 1px 2px 0 $black-4;
+    }
+}
+
+.custom-switch-input:checked~.custom-switch-indicator-xl:before {
+    left: calc(1.96rem + 1px) !important;
+}
+
+.custom-square, .custom-square:before {
+    border-radius: 0px !important;
+}
+
+.custom-radius, .custom-radius:before {
+    border-radius: 4px !important;
+}

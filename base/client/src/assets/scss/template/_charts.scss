@@ -1,0 +1,280 @@
+/*------ Charts styles ------*/
+
+.chart-visitors {
+	min-height: 18rem;
+	overflow: hidden;
+}
+
+.chart-tasks {
+	height: 15rem;
+	overflow: hidden;
+}
+
+.chart-donut {
+	height: 21rem;
+	overflow: hidden;
+}
+
+.chart-pie {
+	height: 14.7rem;
+	overflow: hidden;
+}
+
+.chartsh {
+	height: 16rem;
+	overflow: hidden;
+}
+
+.chartwidget {
+	height: 17rem;
+	overflow: hidden;
+}
+
+.chart {
+	position: relative;
+	padding-top: 56.25%;
+}
+
+.chart-square {
+	padding-top: 100%;
+}
+
+.chart-content {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.chart-circle {
+	display: initial;
+	height: 7rem;
+	width: 7rem;
+	position: relative;
+}
+
+.chart-circle-1 {
+	display: initial;
+	height: 12rem;
+	width: 12rem;
+	position: relative;
+}
+
+.chart-circle canvas {
+	margin: 0 auto;
+	display: block;
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.chart-circle-xs {
+	height: 2.5rem;
+	width: 2.5rem;
+	font-size: .8rem;
+}
+
+.chart-circle-sm {
+	height: 3rem !important;
+	width: 3rem !important;
+	font-size: .5rem;
+}
+
+.chart-circle-lg {
+	height: 10rem;
+	width: 10rem;
+	font-size: .8rem;
+}
+
+.chart-circle-value {
+	position: absolute;
+	top: 0px;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	bottom: 0;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	line-height: 1;
+
+	small {
+		display: block;
+		color: #9aa0ac;
+		font-size: 0.9375rem;
+	}
+}
+
+.chart-circle-1-value {
+	position: absolute;
+	top: -184px;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	bottom: 0;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	line-height: 1;
+	font-size: 40px;
+
+	small {
+		display: block;
+		color: #9aa0ac;
+		font-size: 0.9375rem;
+	}
+}
+
+.chart-circle-value-3 {
+	position: absolute;
+	top: 20px;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	bottom: 0;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	line-height: 1;
+}
+
+.chart-circle-value-4 {
+	position: absolute;
+	top: -66px;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	bottom: 0;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	line-height: 1;
+	font-size: 50px;
+}
+
+/*----chart-drop-shadow----*/
+
+.chart-dropshadow {
+	-webkit-filter: drop-shadow((-6px) 12px 4px rgba(0, 0, 0, 0.1));
+	filter: drop-shadow((-6px) 12px 4px rgba(0, 0, 0, 0.1));
+}
+
+.chart-dropshadow2 {
+	-webkit-filter: drop-shadow((-6px) 12px 4px rgba(0, 0, 0, 0.2));
+	filter: drop-shadow((-6px) 12px 4px rgba(0, 0, 0, 0.2));
+}
+
+.chart-dropshadow-primary {
+	-webkit-filter: drop-shadow((-6px) 12px 4px rgba(105, 231, 128, 0.5));
+	filter: drop-shadow((-6px) 12px 4px rgba(105, 231, 128, 0.5));
+}
+
+.chart-dropshadow-primary-1 {
+	-webkit-filter: drop-shadow((-6px) 12px 4px rgba(105, 231, 128, 0.2));
+	filter: drop-shadow((-6px) 12px 4px rgba(105, 231, 128, 0.2));
+}
+
+.chart-dropshadow-danger {
+	-webkit-filter: drop-shadow((-6px) 12px 4px rgba(244, 88, 91, 0.5));
+	filter: drop-shadow((-6px) 12px 4px rgba(244, 88, 91, 0.5));
+}
+
+.chart-dropshadow-success {
+	-webkit-filter: drop-shadow((-6px) 12px 4px rgba(69, 213, 85, 0.5));
+	filter: drop-shadow((-6px) 12px 4px rgba(69, 213, 85, 0.5));
+}
+
+.chart-dropshadow-warning {
+	-webkit-filter: drop-shadow((-6px) 12px 4px rgba(251, 141, 52, 0.5));
+	filter: drop-shadow((-6px) 12px 4px rgba(251, 141, 52, 0.5));
+}
+
+.chart-dropshadow-blue {
+	-webkit-filter: drop-shadow((-6px) 12px 4px rgba(91, 91, 233, 0.5));
+	filter: drop-shadow((-6px) 12px 4px rgba(91, 91, 233, 0.5));
+}
+
+.GradientlineShadow {
+	-webkit-filter: drop-shadow(0 -8px 4px rgba(0, 0, 0, 0.2));
+	filter: drop-shadow(0 -8px 4px rgba(0, 0, 0, 0.2));
+}
+
+.BarChartShadow {
+	-webkit-filter: drop-shadow((-4px) 9px 4px rgba(0, 0, 0, 0.3));
+	filter: drop-shadow((-6px) 9px 4px rgba(0, 0, 0, 0.3));
+}
+
+.donutShadow {
+	-webkit-filter: drop-shadow((-5px) 4px 6px rgba(0, 0, 0, 0.5));
+	filter: drop-shadow((-1px) 0px 2px rgba(159, 120, 255, 0.5));
+}
+
+.donutShadow-yellow {
+	-webkit-filter: drop-shadow((-5px) 4px 6px rgba(0, 0, 0, 0.5));
+	filter: drop-shadow((-1px) 0px 2px rgba(251, 196, 52, 0.5));
+}
+
+.donutShadow-blue {
+	-webkit-filter: drop-shadow((-5px) 4px 6px rgba(0, 0, 0, 0.5));
+	filter: drop-shadow((-1px) 0px 2px rgba(36, 72, 135, 0.5));
+}
+
+#areaChart1,
+#areaChart11,
+#areaChart2,
+#areaChart3,
+#areaChart4 {
+	height: 6rem !important;
+}
+
+#AreaChart1,
+#AreaChart2,
+#AreaChart3,
+#AreaChart4 {
+	width: 131% !important;
+    height: 149px !important;
+    position: relative;
+    left: -57px;
+    bottom: -27px;
+}
+
+@media (max-width: 430px) {
+	#AreaChart1,
+	#AreaChart2,
+	#AreaChart3,
+	#AreaChart4 {
+		width: 143% !important;
+	}
+}
+
+#widgetChart1 {
+	width: 115% !important;
+	height: 215px !important;
+	bottom: -5px;
+	position: relative;
+	left: -30px;
+}

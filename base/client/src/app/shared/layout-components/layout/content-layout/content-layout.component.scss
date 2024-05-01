@@ -1,0 +1,23 @@
+::ng-deep{
+  .jumps-prevent{
+      display: none;
+  }
+  .pt-74{
+      padding-top: 74px;
+  }
+  body:not(.horizontal){
+      .pt-74{
+          padding-top: 74px;
+      }
+      .jumps-prevent{
+          display: block;
+      }
+  }
+  @media (max-width: 991px){
+      .horizontal{
+          .jumps-prevent{
+              display: block;
+          }
+      }
+  }
+}
