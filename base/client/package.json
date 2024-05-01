@@ -50,7 +50,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.3.3",
     "@angular/cli": "~17.3.3",
-    "@angular/compiler-cli": "^17.3.3",
+    "@angular/compiler-cli": "^17.0.0",
     "@compodoc/compodoc": "^1.1.23",
     "@types/angular-wizard": "^1.1.4",
     "@types/jasmine": "~5.1.4",

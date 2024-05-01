@@ -78,7 +78,7 @@
 
 */
 :root {
-    --primary-bg-color: #9752FC ;
+    --primary-bg-color: rgba(36, 34, 34, 0.9);
     --primary-bg-hover: #0e62df;
     --primary-bg-border: #0e62df;
     --dark-body: #2c333d;
@@ -87,15 +87,15 @@
     --dark-color: #ffffff;
     --dark-shadow: rgba(131, 131, 131, 0.1);
     --primary-05: rgba(151, 82, 252, 0.05);
-    --primary-1: rgba(151, 82, 252, 0.1);
-    --primary-2: rgba(151, 82, 252, 0.2);
-    --primary-3: rgba(151, 82, 252, 0.3);
-    --primary-4: rgba(151, 82, 252, 0.4);
-    --primary-5: rgba(151, 82, 252, 0.5);
-    --primary-6: rgba(151, 82, 252, 0.6);
-    --primary-7: rgba(151, 82, 252, 0.7);
-    --primary-8: rgba(151, 82, 252, 0.8);
-    --primary-9: rgba(151, 82, 252, 0.9);
+    --primary-1: rgba(2, 2, 2, 0.1);
+    --primary-2: rgba(4, 4, 4, 0.2);
+    --primary-3: rgba(1, 1, 1, 0.3);
+    --primary-4: rgba(0, 0, 0, 0.4);
+    --primary-5: rgba(0, 0, 0, 0.5);
+    --primary-6: rgba(0, 0, 0, 0.6);
+    --primary-7: rgba(5, 4, 4, 0.7);
+    --primary-8: rgba(0, 0, 0, 0.8);
+    --primary-9: rgba(0, 0, 0, 0.9);
     --white: #fff;
     --gray: #868e96;
     --gray-dark: #858d97;
@@ -171,10 +171,11 @@ body {
     font-size: 13px;
     font-weight: 400;
     line-height: 1.5;
-    color: #1c1d22;
+    color: #1c1d25;
     text-align: left;
-    background-color: #f0f0f9;
-}
+    background-color: #ffffff;
+    
+}   
 
 [tabindex="-1"]:focus {
     outline: 0 !important;
@@ -807,6 +808,7 @@ pre code {
 
     .navbar {
         display: none;
+        background-color: #828181;
     }
 
     .badge {
