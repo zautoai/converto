@@ -66,9 +66,35 @@ export class OrganizationsController {
     return await this.organizationsService.remove(id);
   }
 
+
+
   @MessagePattern({cmd:'GET_ORGANIZATIONS'})
   async handleGetOrganizations(paginationDto: PaginationDto)
   {
     return await this.organizationsService.findAll(paginationDto);
+  }
+
+  @MessagePattern({cmd:'GET_ORGANIZATION'})
+  async handleGetOrganization(id: string)
+  {
+    return await this.organizationsService.findOne(id);
+  }
+
+  @MessagePattern({cmd:'UPDATE_ORGANIZATION'})
+  async handleUpdateOrganization(data: any)
+  {
+    return await this.organizationsService.update(data.id, data.updateOrganizationDto);
+  }
+
+  @MessagePattern({cmd:'DELETE_ORGANIZATION'})
+  async handleDeleteOrganization(id: string)
+  {
+    return await this.organizationsService.remove(id);
+  }
+
+  @MessagePattern({cmd:'CREATE_ORGANIZATION'}) 
+  async handleCreateOrganization(data: any)
+  {
+    return await this.organizationsService.create(data.createOrganizationDto);
   }
 }

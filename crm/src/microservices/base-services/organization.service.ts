@@ -28,7 +28,7 @@ export class OrganizationService {
 
   async createOrganization(organization: any) {
     try {
-      return await this.baseServiceClient.send({ cmd: 'CREATE_ORGANIZATION' }, organization).toPromise();
+      return await this.baseServiceClient.send({ cmd: 'CREATE_ORGANIZATION' }, {organization}).toPromise();
     } catch (error) {
       this.logger.error(`Error while creating organization: ${error.message}`);
       throw error;
@@ -37,7 +37,7 @@ export class OrganizationService {
 
   async updateOrganization(organization: any) {
     try {
-      return await this.baseServiceClient.send({ cmd: 'UPDATE_ORGANIZATION' }, organization).toPromise();
+      return await this.baseServiceClient.send({ cmd: 'UPDATE_ORGANIZATION' }, {organization}).toPromise();
     } catch (error) {
       this.logger.error(`Error while updating organization: ${error.message}`);
       throw error;

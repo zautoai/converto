@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { ContactService } from './crm_service/contact.service';
+import { SchemaManagerService } from './crm_service/schema-manager.service';
 
 @Module({
     imports: [ConfigModule.forRoot()],
@@ -23,10 +24,12 @@ import { ContactService } from './crm_service/contact.service';
                 )
             }
         },
-        ContactService
+        ContactService,
+        SchemaManagerService
     ],
     exports: [
-        ContactService
+        ContactService,
+        SchemaManagerService
     ],
 })
 export class MicroservicesModule {}

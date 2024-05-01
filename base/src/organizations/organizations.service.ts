@@ -4,6 +4,7 @@ import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CrmService } from 'src/crm/crm.service';
+import { SchemaManagerService } from 'src/microservices/crm_service/schema-manager.service';
 
 
 @Injectable()
@@ -12,12 +13,13 @@ export class OrganizationsService {
 
   constructor(
     private prisma: PrismaService,
-    private readonly crmService: CrmService
+    private readonly schemaManagerService: SchemaManagerService
   ){}
 
   async create(createOrganizationDto: CreateOrganizationDto) {
     const organization = await this.prisma.organization.create({data: createOrganizationDto});
     if(organization) {
+      // await this.schemaManagerService.create(organization.id, organization.name);
       // await this.crmService.createSchemaForOrg(organization.id,{orgId:organization.id,name:organization.name});
     }
     return organization 
