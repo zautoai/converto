@@ -2,10 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { CreateAccountBasedMarketingDto } from './dto/create-account-based-marketing.dto';
 import { UpdateAccountBasedMarketingDto } from './dto/update-account-based-marketing.dto';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
+import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
+import { CustomFieldParent } from 'src/common/enum/enums';
 
 @Injectable()
 export class AccountBasedMarketingService {
-  constructor(private readonly prismaClientManager: PrismaClientManager) {}
+  constructor(
+    private readonly prismaClientManager: PrismaClientManager,
+    private readonly customFieldsService: CustomFieldsService,
+  ) {}
 
   async create(
     orgId: string,
@@ -70,6 +75,24 @@ export class AccountBasedMarketingService {
       code: 204,
       success: true,
       message: 'Account Based Marketing deleted successfully',
+    };
+  }
+
+  async getABMFields(orgId: string) {
+    const defaultFields = await this.customFieldsService.getTableFields(
+      orgId,
+      'Account',
+    );
+    const _customFields = await this.customFieldsService.getAll(
+      orgId,
+      CustomFieldParent.ABM,
+    );
+    const customFields = _customFields.map((field) => field.name);
+    const fields = [...defaultFields, ...customFields];
+    return {
+      code: 200,
+      message: 'ABM fields fetched successfully',
+      data: fields,
     };
   }
 }

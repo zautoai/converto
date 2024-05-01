@@ -7,6 +7,7 @@ import { convertToKey } from 'src/common/utils/cast.helper';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { CreateFieldDto } from './dto/create-fields.dto';
 import { UpdateFiledDto } from './dto/update-fields.dto';
+import { CustomFieldParent } from 'src/common/enum/enums';
 
 @Injectable()
 export class CustomFieldsService {
@@ -71,9 +72,11 @@ export class CustomFieldsService {
     return customField;
   }
 
-  async getAll(orgId: string) {
+  async getAll(orgId: string, customFieldParent: CustomFieldParent) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const customFields = await prisma.customField.findMany();
+    const customFields = await prisma.customField.findMany({
+      where: { customFieldParent },
+    });
     return customFields;
   }
 
@@ -89,5 +92,20 @@ export class CustomFieldsService {
       throw new BadRequestException('Custom field already exists');
     }
     return existingField;
+  }
+
+  async getTableFields(orgId: string, tableName: string): Promise<string[]> {
+    try {
+      const prisma = await this.prismaClientManager.getClient(orgId);
+      const tableMetadata: any[] = await prisma.$queryRaw`
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name = ${tableName}
+        AND table_schema = ${orgId};
+      `;
+      return tableMetadata.map((column) => column.column_name);
+    } catch (e) {
+      return [];
+    }
   }
 }

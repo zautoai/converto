@@ -117,7 +117,10 @@ export class ContactsService {
 
   async createContact(orgId: string, createContactDto: any) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const defaultFields = await this.getTableFields(orgId, 'Contact');
+    const defaultFields = await this.customFieldsService.getTableFields(
+      orgId,
+      'Contact',
+    );
 
     const { _defaultFields, _customFields } = Object.keys(
       createContactDto,
@@ -176,7 +179,10 @@ export class ContactsService {
   async updateContact(orgId: string, id: string, updateContactDto: any) {
     const prisma = await this.prismaClientManager.getClient(orgId);
     const tags = updateContactDto.tags;
-    const defaultFields = await this.getTableFields(orgId, 'Contact');
+    const defaultFields = await this.customFieldsService.getTableFields(
+      orgId,
+      'Contact',
+    );
     const { _defaultFields, _customFields } = Object.keys(
       updateContactDto,
     ).reduce(
@@ -290,15 +296,6 @@ export class ContactsService {
     };
   }
 
-  async getCustomFields(orgId: string) {
-    const customFields = await this.customFieldsService.getAll(orgId);
-    return {
-      code: 200,
-      message: 'Additional fields fetched successfully',
-      data: customFields,
-    };
-  }
-
   async mapContactTag(orgId: string, contactId: string, tagId: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
 
@@ -340,30 +337,21 @@ export class ContactsService {
   }
 
   async getContactFields(orgId: string) {
-    const defaultFields = await this.getTableFields(orgId, 'Contact');
-    const _customFields = await this.getCustomFields(orgId);
-    const customFields = _customFields.data.map((field) => field.name);
+    const defaultFields = await this.customFieldsService.getTableFields(
+      orgId,
+      'Contact',
+    );
+    const _customFields = await this.customFieldsService.getAll(
+      orgId,
+      CustomFieldParent.CONTACT,
+    );
+    const customFields = _customFields.map((field) => field.name);
     const fields = [...defaultFields, ...customFields];
     return {
       code: 200,
       message: 'Contact fields fetched successfully',
       data: fields,
     };
-  }
-
-  async getTableFields(orgId: string, tableName: string): Promise<string[]> {
-    try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
-      const tableMetadata: any[] = await prisma.$queryRaw`
-        SELECT column_name
-        FROM information_schema.columns
-        WHERE table_name = ${tableName}
-        AND table_schema = ${orgId};
-      `;
-      return tableMetadata.map((column) => column.column_name);
-    } catch (e) {
-      return [];
-    }
   }
 
   convertToKey(name: string) {

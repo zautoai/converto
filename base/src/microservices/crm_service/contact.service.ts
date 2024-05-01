@@ -1,5 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
+import { FilterDto } from "src/common/dto/filter.dto";
+import { CreateContactDto } from "src/crm/dto/create-contacts.dto";
 
 
 @Injectable()
@@ -9,15 +11,15 @@ export class ContactService {
 
     constructor(@Inject('CRM_SERVICE') private readonly CRMClient: ClientProxy) {}
 
-    async getContacts(orgId: string) {
+    async getContacts(orgId: string,filterDto:FilterDto) {
         try
         {
-            return this.CRMClient.send({cmd: 'GET_CONTACTS'}, {orgId}).toPromise();
-        }
+            return this.CRMClient.send({cmd: 'GET_CONTACTS'}, {orgId,filterDto}).toPromise(); 
+        } 
         catch (error)
         {
             this.logger.error(`Error while fetching contact: ${error.message}`);
-            throw error;
+            return error;
         }
     }
 
@@ -33,10 +35,10 @@ export class ContactService {
         }
     }
 
-    async createContact(orgId: string,contact: any) {
+    async createContact(orgId: string,createContactDto: CreateContactDto) {
         try
         {
-            return this.CRMClient.send({cmd: 'CREATE_CONTACT'}, {orgId,contact}).toPromise();
+            return this.CRMClient.send({cmd: 'CREATE_CONTACT'}, {orgId,createContactDto}).toPromise();
         }
         catch (error)
         {

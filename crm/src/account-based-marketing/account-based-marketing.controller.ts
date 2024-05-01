@@ -40,16 +40,25 @@ export class AccountBasedMarketingController {
   }
 
   @ApiOperation({
+    summary: 'Get ABM Fields',
+    description: 'Endpoint to get ABM Fields.',
+  })
+  @Get('fields')
+  async getFields(@Req() request: IRequest) {
+    if (request.orgId) {
+      return this.accountBasedMarketingService.getABMFields(request.orgId);
+    } else {
+      throw new UnauthorizedException('Unauthorized access');
+    }
+  }
+  @ApiOperation({
     summary: 'Get Account Based Marketing by id',
     description: 'Endpoint to get Account Based Marketing by id.',
   })
   @Get(':id')
   async findOne(@Req() request: IRequest, @Param('id') id: string) {
     if (request.orgId) {
-      return await this.accountBasedMarketingService.findOne(
-        request.orgId,
-        id,
-      );
+      return await this.accountBasedMarketingService.findOne(request.orgId, id);
     } else {
       throw new UnauthorizedException('Unauthorized access');
     }

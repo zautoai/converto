@@ -20,11 +20,10 @@ import { CreateFieldDto } from 'src/custom-fields/dto/create-fields.dto';
 import { ContactsService } from './contacts.service';
 import { CreateContactDto } from './dto/create-contacts.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
+import { MessagePattern } from '@nestjs/microservices';
 
 @ApiTags('Contacts')
 @Controller('contacts')
-@UseGuards(AuthGuard)
-@ApiBearerAuth()
 export class ContactsController {
   constructor(private contactsService: ContactsService) {}
 
@@ -50,15 +49,6 @@ export class ContactsController {
     }
   }
 
-  @ApiOperation({
-    summary: 'Get all custom fields in contact for an organization',
-    description:
-      'Endpoint to get all custom fields in contact for an organization.',
-  })
-  @Get('customfield')
-  async getCustomFields(@Req() request: IRequest) {
-    return this.contactsService.getCustomFields(request.orgId);
-  }
   @ApiOperation({
     summary: 'Get a single contact for an organization',
     description: 'Endpoint to get a single contact for an organization.',
@@ -131,7 +121,7 @@ export class ContactsController {
     if (request.orgId) {
       return this.contactsService.deleteContact(request.orgId, id);
     } else {
-      throw new UnauthorizedException('Unauthorized access'); 
+      throw new UnauthorizedException('Unauthorized access');
     }
   }
 
@@ -149,5 +139,76 @@ export class ContactsController {
       request.orgId,
       createFieldDto,
     );
+  }
+
+  //MICROSERVICE
+
+  @MessagePattern({cmd: 'GET_CONTACTS'})
+  async get_contacts(data:{ orgId:string,filterDto:FilterDto})
+  {
+    try
+    {
+      return await this.contactsService.getContacts(data.orgId,data.filterDto);
+    }
+    catch(error)
+    {
+      return error.message;
+    }
+  }
+
+  @MessagePattern({cmd: 'GET_CONTACT'})
+  async get_contact(data:{ orgId:string, id:string })
+  {
+    try
+    {
+      return await this.contactsService.getContact(data.orgId, data.id);
+    }
+    catch(error)
+    {
+      return error.message;
+    }
+  }
+
+  @MessagePattern({cmd: 'CREATE_CONTACT'})
+  async create_contact(data:{ orgId:string, createContactDto:CreateContactDto }) 
+  {
+    try
+    {
+      const _createContactDto: CreateContactDto = new CreateContactDto(
+        data.createContactDto,
+      );
+      await _createContactDto.validate();
+    }
+    catch(error)
+    {
+      throw new BadRequestException(error.message);
+    }    
+    return await this.contactsService.createContact(data.orgId, data.createContactDto);
+  }
+
+  @MessagePattern({cmd: 'UPDATE_CONTACT'})
+  async update_contact(data:{ orgId:string, id:string, updateContactDto:any })
+  {
+    try
+    {
+      return await this.contactsService.updateContact(data.orgId, data.id, data.updateContactDto);
+    }
+    catch(error)
+    {
+      return error;
+    }
+  }
+
+  @MessagePattern({cmd: 'DELETE_CONTACT'})
+  async delete_contact(data:{ orgId:string, id:string })
+  {
+    try
+    {
+      return await this.contactsService.deleteContact(data.orgId, data.id);
+    }
+    catch(error)
+    {
+      return error;
+    }
   }
 }

@@ -53,6 +53,7 @@ import { DemandGenModule } from './demand-gen/demand-gen.module';
 import { CrmModule } from './crm/crm.module';
 import { SecureExchangeModule } from './secure-exchange/secure-exchange.module';
 import { MicroservicesModule } from './microservices/microservices.module';
+import { ContactsModule } from './contacts/contacts.module';
 
 @Module({ 
   imports: [
@@ -112,7 +113,8 @@ import { MicroservicesModule } from './microservices/microservices.module';
     DemandGenModule,
     CrmModule,
     SecureExchangeModule,
-    MicroservicesModule
+    MicroservicesModule,
+    ContactsModule
   ],
   controllers: [AppController], 
   providers: [AppService],

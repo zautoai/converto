@@ -20,7 +20,6 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { IRequest } from 'src/common/model/request.model';
-import { MessagePattern } from '@nestjs/microservices';
 
 @ApiTags('Schema Manager')
 @Controller('schema-manager')
@@ -34,7 +33,7 @@ export class SchemaManagerController {
     summary: 'Create a new schema for an organization',
     description: 'Endpoint to create a new schema for an organization.',
   })
-  async create(
+  create(
     @Body() createSchemaManagerDto: CreateSchemaManagerDto,
     @Req() req: IRequest,
   ) {
@@ -42,7 +41,7 @@ export class SchemaManagerController {
     const rollback = () => {
       this.schemaManagerService.delete(createSchemaManagerDto.orgId);
     };
-    return await this.schemaManagerService.create(createSchemaManagerDto, rollback);
+    return this.schemaManagerService.create(createSchemaManagerDto, rollback);
   }
 
   @Post(':orgId/migrate')
@@ -69,10 +68,5 @@ export class SchemaManagerController {
   })
   remove(@Param('orgId') orgId: string, @Req() req: IRequest) {
     return this.schemaManagerService.delete(orgId);
-  }
-
-  @MessagePattern({cmd:'CREATE_SCHEMA'})
-  async createSchema(data: any){
-      return  await this.schemaManagerService.create({orgId: data.orgId, name: data.name }, null);
   }
 }

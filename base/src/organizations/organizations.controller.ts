@@ -66,7 +66,7 @@ export class OrganizationsController {
     return await this.organizationsService.remove(id);
   }
 
-
+  
 
   @MessagePattern({cmd:'GET_ORGANIZATIONS'})
   async handleGetOrganizations(paginationDto: PaginationDto)
