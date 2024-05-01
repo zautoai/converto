@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { convertToKey } from 'src/common/utils/cast.helper';
+import { convertToKey, getSchemaName } from 'src/common/utils/cast.helper';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { CreateFieldDto } from './dto/create-fields.dto';
 import { UpdateFiledDto } from './dto/update-fields.dto';
@@ -97,11 +97,12 @@ export class CustomFieldsService {
   async getTableFields(orgId: string, tableName: string): Promise<string[]> {
     try {
       const prisma = await this.prismaClientManager.getClient(orgId);
+      const schemaName = getSchemaName(orgId);
       const tableMetadata: any[] = await prisma.$queryRaw`
         SELECT column_name
         FROM information_schema.columns
         WHERE table_name = ${tableName}
-        AND table_schema = ${orgId};
+        AND table_schema = ${schemaName};
       `;
       return tableMetadata.map((column) => column.column_name);
     } catch (e) {

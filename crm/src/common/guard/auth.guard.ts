@@ -23,6 +23,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Authorization token is missing');
     }
 
+    
     const token = authorizationHeader.split(' ')[1];
     const tokenData = await this.validateTenant(token);
 
@@ -66,6 +67,8 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException('Error validating token');
       }
     } else {
+      console.log(token);
+      
       if (!token) {
         throw new UnauthorizedException('Authorization token is invalid');
       }

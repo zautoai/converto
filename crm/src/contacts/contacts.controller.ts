@@ -32,6 +32,8 @@ export class ContactsController {
     description: 'Endpoint to get all contacts for an organization.',
   })
   @Get()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async getContacts(@Query() filterDto: FilterDto, @Req() request: IRequest) {
     if (request.orgId) {
       return this.contactsService.getContacts(request.orgId, filterDto);
@@ -41,6 +43,8 @@ export class ContactsController {
   }
 
   @Get('fields')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async getFields(@Req() request: IRequest) {
     if (request.orgId) {
       return this.contactsService.getContactFields(request.orgId);
@@ -54,6 +58,8 @@ export class ContactsController {
     description: 'Endpoint to get a single contact for an organization.',
   })
   @Get(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async getContact(@Req() request: IRequest, @Param('id') id: string) {
     if (request.orgId) {
       return this.contactsService.getContactFields(request.orgId);
@@ -68,6 +74,8 @@ export class ContactsController {
   })
   @ApiBody({ type: CreateContactDto })
   @Post()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async createContact(@Req() request: IRequest, @Body() createContactDto: any) {
     if (request.orgId) {
       try {
@@ -96,6 +104,8 @@ export class ContactsController {
   })
   @ApiBody({ type: UpdateContactDto })
   @Patch(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async updateContact(
     @Req() request: IRequest,
     @Param('id') id: string,
@@ -117,6 +127,8 @@ export class ContactsController {
     description: 'Endpoint to delete a contact for an organization.',
   })
   @Delete(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async deleteContact(@Req() request: IRequest, @Param('id') id: string) {
     if (request.orgId) {
       return this.contactsService.deleteContact(request.orgId, id);
@@ -131,6 +143,8 @@ export class ContactsController {
       'Endpoint to create custom field in contact for an organization.',
   })
   @Post('customfield')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async createCustomField(
     @Req() request: IRequest,
     @Body() createFieldDto: CreateFieldDto,

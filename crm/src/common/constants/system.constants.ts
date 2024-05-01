@@ -1,4 +1,4 @@
-export const DEFAULT_SCHEMA_NAME = 'public';
+export const DEFAULT_SCHEMA_NAME = 'crm';
 export const DEFAULT_SECRET_KEY =
   'HrDpUiAbqwGmETh6vO5MpOBNVzv77bqsgdM0JElq0l8SyDneCX';
 
