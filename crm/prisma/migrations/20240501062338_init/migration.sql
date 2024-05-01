@@ -5,6 +5,9 @@ CREATE TYPE "DataType" AS ENUM ('STRING', 'NUMBER', 'BOOLEAN', 'JSON');
 CREATE TYPE "FieldType" AS ENUM ('TEXT', 'TEXTAREA', 'EMAIL', 'NUMBER');
 
 -- CreateEnum
+CREATE TYPE "CustomFieldParent" AS ENUM ('CONTACT', 'ACCOUNT', 'ABM');
+
+-- CreateEnum
 CREATE TYPE "accountType" AS ENUM ('CUSTOMER', 'PROSPECT', 'PARTNER');
 
 -- CreateTable
@@ -83,6 +86,7 @@ CREATE TABLE "CustomField" (
     "name" TEXT NOT NULL,
     "key" TEXT NOT NULL,
     "dataType" "DataType" NOT NULL DEFAULT 'STRING',
+    "customFieldParent" "CustomFieldParent" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
@@ -144,28 +148,22 @@ CREATE TABLE "Account" (
 );
 
 -- CreateTable
-CREATE TABLE "ABMTarget" (
+CREATE TABLE "AccountBasedMarketingTarget" (
     "id" TEXT NOT NULL,
     "photoUrl" TEXT,
     "targetAccountName" TEXT NOT NULL,
     "industry" TEXT NOT NULL,
-    "accountSize" TEXT NOT NULL,
-    "revenuePotential" DOUBLE PRECISION NOT NULL,
+    "accountSize" TEXT,
+    "revenuePotential" DOUBLE PRECISION,
     "decisionMakers" TEXT[],
     "painPoints" TEXT[],
-    "goals" TEXT[],
-    "buyingStage" TEXT NOT NULL,
-    "personalizedMessages" TEXT[],
-    "tailoredContent" TEXT[],
+    "buyingStage" TEXT,
     "campaigns" TEXT[],
-    "engagementHistory" TEXT[],
     "teamMembers" TEXT[],
-    "budget" DOUBLE PRECISION NOT NULL,
-    "strategyPlan" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "ABMTarget_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "AccountBasedMarketingTarget_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -176,6 +174,9 @@ CREATE UNIQUE INDEX "Contact_email_key" ON "Contact"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "CustomField_key_key" ON "CustomField"("key");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CustomField_key_customFieldParent_key" ON "CustomField"("key", "customFieldParent");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "LeadFormField_leadFormId_contactField_key" ON "LeadFormField"("leadFormId", "contactField");

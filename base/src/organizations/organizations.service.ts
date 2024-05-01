@@ -18,7 +18,7 @@ export class OrganizationsService {
   async create(createOrganizationDto: CreateOrganizationDto) {
     const organization = await this.prisma.organization.create({data: createOrganizationDto});
     if(organization) {
-      await this.crmService.createSchemaForOrg(organization.id,{orgId:organization.id,name:organization.name});
+      // await this.crmService.createSchemaForOrg(organization.id,{orgId:organization.id,name:organization.name});
     }
     return organization 
   }
@@ -59,7 +59,7 @@ export class OrganizationsService {
     let org = await this.prisma.organization.findFirst({where: {id,}});
     if(org) {  
         if(org) {
-          await this.crmService.deleteSchemaForOrg(org.id);
+          // await this.crmService.deleteSchemaForOrg(org.id);
         }
         return await this.prisma.organization.delete({where: {id}});
     } else {

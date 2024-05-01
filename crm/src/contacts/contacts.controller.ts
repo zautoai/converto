@@ -131,7 +131,7 @@ export class ContactsController {
     if (request.orgId) {
       return this.contactsService.deleteContact(request.orgId, id);
     } else {
-      throw new UnauthorizedException('Unauthorized access');
+      throw new UnauthorizedException('Unauthorized access'); 
     }
   }
 
