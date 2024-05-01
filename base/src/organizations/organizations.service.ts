@@ -19,7 +19,7 @@ export class OrganizationsService {
   async create(createOrganizationDto: CreateOrganizationDto) {
     const organization = await this.prisma.organization.create({data: createOrganizationDto});
     if(organization) {
-      // await this.schemaManagerService.create(organization.id, organization.name);
+      await this.schemaManagerService.create(organization.id, organization.name);
       // await this.crmService.createSchemaForOrg(organization.id,{orgId:organization.id,name:organization.name});
     }
     return organization 
