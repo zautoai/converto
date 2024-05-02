@@ -4,11 +4,7 @@ on:
     paths:
       - 'base/**'
       - 'crm/**'
-  pull_request:
-    branches: [ dev ]
-    paths:
-      - 'base/**'
-      - 'crm/**'
+
 
 
 jobs:
