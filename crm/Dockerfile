@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Build your application
-RUN npm run build:dev
+RUN npm run build
 RUN npm install -g npx --force
 
 # Production stage

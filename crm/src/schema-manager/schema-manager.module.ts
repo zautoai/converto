@@ -6,7 +6,7 @@ import { CommonModule } from 'src/common/common.module';
 
 @Module({
   imports: [PrismaModule, CommonModule],
-  controllers: [SchemaManagerController],
+  controllers: [SchemaManagerControlle,SchemaManagerController],
   providers: [SchemaManagerService],
   exports: [SchemaManagerService],
 })
