@@ -125,6 +125,9 @@ export class NavService implements OnDestroy {
 			roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
 		{
+			title: 'FormBuilder', icon: 'fa-solid fa-cube', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/form-builder', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+		},
+		{
 			title: 'Campaigns', icon: 'fe fe-award', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/campaigns', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
 		{

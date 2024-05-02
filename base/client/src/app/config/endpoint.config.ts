@@ -52,6 +52,8 @@ export const API = {
         fileManager:'api/file-manager',
         promptTemplate:'api/prompt-template',
         leadCategory:'api/lead-categories',
+        formbuilder:'api/form-builder'
+
     },
     dev: {
         
