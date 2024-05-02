@@ -1,5 +1,5 @@
 # Build stage
-FROM ghcr.io/zautoai/node:20-builder AS builder
+FROM node:20 AS builder
 WORKDIR /usr/src/app 
 
 # Copy the package.json and package-lock.json (if available)
@@ -16,7 +16,7 @@ RUN npm run build:dev
 RUN npm install -g npx --force
 
 # Production stage
-FROM ghcr.io/zautoai/node:20-alpine-prod
+FROM node:20-alpine
 WORKDIR /usr/src/app
 
 # Install openssl and curl
