@@ -14,7 +14,7 @@ export class AccountBasedMarketingMicroserviceController {
     async createAccountBasedMarketing(data: any) {
        try
        {
-           return this.ambService.create(data.orgId, data.accountBasedMarketing);
+           return this.ambService.create(data.orgId, data.CreateAccountBasedMarketingDto);
        }
        catch (error)
        {
@@ -50,7 +50,7 @@ export class AccountBasedMarketingMicroserviceController {
     async updateAccountBasedMarketing(data: any) {
         try
         {
-            return this.ambService.update(data.orgId, data.id, data.accountBasedMarketing);
+            return this.ambService.update(data.orgId, data.id, data.UpdateAccountBasedMarketingDto);
         }
         catch (error)
         {

@@ -55,6 +55,7 @@ import { SecureExchangeModule } from './secure-exchange/secure-exchange.module';
 import { MicroservicesModule } from './microservices/microservices.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { FormBuilderModule } from './form-builder/form-builder.module';
+import { AccountBasedMaretingModule } from './account-based-mareting/account-based-mareting.module';
 
 @Module({ 
   imports: [
@@ -116,7 +117,8 @@ import { FormBuilderModule } from './form-builder/form-builder.module';
     SecureExchangeModule,
     MicroservicesModule,
     ContactsModule,
-    FormBuilderModule
+    FormBuilderModule,
+    AccountBasedMaretingModule
   ],
   controllers: [AppController], 
   providers: [AppService],
