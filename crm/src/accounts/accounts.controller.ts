@@ -9,6 +9,7 @@ import {
   Req,
   UnauthorizedException,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dto/create-account.dto';
@@ -16,6 +17,7 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { IRequest } from 'src/common/model/request.model';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/common/guard/auth.guard';
+import { FilterDto } from 'src/common/dtos/filter.dto';
 
 @ApiTags('Accounts')
 @Controller('accounts')
@@ -39,10 +41,10 @@ export class AccountsController {
     description: 'Get All Accounts',
     summary: 'Get All Accounts',
   })
-  findAll(@Req() req: IRequest) {
+  findAll(@Req() req: IRequest,@Query() filterDto:FilterDto) {
     if (req.orgId) {
       const orgId = req.orgId;
-      return this.accountsService.findAll(orgId);
+      return this.accountsService.findAll(orgId,filterDto);
     }
     throw new UnauthorizedException('Organization not found');
   }
