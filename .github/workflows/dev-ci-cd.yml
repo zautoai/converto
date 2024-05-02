@@ -143,7 +143,7 @@ jobs:
         key: ${{ secrets.DEV_SERVER_SSH_KEY }}
         script: |
           set -x
-          REDIS_CONTAINER="converto-redis"
+          REDIS_CONTAINER="converto-redis-1"
           REDIS_PASSWORD=${{ secrets.DEV_REDIS_PASSWORD }}
           REDIS_HEALTH=$(docker exec $REDIS_CONTAINER redis-cli -a $DEV_REDIS_PASSWORD PING)
           if [ "$REDIS_HEALTH" != "PONG" ]; then
@@ -160,7 +160,7 @@ jobs:
         username: ${{ secrets.DEV_SERVER_USER }}
         key: ${{ secrets.DEV_SERVER_SSH_KEY }}
         script: |
-          BASE_APP_CONTAINER="converto-base"
+          BASE_APP_CONTAINER="converto-base-1"
           HEALTH_CHECK_URL="http://localhost:3000/health"
           if curl --fail $HEALTH_CHECK_URL; then
           echo "Container $BASE_APP_CONTAINER is healthy"
@@ -176,7 +176,7 @@ jobs:
         username: ${{ secrets.DEV_SERVER_USER }}
         key: ${{ secrets.DEV_SERVER_SSH_KEY }}
         script: |
-          CRM_APP_CONTAINER="converto-crm"
+          CRM_APP_CONTAINER="converto-crm-1"
           HEALTH_CHECK_URL="http://localhost:3001/api/v1/ping"
           if curl --fail $HEALTH_CHECK_URL; then
           echo "Container $CRM_APP_CONTAINER is healthy"
