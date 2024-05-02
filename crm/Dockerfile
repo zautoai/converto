@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20 AS builder
+FROM ghcr.io/zautoai/node:20-builder AS builder
 WORKDIR /usr/src/app 
 
 # Copy the package.json and package-lock.json (if available)
@@ -16,14 +16,12 @@ RUN npm run build:dev
 RUN npm install -g npx --force
 
 # Production stage
-FROM node:20-slim
+FROM ghcr.io/zautoai/node:20-alpine-prod
 WORKDIR /usr/src/app
 
 # Install openssl and curl
 RUN apt-get update -y && apt-get install -y openssl curl
 
-# Set NODE_ENV to development (or production based on your environment)
-ENV NODE_ENV=dev
 
 # Define arguments for environment variables
 ARG CRM_ACCESS_TOKEN
@@ -36,7 +34,7 @@ ARG CRM_JWT_SECRET
 ARG REDIS_IP
 ARG REDIS_PASSWORD
 ARG REDIS_PORT
-
+ARG NODE_ENV
 # Set environment variables from arguments
 ENV CRM_ACCESS_TOKEN=${CRM_ACCESS_TOKEN}
 ENV CRM_API_PORT=${CRM_API_PORT}
@@ -48,6 +46,7 @@ ENV CRM_JWT_SECRET=${CRM_JWT_SECRET}
 ENV REDIS_IP=${REDIS_IP}
 ENV REDIS_PASSWORD=${REDIS_PASSWORD}
 ENV REDIS_PORT=${REDIS_PORT}
+ENV NODE_ENV=${NODE_ENV}
 
 
 # Only copy over the built elements from the dist folder from the previous stage
