@@ -18,4 +18,16 @@ export class SchemaManagerService {
             throw error;
         }
     }
+
+    async delete(orgId: string) {
+        try
+        {
+            return this.CRMClient.send({cmd: 'DELETE_SCHEMA'}, {orgId, name}).toPromise();
+        }
+        catch (error)
+        {
+            this.logger.error(`Error while deleting schema: ${error.message}`);
+            throw error;
+        }
+    }
 }

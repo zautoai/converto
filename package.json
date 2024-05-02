@@ -23,7 +23,8 @@
         "dev:crm": "cd crm && npm run start:dev",
         "debug": "npm-run-all --parallel debug:base debug:crm && echo All debug scripts ran successfully!",
         "debug:base": "cd base && npm run start:debug",
-        "debug:crm": "cd crm && npm run start:debug"
+        "debug:crm": "cd crm && npm run start:debug",
+        "install": "npm install --workspaces"
     },
     "workspaces": [
         "base/*",

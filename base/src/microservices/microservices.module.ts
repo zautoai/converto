@@ -4,35 +4,36 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { ContactService } from './crm_service/contact.service';
 import { SchemaManagerService } from './crm_service/schema-manager.service';
 import { FormBuilderMicroService } from './crm_service/form-builder.service';
+import { AccountMicroService } from './crm_service/account.service';
 
 @Module({
-    imports: [ConfigModule.forRoot()],
-    controllers: [],
-    providers: [
-        {
-            provide: 'CRM_SERVICE',
-            inject:[ConfigService],
-            useFactory: (configService: ConfigService) => {
-                return ClientProxyFactory.create(
-                    {
-                        transport: Transport.REDIS,
-                        options: {
-                            host:process.env.REDIS_IP,
-                            port:+process.env.REDIS_PORT,
-                            password:process.env.REDIS_PASSWORD
-                        }
-                    }
-                )
-            }
-        },
-        ContactService,
-        SchemaManagerService,
-        FormBuilderMicroService
-    ],
-    exports: [
-        ContactService,
-        SchemaManagerService,
-        FormBuilderMicroService
-    ],
+  imports: [ConfigModule.forRoot()],
+  controllers: [],
+  providers: [
+    {
+      provide: 'CRM_SERVICE',
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return ClientProxyFactory.create({
+          transport: Transport.REDIS,
+          options: {
+            host: process.env.REDIS_IP,
+            port: +process.env.REDIS_PORT,
+            password: process.env.REDIS_PASSWORD,
+          },
+        });
+      },
+    },
+    ContactService,
+    SchemaManagerService,
+    FormBuilderMicroService,
+    AccountMicroService,
+  ],
+  exports: [
+    ContactService,
+    SchemaManagerService,
+    FormBuilderMicroService,
+    AccountMicroService,
+  ],
 })
 export class MicroservicesModule {}
