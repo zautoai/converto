@@ -55,37 +55,48 @@ import { SecureExchangeModule } from './secure-exchange/secure-exchange.module';
 import { MicroservicesModule } from './microservices/microservices.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { FormBuilderModule } from './form-builder/form-builder.module';
+import { AccountsModule } from './accounts/accounts.module';
 
-@Module({ 
+@Module({
   imports: [
-    PrismaModule, 
+    PrismaModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'production' ? undefined : ['.env.dev', '.env'],
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? undefined
+          : ['.env.dev', '.env'],
     }),
-    RolesModule, 
-    UsersModule, 
-    AuthModule, 
-    CommonModule, 
-    OrganizationsModule, AgentModule, SiteModule, 
-    ChromaModule, StartupModule, 
-    WorkerModule, LlmModule, AgentPromptModule, 
-    VisitorModule, ConversationModule, 
-    LeadModule, RegistrationModule,
+    RolesModule,
+    UsersModule,
+    AuthModule,
+    CommonModule,
+    OrganizationsModule,
+    AgentModule,
+    SiteModule,
+    ChromaModule,
+    StartupModule,
+    WorkerModule,
+    LlmModule,
+    AgentPromptModule,
+    VisitorModule,
+    ConversationModule,
+    LeadModule,
+    RegistrationModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public/assets/bot'),
-      serveRoot: '/assets'
+      serveRoot: '/assets',
     }),
     LeadConfigModule,
     PlatformModule,
-    OrgPlatformModule, 
-    AssistantsModule, 
-    CampaignModule, 
-    DashboardModule, 
-    StageModule, 
+    OrgPlatformModule,
+    AssistantsModule,
+    CampaignModule,
+    DashboardModule,
+    StageModule,
     HelpersModule,
     BullModule.forRoot({
       redis: {
@@ -116,9 +127,10 @@ import { FormBuilderModule } from './form-builder/form-builder.module';
     SecureExchangeModule,
     MicroservicesModule,
     ContactsModule,
-    FormBuilderModule
+    FormBuilderModule,
+    AccountsModule,
   ],
-  controllers: [AppController], 
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
