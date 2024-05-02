@@ -284,8 +284,6 @@ export class DashboardService {
   async getVisitCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
     try {
       let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-      console.log('Start Date : ' + startDate);
-      console.log('End Date : ' + endDate);
 
       const _startDate = startDate;
       const _endDate = endDate;
@@ -632,7 +630,6 @@ export class DashboardService {
       dashbaordDto,
     );
     const campaignData = await this.getCampaignCountByDate(orgId, dashbaordDto);
-    console.log(visitorData);
 
     const visitorCount = visitorData.values.reduce(
       (acc, curr) => acc + curr,
@@ -672,7 +669,6 @@ export class DashboardService {
       let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
       const _startDate = startDate;
       const _endDate = endDate;
-      console.log(_startDate, _endDate);
 
       const top5Campaigns = await this.prisma.$queryRaw`
                 WITH CampaignCounts AS (
