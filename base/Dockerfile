@@ -133,5 +133,7 @@ RUN npx prisma generate
 # Expose the port the app runs on
 EXPOSE 3000
 
+WORKDIR /usr/src/
+
 # Start the app
 CMD [ "node", "main.js" ]
