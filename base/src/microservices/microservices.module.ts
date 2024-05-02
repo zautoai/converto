@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { ContactService } from './crm_service/contact.service';
 import { SchemaManagerService } from './crm_service/schema-manager.service';
+import { FormBuilderMicroService } from './crm_service/form-builder.service';
 
 @Module({
     imports: [ConfigModule.forRoot()],
@@ -25,11 +26,13 @@ import { SchemaManagerService } from './crm_service/schema-manager.service';
             }
         },
         ContactService,
-        SchemaManagerService
+        SchemaManagerService,
+        FormBuilderMicroService
     ],
     exports: [
         ContactService,
-        SchemaManagerService
+        SchemaManagerService,
+        FormBuilderMicroService
     ],
 })
 export class MicroservicesModule {}

@@ -95,6 +95,7 @@ export class FormBuilderService {
     updateFormBuilderDto: UpdateFormBuilderDto,
   ) {
     const prisma = await this.prismaClientManager.getClient(orgId);
+    await this.findOne(orgId, id);
     try {
       const updateFields = updateFormBuilderDto.updateLeadField;
       delete updateFormBuilderDto.updateLeadField;
@@ -130,6 +131,7 @@ export class FormBuilderService {
   }
 
   async remove(orgId: string, id: string) {
+    await this.findOne(orgId, id);
     const prisma = await this.prismaClientManager.getClient(orgId);
     await prisma.leadForm.delete({ where: { id } });
     return {
@@ -144,6 +146,7 @@ export class FormBuilderService {
       throw new NotFoundException('Form not found');
     }
     id = id.replace('.js', '');
+    await this.findOne(orgId, id);
     try {
       const filePath = `./src/common/scripts/form.js`;
       let content = await readFile(filePath, 'utf-8');
@@ -168,6 +171,7 @@ export class FormBuilderService {
         LeadFormField: true,
       },
     });
+    await this.findOne(orgId, id);
     const formId = `form_${id.replace(' ', '')}`;
     let formHTML = `<form id='${formId}'>`;
     formHTML += `<h2>${form.title}</h2>`;

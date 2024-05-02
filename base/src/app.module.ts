@@ -54,6 +54,7 @@ import { CrmModule } from './crm/crm.module';
 import { SecureExchangeModule } from './secure-exchange/secure-exchange.module';
 import { MicroservicesModule } from './microservices/microservices.module';
 import { ContactsModule } from './contacts/contacts.module';
+import { FormBuilderModule } from './form-builder/form-builder.module';
 
 @Module({ 
   imports: [
@@ -114,7 +115,8 @@ import { ContactsModule } from './contacts/contacts.module';
     CrmModule,
     SecureExchangeModule,
     MicroservicesModule,
-    ContactsModule
+    ContactsModule,
+    FormBuilderModule
   ],
   controllers: [AppController], 
   providers: [AppService],

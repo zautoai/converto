@@ -14,8 +14,8 @@ export class PrismaClientManager implements OnModuleDestroy {
   private clients: { [key: string]: PrismaClient } = {};
 
   async getClient(orgId: string): Promise<PrismaClient> {
-    let client = this.clients[orgId];
     const schemaName = orgId != DEFAULT_SCHEMA_NAME ? getSchemaName(orgId) : DEFAULT_SCHEMA_NAME;
+    let client = this.clients[schemaName];
     const databaseUrl = process.env.DATABASE_URL.replaceAll(
       DEFAULT_SCHEMA_NAME,
       schemaName,
