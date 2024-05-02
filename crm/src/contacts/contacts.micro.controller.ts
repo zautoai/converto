@@ -1,0 +1,75 @@
+import { BadRequestException, Controller } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
+import { ContactsService } from './contacts.service';
+import { FilterDto } from 'src/common/dtos/filter.dto';
+import { CreateContactDto } from './dto/create-contacts.dto';
+import { UpdateContactDto } from './dto/update-contact.dto';
+
+@Controller()
+export class ContactMicroserviceController {
+  constructor(private contactsService: ContactsService) {}
+
+  @MessagePattern({ cmd: 'GET_CONTACTS' })
+  async get_contacts(data: { orgId: string; filterDto: FilterDto }) {
+    try {
+      return await this.contactsService.getContacts(data.orgId, data.filterDto);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'GET_CONTACT' })
+  async get_contact(data: { orgId: string; id: string }) {
+    try {
+      return await this.contactsService.getContact(data.orgId, data.id);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'CREATE_CONTACT' })
+  async create_contact(data: { orgId: string; createContactDto: any }) {
+    try {
+      try {
+        const _createContactDto: CreateContactDto = new CreateContactDto(
+          data.createContactDto,
+        );
+        await _createContactDto.validate();
+      } catch (error) {
+        throw new BadRequestException(error.message);
+      }
+      return await this.contactsService.createContact(
+        data.orgId,
+        data.createContactDto,
+      );
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'UPDATE_CONTACT' })
+  async update_contact(data: {
+    orgId: string;
+    id: string;
+    updateContactDto: any;
+  }) {
+    try {
+      return await this.contactsService.updateContact(
+        data.orgId,
+        data.id,
+        data.updateContactDto,
+      );
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'DELETE_CONTACT' })
+  async delete_contact(data: { orgId: string; id: string }) {
+    try {
+      return await this.contactsService.deleteContact(data.orgId, data.id);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+}
