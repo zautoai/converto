@@ -12,7 +12,7 @@ RUN npm install -g npx --force
 FROM ghcr.io/zautoai/node:20-alpine-prod
 
 # Set NODE_ENV to development (or production based on your environment)
-ENV NODE_ENV=dev
+ENV NODE_ENV=prod
 
 # Define arguments for environment variables
 ARG DATABASE_URL
