@@ -25,7 +25,7 @@ export class FormBuilderMicroserviceController {
     async getForms(data: any) {
         try
         {
-            return await this.formBuilderService.findAll(data.orgId);
+            return await this.formBuilderService.findAll(data.orgId,data.filterDto);
         }
         catch (error)
         {

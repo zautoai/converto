@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateFormBuilderDto } from './dto/create-form-builder.dto';
 import { UpdateFormBuilderDto } from './dto/update-form-builder.dto';
 import { FormBuilderMicroService } from 'src/microservices/crm_service/form-builder.service';
+import { FilterDto } from 'src/common/dto/filter.dto';
 
 @Injectable()
 export class FormBuilderService {
@@ -14,8 +15,8 @@ export class FormBuilderService {
     return await this.formBuilderService.createForm(orgId,createFormBuilderDto);
   }
 
-  async findAll(orgId:string,) {
-    return await this.formBuilderService.getForms(orgId);
+  async findAll(orgId:string,filterDto:FilterDto) {
+    return await this.formBuilderService.getForms(orgId,filterDto);
   }
 
   async findOne(orgId:string,id: string) {

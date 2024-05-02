@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException, Header } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException, Header, Query } from '@nestjs/common';
 import { FormBuilderService } from './form-builder.service';
 import { CreateFormBuilderDto } from './dto/create-form-builder.dto';
 import { UpdateFormBuilderDto } from './dto/update-form-builder.dto';
@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { ZautoRequest } from 'src/common/models/request.model';
+import { FilterDto } from 'src/common/dto/filter.dto';
 
 @ApiTags('form-builder')
 @Controller('form-builder')
@@ -24,10 +25,10 @@ export class FormBuilderController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  async findAll(@Req() request: ZautoRequest) {
+  async findAll(@Req() request: ZautoRequest,@Query() filterDto:FilterDto) {
     const orgId = request.user.org.id;
     if(!orgId) throw new UnauthorizedException('Organization not found');
-    return await this.formBuilderService.findAll(orgId);
+    return await this.formBuilderService.findAll(orgId,filterDto);
   }
 
   @Get(':id')

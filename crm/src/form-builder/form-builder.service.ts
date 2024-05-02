@@ -4,6 +4,7 @@ import { UpdateFormBuilderDto } from './dto/update-form-builder.dto';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { readFile } from 'fs/promises';
 import { ContactsService } from 'src/contacts/contacts.service';
+import { FilterDto } from 'src/common/dtos/filter.dto';
 const { minify } = require('uglify-js');
 
 @Injectable()
@@ -53,11 +54,40 @@ export class FormBuilderService {
     };
   }
 
-  async findAll(orgId: string) {
+  async findAll(orgId: string,filterDto:FilterDto) {
+    const { page, limit, sort, searchTerm } = filterDto;
+    const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
     const forms = await prisma.leadForm.findMany({
+      where: {
+        ...(searchTerm
+          ? {
+              OR: [
+                { title: { contains: searchTerm } },
+                { description: { contains: searchTerm } },
+              ],
+            }
+          : {}),
+      },
+      take: limit,
+      skip: skip,
+      orderBy: {
+        createdAt: sort,
+      },
       include: {
         LeadFormField: true,
+      },
+    });
+    const total = await prisma.leadForm.count({
+      where: {
+        ...(searchTerm
+          ? {
+              OR: [
+                { title: { contains: searchTerm } },
+                { description: { contains: searchTerm } },
+              ],
+            }
+          : {}),
       },
     });
     return {
@@ -65,6 +95,8 @@ export class FormBuilderService {
       success: true,
       message: 'Forms fetched successfully',
       data: forms,
+      total: total,
+      page: page,
     };
   }
 

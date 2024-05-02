@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
+import { FilterDto } from "src/common/dto/filter.dto";
 
 @Injectable()
 export class FormBuilderMicroService {
@@ -33,10 +34,10 @@ export class FormBuilderMicroService {
         }
     }
 
-    async getForms(orgId: string) {
+    async getForms(orgId: string,filterDto:FilterDto) {
         try
         {
-            return this.CRMClient.send({ cmd: 'GET_FORMS' }, {orgId}).toPromise();
+            return this.CRMClient.send({ cmd: 'GET_FORMS' }, {orgId,filterDto}).toPromise();
         }
         catch (error)
         {
