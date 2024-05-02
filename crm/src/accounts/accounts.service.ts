@@ -100,6 +100,8 @@ export class AccountsService {
         id,
       },
     });
+    console.log(id);
+
     if (!account) {
       throw new NotFoundException('Account not found');
     }

@@ -28,7 +28,7 @@ export class AccountMicroService extends BaseService{
     try {
       return this.CRMClient.send(
         { cmd: 'GET_ACCOUNT' },
-        { orgId, accountId },
+        { orgId, id: accountId },
       ).toPromise();
     } catch (error) {
       this.logger.error(`Error while fetching account: ${error.message}`);

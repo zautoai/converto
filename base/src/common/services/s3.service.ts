@@ -22,7 +22,7 @@ export class S3Service {
 
     const uploadResult = await this.s3
       .upload({
-        Bucket: process.env.ZAUTOPIC_BUCKET_NAME,
+        Bucket: process.env.CONVERTO_PIC_BUCKET_NAME,
         Key: originalname,
         Body: buffer,
         ContentType: mimetype,
@@ -32,12 +32,14 @@ export class S3Service {
     return uploadResult;
   }
 
-  async uploadTextFile(filePath: string): Promise<AWS.S3.ManagedUpload.SendData> {
+  async uploadTextFile(
+    filePath: string,
+  ): Promise<AWS.S3.ManagedUpload.SendData> {
     const fileStream = fs.createReadStream(filePath);
     const fileName = path.basename(filePath);
 
     const params: AWS.S3.PutObjectRequest = {
-      Bucket: process.env.ZAUTOTRAIN_BUCKET_NAME,
+      Bucket: process.env.CONVERTO_TRAIN_BUCKET_NAME,
       Key: fileName,
       Body: fileStream,
       ContentType: 'text/plain',
@@ -50,7 +52,10 @@ export class S3Service {
     try {
       const parts = filePath.split('/');
       const fileName = parts.pop();
-      const params = { Bucket: process.env.ZAUTOTRAIN_BUCKET_NAME, Key: fileName };
+      const params = {
+        Bucket: process.env.CONVERTO_TRAIN_BUCKET_NAME,
+        Key: fileName,
+      };
       const data = await this.s3.getObject(params).promise();
       fs.writeFileSync(filePath, data.Body.toString('utf-8'));
     } catch (error) {
@@ -62,7 +67,10 @@ export class S3Service {
     try {
       const parts = filePath.split('/');
       const fileName = parts.pop();
-      const params = { Bucket: process.env.ZAUTOTRAIN_BUCKET_NAME, Key: fileName };
+      const params = {
+        Bucket: process.env.CONVERTO_TRAIN_BUCKET_NAME,
+        Key: fileName,
+      };
       const data = await this.s3.deleteObject(params).promise();
     } catch (error) {
       console.log(error);
@@ -70,7 +78,10 @@ export class S3Service {
   }
 
   async isFileExists(fileName: string) {
-    const params = { Bucket: process.env.ZAUTOTRAIN_BUCKET_NAME, Key: fileName };
+    const params = {
+      Bucket: process.env.CONVERTO_TRAIN_BUCKET_NAME,
+      Key: fileName,
+    };
     const data = await this.s3.getObject(params).promise();
     if (data) {
       return true;
