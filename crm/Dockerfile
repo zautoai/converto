@@ -58,7 +58,7 @@ COPY --from=builder /usr/src/app/prisma ./prisma
 
 RUN npx prisma generate
 
-WORKDIR /usr/src/
+
 
 # Expose the port the app runs on
 EXPOSE 3001
