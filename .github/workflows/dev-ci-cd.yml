@@ -101,7 +101,7 @@ jobs:
           CRM_HOST_PORT=${{ secrets.DEV_CRM_HOST_PORT }}
           CRM_JWT_SECRET=${{ secrets.DEV_CRM_JWT_SECRET }}
 
-deploy:
+  deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
     steps:
@@ -184,4 +184,4 @@ deploy:
           exit 1
           fi
     - name: Deployment Success Message
-      run: echo "Deployment completed successfully!🎉😂🎉"
+      run: echo "Deployment completed successfully!🎉😂
