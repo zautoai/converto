@@ -9,7 +9,7 @@ import { ZautoRequest } from 'src/common/models/request.model';
 import { FilterDto } from 'src/common/dto/filter.dto';
 
 @ApiTags('form-builder')
-@Controller('form-builder')
+@Controller('api/form-builder')
 export class FormBuilderController {
   constructor(private readonly formBuilderService: FormBuilderService) {}
 
