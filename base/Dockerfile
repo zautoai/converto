@@ -11,7 +11,7 @@ RUN npm install
 # Copy the rest of your source code
 COPY . .
 
-# Build your application
+# Build your application.
 RUN npm run build:dev
 RUN npm install -g npx --force
 
