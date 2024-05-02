@@ -63,4 +63,4 @@ RUN npx prisma generate
 EXPOSE 3001
 
 # Start the app
-CMD [ "node", "app/main.js" ]
+CMD [ "node", "main.js" ]
