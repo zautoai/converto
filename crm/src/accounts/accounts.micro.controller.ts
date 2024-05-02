@@ -25,7 +25,7 @@ export class AccountsMicroController {
     getAccounts(data: any) {
         try
         {
-            return this.accountService.findAll(data.orgId);
+            return this.accountService.findAll(data.orgId,data.filterDto);
         }
         catch (error)
         {
