@@ -16,7 +16,7 @@ RUN npm run build:dev
 RUN npm install -g npx --force
 
 # Production stage
-FROM node:20-alpine
+FROM node:20-slim
 WORKDIR /usr/src/app
 
 # Install openssl and curl
