@@ -15,7 +15,7 @@ services:
     restart: always  # Restart policy for the Node app.
 
   crm:
-     image: ghcr.io/zautoai/converto:dev-crm
+    image: ghcr.io/zautoai/converto:dev-crm
     networks:
       - converto-network
     ports:
@@ -31,7 +31,6 @@ services:
     volumes:
       - redis_vol:/data
     restart: always
-
 
 networks:
   redis-net:
