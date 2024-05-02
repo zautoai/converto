@@ -2,9 +2,9 @@ version: '3.8'
 
 services:
   base:
-    image: ghcr.io/zautoai/converto_base:dev
+    image: ghcr.io/zautoai/converto:dev-base
     networks:
-      - redis-net
+      - converto-network
     volumes:
       - app_uploads:/usr/src/uploads
       - app_images:/usr/src/public/images
@@ -15,9 +15,9 @@ services:
     restart: always  # Restart policy for the Node app.
 
   crm:
-     image: ghcr.io/zautoai/converto_crm:dev
+     image: ghcr.io/zautoai/converto:dev-crm
     networks:
-      - redis-net
+      - converto-network
     ports:
       - "3031:3001"
 
@@ -25,7 +25,7 @@ services:
     image: redis:latest
     command: redis-server --requirepass REDIS_PASSWORD_PLACEHOLDER
     networks:
-      - redis-net
+      - converto-network
     expose:
       - "6379"
     volumes:
