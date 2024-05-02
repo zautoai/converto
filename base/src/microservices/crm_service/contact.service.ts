@@ -1,13 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { FilterDto } from 'src/common/dto/filter.dto';
+import { BaseService } from 'src/common/services/base.service';
 import { CreateContactDto } from 'src/crm/dto/create-contacts.dto';
 
 @Injectable()
-export class ContactService {
-  private logger = new Logger(ContactService.name);
+export class ContactService extends BaseService{
 
-  constructor(@Inject('CRM_SERVICE') private readonly CRMClient: ClientProxy) {}
+  constructor(@Inject('CRM_SERVICE') private readonly CRMClient: ClientProxy) {
+    super();
+  }
 
   async getContacts(orgId: string, filterDto: FilterDto) {
     try {
