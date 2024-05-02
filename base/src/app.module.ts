@@ -56,6 +56,7 @@ import { MicroservicesModule } from './microservices/microservices.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { FormBuilderModule } from './form-builder/form-builder.module';
 import { AccountsModule } from './accounts/accounts.module';
+import { AccountBasedMaretingModule } from './account-based-mareting/account-based-mareting.module';
 
 @Module({
   imports: [
@@ -129,6 +130,7 @@ import { AccountsModule } from './accounts/accounts.module';
     ContactsModule,
     FormBuilderModule,
     AccountsModule,
+    AccountBasedMaretingModule
   ],
   controllers: [AppController],
   providers: [AppService],

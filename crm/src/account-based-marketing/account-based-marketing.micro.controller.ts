@@ -14,7 +14,7 @@ export class AccountBasedMarketingMicroserviceController {
     async createAccountBasedMarketing(data: any) {
        try
        {
-           return this.ambService.create(data.orgId, data.accountBasedMarketing);
+           return await this.ambService.create(data.orgId, data.createAccountBasedMarketingDto);
        }
        catch (error)
        {
@@ -26,7 +26,7 @@ export class AccountBasedMarketingMicroserviceController {
     async getAccountBasedMarketing(data: any) {
         try
         {
-            return this.ambService.findOne(data.orgId, data.id);
+            return await this.ambService.findOne(data.orgId, data.id);
         }
         catch (error)
         {
@@ -38,7 +38,7 @@ export class AccountBasedMarketingMicroserviceController {
     async getAccountBasedMarketings(data: any) {
         try
         {
-            return this.ambService.findAll(data.orgId);
+            return await this.ambService.findAll(data.orgId);
         }
         catch (error)
         {
@@ -50,7 +50,7 @@ export class AccountBasedMarketingMicroserviceController {
     async updateAccountBasedMarketing(data: any) {
         try
         {
-            return this.ambService.update(data.orgId, data.id, data.accountBasedMarketing);
+            return await this.ambService.update(data.orgId, data.id, data.updateAccountBasedMarketingDto);
         }
         catch (error)
         {
@@ -62,7 +62,7 @@ export class AccountBasedMarketingMicroserviceController {
     async deleteAccountBasedMarketing(data: any) {
         try
         {
-            return this.ambService.remove(data.orgId, data.id);
+            return await this.ambService.remove(data.orgId, data.id);
         }
         catch (error)
         {

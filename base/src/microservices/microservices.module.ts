@@ -5,6 +5,7 @@ import { ContactService } from './crm_service/contact.service';
 import { SchemaManagerService } from './crm_service/schema-manager.service';
 import { FormBuilderMicroService } from './crm_service/form-builder.service';
 import { AccountMicroService } from './crm_service/account.service';
+import { AccountBasedMarketingMicroService } from './crm_service/account-based-marketing.service';
 
 @Module({
   imports: [ConfigModule.forRoot()],
@@ -28,12 +29,14 @@ import { AccountMicroService } from './crm_service/account.service';
     SchemaManagerService,
     FormBuilderMicroService,
     AccountMicroService,
-  ],
-  exports: [
+    AccountBasedMarketingMicroService
+],
+exports: [ 
     ContactService,
     SchemaManagerService,
     FormBuilderMicroService,
     AccountMicroService,
+    AccountBasedMarketingMicroService
   ],
 })
 export class MicroservicesModule {}
