@@ -33,7 +33,7 @@ services:
     restart: always
 
 networks:
-  redis-net:
+  converto-network:
     driver: bridge
 
 volumes:
