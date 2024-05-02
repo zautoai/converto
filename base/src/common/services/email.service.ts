@@ -73,7 +73,7 @@ export class EmailService {
         SendGrid.setApiKey(process.env.SENDGRID_KEY);
         const message: SendGrid.MailDataRequired = {
             to: verification.user.email,
-            from: process.env.ZAUTO_EMAIL,
+            from: process.env.CONVERTO_EMAIL,
             subject: (verification.type == VerificationType.VERIFYEMAIL) ? 'Welcome to ZautoAI' : 'Reset Account Password',
             html: template
         };
@@ -90,7 +90,7 @@ export class EmailService {
             .replaceAll('{{createdAt}}', signupMailDto.user.createdAt.toDateString())
         const message: SendGrid.MailDataRequired = {
             to: process.env.SIGNUP_ALERT_MAIL,
-            from: process.env.ZAUTO_EMAIL,
+            from: process.env.CONVERTO_EMAIL,
             subject: 'Signup Aleart',
             html: template
         };
