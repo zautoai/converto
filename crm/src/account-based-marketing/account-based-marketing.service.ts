@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAccountBasedMarketingDto } from './dto/create-account-based-marketing.dto';
 import { UpdateAccountBasedMarketingDto } from './dto/update-account-based-marketing.dto';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
@@ -47,6 +47,10 @@ export class AccountBasedMarketingService {
     const data = await prisma.accountBasedMarketingTarget.findUnique({
       where: { id },
     });
+    if(!data)
+    {
+      throw new NotFoundException('Account Based Marketing not found'); 
+    }
     return {
       code: 200,
       success: true,

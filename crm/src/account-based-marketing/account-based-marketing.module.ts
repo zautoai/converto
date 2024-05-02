@@ -4,10 +4,11 @@ import { AccountBasedMarketingController } from './account-based-marketing.contr
 import { CommonModule } from 'src/common/common.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { CustomFieldsModule } from 'src/custom-fields/custom-fields.module';
+import { AccountBasedMarketingMicroserviceController } from './account-based-marketing.micro.controller';
 
 @Module({
   imports: [CommonModule, PrismaModule, CustomFieldsModule],
-  controllers: [AccountBasedMarketingController],
+  controllers: [AccountBasedMarketingController,AccountBasedMarketingMicroserviceController],
   providers: [AccountBasedMarketingService],
   exports: [AccountBasedMarketingService],
 })
