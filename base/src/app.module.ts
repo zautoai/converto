@@ -129,7 +129,7 @@ import { AccountBasedMaretingModule } from './account-based-mareting/account-bas
     MicroservicesModule,
     ContactsModule,
     FormBuilderModule,
-    AccountsModule,,
+    AccountsModule,
     AccountBasedMaretingModule
   ],
   controllers: [AppController],
