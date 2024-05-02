@@ -138,7 +138,7 @@ RUN npx prisma generate
 WORKDIR /usr/src/
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 3001
 
 # Start the app
 CMD [ "node", "app/main.js" ]
