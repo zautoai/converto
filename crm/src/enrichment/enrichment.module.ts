@@ -9,6 +9,7 @@ import { ZoomInfoService } from './providers/zoominfo.service';
 import { BullModule } from '@nestjs/bull';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { EnrichmentProcessor } from './enrichment.processor';
+import { EnrichmentMicroserviceController } from './enrichment-provider.micro.controller';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { EnrichmentProcessor } from './enrichment.processor';
     ClearBitService,
     ZoomInfoService,
     EnrichmentProcessor,
+    EnrichmentMicroserviceController
   ],
   exports: [EnrichmentService, ClearBitService, ZoomInfoService],
 })
