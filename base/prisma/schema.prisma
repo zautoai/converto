@@ -13,7 +13,7 @@ model Role {
   name       String   @unique @db.VarChar(50)
   createdAt  DateTime @default(now())
   modifiedAt DateTime @updatedAt
-  Users      User[]
+  Users      User[] 
 }
 
 model User {
