@@ -20,6 +20,7 @@ services:
       - converto-network
     ports:
       - "3031:3001"
+    restart: always
 
   redis:
     image: redis:latest
