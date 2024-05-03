@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { logger } from './common/middlewares/logger.middleware';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Transport } from '@nestjs/microservices';
 
@@ -10,7 +10,9 @@ async function bootstrap() {
   app.connectMicroservice({
     transport: Transport.REDIS,
     options: {
-      url: `redis://${process.env.REDIS_IP}:${process.env.REDIS_PORT}`,
+      host: process.env.REDIS_IP || 'redis',
+      port: +process.env.REDIS_PORT || 6379,
+      password: process.env.REDIS_PASSWORD || '',
     },
   });  
   // CORS

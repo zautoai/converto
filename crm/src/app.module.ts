@@ -23,15 +23,6 @@ import { MicroservicesModule } from './microservices/microservices.module';
 
 @Module({
   imports: [
-    ClientsModule.register([
-      {
-        name: 'BASE_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          port: +process.env.BASE_API_PORT || 3000,
-        },
-      },
-    ]),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === 'production' ? '.prod.env' : '.env',

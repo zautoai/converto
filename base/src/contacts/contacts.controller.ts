@@ -21,6 +21,7 @@ import { ZautoRequest } from 'src/common/models/request.model';
 import { ContactsService } from './contacts.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
+import { CreateFieldDto } from './dto/create-field.dto';
 
 @ApiTags('contacts')
 @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
@@ -47,6 +48,15 @@ export class ContactsController {
       throw new UnauthorizedException('Org Id not found');
     }
     return await this.contactsService.findAll(orgId, filterDto);
+  }
+
+  @Get('fields')
+  async getFields(@Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    return await this.contactsService.getContactFields(orgId);
   }
 
   @Get(':id')
@@ -80,4 +90,14 @@ export class ContactsController {
     }
     return await this.contactsService.remove(orgId, id);
   }
+
+  @Post('customfield')
+  async createCustomField(@Body() createFieldDto:CreateFieldDto, @Req() request: ZautoRequest){
+    const orgId = request.user.org.id;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    return await this.contactsService.createCustomFields(orgId, createFieldDto);
+  }
+
 }
