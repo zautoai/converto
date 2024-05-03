@@ -4,7 +4,7 @@ export const SYSTEM_CONST = {
     DEFALT_ROLE :'user',
     ADMIN_ROLE: 'admin',
     SUPERUSER_ROLE: 'superadmin',
-    TRAINING_CONTENT_PATH: process.env.TRAINING_CONTENT_PATH
+    TRAINING_CONTENT_PATH: 'uploads'
 }
 
 export const MEDIA_EXTENTIONS = [

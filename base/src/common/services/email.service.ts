@@ -78,7 +78,13 @@ export class EmailService {
             html: template
         };
         console.log(template)
-        const result = await SendGrid.send(message);
+        try {
+            const result = await SendGrid.send(message);
+            console.log(result)
+        } catch(error) {
+            console.log(error)
+        }
+        
     }
 
     async sendSignupAleartMail(signupMailDto: SignupMailDto) {
