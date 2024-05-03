@@ -49,18 +49,24 @@ export enum DateFilter {
   THIS_MONTH = 'this_month',
   LAST_MONTH = 'last_month',
   THIS_WEEK = 'this_week',
-  BETWEEN = 'between'
+  BETWEEN = 'between',
 }
 
 export enum ToolType {
   RESTAPI = 'RESTAPI',
   CRM = 'CRM',
   CALENDAR = 'CALENDAR',
-  COMMUNICATION = 'COMMUNICATION'
+  COMMUNICATION = 'COMMUNICATION',
 }
 
 export enum CTAType {
   CTA = 'CTA',
   NAVIGATOR = 'NAVIGATOR',
   CALENDAR = 'CALENDAR',
+}
+
+export enum CustomFieldParent {
+  CONTACT = 'CONTACT',
+  ACCOUNT = 'ACCOUNT',
+  ABM = 'ABM',
 }
