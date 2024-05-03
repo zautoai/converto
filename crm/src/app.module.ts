@@ -23,6 +23,10 @@ import { MicroservicesModule } from './microservices/microservices.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: process.env.NODE_ENV === 'production' ? '.prod.env' : '.env',
+    }),
     ClientsModule.register([
       {
         name: 'BASE_SERVICE',
@@ -32,10 +36,6 @@ import { MicroservicesModule } from './microservices/microservices.module';
         },
       },
     ]),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'production' ? '.prod.env' : '.env',
-    }),
     BullBoardModule.forRoot({
       route: '/bull-board',
       adapter: ExpressAdapter,
