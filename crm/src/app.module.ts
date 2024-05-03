@@ -27,15 +27,6 @@ import { MicroservicesModule } from './microservices/microservices.module';
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === 'production' ? '.prod.env' : '.env',
     }),
-    ClientsModule.register([
-      {
-        name: 'BASE_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          port: +process.env.BASE_API_PORT || 3000,
-        },
-      },
-    ]),
     BullBoardModule.forRoot({
       route: '/bull-board',
       adapter: ExpressAdapter,

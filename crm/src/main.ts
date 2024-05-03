@@ -7,7 +7,6 @@ import { Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const logger = new Logger('Main');
-  logger.debug(process.env.REDIS_IP)
   const app = await NestFactory.create(AppModule);
   app.connectMicroservice({
     transport: Transport.REDIS,
