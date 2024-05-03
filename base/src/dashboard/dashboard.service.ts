@@ -312,7 +312,7 @@ export class DashboardService {
                         CAST(COALESCE(COUNT(V.ID), 0) AS INT) AS VISIT_COUNT
                     FROM
                         DATE_RANGE DR
-                        LEFT JOIN ${DEFAULT_SCHEMA_NAME}."Visit" V ON DATE (V."createdAt") = DR.VISIT_DATE
+                        LEFT JOIN "Visit" V ON DATE (V."createdAt") = DR.VISIT_DATE
                         AND V."orgId" = ${orgId}
                     WHERE
                         DR.VISIT_DATE >= ${_startDate}
@@ -363,7 +363,7 @@ export class DashboardService {
                         CAST(COALESCE(COUNT(L.ID), 0) AS INT) AS LEAD_COUNT
                     FROM
                         DATE_RANGE DR
-                        LEFT JOIN ${DEFAULT_SCHEMA_NAME}."Lead" L ON DATE (L."createdAt") = DR.LEAD_DATE
+                        LEFT JOIN "Lead" L ON DATE (L."createdAt") = DR.LEAD_DATE
                         AND L."convId" IS NOT NULL
                         AND L."orgId" = ${orgId}
                     WHERE
@@ -415,7 +415,7 @@ export class DashboardService {
                         CAST(COALESCE(COUNT(C.ID), 0) AS INT) AS CONVO_COUNT
                     FROM
                         DATE_RANGE DR
-                        LEFT JOIN ${DEFAULT_SCHEMA_NAME}."Conversation" C ON DATE (C."createdAt") = DR.CONVO_DATE
+                        LEFT JOIN "Conversation" C ON DATE (C."createdAt") = DR.CONVO_DATE
                         AND C."orgId" = ${orgId}
                         AND C."isValid" = TRUE
                     WHERE
@@ -680,10 +680,10 @@ export class DashboardService {
                         COALESCE(COUNT(DISTINCT CONV."id"), 0) AS CONVOCOUNT,
                         COALESCE(COUNT(DISTINCT L."id"), 0) AS LEADCOUNT
                     FROM
-                        ${DEFAULT_SCHEMA_NAME}."Campaign" C
-                        LEFT JOIN ${DEFAULT_SCHEMA_NAME}."Visit" V ON C.ID = V."campaignId" AND V."createdAt" >= ${_startDate} AND V."createdAt" <= ${_endDate}
-                        LEFT JOIN ${DEFAULT_SCHEMA_NAME}."Conversation" CONV ON C.ID = CONV."campaignId" AND CONV."isValid" = TRUE AND CONV."createdAt" >= ${_startDate} AND CONV."createdAt" <= ${_endDate}
-                        LEFT JOIN ${DEFAULT_SCHEMA_NAME}."Lead" L ON CONV.ID = L."convId" AND L."createdAt" >= ${_startDate} AND L."createdAt" <= ${_endDate}
+                        "Campaign" C
+                        LEFT JOIN "Visit" V ON C.ID = V."campaignId" AND V."createdAt" >= ${_startDate} AND V."createdAt" <= ${_endDate}
+                        LEFT JOIN "Conversation" CONV ON C.ID = CONV."campaignId" AND CONV."isValid" = TRUE AND CONV."createdAt" >= ${_startDate} AND CONV."createdAt" <= ${_endDate}
+                        LEFT JOIN "Lead" L ON CONV.ID = L."convId" AND L."createdAt" >= ${_startDate} AND L."createdAt" <= ${_endDate}
                     WHERE
                         C."orgId" = ${orgId}
                     GROUP BY
@@ -706,7 +706,7 @@ export class DashboardService {
                     0 AS CONVOCOUNT,
                     0 AS LEADCOUNT
                 FROM
-                    ${DEFAULT_SCHEMA_NAME}."Campaign" C
+                    "Campaign" C
                 WHERE
                     NOT EXISTS (
                         SELECT 1 FROM CampaignCounts
