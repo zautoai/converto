@@ -1,11 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { logger } from './common/middlewares/logger.middleware';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
+  const logger = new Logger('Main');
+  logger.debug(process.env.REDIS_PORT)
   const app = await NestFactory.create(AppModule);
   app.connectMicroservice({
     transport: Transport.REDIS,
