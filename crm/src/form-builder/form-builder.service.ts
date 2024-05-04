@@ -18,6 +18,16 @@ export class FormBuilderService {
 
   async create(orgId: string, createFormBuilderDto: CreateFormBuilderDto) {
     const prisma = await this.prismaClientManager.getClient(orgId);
+    const total = await prisma.leadForm.count();
+    console.log(total);
+    if (total >= 10) {
+      return {
+        statusCode: 400,
+        success: false,
+        message: 'You can not create more than 10 forms',
+      };
+    }
+
     let leadForm;
     try {
       const fields = createFormBuilderDto.createLeadField;
@@ -54,7 +64,7 @@ export class FormBuilderService {
     };
   }
 
-  async findAll(orgId: string,filterDto:FilterDto) {
+  async findAll(orgId: string, filterDto: FilterDto) {
     const { page, limit, sort, searchTerm } = filterDto;
     const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
@@ -227,12 +237,12 @@ export class FormBuilderService {
     });
     formHTML += `<button type="submit">Submit</button>`;
     formHTML += '</form>';
-    return formHTML;
-    // return {
-    //   code:200,
-    //   message: 'Form HTML generated successfully',
-    //   data: formHTML
-    // };
+    // return formHTML;
+    return {
+      code: 200,
+      message: 'Form HTML generated successfully',
+      data: formHTML,
+    };
   }
 
   async submitForm(orgId: string, id: string, formData: any) {
