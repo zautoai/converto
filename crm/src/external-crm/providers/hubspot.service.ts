@@ -87,8 +87,8 @@ export class HubspotService extends BaseExternalCrm {
             });
             if(this.isTokenExpired(hubspotToken.expiresIn))
             {
-                const accessToken = await this.exchangeRefreshTokenForAccessToken(orgId,hubspotToken.refreshToken);
-                return accessToken.data.access_token;   
+                const data = await this.exchangeRefreshTokenForAccessToken(orgId,hubspotToken.refreshToken);
+                return data.access_token;   
             }
             return hubspotToken.accessToken;
         }
@@ -138,8 +138,9 @@ export class HubspotService extends BaseExternalCrm {
         }
     }    
 
-    private isTokenExpired(expiresIn: any): boolean {
+    private isTokenExpired(expiresIn: number): boolean {
         const currentTime = Math.floor(Date.now() / 1000);
-        return expiresIn < currentTime;
+        const expirationTime = expiresIn + currentTime; 
+        return expirationTime < currentTime;
     }
 }

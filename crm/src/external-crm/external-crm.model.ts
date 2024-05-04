@@ -30,4 +30,6 @@ export abstract class BaseExternalCrm {
     abstract exchangeRefreshTokenForAccessToken(orgId:string, refreshToken: string): Promise<any>;
 
     abstract handleToken(orgId:string,tokenData: Token): Promise<void>;
+
+    abstract getAccessToken(orgId:string): Promise<any>;
 }

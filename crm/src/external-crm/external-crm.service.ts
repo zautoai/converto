@@ -23,4 +23,10 @@ export class ExternalCrmService {
         const accessToken = await crm.exchangeCodeForAccessToken(orgId,code);
         return accessToken;
     }
+
+    async getAccessToken(orgId:string, crmName:string): Promise<any> {
+        const crm = this.crmProvider.getCRM(crmName);
+        const accessToken = await crm.getAccessToken(orgId);
+        return accessToken;
+    }
 }
