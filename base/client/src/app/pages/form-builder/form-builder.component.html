@@ -28,7 +28,7 @@
             </thead>
             <tbody>
               <ng-container>
-                <tr *ngFor="let data of submittedData">
+                <tr *ngFor="let data of userList">
                   <td>
                     {{ data.title }}
                   </td>
@@ -44,14 +44,14 @@
                       <i class="fa fa-edit text-success update"></i>
                     </button>
   
-                    <button (click)="deleteSubmittedData(data)">
+                    <button (click)="delete(data)">
                       <i class="fa fa-trash-o text-danger delete"></i>
                     </button>
                   </td>
                 </tr>
               </ng-container>
               <tr *ngIf="userList?.data?.length <= 0">
-                <td class="text-center" colspan="4">User not found.</td>
+                <td class="text-center" colspan="4">Form not found.</td>
               </tr>
             </tbody>
           </table>

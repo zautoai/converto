@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException, Header, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  UnauthorizedException,
+  Header,
+  Query,
+} from '@nestjs/common';
 import { FormBuilderService } from './form-builder.service';
 import { CreateFormBuilderDto } from './dto/create-form-builder.dto';
 import { UpdateFormBuilderDto } from './dto/update-form-builder.dto';
@@ -16,46 +29,57 @@ export class FormBuilderController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  async create(@Body() createFormBuilderDto: CreateFormBuilderDto,@Req() request: ZautoRequest) {
+  async create(
+    @Body() createFormBuilderDto: CreateFormBuilderDto,
+    @Req() request: ZautoRequest,
+  ) {
     const orgId = request.user.org.id;
-    if(!orgId) throw new UnauthorizedException('Organization not found');
-    return await this.formBuilderService.create(orgId,createFormBuilderDto);
+    if (!orgId) throw new UnauthorizedException('Organization not found');
+    return await this.formBuilderService.create(orgId, createFormBuilderDto);
   }
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  async findAll(@Req() request: ZautoRequest,@Query() filterDto:FilterDto) {
+  async findAll(@Req() request: ZautoRequest, @Query() filterDto: FilterDto) {
     const orgId = request.user.org.id;
-    if(!orgId) throw new UnauthorizedException('Organization not found');
-    return await this.formBuilderService.findAll(orgId,filterDto);
+    if (!orgId) throw new UnauthorizedException('Organization not found');
+    return await this.formBuilderService.findAll(orgId, filterDto);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  async findOne(@Param('id') id: string,@Req() request: ZautoRequest) {
+  async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
-    if(!orgId) throw new UnauthorizedException('Organization not found');
-    return await this.formBuilderService.findOne(orgId,id);
+    if (!orgId) throw new UnauthorizedException('Organization not found');
+    return await this.formBuilderService.findOne(orgId, id);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  async update(@Param('id') id: string, @Body() updateFormBuilderDto: UpdateFormBuilderDto,@Req() request: ZautoRequest) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateFormBuilderDto: UpdateFormBuilderDto,
+    @Req() request: ZautoRequest,
+  ) {
     const orgId = request.user.org.id;
-    if(!orgId) throw new UnauthorizedException('Organization not found');
-    return await this.formBuilderService.update(orgId,id, updateFormBuilderDto);
+    if (!orgId) throw new UnauthorizedException('Organization not found');
+    return await this.formBuilderService.update(
+      orgId,
+      id,
+      updateFormBuilderDto,
+    );
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  async remove(@Param('id') id: string,@Req() request: ZautoRequest) {
+  async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
-    if(!orgId) throw new UnauthorizedException('Organization not found');
-    return await this.formBuilderService.remove(orgId,id);
+    if (!orgId) throw new UnauthorizedException('Organization not found');
+    return await this.formBuilderService.remove(orgId, id);
   }
 
   @Get(':orgId/form/script/:id')

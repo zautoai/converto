@@ -1,4 +1,3 @@
-
 import {
   Component,
   ViewChild,
@@ -20,19 +19,17 @@ import { ChatBotWidgetsComponent } from 'src/app/widgets/chat-bot-widgets/chatbo
 import { EventEmitter } from 'stream';
 import { DeployScriptType } from '../zautosettings/settings/settings.component';
 
-
 @Component({
   selector: 'app-form-builder',
   templateUrl: './form-builder.component.html',
-  styleUrl: './form-builder.component.scss'
+  styleUrl: './form-builder.component.scss',
 })
 export class FormBuilderComponent implements OnInit {
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
- @Input()chatBotWidget! : ChatBotWidgetsComponent;
-
+  @Input() chatBotWidget!: ChatBotWidgetsComponent;
 
   user: any = {};
   userList: any = [];
@@ -46,7 +43,7 @@ export class FormBuilderComponent implements OnInit {
   currentPage: number = 1;
   itemPerPage: number = 10;
   submittedData: any[] = [];
-  selectedData: any = null; 
+  selectedData: any = null;
   selectedCheckboxes: string[] = [];
 
   constructor(
@@ -63,22 +60,19 @@ export class FormBuilderComponent implements OnInit {
       description: [''],
       name: false,
       label: false,
-      contactdetails: false
+      contactdetails: false,
     });
   }
-
 
   ngOnInit(): void {
     this.getUsers();
   }
   ngAfterViewInit(): void {
-    if(this.chatBotWidget) {
+    if (this.chatBotWidget) {
       this.chatBotWidget.getAgent(this.avatarService.getAvatarId());
     }
   }
 
-
-  
   deleteSubmittedData(data: any): void {
     const index = this.submittedData.indexOf(data);
     if (index !== -1) {
@@ -100,20 +94,22 @@ export class FormBuilderComponent implements OnInit {
       this.selectedCheckboxes.push('Phone Number');
     }
     this.offcanvasService.dismiss();
-    console.log('Form submitted with selected checkboxes:', this.selectedCheckboxes);
-
-  
+    console.log(
+      'Form submitted with selected checkboxes:',
+      this.selectedCheckboxes,
+    );
   }
 
   getUsers = () => {
     this.restService
-      .get(
-        API.main.orgUser,
-        `?limit=${this.itemPerPage}&page=${this.currentPage}`,
+      .getAll(
+        API.main.formbuilder +
+          `?limit=${this.itemPerPage}&page=${this.currentPage}`,
       )
       .subscribe(
         (response: any) => {
-          this.userList = response;
+          this.userList = response.data;
+          console.log(response);
         },
         (error) => {
           console.log(error);
@@ -132,7 +128,7 @@ export class FormBuilderComponent implements OnInit {
       animation: true,
     });
   }
-  openViewUser(data:any) {
+  openViewUser(data: any) {
     this.selectedData = data;
     this.Form.reset();
     this.resetErrorFeedback();
@@ -160,9 +156,9 @@ export class FormBuilderComponent implements OnInit {
 
   deplymentType = DeployScriptType;
   getAgentDeploy(type: DeployScriptType) {
-    const botId = this.avatarService.getAvatarId()
+    const botId = this.avatarService.getAvatarId();
 
-    let script = "";
+    let script = '';
     if (type == DeployScriptType.BOTTOM_BAR) {
       script = `
       <script type="text/javascript">
@@ -178,7 +174,7 @@ export class FormBuilderComponent implements OnInit {
             d.getElementsByTagName("head")[0].appendChild(s);
         })();
       </script>
-      `
+      `;
     }
 
     return script;
@@ -190,26 +186,24 @@ export class FormBuilderComponent implements OnInit {
     this.showHTML = false;
   }
 
-
   onCreateuserSubmit() {
     this.resetErrorFeedback();
     const title = this.Form.value.title || '';
     const description = this.Form.value.description || '';
-  
 
     if (this.Form.valid) {
       const data = {
-        title: "title",
-        description: "description",
+        title: title,
+        description: description,
         isActive: true,
-         createLeadField: [
+        createLeadField: [
           {
-            label: "string",
-            type: "TEXT",
-            contactField: "string",
-            isRequired: true
-          }
-        ]
+            label: 'string',
+            type: 'TEXT',
+            contactField: 'string',
+            isRequired: true,
+          },
+        ],
       };
       console.log(data);
       this.restService.post(API.main.formbuilder, data).subscribe({
@@ -224,7 +218,6 @@ export class FormBuilderComponent implements OnInit {
           this.notifService.showError(error.error.message);
         },
       });
-
     } else {
       if (title.length <= 0) {
         this.errorFeedback.name = 'Name required.';
@@ -234,7 +227,6 @@ export class FormBuilderComponent implements OnInit {
       }
     }
   }
-
 
   openUpdateUser(user: any) {
     this.user = user;
@@ -265,10 +257,8 @@ export class FormBuilderComponent implements OnInit {
     }
   }
 
-
-  delete = (user: any) => {
-    this.user = user;
-
+  delete = (data: any) => {
+    this.user = data;
     this.sweetAlertService.warning(
       'Delete user',
       'Are you sure you want to delete ?',
@@ -293,9 +283,9 @@ export class FormBuilderComponent implements OnInit {
   };
 
   confirmDelete = () => {
-    this.restService.delete(API.main.orgUser, this.user.id).subscribe(
+    this.restService.delete(API.main.formbuilder, this.user.id).subscribe(
       (response: any) => {
-        this.notifService.showSuccess('User Deleted Successfully.');
+        this.notifService.showSuccess('Form Deleted Successfully.');
         this.getUsers();
         this.closeModal();
       },
