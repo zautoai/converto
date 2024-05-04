@@ -31,6 +31,7 @@ export class NotificationService {
     this.toastr.show(message,'Info',{
       timeOut: 3000,
       positionClass: 'toast-top-center',
+      // toastClass:'customtoast',
     })
   }
 
