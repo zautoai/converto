@@ -58,10 +58,7 @@ import { FormBuilderComponent } from './form-builder/form-builder.component';
   declarations: [
     ZautoDashboardComponent,
     AccountsComponent,
-
-=======
-FormBuilderComponent,
->>>>>>> 525ef043c46b528026801fe985b714b4c2da3b3b
+    FormBuilderComponent,
     conversationcomponent,
     ChatContainerComponent,
     SummaryContainerComponent,
@@ -113,10 +110,9 @@ FormBuilderComponent,
     TableCardComponent,
     ChartCardComponent,
     WlcomeCardComponent,
-    
 
     CounterFormatPipe,
-      ProgressCardComponent
+    ProgressCardComponent,
   ],
   imports: [
     CommonModule,
@@ -127,20 +123,18 @@ FormBuilderComponent,
     NgSelectModule,
     NgScrollbar,
     ReactiveFormsModule,
-    NgxSkeletonLoaderModule.forRoot(
-      {
-        theme: {
-          extendsFromRoot: true,
-          'background-color': 'var(--primary-1)'
-        }
-      }
-    ),
+    NgxSkeletonLoaderModule.forRoot({
+      theme: {
+        extendsFromRoot: true,
+        'background-color': 'var(--primary-1)',
+      },
+    }),
     MarkdownModule.forRoot(),
     NgCircleProgressModule.forRoot(),
     NgxDropzoneModule,
     NgxColorsModule,
     NgApexchartsModule,
-    NgbProgressbarModule
+    NgbProgressbarModule,
   ],
 })
-export class PagesModule { }
+export class PagesModule {}
