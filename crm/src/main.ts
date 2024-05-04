@@ -10,12 +10,12 @@ async function bootstrap() {
   app.connectMicroservice({
     transport: Transport.REDIS,
     options: {
-      host: process.env.REDIS_IP || 'redis',
+      host: process.env.REDIS_IP,
       port: +process.env.REDIS_PORT || 6379,
       password: process.env.REDIS_PASSWORD || '',
     },
   });  
-  // CORS
+  // CORS 
   app.enableCors({
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
