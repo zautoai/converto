@@ -1,13 +1,14 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { FilterDto } from 'src/common/dto/filter.dto';
-import { CreateContactDto } from 'src/crm/dto/create-contacts.dto';
+import { BaseService } from 'src/common/services/base.service';
+import { CreateFieldDto } from 'src/contacts/dto/create-field.dto';
 
 @Injectable()
-export class ContactService {
-  private logger = new Logger(ContactService.name);
-
-  constructor(@Inject('CRM_SERVICE') private readonly CRMClient: ClientProxy) {}
+export class ContactService extends BaseService {
+  constructor(@Inject('CRM_SERVICE') private readonly CRMClient: ClientProxy) {
+    super();
+  }
 
   async getContacts(orgId: string, filterDto: FilterDto) {
     try {
@@ -65,6 +66,32 @@ export class ContactService {
       ).toPromise();
     } catch (error) {
       this.logger.error(`Error while deleting contact: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async getContactFields(orgId: string) {
+    try {
+      return this.CRMClient.send(
+        { cmd: 'GET_CONTACT_FIELDS' },
+        { orgId },
+      ).toPromise();
+    } catch (error) {
+      this.logger.error(
+        `Error while fetching contact fields: ${error.message}`,
+      );
+      throw error;
+    }
+  }
+
+  async createCustomField(orgId: string, createFieldDto: CreateFieldDto) {
+    try {
+      return this.CRMClient.send(
+        { cmd: 'CREATE_CUSTOM_FIELD' },
+        { orgId, createFieldDto },
+      ).toPromise();
+    } catch (error) {
+      this.logger.error(`Error while creating custom field: ${error.message}`);
       throw error;
     }
   }

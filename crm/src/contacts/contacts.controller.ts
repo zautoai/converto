@@ -153,7 +153,4 @@ export class ContactsController {
       createFieldDto,
     );
   }
-
-  //MICROSERVICE
-
 }

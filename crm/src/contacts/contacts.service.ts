@@ -7,9 +7,9 @@ import {
 import { FilterDto } from 'src/common/dtos/filter.dto';
 import { CustomFieldParent } from 'src/common/enum/enums';
 import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
-import { CreateFieldDto } from 'src/custom-fields/dto/create-fields.dto';
 import { EnrichmentService } from 'src/enrichment/enrichment.service';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
+import { CreateFieldDto } from './dto/create-field.dto';
 
 @Injectable()
 export class ContactsService {
@@ -307,7 +307,11 @@ export class ContactsService {
     };
   }
 
-  async createCustomField(orgId: string, createCustomFieldDto: CreateFieldDto) {
+  async createCustomField(orgId: string, createCustomFieldDto: any) {
+    createCustomFieldDto = {
+      ...createCustomFieldDto,
+      customFieldParent: CustomFieldParent.CONTACT,
+    };
     const newField = await this.customFieldsService.create(
       orgId,
       createCustomFieldDto,

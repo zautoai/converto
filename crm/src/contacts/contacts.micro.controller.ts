@@ -4,6 +4,7 @@ import { ContactsService } from './contacts.service';
 import { FilterDto } from 'src/common/dtos/filter.dto';
 import { CreateContactDto } from './dto/create-contacts.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
+import { CreateFieldDto } from 'src/custom-fields/dto/create-fields.dto';
 
 @Controller()
 export class ContactMicroserviceController {
@@ -68,6 +69,30 @@ export class ContactMicroserviceController {
   async delete_contact(data: { orgId: string; id: string }) {
     try {
       return await this.contactsService.deleteContact(data.orgId, data.id);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'GET_CONTACT_FIELDS' })
+  async get_contact_fields(data: { orgId: string }) {
+    try {
+      return await this.contactsService.getContactFields(data.orgId);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'CREATE_CUSTOM_FIELD' })
+  async create_custom_field(data: {
+    orgId: string;
+    createFieldDto: CreateFieldDto;
+  }) {
+    try {
+      return await this.contactsService.createCustomField(
+        data.orgId,
+        data.createFieldDto,
+      );
     } catch (error) {
       return error.response || error;
     }

@@ -3,28 +3,31 @@ import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { FilterDto } from 'src/common/dto/filter.dto';
 import { AccountMicroService } from 'src/microservices/crm_service/account.service';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class AccountsService {
-  constructor(private readonly accountService: AccountMicroService) {}
+export class AccountsService extends BaseService{
+  constructor(private readonly accountService: AccountMicroService) {
+    super();
+  }
 
   async create(orgId: string, createAccountDto: CreateAccountDto) {
-    return await this.accountService.createAccount(orgId, createAccountDto);
+    return this.handleException(await this.accountService.createAccount(orgId, createAccountDto));
   }
 
   async findAll(orgId: string, filterDto: FilterDto) {
-    return await this.accountService.getAccounts(orgId, filterDto);
+    return this.handleException(await this.accountService.getAccounts(orgId, filterDto));
   }
 
   async findOne(orgId: string, id: string) {
-    return await this.accountService.getAccount(orgId, id);
+    return this.handleException(await this.accountService.getAccount(orgId, id));
   }
 
   async update(orgId: string, id: string, updateAccountDto: UpdateAccountDto) {
-    return await this.accountService.updateAccount(orgId, id, updateAccountDto);
+    return this.handleException(await this.accountService.updateAccount(orgId, id, updateAccountDto));
   }
 
   async remove(orgId: string, id: string) {
-    return await this.accountService.deleteAccount(orgId, id);
+    return this.handleException(await this.accountService.deleteAccount(orgId, id));
   }
 }

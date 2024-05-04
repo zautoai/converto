@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAccountBasedMaretingDto } from './dto/create-account-based-mareting.dto';
 import { UpdateAccountBasedMaretingDto } from './dto/update-account-based-mareting.dto';
+import { FilterDto } from 'src/common/dto/filter.dto';
+import { AccountBasedMarketingMicroService } from 'src/microservices/crm_service/account-based-marketing.service';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class AccountBasedMaretingService {
-  create(createAccountBasedMaretingDto: CreateAccountBasedMaretingDto) {
-    return 'This action adds a new accountBasedMareting';
+export class AccountBasedMaretingService extends BaseService{
+
+  constructor(
+    private readonly abmService:AccountBasedMarketingMicroService
+  ) {
+    super();
   }
 
-  findAll() {
-    return `This action returns all accountBasedMareting`;
+  async create(orgId: string,createAccountBasedMaretingDto: CreateAccountBasedMaretingDto) {
+    return this.handleException(await this.abmService.createAccountBasedMarketing(orgId,createAccountBasedMaretingDto));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} accountBasedMareting`;
+  async findAll(orgId: string,filterDto: FilterDto) {
+    return this.handleException(await this.abmService.getAccountBasedMarketing(orgId, filterDto));
   }
 
-  update(id: number, updateAccountBasedMaretingDto: UpdateAccountBasedMaretingDto) {
-    return `This action updates a #${id} accountBasedMareting`;
+  async findOne(orgId: string,id: string) {
+    return this.handleException(await this.abmService.getAccountBasedMarketingById(orgId, id));
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} accountBasedMareting`;
+  async update(orgId: string,id: string, updateAccountBasedMaretingDto: UpdateAccountBasedMaretingDto) {
+    return this.handleException(await this.abmService.updateAccountBasedMarketing(orgId, id, updateAccountBasedMaretingDto));
+  }
+
+  async remove(orgId: string,id: string) {
+    return this.handleException(await this.abmService.deleteAccountBasedMarketing(orgId, id));
   }
 }

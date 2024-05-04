@@ -3,12 +3,14 @@ import { ClientProxy } from '@nestjs/microservices';
 import { CreateAccountDto } from 'src/accounts/dto/create-account.dto';
 import { UpdateAccountDto } from 'src/accounts/dto/update-account.dto';
 import { FilterDto } from 'src/common/dto/filter.dto';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class AccountMicroService {
-  private logger = new Logger(AccountMicroService.name);
+export class AccountMicroService extends BaseService{
 
-  constructor(@Inject('CRM_SERVICE') private readonly CRMClient: ClientProxy) {}
+  constructor(@Inject('CRM_SERVICE') private readonly CRMClient: ClientProxy) {
+    super();
+  }
 
   async getAccounts(orgId: string, filterDto: FilterDto) {
     try {
@@ -26,7 +28,7 @@ export class AccountMicroService {
     try {
       return this.CRMClient.send(
         { cmd: 'GET_ACCOUNT' },
-        { orgId, accountId },
+        { orgId, id: accountId },
       ).toPromise();
     } catch (error) {
       this.logger.error(`Error while fetching account: ${error.message}`);
