@@ -22,9 +22,6 @@ export class CohereAIService implements LLMServiceIntf {
     }
     async getLLMOutput(chatHistory: ZautoChatCompletionMessage[], model: string) {
         console.log("Preparing the Req: ", new Date())
-        const totalRequest = chatHistory.map(item => item.content).join('');
-        const inputTokens = totalRequest.length/4;
-        console.log('Input Tokens: ' + inputTokens)
         const messages = this.chatHistoryFormat(chatHistory.slice(0, -1));
         const message = chatHistory[chatHistory.length - 1].content;
 

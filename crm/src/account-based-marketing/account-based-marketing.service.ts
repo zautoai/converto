@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAccountBasedMarketingDto } from './dto/create-account-based-marketing.dto';
 import { UpdateAccountBasedMarketingDto } from './dto/update-account-based-marketing.dto';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
@@ -12,19 +12,23 @@ export class AccountBasedMarketingService {
     private readonly customFieldsService: CustomFieldsService,
   ) {}
 
-  async create(
-    orgId: string,
-    createAccountBasedMarketingDto: CreateAccountBasedMarketingDto,
-  ) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
-    await prisma.accountBasedMarketingTarget.create({
-      data: createAccountBasedMarketingDto,
-    });
-    return {
-      code: 201,
-      success: true,
-      message: 'Account Based Marketing created successfully',
-    };
+  async create(orgId: string,createAccountBasedMarketingDto: CreateAccountBasedMarketingDto,) {
+    try
+    {
+      const prisma = await this.prismaClientManager.getClient(orgId);
+      await prisma.accountBasedMarketingTarget.create({
+        data: createAccountBasedMarketingDto,
+      });
+      return {
+        code: 201,
+        success: true,
+        message: 'Account Based Marketing created successfully',
+      };
+    }
+    catch(error)
+    {
+      throw new BadRequestException(error)
+    }
   }
 
   async findAll(orgId: string) {
@@ -43,6 +47,10 @@ export class AccountBasedMarketingService {
     const data = await prisma.accountBasedMarketingTarget.findUnique({
       where: { id },
     });
+    if(!data)
+    {
+      throw new NotFoundException('Account Based Marketing not found'); 
+    }
     return {
       code: 200,
       success: true,
@@ -51,11 +59,8 @@ export class AccountBasedMarketingService {
     };
   }
 
-  async update(
-    orgId: string,
-    id: string,
-    updateAccountBasedMarketingDto: UpdateAccountBasedMarketingDto,
-  ) {
+  async update(orgId: string,id: string,updateAccountBasedMarketingDto: UpdateAccountBasedMarketingDto,) {
+    await this.findOne(orgId, id);
     const prisma = await this.prismaClientManager.getClient(orgId);
     await prisma.accountBasedMarketingTarget.update({
       where: { id },
@@ -69,6 +74,7 @@ export class AccountBasedMarketingService {
   }
 
   async remove(orgId: string, id: string) {
+    await this.findOne(orgId, id);
     const prisma = await this.prismaClientManager.getClient(orgId);
     await prisma.accountBasedMarketingTarget.delete({ where: { id } });
     return {

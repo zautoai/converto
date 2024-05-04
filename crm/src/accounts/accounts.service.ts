@@ -1,9 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { FilterDto } from 'src/common/dtos/filter.dto';
+import { CustomFieldParent } from 'src/common/enum/enums';
+import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
+import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
-import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
-import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
-import { CustomFieldParent } from 'src/common/enum/enums';
 
 @Injectable()
 export class AccountsService {
@@ -32,13 +37,59 @@ export class AccountsService {
     };
   }
 
-  async findAll(orgId: string) {
+  async findAll(orgId: string, filterDto: FilterDto) {
+    const { page, limit, sort, searchTerm } = filterDto;
+    const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const accounts = await prisma.account.findMany();
+    const accounts = await prisma.account.findMany({
+      where: {
+        ...(searchTerm
+          ? {
+              OR: [
+                { accountName: { contains: searchTerm } },
+                { website: { contains: searchTerm } },
+                { phone: { contains: searchTerm } },
+                { email: { contains: searchTerm } },
+                { address: { contains: searchTerm } },
+                { notes: { contains: searchTerm } },
+                { source: { contains: searchTerm } },
+                { status: { contains: searchTerm } },
+                { industry: { contains: searchTerm } },
+              ],
+            }
+          : {}),
+      },
+      take: limit,
+      skip: skip,
+      orderBy: {
+        createdAt: sort,
+      },
+    });
+    const total = await prisma.account.count({
+      where: {
+        ...(searchTerm
+          ? {
+              OR: [
+                { accountName: { contains: searchTerm } },
+                { website: { contains: searchTerm } },
+                { phone: { contains: searchTerm } },
+                { email: { contains: searchTerm } },
+                { address: { contains: searchTerm } },
+                { notes: { contains: searchTerm } },
+                { source: { contains: searchTerm } },
+                { status: { contains: searchTerm } },
+                { industry: { contains: searchTerm } },
+              ],
+            }
+          : {}),
+      },
+    });
     return {
       code: 200,
       message: 'Accounts fetched successfully',
       data: accounts,
+      page: page,
+      total: total,
     };
   }
 
@@ -49,6 +100,11 @@ export class AccountsService {
         id,
       },
     });
+    console.log(id);
+
+    if (!account) {
+      throw new NotFoundException('Account not found');
+    }
     return {
       code: 200,
       message: 'Account fetched successfully',

@@ -5,8 +5,9 @@ import {
   Get,
   Header,
   Param,
-  Patch,
+  Patch, 
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -18,6 +19,7 @@ import { CreateContactDto } from 'src/contacts/dto/create-contacts.dto';
 import { CreateFormBuilderDto } from './dto/create-form-builder.dto';
 import { UpdateFormBuilderDto } from './dto/update-form-builder.dto';
 import { FormBuilderService } from './form-builder.service';
+import { FilterDto } from 'src/common/dtos/filter.dto';
 
 @ApiTags('Form Builder')
 @Controller('form-builder')
@@ -52,9 +54,9 @@ export class FormBuilderController {
   @Get()
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  async findAll(@Req() request: IRequest) {
+  async findAll(@Req() request: IRequest,@Query() filterDto:FilterDto) {
     if (request.orgId) {
-      return await this.formBuilderService.findAll(request.orgId);
+      return await this.formBuilderService.findAll(request.orgId,filterDto);
     } else {
       throw new UnauthorizedException('Unauthorized access');
     }

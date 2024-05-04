@@ -20,18 +20,10 @@ import { AccountBasedMarketingModule } from './account-based-marketing/account-b
 import { CustomFieldsModule } from './custom-fields/custom-fields.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MicroservicesModule } from './microservices/microservices.module';
+import { ExternalCrmModule } from './external-crm/external-crm.module';
 
 @Module({
   imports: [
-    ClientsModule.register([
-      {
-        name: 'BASE_SERVICE',
-        transport: Transport.TCP,
-        options: {
-          port: +process.env.BASE_API_PORT || 3000,
-        },
-      },
-    ]),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === 'production' ? '.prod.env' : '.env',
@@ -54,6 +46,7 @@ import { MicroservicesModule } from './microservices/microservices.module';
     AccountBasedMarketingModule,
     CustomFieldsModule,
     MicroservicesModule,
+    ExternalCrmModule,
   ],
   controllers: [AppController],
   providers: [AppService],

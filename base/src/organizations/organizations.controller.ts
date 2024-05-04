@@ -71,30 +71,65 @@ export class OrganizationsController {
   @MessagePattern({cmd:'GET_ORGANIZATIONS'})
   async handleGetOrganizations(paginationDto: PaginationDto)
   {
-    return await this.organizationsService.findAll(paginationDto);
+    try
+    {
+      return await this.organizationsService.findAll(paginationDto);
+    }
+    catch (error)
+    {
+      return error.response || error;
+    }
   }
 
   @MessagePattern({cmd:'GET_ORGANIZATION'})
   async handleGetOrganization(id: string)
   {
-    return await this.organizationsService.findOne(id);
+    try
+    {
+      return await this.organizationsService.findOne(id);
+    }
+    catch (error)
+    {
+      return error.response || error;
+    }
   }
 
   @MessagePattern({cmd:'UPDATE_ORGANIZATION'})
   async handleUpdateOrganization(data: any)
   {
-    return await this.organizationsService.update(data.id, data.updateOrganizationDto);
+    try
+    {
+      return await this.organizationsService.update(data.id, data.updateOrganizationDto);
+    }
+    catch (error)
+    {
+      return error.response || error;
+    }
   }
 
   @MessagePattern({cmd:'DELETE_ORGANIZATION'})
   async handleDeleteOrganization(id: string)
   {
-    return await this.organizationsService.remove(id);
+    try
+    {
+      return await this.organizationsService.remove(id);
+    }
+    catch (error)
+    {
+      return error.response || error;
+    }
   }
 
   @MessagePattern({cmd:'CREATE_ORGANIZATION'}) 
   async handleCreateOrganization(data: any)
   {
-    return await this.organizationsService.create(data.createOrganizationDto);
+    try
+    {
+      return await this.organizationsService.create(data.createOrganizationDto);
+    }
+    catch (error)
+    {
+      return error.response || error;
+    }
   }
 }

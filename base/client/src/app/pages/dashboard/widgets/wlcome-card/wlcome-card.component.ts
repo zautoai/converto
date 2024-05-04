@@ -9,7 +9,7 @@ export class WlcomeCardComponent {
 
   welcomeText:string = '';
   @Input() name: string = '';
-  @Input() description: string = 'Here is what’s happening with your projects today';
+  @Input() description: string = 'Here is what’s happening with your campaigns today';
 
   constructor() {
     this.setWelcomeText();

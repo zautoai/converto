@@ -4,6 +4,7 @@ import { UpdateFormBuilderDto } from './dto/update-form-builder.dto';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { readFile } from 'fs/promises';
 import { ContactsService } from 'src/contacts/contacts.service';
+import { FilterDto } from 'src/common/dtos/filter.dto';
 const { minify } = require('uglify-js');
 
 @Injectable()
@@ -53,11 +54,40 @@ export class FormBuilderService {
     };
   }
 
-  async findAll(orgId: string) {
+  async findAll(orgId: string,filterDto:FilterDto) {
+    const { page, limit, sort, searchTerm } = filterDto;
+    const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
     const forms = await prisma.leadForm.findMany({
+      where: {
+        ...(searchTerm
+          ? {
+              OR: [
+                { title: { contains: searchTerm } },
+                { description: { contains: searchTerm } },
+              ],
+            }
+          : {}),
+      },
+      take: limit,
+      skip: skip,
+      orderBy: {
+        createdAt: sort,
+      },
       include: {
         LeadFormField: true,
+      },
+    });
+    const total = await prisma.leadForm.count({
+      where: {
+        ...(searchTerm
+          ? {
+              OR: [
+                { title: { contains: searchTerm } },
+                { description: { contains: searchTerm } },
+              ],
+            }
+          : {}),
       },
     });
     return {
@@ -65,6 +95,8 @@ export class FormBuilderService {
       success: true,
       message: 'Forms fetched successfully',
       data: forms,
+      total: total,
+      page: page,
     };
   }
 
@@ -95,6 +127,7 @@ export class FormBuilderService {
     updateFormBuilderDto: UpdateFormBuilderDto,
   ) {
     const prisma = await this.prismaClientManager.getClient(orgId);
+    await this.findOne(orgId, id);
     try {
       const updateFields = updateFormBuilderDto.updateLeadField;
       delete updateFormBuilderDto.updateLeadField;
@@ -130,6 +163,7 @@ export class FormBuilderService {
   }
 
   async remove(orgId: string, id: string) {
+    await this.findOne(orgId, id);
     const prisma = await this.prismaClientManager.getClient(orgId);
     await prisma.leadForm.delete({ where: { id } });
     return {
@@ -144,6 +178,7 @@ export class FormBuilderService {
       throw new NotFoundException('Form not found');
     }
     id = id.replace('.js', '');
+    await this.findOne(orgId, id);
     try {
       const filePath = `./src/common/scripts/form.js`;
       let content = await readFile(filePath, 'utf-8');
@@ -168,6 +203,7 @@ export class FormBuilderService {
         LeadFormField: true,
       },
     });
+    await this.findOne(orgId, id);
     const formId = `form_${id.replace(' ', '')}`;
     let formHTML = `<form id='${formId}'>`;
     formHTML += `<h2>${form.title}</h2>`;

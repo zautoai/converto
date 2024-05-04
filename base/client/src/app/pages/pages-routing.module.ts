@@ -26,6 +26,7 @@ import { PromptComponent } from './prompt/prompt.component';
 import { LeadConfigComponent } from './lead-config/lead-config.component';
 import { StartersConfigComponent } from './starters-config/starters-config.component';
 import { CustomiseAvatarComponent } from './customise-avatar/customise-avatar/customise-avatar.component';
+import { FormBuilderComponent } from './form-builder/form-builder.component';
 
 const routes: Routes = [
   {
@@ -73,7 +74,13 @@ const routes: Routes = [
   {
     path: 'campaigns/:id',
     title: "Campaigns",
-    component: CampaignComponent,
+    component:CampaignComponent ,
+    canActivate:[SetupGuard]
+  },
+  {
+    path: 'form-builder',
+    title: "FormBuilder",
+    component: FormBuilderComponent,
     canActivate:[SetupGuard]
   },
   {

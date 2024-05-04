@@ -4,10 +4,11 @@ import { AccountsController } from './accounts.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { CommonModule } from 'src/common/common.module';
 import { CustomFieldsModule } from 'src/custom-fields/custom-fields.module';
+import { AccountsMicroController } from './accounts.micro.controller';
 
 @Module({
   imports: [CommonModule, PrismaModule, CustomFieldsModule],
-  controllers: [AccountsController],
+  controllers: [AccountsController,AccountsMicroController],
   providers: [AccountsService],
   exports: [AccountsService],
 })

@@ -15,7 +15,7 @@ import { AuthService } from './base-services/auth.service';
                     { 
                         transport: Transport.REDIS,
                         options: {
-                            host: process.env.REDIS_IP || 'localhost',
+                            host: process.env.REDIS_IP || 'redis',
                             port: +process.env.REDIS_PORT || 6379,
                             password: process.env.REDIS_PASSWORD || '',
                         }, 

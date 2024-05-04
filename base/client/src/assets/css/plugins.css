@@ -3746,7 +3746,7 @@ a.fc-event:hover {
 }
 
 .ms-choice.disabled {
-    background-color: #f1f2fd;
+    background-color: #f3f3f3;
     background-image: none;
     border: 1px solid #e3e3f7;
     cursor: default;
@@ -4613,7 +4613,7 @@ a.fc-event:hover {
 }
 
 .select2-container--default.select2-container--disabled .select2-selection--single {
-    background-color: #f1f2fd;
+    background-color: #f3f3f3;
     cursor: default;
 }
 

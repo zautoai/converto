@@ -51,11 +51,12 @@ import { WlcomeCardComponent } from './dashboard/widgets/wlcome-card/wlcome-card
 import { CounterFormatPipe } from './dashboard/widgets/pipe/CounterFormat.pipe';
 import { ProgressCardComponent } from './dashboard/widgets/progress-card/progress-card.component';
 import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
+import { FormBuilderComponent } from './form-builder/form-builder.component';
 
 @NgModule({
   declarations: [
     ZautoDashboardComponent,
-
+FormBuilderComponent,
     conversationcomponent,
     ChatContainerComponent,
     SummaryContainerComponent,
@@ -107,6 +108,7 @@ import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
     TableCardComponent,
     ChartCardComponent,
     WlcomeCardComponent,
+    
 
     CounterFormatPipe,
       ProgressCardComponent

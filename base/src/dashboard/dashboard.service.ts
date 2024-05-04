@@ -6,6 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { DashbaordDto } from './dto/dashboard.dto';
 import { Sql } from '@prisma/client/runtime/library';
 import { Prisma } from '@prisma/client';
+import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
 
 @Injectable()
 export class DashboardService {
@@ -284,8 +285,6 @@ export class DashboardService {
   async getVisitCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
     try {
       let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-      console.log('Start Date : ' + startDate);
-      console.log('End Date : ' + endDate);
 
       const _startDate = startDate;
       const _endDate = endDate;
@@ -313,7 +312,7 @@ export class DashboardService {
                         CAST(COALESCE(COUNT(V.ID), 0) AS INT) AS VISIT_COUNT
                     FROM
                         DATE_RANGE DR
-                        LEFT JOIN PUBLIC."Visit" V ON DATE (V."createdAt") = DR.VISIT_DATE
+                        LEFT JOIN "Visit" V ON DATE (V."createdAt") = DR.VISIT_DATE
                         AND V."orgId" = ${orgId}
                     WHERE
                         DR.VISIT_DATE >= ${_startDate}
@@ -364,7 +363,7 @@ export class DashboardService {
                         CAST(COALESCE(COUNT(L.ID), 0) AS INT) AS LEAD_COUNT
                     FROM
                         DATE_RANGE DR
-                        LEFT JOIN PUBLIC."Lead" L ON DATE (L."createdAt") = DR.LEAD_DATE
+                        LEFT JOIN "Lead" L ON DATE (L."createdAt") = DR.LEAD_DATE
                         AND L."convId" IS NOT NULL
                         AND L."orgId" = ${orgId}
                     WHERE
@@ -416,7 +415,7 @@ export class DashboardService {
                         CAST(COALESCE(COUNT(C.ID), 0) AS INT) AS CONVO_COUNT
                     FROM
                         DATE_RANGE DR
-                        LEFT JOIN PUBLIC."Conversation" C ON DATE (C."createdAt") = DR.CONVO_DATE
+                        LEFT JOIN "Conversation" C ON DATE (C."createdAt") = DR.CONVO_DATE
                         AND C."orgId" = ${orgId}
                         AND C."isValid" = TRUE
                     WHERE
@@ -632,7 +631,6 @@ export class DashboardService {
       dashbaordDto,
     );
     const campaignData = await this.getCampaignCountByDate(orgId, dashbaordDto);
-    console.log(visitorData);
 
     const visitorCount = visitorData.values.reduce(
       (acc, curr) => acc + curr,
@@ -672,7 +670,6 @@ export class DashboardService {
       let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
       const _startDate = startDate;
       const _endDate = endDate;
-      console.log(_startDate, _endDate);
 
       const top5Campaigns = await this.prisma.$queryRaw`
                 WITH CampaignCounts AS (
@@ -683,10 +680,10 @@ export class DashboardService {
                         COALESCE(COUNT(DISTINCT CONV."id"), 0) AS CONVOCOUNT,
                         COALESCE(COUNT(DISTINCT L."id"), 0) AS LEADCOUNT
                     FROM
-                        PUBLIC."Campaign" C
-                        LEFT JOIN PUBLIC."Visit" V ON C.ID = V."campaignId" AND V."createdAt" >= ${_startDate} AND V."createdAt" <= ${_endDate}
-                        LEFT JOIN PUBLIC."Conversation" CONV ON C.ID = CONV."campaignId" AND CONV."isValid" = TRUE AND CONV."createdAt" >= ${_startDate} AND CONV."createdAt" <= ${_endDate}
-                        LEFT JOIN PUBLIC."Lead" L ON CONV.ID = L."convId" AND L."createdAt" >= ${_startDate} AND L."createdAt" <= ${_endDate}
+                        "Campaign" C
+                        LEFT JOIN "Visit" V ON C.ID = V."campaignId" AND V."createdAt" >= ${_startDate} AND V."createdAt" <= ${_endDate}
+                        LEFT JOIN "Conversation" CONV ON C.ID = CONV."campaignId" AND CONV."isValid" = TRUE AND CONV."createdAt" >= ${_startDate} AND CONV."createdAt" <= ${_endDate}
+                        LEFT JOIN "Lead" L ON CONV.ID = L."convId" AND L."createdAt" >= ${_startDate} AND L."createdAt" <= ${_endDate}
                     WHERE
                         C."orgId" = ${orgId}
                     GROUP BY
@@ -709,7 +706,7 @@ export class DashboardService {
                     0 AS CONVOCOUNT,
                     0 AS LEADCOUNT
                 FROM
-                    PUBLIC."Campaign" C
+                    "Campaign" C
                 WHERE
                     NOT EXISTS (
                         SELECT 1 FROM CampaignCounts

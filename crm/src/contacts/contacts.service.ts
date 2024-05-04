@@ -1,10 +1,15 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { FilterDto } from 'src/common/dtos/filter.dto';
 import { CustomFieldParent } from 'src/common/enum/enums';
 import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
-import { CreateFieldDto } from 'src/custom-fields/dto/create-fields.dto';
 import { EnrichmentService } from 'src/enrichment/enrichment.service';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
+import { CreateFieldDto } from './dto/create-field.dto';
 
 @Injectable()
 export class ContactsService {
@@ -135,7 +140,10 @@ export class ContactsService {
       },
       { _defaultFields: {}, _customFields: {} },
     );
-    const existingContact = await this.getContactByEmail(orgId,  createContactDto.email);
+    const existingContact = await this.getContactByEmail(
+      orgId,
+      createContactDto.email,
+    );
     if (existingContact) {
       throw new BadRequestException('Contact already exists');
     }
@@ -181,6 +189,10 @@ export class ContactsService {
 
   async updateContact(orgId: string, id: string, updateContactDto: any) {
     const prisma = await this.prismaClientManager.getClient(orgId);
+    const existingContact = await this.getContact(orgId, id);
+    if (!existingContact) {
+      throw new NotFoundException('Contact not found');
+    }
     const tags = updateContactDto.tags;
     const defaultFields = await this.customFieldsService.getTableFields(
       orgId,
@@ -282,15 +294,7 @@ export class ContactsService {
     const contact = await prisma.contact.findFirst({
       where: { email },
     });
-    if (!contact) {
-      throw new NotFoundException('Contact not found');
-    }
-    return {
-      code: 200,
-      success: true,
-      message: 'Contact fetched successfully',
-      data: contact,
-    };
+    return contact;
   }
 
   async getCustomField(orgId: string, id: string) {
@@ -303,7 +307,11 @@ export class ContactsService {
     };
   }
 
-  async createCustomField(orgId: string, createCustomFieldDto: CreateFieldDto) {
+  async createCustomField(orgId: string, createCustomFieldDto: any) {
+    createCustomFieldDto = {
+      ...createCustomFieldDto,
+      customFieldParent: CustomFieldParent.CONTACT,
+    };
     const newField = await this.customFieldsService.create(
       orgId,
       createCustomFieldDto,

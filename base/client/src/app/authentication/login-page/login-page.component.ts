@@ -77,7 +77,7 @@ export class LoginPageComponent implements OnInit {
         .subscribe({next: (response: any) => {
           localStorage.setItem('token', response.accessToken);
           this.authservice.setUser(response.user);
-          this.notifService.showInfo('Welcome to ZautoAI!');
+          this.notifService.showInfo('Welcome to Converto!');
           if(!response.avatar)
           {
             this.router.navigate(['/setup']);

@@ -1,33 +1,54 @@
 import { Injectable } from '@nestjs/common';
-import { CreateContactDto } from './dto/create-contact.dto';
-import { UpdateContactDto } from './dto/update-contact.dto';
-import { ContactService } from 'src/microservices/crm_service/contact.service';
 import { FilterDto } from 'src/common/dto/filter.dto';
+import { BaseService } from 'src/common/services/base.service';
+import { ContactService } from 'src/microservices/crm_service/contact.service';
+import { CreateFieldDto } from './dto/create-field.dto';
 
 @Injectable()
-export class ContactsService {
-
-  constructor(
-    private readonly contactService: ContactService,
-  ) { }
-
-  async create(orgId:string, createContactDto: CreateContactDto) {
-    return await this.contactService.createContact(orgId, createContactDto); 
+export class ContactsService extends BaseService {
+  constructor(private readonly contactService: ContactService) {
+    super();
   }
 
-  async findAll(orgId:string,filterDto:FilterDto) {
-    return await this.contactService.getContacts(orgId,filterDto);
+  async create(orgId: string, createContactDto: any) {
+    return this.handleException(
+      await this.contactService.createContact(orgId, createContactDto),
+    );
   }
 
-  async findOne(orgId:string, id: string) {
-    return await this.contactService.getContact(orgId, id);
+  async findAll(orgId: string, filterDto: FilterDto) {
+    return this.handleException(
+      await this.contactService.getContacts(orgId, filterDto),
+    );
   }
 
-  async update(orgId:string, id: string, updateContactDto: UpdateContactDto) {
-    return await this.contactService.updateContact(orgId, id, updateContactDto);
+  async findOne(orgId: string, id: string) {
+    return this.handleException(
+      await this.contactService.getContact(orgId, id),
+    );
   }
 
-  async remove(orgId:string, id: string) {
-    return await this.contactService.deleteContact(orgId, id);
+  async update(orgId: string, id: string, updateContactDto: any) {
+    return this.handleException(
+      await this.contactService.updateContact(orgId, id, updateContactDto),
+    );
+  }
+
+  async remove(orgId: string, id: string) {
+    return this.handleException(
+      await this.contactService.deleteContact(orgId, id),
+    );
+  }
+
+  async getContactFields(orgId: string) {
+    return this.handleException(
+      await this.contactService.getContactFields(orgId),
+    );
+  }
+
+  async createCustomFields(orgId: string, createFieldDto: CreateFieldDto) {
+    return this.handleException(
+      await this.contactService.createCustomField(orgId, createFieldDto),
+    );
   }
 }

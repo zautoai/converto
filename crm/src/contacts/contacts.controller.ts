@@ -20,7 +20,6 @@ import { CreateFieldDto } from 'src/custom-fields/dto/create-fields.dto';
 import { ContactsService } from './contacts.service';
 import { CreateContactDto } from './dto/create-contacts.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
-import { MessagePattern } from '@nestjs/microservices';
 
 @ApiTags('Contacts')
 @Controller('contacts')
@@ -153,84 +152,5 @@ export class ContactsController {
       request.orgId,
       createFieldDto,
     );
-  }
-
-  //MICROSERVICE
-
-  @MessagePattern({cmd: 'GET_CONTACTS'})
-  async get_contacts(data:{ orgId:string,filterDto:FilterDto})
-  {
-    try
-    {
-      return await this.contactsService.getContacts(data.orgId,data.filterDto);
-    }
-    catch(error)
-    {
-      return error.message;
-    }
-  }
-
-  @MessagePattern({cmd: 'GET_CONTACT'})
-  async get_contact(data:{ orgId:string, id:string })
-  {
-    try
-    {
-      return await this.contactsService.getContact(data.orgId, data.id);
-    }
-    catch(error)
-    {
-      return error.message;
-    }
-  }
-
-  @MessagePattern({cmd: 'CREATE_CONTACT'})
-  async create_contact(data:{ orgId:string, createContactDto:CreateContactDto }) 
-  {
-    try
-    {
-      const _createContactDto: CreateContactDto = new CreateContactDto(
-        data.createContactDto,
-      );
-      await _createContactDto.validate();
-    }
-    catch(error)
-    {
-      throw new BadRequestException(error.message);
-    }   
-    try
-    {
-      
-      return await this.contactsService.createContact(data.orgId, data.createContactDto);
-    } 
-    catch(error)
-    {
-      return error;
-    }
-  }
-
-  @MessagePattern({cmd: 'UPDATE_CONTACT'})
-  async update_contact(data:{ orgId:string, id:string, updateContactDto:any })
-  {
-    try
-    {
-      return await this.contactsService.updateContact(data.orgId, data.id, data.updateContactDto);
-    }
-    catch(error)
-    {
-      return error;
-    }
-  }
-
-  @MessagePattern({cmd: 'DELETE_CONTACT'})
-  async delete_contact(data:{ orgId:string, id:string })
-  {
-    try
-    {
-      return await this.contactsService.deleteContact(data.orgId, data.id);
-    }
-    catch(error)
-    {
-      return error;
-    }
   }
 }
