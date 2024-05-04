@@ -62,8 +62,6 @@ jobs:
             CRYPTO_ENCRYPTION_SECRET=${{ secrets.DEMO_CRYPTO_ENCRYPTION_SECRET }}
             DATABASE_URL=${{ secrets.DEMO_DATABASE_URL_BASE }}
             EMBEDDING_PROVIDER=${{ secrets.DEMO_EMBEDDING_PROVIDER }}
-            GITHUB_TOKEN=${{ secrets.DEMO_GITHUB_TOKEN }}
-            GITHUB_USER=${{ secrets.DEMO_GITHUB_USER }}
             GOOGLE_CLIENT_ID=${{ secrets.DEMO_GOOGLE_CLIENT_ID }}
             HOST_PORT=${{ secrets.DEMO_HOST_PORT }}
             HOST_URL=${{ secrets.DEMO_HOST_URL }}
@@ -83,9 +81,6 @@ jobs:
             REDIS_PASSWORD=${{ secrets.DEMO_REDIS_PASSWORD }}
             REDIS_PORT=${{ secrets.DEMO_REDIS_PORT }}
             SENDGRID_KEY=${{ secrets.DEMO_SENDGRID_KEY }}
-            SERVER_HOST=${{ secrets.DEMO_SERVER_HOST }}
-            SERVER_SSH_KEY=${{ secrets.DEMO_SERVER_SSH_KEY }}
-            SERVER_USER=${{ secrets.DEMO_SERVER_USER }}
             SIGNUP_ALERT_MAIL=${{ secrets.DEMO_SIGNUP_ALERT_MAIL }}
             SUPER_USER_EMAIL=${{ secrets.DEMO_SUPER_USER_EMAIL }}
             SUPER_user=${{ secrets.DEMO_SUPER_user }}
