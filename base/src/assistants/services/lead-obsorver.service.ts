@@ -1,9 +1,9 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { LlmService } from 'src/llm/llm.service';
-import { LEAD_OBSORVER_PROMPT_TEMPLATE } from 'src/llm/prompts.template';
 import Redis, { Redis as RedisClient } from 'ioredis';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LLMModels, LLMNames } from 'src/llm/llm.contants';
+import { LEAD_OBSORVER_PROMPT_TEMPLATE } from 'src/common/templates/lead-obsorver-prompt.template';
 
 @Injectable()
 export class LeadObsorverService implements OnModuleInit{

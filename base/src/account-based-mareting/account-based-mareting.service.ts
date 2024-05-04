@@ -3,31 +3,34 @@ import { CreateAccountBasedMaretingDto } from './dto/create-account-based-mareti
 import { UpdateAccountBasedMaretingDto } from './dto/update-account-based-mareting.dto';
 import { FilterDto } from 'src/common/dto/filter.dto';
 import { AccountBasedMarketingMicroService } from 'src/microservices/crm_service/account-based-marketing.service';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class AccountBasedMaretingService {
+export class AccountBasedMaretingService extends BaseService{
 
   constructor(
     private readonly abmService:AccountBasedMarketingMicroService
-  ) { }
+  ) {
+    super();
+  }
 
   async create(orgId: string,createAccountBasedMaretingDto: CreateAccountBasedMaretingDto) {
-    return await this.abmService.createAccountBasedMarketing(orgId,createAccountBasedMaretingDto);
+    return this.handleException(await this.abmService.createAccountBasedMarketing(orgId,createAccountBasedMaretingDto));
   }
 
   async findAll(orgId: string,filterDto: FilterDto) {
-    return await this.abmService.getAccountBasedMarketing(orgId, filterDto);
+    return this.handleException(await this.abmService.getAccountBasedMarketing(orgId, filterDto));
   }
 
   async findOne(orgId: string,id: string) {
-    return await this.abmService.getAccountBasedMarketingById(orgId, id);
+    return this.handleException(await this.abmService.getAccountBasedMarketingById(orgId, id));
   }
 
   async update(orgId: string,id: string, updateAccountBasedMaretingDto: UpdateAccountBasedMaretingDto) {
-    return await this.abmService.updateAccountBasedMarketing(orgId, id, updateAccountBasedMaretingDto);
+    return this.handleException(await this.abmService.updateAccountBasedMarketing(orgId, id, updateAccountBasedMaretingDto));
   }
 
   async remove(orgId: string,id: string) {
-    return await this.abmService.deleteAccountBasedMarketing(orgId, id);
+    return this.handleException(await this.abmService.deleteAccountBasedMarketing(orgId, id));
   }
 }
