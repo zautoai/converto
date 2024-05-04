@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
 import { Multer } from 'multer';
@@ -8,6 +8,7 @@ import * as path from 'path';
 @Injectable()
 export class S3Service {
   private s3: AWS.S3;
+  private logger = new Logger(S3Service.name);
 
   constructor(private readonly configService: ConfigService) {
     this.s3 = new AWS.S3({
@@ -18,6 +19,7 @@ export class S3Service {
   }
 
   async uploadFile(file: Multer.File): Promise<AWS.S3.ManagedUpload.SendData> {
+    this.logger.log('Uploading file to S3...');
     const { originalname, buffer, mimetype } = file;
 
     const uploadResult = await this.s3
@@ -29,12 +31,15 @@ export class S3Service {
       })
       .promise();
 
+    this.logger.log('File uploaded successfully!');
+
     return uploadResult;
   }
 
   async uploadTextFile(
     filePath: string,
   ): Promise<AWS.S3.ManagedUpload.SendData> {
+    this.logger.log('Uploading Textfile to S3...');
     const fileStream = fs.createReadStream(filePath);
     const fileName = path.basename(filePath);
 
@@ -45,10 +50,13 @@ export class S3Service {
       ContentType: 'text/plain',
     };
 
+    this.logger.log('TextFile uploaded successfully!');
+
     return this.s3.upload(params).promise();
   }
 
   async downloadTextFile(filePath: string) {
+    this.logger.log('Downloading Textfile from S3...');
     try {
       const parts = filePath.split('/');
       const fileName = parts.pop();
@@ -58,12 +66,15 @@ export class S3Service {
       };
       const data = await this.s3.getObject(params).promise();
       fs.writeFileSync(filePath, data.Body.toString('utf-8'));
+      this.logger.log('TextFile downloaded successfully!');
     } catch (error) {
+      this.logger.log('TextFile downloaded failed!');
       console.log(error);
     }
   }
 
   async deleteFile(filePath: string) {
+    this.logger.log('Deleting file from S3...');
     try {
       const parts = filePath.split('/');
       const fileName = parts.pop();
@@ -72,19 +83,26 @@ export class S3Service {
         Key: fileName,
       };
       const data = await this.s3.deleteObject(params).promise();
+      this.logger.log('File deleted successfully!');
     } catch (error) {
+      this.logger.log('File deleted failed!');
       console.log(error);
     }
   }
 
   async isFileExists(fileName: string) {
+    this.logger.log('Checking file exists in S3...');
     const params = {
       Bucket: process.env.CONVERTO_TRAIN_BUCKET_NAME,
       Key: fileName,
     };
     const data = await this.s3.getObject(params).promise();
     if (data) {
+      this.logger.log('File exists in S3!');
       return true;
-    } else return false;
+    } else {
+      this.logger.log('File does not exists in S3!');
+      return false;
+    }
   }
 }
