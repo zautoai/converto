@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   base:
-    image: ghcr.io/zautoai/converto:dev-base
+    image: ghcr.io/zautoai/converto:demo-base
     networks:
       - converto-network
     volumes:
@@ -15,7 +15,7 @@ services:
     restart: always  # Restart policy for the Node app.
 
   crm:
-    image: ghcr.io/zautoai/converto:dev-crm
+    image: ghcr.io/zautoai/converto:demo-crm
     networks:
       - converto-network
     ports:
