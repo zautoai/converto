@@ -103,8 +103,8 @@ jobs:
           context: ./crm
           file: ./crm/Dockerfile
           tags: |
-            ghcr.io/zautoai/converto:dev-crm${{ github.sha }}
-            ghcr.io/zautoai/converto:dev-crm
+            ghcr.io/zautoai/converto:demo-crm${{ github.sha }}
+            ghcr.io/zautoai/converto:demo-crm
           build-args: |
             REDIS_IP=${{ secrets.DEMO_REDIS_IP }}
             REDIS_PASSWORD=${{ secrets.DEMO_REDIS_PASSWORD }}
