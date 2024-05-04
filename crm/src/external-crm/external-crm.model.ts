@@ -1,5 +1,6 @@
 import { Logger } from "@nestjs/common";
 import { ICRMConfig } from "./interfaces/appconfig.inteface";
+import { Token } from "./interfaces/token.interface";
 
 export abstract class BaseExternalCrm {
     protected readonly logger;
@@ -22,8 +23,11 @@ export abstract class BaseExternalCrm {
         this.logger.log(`Created ${loggerName}`);
     }
 
-    abstract getAuthUrl(additionalInfo:any):string;
+    abstract getAuthUrl(orgId:string,additionalInfo:any):string;
     
-    abstract getAccessToken(code: string): Promise<any>;
+    abstract exchangeCodeForAccessToken(orgId:string,code: string): Promise<any>;
 
+    abstract exchangeRefreshTokenForAccessToken(orgId:string, refreshToken: string): Promise<any>;
+
+    abstract handleToken(orgId:string,tokenData: Token): Promise<void>;
 }

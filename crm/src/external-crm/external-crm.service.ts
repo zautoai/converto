@@ -9,18 +9,18 @@ export class ExternalCrmService {
         private readonly crmProvider:ExternalCrmProvider
     ){}
 
-    getAuthUrl(crmName:string): any {
+    getAuthUrl(orgId:string,crmName:string): any {
         const crm = this.crmProvider.getCRM(crmName);
         const additionalInfo = crmName;
-        const authUrl = crm.getAuthUrl(additionalInfo);
+        const authUrl = crm.getAuthUrl(orgId,additionalInfo);
         return {
             url: authUrl,
         };
     }
 
-    async getAccessToken(crmName:string, code:string): Promise<any> {
+    async exchangeCodeForAccessToken(orgId:string,crmName:string, code:string): Promise<any> {
         const crm = this.crmProvider.getCRM(crmName);
-        const accessToken = await crm.getAccessToken(code);
+        const accessToken = await crm.exchangeCodeForAccessToken(orgId,code);
         return accessToken;
     }
 }
