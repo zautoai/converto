@@ -145,7 +145,7 @@ jobs:
           set -x
           REDIS_CONTAINER="converto-redis-1"
           REDIS_PASSWORD=${{ secrets.DEV_REDIS_PASSWORD }}
-          REDIS_HEALTH=$(docker exec $REDIS_CONTAINER redis-cli -a $DEV_REDIS_PASSWORD PING)
+          REDIS_HEALTH=$(docker exec $REDIS_CONTAINER redis-cli -a $REDIS_PASSWORD PING)
           if [ "$REDIS_HEALTH" != "PONG" ]; then
           echo "Redis container $REDIS_CONTAINER is not healthy😭"
           exit 1
