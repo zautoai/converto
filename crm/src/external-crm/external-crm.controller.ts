@@ -27,4 +27,12 @@ export class ExternalCrmController {
     const orgId = request.orgId;
     return await this.externalCrmService.exchangeCodeForAccessToken(orgId,hubspotCallBackDto.state,hubspotCallBackDto.code);
   }
+
+  @Get('access-token')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+   async getAccessToken(@Query() crmAuthDto:CRMAuthDto, @Req() request: IRequest) {
+    const orgId = request.orgId;
+    return await this.externalCrmService.getAccessToken(orgId, crmAuthDto.name);
+  }
 }
