@@ -5,7 +5,7 @@ import { HttpService } from '@nestjs/axios';
 import { Token } from '../interfaces/token.interface';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { Client } from "@hubspot/api-client";
-import { PublicGdprDeleteInput, SimplePublicObject, SimplePublicObjectInput, SimplePublicObjectInputForCreate } from '@hubspot/api-client/lib/codegen/crm/contacts';
+import { Filter, FilterGroup, FilterOperatorEnum, PublicGdprDeleteInput, SimplePublicObject, SimplePublicObjectInput, SimplePublicObjectInputForCreate } from '@hubspot/api-client/lib/codegen/crm/contacts';
 
 @Injectable()
 export class HubspotService extends BaseExternalCrm implements OnModuleInit {
@@ -28,6 +28,8 @@ export class HubspotService extends BaseExternalCrm implements OnModuleInit {
         // console.log(contactsProperties);
         // const profile = await this.getProfile('crm');
         // console.log(profile);
+        // const contact = await this.getContactByEmail('crm', 'sridharan@gmail.com');
+        // console.log(contact);
         // const contacts = await this.getContacts('crm');
         // console.log(contacts);
         // const contact = await this.getContact('crm', 18758600027);
@@ -38,8 +40,8 @@ export class HubspotService extends BaseExternalCrm implements OnModuleInit {
         // console.log(contact);
         // const contact = await this.deleteContact('crm', 18758600027);
         // console.log(contact); 
-        const companies = await this.getCompanies('crm');
-        console.log(companies);
+        // const companies = await this.getCompanies('crm');
+        // console.log(companies);
         // const company = await this.getCompany('crm', 18758600027);
         // console.log(company);
         // const company = await this.createCompany('crm', { name: 'sridhar'});
@@ -182,9 +184,23 @@ export class HubspotService extends BaseExternalCrm implements OnModuleInit {
         const hubspotClient = new Client({ accessToken:  accessToken});
         const properties = await hubspotClient.apiRequest({
             method: 'GET',
-            path: '/properties/v2/contacts/properties',
+            path: '/crm/v3/properties/contacts',
             qs: {
-                property:['name','label','type'], 
+                properties:['name','label','type'], 
+             }
+        });
+        return properties.json();
+    }
+
+    async getCompanyProperties(orgId:string): Promise<any> {
+        const accessToken = await this.getAccessToken(orgId);
+        if(!accessToken) return null;
+        const hubspotClient = new Client({ accessToken:  accessToken});
+        const properties = await hubspotClient.apiRequest({
+            method: 'GET',
+            path: '/crm/v3/properties/companies',
+            qs: {
+                properties:['name','label','type'],
              }
         });
         return properties.json();
@@ -207,6 +223,29 @@ export class HubspotService extends BaseExternalCrm implements OnModuleInit {
         const hubspotClient = new Client({ accessToken:  accessToken});
         const contact = await hubspotClient.crm.contacts.basicApi.getById(id);
         return contact.properties;
+    }
+    async getContactByEmail(orgId: string, email: string): Promise<any> {
+        const accessToken = await this.getAccessToken(orgId);
+        if(!accessToken) return null;
+        const hubspotClient = new Client({ accessToken:  accessToken});
+        const contact = await hubspotClient.crm.contacts.searchApi.doSearch({
+            filterGroups: [
+                {
+                    filters: [
+                        {
+                            propertyName: 'email',
+                            operator: FilterOperatorEnum.Eq,
+                            value: email,
+                        }
+                    ]
+                }
+            ],
+            limit: 100,
+            after: '',
+            sorts: [],
+            properties: []
+        });
+        return contact.results[0].properties || null; 
     }
     async createContact(orgId: string, data: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);

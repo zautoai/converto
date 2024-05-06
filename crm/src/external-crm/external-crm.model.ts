@@ -42,8 +42,10 @@ export abstract class BaseExternalCrm {
     // CRM functions
     abstract getProfile(orgId:string): Promise<any>;
     abstract getContactProperties(orgId:string): Promise<any>;
+    abstract getCompanyProperties(orgId:string): Promise<any>;
     abstract getContacts(orgId:string): Promise<any>;
     abstract getContact(orgId:string, id:any): Promise<any>;
+    abstract getContactByEmail(orgId: string, email: string): Promise<any>;
     abstract createContact(orgId:string, data:any): Promise<any>;
     abstract updateContact(orgId:string, id:any, data:any): Promise<any>;
     abstract deleteContact(orgId:string, id:any): Promise<any>;
