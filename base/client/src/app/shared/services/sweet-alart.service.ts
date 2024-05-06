@@ -13,7 +13,9 @@ export class SweetAlertService {
       icon: icon,
       title: title,
       text: text,
+      confirmButtonColor: '#81847d',
       confirmButtonText: 'Ok',
+      backdrop: `rgba(0, 0, 0, 0.4)`
     };
   
     if (buttons && buttons.length > 0) {
@@ -56,4 +58,7 @@ export class SweetAlertService {
   info(title: string, text: string, buttons?: string[], callback?: (result: any) => void): void {
     this.showAlert('info', title, text, buttons, callback);
   }
+
+
+
 }

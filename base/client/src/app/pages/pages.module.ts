@@ -51,12 +51,14 @@ import { WlcomeCardComponent } from './dashboard/widgets/wlcome-card/wlcome-card
 import { CounterFormatPipe } from './dashboard/widgets/pipe/CounterFormat.pipe';
 import { ProgressCardComponent } from './dashboard/widgets/progress-card/progress-card.component';
 import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
+import { AccountsComponent } from './account/account.component';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
 
 @NgModule({
   declarations: [
     ZautoDashboardComponent,
-FormBuilderComponent,
+    AccountsComponent,
+    FormBuilderComponent,
     conversationcomponent,
     ChatContainerComponent,
     SummaryContainerComponent,
@@ -108,10 +110,9 @@ FormBuilderComponent,
     TableCardComponent,
     ChartCardComponent,
     WlcomeCardComponent,
-    
 
     CounterFormatPipe,
-      ProgressCardComponent
+    ProgressCardComponent,
   ],
   imports: [
     CommonModule,
@@ -122,20 +123,18 @@ FormBuilderComponent,
     NgSelectModule,
     NgScrollbar,
     ReactiveFormsModule,
-    NgxSkeletonLoaderModule.forRoot(
-      {
-        theme: {
-          extendsFromRoot: true,
-          'background-color': 'var(--primary-1)'
-        }
-      }
-    ),
+    NgxSkeletonLoaderModule.forRoot({
+      theme: {
+        extendsFromRoot: true,
+        'background-color': 'var(--primary-1)',
+      },
+    }),
     MarkdownModule.forRoot(),
     NgCircleProgressModule.forRoot(),
     NgxDropzoneModule,
     NgxColorsModule,
     NgApexchartsModule,
-    NgbProgressbarModule
+    NgbProgressbarModule,
   ],
 })
-export class PagesModule { }
+export class PagesModule {}

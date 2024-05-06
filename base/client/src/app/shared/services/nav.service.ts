@@ -114,7 +114,10 @@ export class NavService implements OnDestroy {
 			roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
 		{
-			title: 'Conversations', icon: 'fe fe-message-circle', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/conversations', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+			title: 'Conversations', icon: 'fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/conversations', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+		},
+		{
+			title: 'Accounts', icon: 'fa-regular fa-building', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/accounts', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
 		{
 			title: 'Contacts', icon: 'fe fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/leads', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]

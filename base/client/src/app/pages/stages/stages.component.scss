@@ -14,7 +14,7 @@
     min-height: 50px;
     padding: 0 10px;
     background-color: var(--primary-1);
-    border: 1px #57575744 solid;
+    border: 1   px #57575744 solid;
     border-radius: 3px;
     margin-bottom: 25px;
     display: flex;
@@ -83,4 +83,8 @@
         flex: 1;
         margin-left: 10px;
     }
+    .ct{
+        background-color: #575757;
+    }
 }
+
