@@ -6,7 +6,7 @@ import { CrmMappingDto } from './dto/crm-mapping.dto';
 export class MappingService {
 
     constructor(
-        private readonly prismaClientManager: PrismaClientManager
+        private readonly prismaClientManager: PrismaClientManager,
     ){}
 
     async getMappingById(orgId:string,id: string){
@@ -71,6 +71,25 @@ export class MappingService {
                 }
             });
             return mappings;
+        }
+        catch(e)
+        {
+            throw e;
+        }
+    }
+
+    async getMappingByCrmNameAndObjectTypeAndField(orgId:string, crmName: string, objectType: string, fieldName: string){
+        try
+        {
+            const prisma = await this.prismaClientManager.getClient(orgId);
+            const mapping = await prisma.crmMapping.findFirst({
+                where: {
+                    crmName,
+                    objectType,
+                    fieldName
+                }
+            });
+            return mapping;
         }
         catch(e)
         {

@@ -7,8 +7,8 @@
           type="button"
           class="btn btn-outline-primary"
           data-bs-toggle="modal"
-          data-bs-target="#addUser"
-          (click)="openCreateUser()"
+          data-bs-target="#addForm"
+          (click)="openCreateForm()"
         >
           <i class="fa fa-plus"></i>
           Create Form Builder
@@ -28,7 +28,7 @@
           </thead>
           <tbody>
             <ng-container>
-              <tr *ngFor="let data of userList">
+              <tr *ngFor="let data of formList">
                 <td>
                   {{ data.title }}
                 </td>
@@ -36,11 +36,11 @@
                   {{ data.description }}
                 </td>
                 <td class="icon w-1">
-                  <button (click)="openViewUser(data)">
+                  <button (click)="openViewForm(data)">
                     <i class="fa fa-eye text-secondary view"></i>
                   </button>
 
-                  <button (click)="openUpdateUser(data)">
+                  <button (click)="openUpdateForm(data)">
                     <i class="fa fa-edit text-success update"></i>
                   </button>
 
@@ -50,7 +50,7 @@
                 </td>
               </tr>
             </ng-container>
-            <tr *ngIf="userList?.length <= 0">
+            <tr *ngIf="formList?.length <= 0">
               <td class="text-center" colspan="4">No Form found.</td>
             </tr>
           </tbody>
@@ -58,7 +58,7 @@
       </div>
 
       <app-pagination
-        [totalItem]="userList.total"
+        [totalItem]="formList.total"
         [limit]="itemPerPage"
         (pageChange)="onPageChange($event)"
       >
@@ -95,7 +95,7 @@
   </div>
 </ng-template>
 
-<ng-template #createUserOffcanvas let-offcanvas>
+<ng-template #createFormOffcanvas let-offcanvas>
   <div class="offcanvas-header">
     <h4 class="offcanvas-title"><i class="fe fe-cube"></i> Create Form</h4>
     <button
@@ -107,7 +107,7 @@
   </div>
   <hr class="m-0" />
   <div class="offcanvas-body">
-    <form [formGroup]="Form" (ngSubmit)="onCreateuserSubmit()">
+    <form [formGroup]="Form" (ngSubmit)="onCreateformSubmit()">
       <div class="form-group">
         <label class="form-label">Title</label>
         <input
@@ -189,9 +189,9 @@
   </div>
 </ng-template>
 
-<ng-template #updateUserOffcanvas let-offcanvas>
+<ng-template #updateFormOffcanvas let-offcanvas>
   <div class="offcanvas-header">
-    <h4 class="offcanvas-title"><i class="fe fe-user"></i>Edit Form</h4>
+    <h4 class="offcanvas-title"><i class="fe fe-form"></i>Edit Form</h4>
     <button
       type="button"
       class="btn-close"
@@ -201,7 +201,7 @@
   </div>
   <hr class="m-0" />
   <div class="offcanvas-body">
-    <form [formGroup]="Form" (ngSubmit)="onUpdateuserSubmit()">
+    <form [formGroup]="Form" (ngSubmit)="onUpdateformSubmit()">
       <div class="form-group">
         <label class="form-label">Title</label>
         <input
@@ -283,7 +283,7 @@
   </div>
 </ng-template>
 
-<ng-template #viewUserOffcanvas let-offcanvas>
+<ng-template #viewFormOffcanvas let-offcanvas>
   <div class="offcanvas-header">
     <h5 class="offcanvas-title"><i class="fe fe-cube"></i> View Form</h5>
     <button
@@ -342,7 +342,7 @@
         class="additional-content border p-3"
       >
         <div *ngIf="selectedData">
-          <h4>User Details</h4>
+          <h4>Form Details</h4>
           <p><strong>Title:</strong> {{ selectedData.title }}</p>
           <p><strong>Description:</strong> {{ selectedData.description }}</p>
         </div>

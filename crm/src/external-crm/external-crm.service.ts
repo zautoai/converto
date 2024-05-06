@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ExternalCrmProvider } from './external-crm.provider';
 import { Session } from 'inspector';
+import { CreateCRMMappingsDto } from './dto/create-crm-mappings.dto';
+import { MappingService } from './mapping.service';
 
 @Injectable()
 export class ExternalCrmService {
 
     constructor(
-        private readonly crmProvider:ExternalCrmProvider
+        private readonly crmProvider:ExternalCrmProvider,
+        private readonly mappingService: MappingService
     ){}
 
     getAuthUrl(orgId:string,crmName:string): any {
@@ -78,6 +81,35 @@ export class ExternalCrmService {
         const crm = this.crmProvider.getCRM(crmName);
         const company = await crm.deleteCompany(orgId, id);
         return company;
+    }
+
+    async getMappingsByCrmName(orgId:string, crmName: string)
+    {
+        return await this.mappingService.getMappingsByCrmName(orgId, crmName);
+    }
+
+    async createMappings(orgId:string, createCRMMappingsDto:CreateCRMMappingsDto): Promise<any> {
+        for(const _mapping of createCRMMappingsDto.mappings) {
+            const mapping = await this.mappingService.getMappingByCrmNameAndObjectTypeAndField(orgId, _mapping.crmName, _mapping.objectType, _mapping.fieldName);
+            if(mapping){
+                if(_mapping.externalCRMFieldName == null)
+                {
+                    await this.mappingService.deleteMapping(orgId, mapping.id);
+                }
+                else if(mapping.externalCRMFieldName !== _mapping.externalCRMFieldName)
+                {
+                    await this.mappingService.updateMapping(orgId, mapping.id, _mapping);
+                }
+                continue;
+            };
+            if(_mapping.externalCRMFieldName == null) continue;
+            await this.mappingService.createMapping(orgId, _mapping);
+        }
+        return {
+            status: 200,
+            message: 'success',
+            data:createCRMMappingsDto.mappings
+        };
     }
 
 }

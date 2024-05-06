@@ -199,4 +199,6 @@ model CrmMapping {
   crmName               String
   createdAt             DateTime @default(now())
   modifiedAt            DateTime @updatedAt
+
+  @@unique([objectType,fieldName,externalCRMObjectType,externalCRMFieldName])
 }

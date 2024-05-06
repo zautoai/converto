@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString } from "class-validator";
+import { CrmNames } from "../enum/external-crm.enum";
 
 export class CrmMappingDto {
 
@@ -26,5 +27,5 @@ export class CrmMappingDto {
     @ApiProperty({required:true})
     @IsString()
     @IsNotEmpty()
-    crmName:string;
+    crmName:CrmNames = CrmNames.HUBSPOT;
 }

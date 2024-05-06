@@ -1,24 +1,14 @@
-import {
-  Component,
-  ViewChild,
-  ElementRef,
-  AfterViewInit,
-  OnInit,
-  Input,
-  Output,
-} from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { API } from 'src/app/config/endpoint.config';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
-import { API } from 'src/app/config/endpoint.config';
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
-import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { ChatBotWidgetsComponent } from 'src/app/widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { EventEmitter } from 'stream';
 import { DeployScriptType } from '../zautosettings/settings/settings.component';
-import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-form-builder',
@@ -26,15 +16,15 @@ import { AuthService } from 'src/app/shared/services/auth.service';
   styleUrl: './form-builder.component.scss',
 })
 export class FormBuilderComponent implements OnInit {
-  @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
-  @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
-  @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
+  @ViewChild('createFormOffcanvas') createFormOffcanvas: ElementRef | undefined;
+  @ViewChild('updateFormOffcanvas') updateFormOffcanvas: ElementRef | undefined;
+  @ViewChild('viewFormOffcanvas') viewFormOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
   @Input() chatBotWidget!: ChatBotWidgetsComponent;
 
-  user: any = {};
-  userList: any = [];
-  selectedUser: any = undefined;
+  form: any = {};
+  formList: any = [];
+  selectedForm: any = undefined;
   isEdit: boolean = false;
   Form: FormGroup;
   errorFeedback: any = { name: '', email: '', password: '' };
@@ -69,7 +59,7 @@ export class FormBuilderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getUsers();
+    this.getForms();
   }
   ngAfterViewInit(): void {
     if (this.chatBotWidget) {
@@ -103,7 +93,7 @@ export class FormBuilderComponent implements OnInit {
     );
   }
 
-  getUsers = () => {
+  getForms = () => {
     this.restService
       .getAll(
         API.main.formbuilder +
@@ -111,7 +101,7 @@ export class FormBuilderComponent implements OnInit {
       )
       .subscribe(
         (response: any) => {
-          this.userList = response.data;
+          this.formList = response.data;
           console.log(response);
         },
         (error) => {
@@ -121,21 +111,21 @@ export class FormBuilderComponent implements OnInit {
       );
   };
 
-  openCreateUser() {
+  openCreateForm() {
     this.Form.reset();
     this.resetErrorFeedback();
-    this.offcanvasService.open(this.createUserOffcanvas, {
+    this.offcanvasService.open(this.createFormOffcanvas, {
       position: 'end',
       backdrop: 'static',
       panelClass: 'visible',
       animation: true,
     });
   }
-  openViewUser(data: any) {
+  openViewForm(data: any) {
     this.selectedData = data;
     this.Form.reset();
     this.resetErrorFeedback();
-    this.offcanvasService.open(this.viewUserOffcanvas, {
+    this.offcanvasService.open(this.viewFormOffcanvas, {
       position: 'end',
       backdrop: 'static',
       panelClass: 'visible',
@@ -183,7 +173,7 @@ export class FormBuilderComponent implements OnInit {
     this.getJsScript(this.selectedData.id);
   }
 
-  onCreateuserSubmit() {
+  onCreateformSubmit() {
     this.resetErrorFeedback();
     this.onSubmitForm();
     const title = this.Form.value.title || '';
@@ -216,8 +206,8 @@ export class FormBuilderComponent implements OnInit {
         next: (response: any) => {
           console.log(response);
           this.offcanvasService.dismiss();
-          this.notifService.showSuccess('User Added Successfully.');
-          this.getUsers();
+          this.notifService.showSuccess('Form Added Successfully.');
+          this.getForms();
         },
         error: (error) => {
           console.error(error);
@@ -234,7 +224,7 @@ export class FormBuilderComponent implements OnInit {
     }
   }
 
-  openUpdateUser(data: any) {
+  openUpdateForm(data: any) {
     this.selectedData = data;
     this.Form.reset();
     this.Form.get('title')?.setValue(data?.title);
@@ -247,7 +237,7 @@ export class FormBuilderComponent implements OnInit {
     this.Form.get('contactdetails')?.setValue(
       leadFormFields.includes('Phone Number'),
     );
-    this.offcanvasService.open(this.updateUserOffcanvas, {
+    this.offcanvasService.open(this.updateFormOffcanvas, {
       position: 'end',
       backdrop: 'static',
       panelClass: 'visible',
@@ -255,7 +245,7 @@ export class FormBuilderComponent implements OnInit {
     });
   }
 
-  onUpdateuserSubmit(): void {
+  onUpdateformSubmit(): void {
     const updateLeadField: any[] = [];
 
     if (this.Form.get('name')?.value) {
@@ -284,18 +274,18 @@ export class FormBuilderComponent implements OnInit {
     }
 
     if (this.Form.valid) {
-      const updatedUserData = {
+      const updatedFormData = {
         title: this.Form.value.title,
         description: this.Form.value.description,
         updateLeadField,
       };
       this.restService
-        .patch(API.main.formbuilder, this.selectedData.id, updatedUserData)
+        .patch(API.main.formbuilder, this.selectedData.id, updatedFormData)
         .subscribe(
           (response: any) => {
             console.log(response);
-            this.notifService.showSuccess('User Updated Successfully.');
-            this.getUsers();
+            this.notifService.showSuccess('Form Updated Successfully.');
+            this.getForms();
           },
           (error) => {
             console.error(error);
@@ -313,9 +303,9 @@ export class FormBuilderComponent implements OnInit {
   }
 
   delete = (data: any) => {
-    this.user = data;
+    this.form = data;
     this.sweetAlertService.warning(
-      'Delete user',
+      'Delete form',
       'Are you sure you want to delete ?',
       ['Delete', 'Cancel'],
       (confirm: any) => {
@@ -326,22 +316,22 @@ export class FormBuilderComponent implements OnInit {
     );
   };
 
-  onSubmit = (userForm: any) => {
+  onSubmit = (formForm: any) => {
     this.modalService.dismissAll();
-    this.notifService.showSuccess('User Added Successfully');
+    this.notifService.showSuccess('Form Added Successfully');
   };
 
   closeModal = () => {
-    this.user = {};
+    this.form = {};
     this.isEdit = false;
     this.modalService.dismissAll();
   };
 
   confirmDelete = () => {
-    this.restService.delete(API.main.formbuilder, this.user.id).subscribe(
+    this.restService.delete(API.main.formbuilder, this.form.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Form Deleted Successfully.');
-        this.getUsers();
+        this.getForms();
         this.closeModal();
       },
       (error) => {
@@ -353,7 +343,7 @@ export class FormBuilderComponent implements OnInit {
 
   onPageChange(pageNumber: number) {
     this.currentPage = pageNumber;
-    this.getUsers();
+    this.getForms();
   }
 
   resetErrorFeedback() {
