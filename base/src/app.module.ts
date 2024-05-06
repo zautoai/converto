@@ -57,6 +57,7 @@ import { ContactsModule } from './contacts/contacts.module';
 import { FormBuilderModule } from './form-builder/form-builder.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { AccountBasedMaretingModule } from './account-based-mareting/account-based-mareting.module';
+import { EnrichmentModule } from './enrichment/enrichment.module';
 
 @Module({
   imports: [
@@ -130,7 +131,8 @@ import { AccountBasedMaretingModule } from './account-based-mareting/account-bas
     ContactsModule,
     FormBuilderModule,
     AccountsModule,
-    AccountBasedMaretingModule
+    AccountBasedMaretingModule,
+    EnrichmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
