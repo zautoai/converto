@@ -21,7 +21,7 @@ export abstract class BaseExternalCrm {
         const loggerName = `ExternalCrm:${this.crmName}`;
         this.logger = new Logger(loggerName);
         this.logger.log(`Created ${loggerName}`);
-    }
+    } 
 
     abstract getAuthUrl(orgId:string,additionalInfo:any):string;
     
@@ -32,4 +32,24 @@ export abstract class BaseExternalCrm {
     abstract handleToken(orgId:string,tokenData: Token): Promise<void>;
 
     abstract getAccessToken(orgId:string): Promise<any>;
+
+    protected isTokenExpired(expiresIn: number, modifiedAt: Date): boolean {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const modifiedTime = Math.floor(modifiedAt.getTime() / 1000); 
+        const expirationTime = modifiedTime + expiresIn;
+        return expirationTime < currentTime;
+    }
+    // CRM functions
+    abstract getProfile(orgId:string): Promise<any>;
+    abstract getContactProperties(orgId:string): Promise<any>;
+    abstract getContacts(orgId:string): Promise<any>;
+    abstract getContact(orgId:string, id:any): Promise<any>;
+    abstract createContact(orgId:string, data:any): Promise<any>;
+    abstract updateContact(orgId:string, id:any, data:any): Promise<any>;
+    abstract deleteContact(orgId:string, id:any): Promise<any>;
+    abstract getCompany(orgId: string, id: any): Promise<any>;
+    abstract getCompanies(orgId: string): Promise<any>;
+    abstract createCompany(orgId: string, data: any): Promise<any>;
+    abstract updateCompany(orgId: string, id: any, data: any): Promise<any>;
+    abstract deleteCompany(orgId: string, id: any): Promise<any>;
 }

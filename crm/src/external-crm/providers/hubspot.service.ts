@@ -19,7 +19,7 @@ export class HubspotService extends BaseExternalCrm implements OnModuleInit {
             clientId: process.env.HUBSPOT_CLIENT_ID,
             clientSecret: process.env.HUBSPOT_CLIENT_SECRET,
             redirectUri: process.env.HUBSPOT_REDIRECT_URI,
-            scope: 'crm.schemas.contacts.read crm.schemas.contacts.write settings.users.read'
+            scope: 'crm.objects.contacts.read crm.objects.contacts.write crm.objects.companies.read crm.objects.companies.write settings.users.read'
         });
     }
 
@@ -38,6 +38,16 @@ export class HubspotService extends BaseExternalCrm implements OnModuleInit {
         // console.log(contact);
         // const contact = await this.deleteContact('crm', 18758600027);
         // console.log(contact); 
+        const companies = await this.getCompanies('crm');
+        console.log(companies);
+        // const company = await this.getCompany('crm', 18758600027);
+        // console.log(company);
+        // const company = await this.createCompany('crm', { name: 'sridhar'});
+        // console.log(company);
+        // const company = await this.updateCompany('crm', 1551, { name: 'sridhar'});
+        // console.log(company);
+        // const company = await this.deleteCompany('crm', 1551);
+        // console.log(company);
          
     }
 
@@ -225,5 +235,50 @@ export class HubspotService extends BaseExternalCrm implements OnModuleInit {
         const contact = await hubspotClient.crm.contacts.gdprApi.purge(payload);
         return contact;
     }
-
+    
+    // company crud
+    async getCompanies(orgId: string): Promise<any> {
+        const accessToken = await this.getAccessToken(orgId);
+        if(!accessToken) return null;
+        const hubspotClient = new Client({ accessToken:  accessToken});
+        const companies = await hubspotClient.crm.companies.getAll()
+        const _companies = companies.map(company => {
+            return company.properties;
+        });
+        return _companies;
+    }
+    async getCompany(orgId: string, id: any): Promise<any> {
+        const accessToken = await this.getAccessToken(orgId);
+        if(!accessToken) return null;
+        const hubspotClient = new Client({ accessToken:  accessToken});
+        const company = await hubspotClient.crm.companies.basicApi.getById(id);
+        return company.properties;
+    }
+    async createCompany(orgId: string, data: any): Promise<any> {
+        const accessToken = await this.getAccessToken(orgId);
+        if(!accessToken) return null;
+        const hubspotClient = new Client({ accessToken:  accessToken});
+        const payload = new SimplePublicObjectInputForCreate()
+        payload.properties = data;
+        const company = await hubspotClient.crm.companies.basicApi.create(payload);
+        return company.properties;
+    }
+    async updateCompany(orgId: string, id:any, data: any): Promise<any> {
+        const accessToken = await this.getAccessToken(orgId);
+        if(!accessToken) return null;
+        const hubspotClient = new Client({ accessToken:  accessToken});
+        const payload = new SimplePublicObjectInput();
+        payload.properties = data;
+        const company = await hubspotClient.crm.companies.basicApi.update(id, payload);
+        return company.properties;
+    }
+    async deleteCompany(orgId: string, id:any): Promise<any> {
+        const accessToken = await this.getAccessToken(orgId);
+        if(!accessToken) return null;
+        const hubspotClient = new Client({ accessToken:  accessToken});
+        const payload = new PublicGdprDeleteInput();
+        payload.objectId = id;
+        const company = await hubspotClient.crm.companies.gdprApi.purge(payload);
+        return company;
+    }
 }
