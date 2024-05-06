@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
 import { FormBuilder, FormGroup,Validators } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
@@ -51,6 +51,7 @@ export class AccountsComponent implements OnInit {
     private offcanvasService: NgbOffcanvas,
     private formBuilder: FormBuilder,
     private sweetAlertService: SweetAlertService,
+    private changeDetectorRef: ChangeDetectorRef,
   ) {
     
     this.Form = this.formBuilder.group({
@@ -159,25 +160,25 @@ export class AccountsComponent implements OnInit {
 
   onCreateuserSubmit() {
     this.resetErrorFeedback();
-    const parentaccountId = this.Form.value.parentaccountId || '';
-    const photoUrl = this.Form.value.photoUrl || '';
-    const accountname = this.Form.value.accountname || '';
-    const industry = this.Form.value.industry || '';
-    const companySize = this.Form.value.companySize || '';
-    const annualRevenue = this.Form.value.annualRevenue || '';
-    const accountType = this.Form.value.accountType || '';
-    const website = this.Form.value.website || '';
-    const address = this.Form.value.address || '';
-    const city = this.Form.value.city || '';
-    const state = this.Form.value.state || '';
-    const zip = this.Form.value.zip || '';
-    const country = this.Form.value.country || '';
-    const phone = this.Form.value.phone || '';
-    const email = this.Form.value.email || '';
-    const socialMedia = this.Form.value.socialMedia || '';
-    const notes = this.Form.value.notes || '';
-    const source = this.Form.value.source || '';
-    const status = this.Form.value.status || '';
+    const parentaccountId = this.Form.value.parentaccountId || null;
+    const photoUrl = this.Form.value.photoUrl || null;
+    const accountname = this.Form.value.accountname || null;
+    const industry = this.Form.value.industry || null;
+    const companySize = this.Form.value.companySize || null;
+    const annualRevenue = this.Form.value.annualRevenue || null;
+    const accountType = this.Form.value.accountType || null;
+    const website = this.Form.value.website || null;
+    const address = this.Form.value.address || null;
+    const city = this.Form.value.city || null;
+    const state = this.Form.value.state || null;
+    const zip = this.Form.value.zip || null;
+    const country = this.Form.value.country || null;
+    const phone = this.Form.value.phone || null;
+    const email = this.Form.value.email || null;
+    const socialMedia = this.Form.value.socialMedia || null;
+    const notes = this.Form.value.notes || null;
+    const source = this.Form.value.source || null;
+    const status = this.Form.value.status || null;
     
 
     if (this.Form.valid) {
@@ -208,6 +209,8 @@ export class AccountsComponent implements OnInit {
 
           this.offcanvasService.dismiss();
           this.notifService.showSuccess('User Added Successfully.');
+          this.getAccounts();
+          this.changeDetectorRef.detectChanges();
           
         },
         error: (error) => {
