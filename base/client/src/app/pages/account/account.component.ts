@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup,Validators } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -58,8 +58,8 @@ export class AccountsComponent implements OnInit {
       photoUrl:[''],
       accountname: [''],
       industry:[''],
-      companySize:[''],
-      annualRevenue:[''],
+      companySize: ['', [Validators.required, Validators.pattern("^[0-9]*$")]],
+      annualRevenue: ['', [Validators.required, Validators.pattern("^[0-9]*$")]],
       accountType:[''],
       website:[''],       
       address:[''],        
@@ -73,7 +73,8 @@ export class AccountsComponent implements OnInit {
       notes :[''],          
       source :[''],  
       status:[''],       
-    });
+    }); console.log(FormData);
+    
   }
 
 
@@ -86,13 +87,12 @@ export class AccountsComponent implements OnInit {
     }
   }
   getAccounts(page: number = 1, limit: number = 10): void {
-    const queryParams = { page, limit }; // Define pagination parameters
-    const endpoint = API.main.account + `?${queryParams}`;
-    this.restService.getAll(endpoint) // Pass pagination parameters to the service
+    this.restService.getAll(API.main.account+`?limit=${limit}&page=${page}`)
       .subscribe((response: any) => {
         this.submittedData = response.data; 
-        this.totalPages = Math.ceil(response.totalCount / limit); // Update data with response from API
-        // Update any other pagination-related properties if necessary
+        console.log(response.data);
+        
+        this.totalPages = Math.ceil(response.totalCount / limit);
       }, (error) => {
         console.error(error);
         this.notifService.showError(error.error.message);
@@ -100,17 +100,16 @@ export class AccountsComponent implements OnInit {
 }
 
 
-
-  deleteSubmittedData(data: any): void {
+  deleteSubmittedData(data: any) {
     const index = this.submittedData.indexOf(data);
     if (index !== -1) {
       this.submittedData.splice(index, 1);
     }
   }
 
-  onSubmitForm(): void {
+  onSubmitForm(Form: any){
     this.submittedData.push({ ...this.Form.value });
-    this.Form.reset()
+    this.Form.reset();
   
   }
 
@@ -150,31 +149,7 @@ export class AccountsComponent implements OnInit {
     this.showScript = false;
   }
 
-  deplymentType = DeployScriptType;
-  getAgentDeploy(type: DeployScriptType) {
-    const botId = this.avatarService.getAvatarId()
 
-    let script = "";
-    if (type == DeployScriptType.BOTTOM_BAR) {
-      script = `
-      <script type="text/javascript">
-        (function()
-        {
-            var rootElement = document.createElement("div");
-            rootElement.id = "zauto_root";
-            document.body.appendChild(rootElement);
-            d = document; 
-            s = d.createElement("script");     
-            s.async = 1;     
-            s.src = "${API.rootURL}api/agents/widget/${botId}.js";
-            d.getElementsByTagName("head")[0].appendChild(s);
-        })();
-      </script>
-      `
-    }
-
-    return script;
-  }
 
   toggleScript(): void {
     this.showScript = !this.showScript;
@@ -184,17 +159,50 @@ export class AccountsComponent implements OnInit {
 
   onCreateuserSubmit() {
     this.resetErrorFeedback();
-    const name = this.Form.value.name || '';
+    const parentaccountId = this.Form.value.parentaccountId || '';
+    const photoUrl = this.Form.value.photoUrl || '';
+    const accountname = this.Form.value.accountname || '';
+    const industry = this.Form.value.industry || '';
+    const companySize = this.Form.value.companySize || '';
+    const annualRevenue = this.Form.value.annualRevenue || '';
+    const accountType = this.Form.value.accountType || '';
+    const website = this.Form.value.website || '';
+    const address = this.Form.value.address || '';
+    const city = this.Form.value.city || '';
+    const state = this.Form.value.state || '';
+    const zip = this.Form.value.zip || '';
+    const country = this.Form.value.country || '';
+    const phone = this.Form.value.phone || '';
     const email = this.Form.value.email || '';
-    const password = this.Form.value.password || '';
+    const socialMedia = this.Form.value.socialMedia || '';
+    const notes = this.Form.value.notes || '';
+    const source = this.Form.value.source || '';
+    const status = this.Form.value.status || '';
+    
 
     if (this.Form.valid) {
       const data = {
-        name: name,
-        email: email,
-        password: password,
+        parentaccountId: parentaccountId,
+        photoUrl: photoUrl,
+        accountname: accountname,
+        industry: industry,
+        companySize: companySize,
+        annualRevenue:annualRevenue,
+        accountType: accountType,
+        website: website,
+        address:address,
+        city:city,
+        state:state,
+        zip:zip,
+        country:country,
+        phone:phone,
+        email:email,
+        socialMedia:socialMedia,
+        notes:notes,
+        source:source,
+        status:status,
       };
-      this.restService.post(API.main.orgUser, data).subscribe({
+      this.restService.post(API.main.account, data).subscribe({
         next: (response: any) => {
           console.log(response);
 
@@ -208,15 +216,23 @@ export class AccountsComponent implements OnInit {
         },
       });
     } else {
-      if (name.length <= 0) {
+      if (parentaccountId.length <= 0) {
         this.errorFeedback.name = 'Name required.';
       }
-      if (email.length <= 0) {
-        this.errorFeedback.email = 'Email required.';
+      if (photoUrl.length <= 0) {
+        this.errorFeedback.email = 'photoUrl required.';
       }
-      if (password.length <= 0) {
-        this.errorFeedback.password = 'password required.';
+      if (accountname.length <= 0) {
+        this.errorFeedback.password = 'accountname required.';
       }
+      if (industry.length <= 0) {
+        this.errorFeedback.password = 'indusrty required.';
+      }
+      if (accountname.length <= 0) {
+        this.errorFeedback.password = 'accountname required.';
+      }
+  
+      
     }
   }
 
@@ -266,10 +282,7 @@ export class AccountsComponent implements OnInit {
     );
   };
 
-  onSubmit = (userForm: any) => {
-    this.modalService.dismissAll();
-    this.notifService.showSuccess('User Added Successfully');
-  };
+
 
   closeModal = () => {
     this.user = {};
