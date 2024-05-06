@@ -6,6 +6,7 @@ import { HubspotService } from './providers/hubspot.service';
 import { CommonModule } from 'src/common/common.module';
 import { HttpModule } from '@nestjs/axios';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { MappingService } from './mapping.service';
 
 @Module({
   imports:[
@@ -17,7 +18,8 @@ import { PrismaModule } from 'src/prisma/prisma.module';
   providers: [
     ExternalCrmService, 
     ExternalCrmProvider,
-    HubspotService
+    HubspotService,
+    MappingService
   ],
 })
 export class ExternalCrmModule {}

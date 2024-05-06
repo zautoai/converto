@@ -179,14 +179,24 @@ model AccountBasedMarketingTarget {
   modifiedAt        DateTime @updatedAt
 }
 
-
 model ExternalCrmCredential {
-  id           String      @id @default(uuid())
+  id           String   @id @default(uuid())
   tokeType     String?
   refreshToken String
   accessToken  String
   expiresIn    Int
   crmName      String
-  createdAt    DateTime    @default(now())
-  modifiedAt   DateTime    @updatedAt
+  createdAt    DateTime @default(now())
+  modifiedAt   DateTime @updatedAt
+}
+
+model CrmMapping {
+  id                    String   @id @default(uuid())
+  objectType            String
+  fieldName             String
+  externalCRMObjectType String
+  externalCRMFieldName  String
+  crmName               String
+  createdAt             DateTime @default(now())
+  modifiedAt            DateTime @updatedAt
 }
