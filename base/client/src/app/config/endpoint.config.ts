@@ -53,7 +53,7 @@ export const API = {
     promptTemplate: 'api/prompt-template',
     leadCategory: 'api/lead-categories',
     formbuilder: 'api/form-builder',
-    account: 'api/accounts',
+    account: 'api/crm-accounts',
   },
   dev: {},
 };

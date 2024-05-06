@@ -70,3 +70,9 @@ export enum CustomFieldParent {
   ACCOUNT = 'ACCOUNT',
   ABM = 'ABM',
 }
+
+export enum EnrichmentProviderName {
+  APOLLO = 'Apollo',
+  CLEARBIT = 'Clearbit',
+  ZOOMINFO = 'Zoominfo',
+}

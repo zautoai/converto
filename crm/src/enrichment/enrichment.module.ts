@@ -24,7 +24,7 @@ import { EnrichmentMicroserviceController } from './enrichment-provider.micro.co
     }),
     BullModule.registerQueue({ name: 'enrichment_queue' }),
   ],
-  controllers: [EnrichmentController],
+  controllers: [EnrichmentController, EnrichmentMicroserviceController],
   providers: [
     EnrichmentService,
     EnrichmentProvider,
@@ -32,7 +32,6 @@ import { EnrichmentMicroserviceController } from './enrichment-provider.micro.co
     ClearBitService,
     ZoomInfoService,
     EnrichmentProcessor,
-    EnrichmentMicroserviceController
   ],
   exports: [EnrichmentService, ClearBitService, ZoomInfoService],
 })
