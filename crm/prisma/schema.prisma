@@ -144,7 +144,7 @@ model Account {
   industry        String?
   companySize     Int?
   annualRevenue   Float?
-  accountType     accountType?
+  accountType     accountType @default(PROSPECT)
   website         String?
   address         String?
   city            String?
