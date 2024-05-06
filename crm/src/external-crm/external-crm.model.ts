@@ -1,6 +1,8 @@
-import { Logger } from "@nestjs/common";
+import { Inject, Logger } from "@nestjs/common";
 import { ICRMConfig } from "./interfaces/appconfig.inteface";
 import { Token } from "./interfaces/token.interface";
+import { MappingService } from "./mapping.service";
+import { PrismaClientManager } from "src/prisma/prismaClientManager.service";
 
 export abstract class BaseExternalCrm {
     protected readonly logger;
@@ -11,7 +13,9 @@ export abstract class BaseExternalCrm {
     protected readonly redirectUri: string; 
     protected readonly scope: string;
 
-    constructor(config:ICRMConfig)
+    constructor(
+        config:ICRMConfig,
+    )
     {        
         this.crmName = config.name;
         this.clientId = config.clientId;
@@ -55,3 +59,4 @@ export abstract class BaseExternalCrm {
     abstract updateCompany(orgId: string, id: any, data: any): Promise<any>;
     abstract deleteCompany(orgId: string, id: any): Promise<any>;
 }
+

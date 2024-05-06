@@ -1,14 +1,14 @@
-import { BadRequestException, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseExternalCrm } from '../external-crm.model';
 import { CrmNames } from '../enum/external-crm.enum';
 import { HttpService } from '@nestjs/axios';
 import { Token } from '../interfaces/token.interface';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { Client } from "@hubspot/api-client";
-import { Filter, FilterGroup, FilterOperatorEnum, PublicGdprDeleteInput, SimplePublicObject, SimplePublicObjectInput, SimplePublicObjectInputForCreate } from '@hubspot/api-client/lib/codegen/crm/contacts';
+import { FilterOperatorEnum, PublicGdprDeleteInput, SimplePublicObjectInput, SimplePublicObjectInputForCreate } from '@hubspot/api-client/lib/codegen/crm/contacts';
 
 @Injectable()
-export class HubspotService extends BaseExternalCrm implements OnModuleInit {
+export class HubspotService extends BaseExternalCrm {
    
     constructor(
         private readonly httpService:HttpService,
@@ -21,36 +21,6 @@ export class HubspotService extends BaseExternalCrm implements OnModuleInit {
             redirectUri: process.env.HUBSPOT_REDIRECT_URI,
             scope: 'crm.objects.contacts.read crm.objects.contacts.write crm.objects.companies.read crm.objects.companies.write settings.users.read'
         });
-    }
-
-    async onModuleInit() {
-        // const contactsProperties = await this.getContactProperties('crm');
-        // console.log(contactsProperties);
-        // const profile = await this.getProfile('crm');
-        // console.log(profile);
-        // const contact = await this.getContactByEmail('crm', 'sridharan@gmail.com');
-        // console.log(contact);
-        // const contacts = await this.getContacts('crm');
-        // console.log(contacts);
-        // const contact = await this.getContact('crm', 18758600027);
-        // console.log(contact);
-        // const contact = await this.createContact('crm', { firstname: 'sridhar', lastname: 'dhamodharan'});
-        // console.log(contact);
-        // const contact = await this.updateContact('crm',1551,{ firstname: 'sridhar', lastname: 'dhamodharan'});
-        // console.log(contact);
-        // const contact = await this.deleteContact('crm', 18758600027);
-        // console.log(contact); 
-        // const companies = await this.getCompanies('crm');
-        // console.log(companies);
-        // const company = await this.getCompany('crm', 18758600027);
-        // console.log(company);
-        // const company = await this.createCompany('crm', { name: 'sridhar'});
-        // console.log(company);
-        // const company = await this.updateCompany('crm', 1551, { name: 'sridhar'});
-        // console.log(company);
-        // const company = await this.deleteCompany('crm', 1551);
-        // console.log(company);
-         
     }
 
     getAuthUrl(orgId:string,additionalInfo:any): string {

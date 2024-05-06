@@ -1,16 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ExternalCrmProvider } from './external-crm.provider';
-import { Session } from 'inspector';
 import { CreateCRMMappingsDto } from './dto/create-crm-mappings.dto';
 import { MappingService } from './mapping.service';
+import { CrmNames, ObjectType } from './enum/external-crm.enum';
 
 @Injectable()
-export class ExternalCrmService {
+export class ExternalCrmService implements OnModuleInit{
 
     constructor(
         private readonly crmProvider:ExternalCrmProvider,
         private readonly mappingService: MappingService
     ){}
+
+    async onModuleInit() {
+        await this.createContact('crm',CrmNames.HUBSPOT,{
+            firstName: 'sridhar',
+            lastName: 'dhamodharan',
+            organization: 'ZautoAI'
+        });
+    }
 
     getAuthUrl(orgId:string,crmName:string): any {
         const crm = this.crmProvider.getCRM(crmName);
@@ -43,9 +51,10 @@ export class ExternalCrmService {
     }
     async createContact(orgId:string, crmName:string, data:any): Promise<any> {
         const crm = this.crmProvider.getCRM(crmName);
-        const contact = await crm.createContact(orgId, data);
+        const mappedData = await this.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
+        const contact = await crm.createContact(orgId, mappedData);
         return contact;
-    }
+    } 
     async updateContact(orgId:string, crmName:string, id:any, data:any): Promise<any> {
         const crm = this.crmProvider.getCRM(crmName);
         const contact = await crm.updateContact(orgId, id, data);
@@ -112,4 +121,18 @@ export class ExternalCrmService {
         };
     }
 
+    async handleMapping(orgId: string, crmName: string, objectType:string,data: any): Promise<any> {
+
+        const mappings = await this.mappingService.getMappingsBycrmNameAndObjectType(orgId, crmName, objectType);
+        let mappedData = {};
+        for(const mapping of mappings)
+        {
+            const externalCRMFieldName = mapping.externalCRMFieldName;
+            const fieldName = mapping.fieldName;
+            if(externalCRMFieldName == null) continue;
+            mappedData[externalCRMFieldName] = data[fieldName];
+        }
+        return mappedData;       
+    }
+ 
 }
