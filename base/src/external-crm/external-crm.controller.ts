@@ -62,4 +62,13 @@ export class ExternalCrmController {
     }
     return await this.externalCrmService.getFields(orgId, crmName)
   }
+
+  @Get('profile')
+  async getProfile(@Query() crmAuthDto:CRMAuthDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    return await this.externalCrmService.getProfile(orgId, crmAuthDto);
+  }
 }

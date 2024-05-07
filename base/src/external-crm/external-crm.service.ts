@@ -31,4 +31,8 @@ export class ExternalCrmService extends BaseService {
     async getFields(orgId: string, crmName: string) {
         return this.handleException(await this.externalCrmMicroService.getFields(orgId, crmName))
     }
+
+    async getProfile(orgId: string, crmName: CRMAuthDto) {
+        return this.handleException(await this.externalCrmMicroService.getProfile(orgId, crmName.name))
+    }
 }
