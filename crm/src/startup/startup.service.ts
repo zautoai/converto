@@ -32,7 +32,7 @@ export class StartupService implements OnModuleInit {
       let _total = 1;
       let _page = Math.ceil(_total / itemPerPage);
 
-      let page = 1;
+      let page = 1;  
       while (page <= _page) {
         const response = await this.organizationService.getOrganizations({ page: page, limit: itemPerPage });
         _total = response.total;
