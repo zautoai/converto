@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BaseExternalCrm } from './external-crm.model';
 import { CrmNames } from './enum/external-crm.enum';
 import { HubspotService } from './providers/hubspot.service';
@@ -16,6 +16,11 @@ export class ExternalCrmProvider {
     }
 
     getCRM(name: string): BaseExternalCrm {
-        return this.providers[name];
+        const crm = this.providers[name];
+        if(!crm)
+        {
+            throw new NotFoundException(`Invalid CRM name ${name}`);   
+        }
+        return crm;
     }
 }

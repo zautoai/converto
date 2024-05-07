@@ -173,7 +173,8 @@ export class HubspotService extends BaseExternalCrm {
                 properties:['name','label','type'],
              }
         });
-        return properties.json();
+        const _updatedFields = await properties.json();
+        return _updatedFields.results;
     }
 
     // contact crud

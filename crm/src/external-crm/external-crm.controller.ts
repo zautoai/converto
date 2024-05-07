@@ -55,6 +55,14 @@ export class ExternalCrmController {
     const orgId = request.orgId;
     return await this.externalCrmService.createMappings(orgId, createCRMMappingsDto);
   }
+
+  @Get('fields/contacts/:crm_name')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  async getFields(@Param('crm_name')crmName:string, @Req() request: IRequest) {
+    const orgId = request.orgId;
+    return await this.externalCrmService.getContactFields(orgId, crmName);
+  }
 }
 
 
