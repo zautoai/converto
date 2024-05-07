@@ -54,6 +54,7 @@ export const API = {
     leadCategory: 'api/lead-categories',
     formbuilder: 'api/form-builder',
     account: 'api/crm-accounts',
+    external_crm: 'api/external-crm'
   },
   dev: {},
 };

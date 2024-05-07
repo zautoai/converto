@@ -14,7 +14,7 @@ import { CreateCRMMappingsDto } from './dto/create-crm-mappings.dto';
 @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
-@Controller('external-crm')
+@Controller('api/external-crm')
 export class ExternalCrmController {
   constructor(private readonly externalCrmService: ExternalCrmService) { }
 
