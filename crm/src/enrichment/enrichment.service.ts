@@ -134,12 +134,12 @@ export class EnrichmentService {
       };
       const enrichedContact = await prisma.contact.update({
         where: { id: contactId },
-        data: data,
+        data: {...data},
       });
       try{
         const existingCrmContact = await this.externalCrmService.getContactByEmail(orgId, CrmNames.HUBSPOT,existingContact.email);
         if(existingCrmContact){
-          await this.externalCrmService.updateContact(orgId, CrmNames.HUBSPOT, existingCrmContact.id, enrichedContact);
+          await this.externalCrmService.updateContact(orgId, CrmNames.HUBSPOT, existingCrmContact.id, {...enrichedContact});
         }
       }
       catch(err){

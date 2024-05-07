@@ -180,7 +180,7 @@ export class ContactsService {
     }
 
     if (contact.email) {
-      await this.enrichmentService.enrichContact(orgId, contact.id);
+      // await this.enrichmentService.enrichContact(orgId, contact.id);
     }
 
     try
@@ -283,7 +283,7 @@ export class ContactsService {
     {
       const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, CrmNames.HUBSPOT,existingContact.data.email);
       if(existingCrmContact){
-        await this.externalCRMService.updateContact(orgId, CrmNames.HUBSPOT, existingCrmContact.id, updateContactDto);
+        await this.externalCRMService.updateContact(orgId, CrmNames.HUBSPOT, existingCrmContact.hs_object_id, updateContactDto);
       }
     }
     catch(err)
@@ -310,7 +310,7 @@ export class ContactsService {
     {
       const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, CrmNames.HUBSPOT,existingContact.data.email);
       if(existingCrmContact){
-        await this.externalCRMService.deleteContact(orgId, CrmNames.HUBSPOT, existingCrmContact.id);
+        await this.externalCRMService.deleteContact(orgId, CrmNames.HUBSPOT, existingCrmContact.hs_object_id);
       }
     }
     catch(err)
