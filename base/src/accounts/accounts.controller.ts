@@ -28,13 +28,15 @@ import { FilterDto } from 'src/common/dto/filter.dto';
 @ApiBearerAuth()
 @Controller('api/crm-accounts')
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService) {}
+  constructor(private readonly accountsService: AccountsService) { }
 
   @Post()
   async create(
     @Body() createAccountDto: CreateAccountDto,
     @Req() request: ZautoRequest,
   ) {
+    console.log(createAccountDto);
+
     const orgId = request.user.org.id;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');

@@ -58,6 +58,7 @@ import { FormBuilderModule } from './form-builder/form-builder.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { AccountBasedMaretingModule } from './account-based-mareting/account-based-mareting.module';
 import { EnrichmentModule } from './enrichment/enrichment.module';
+import { ExternalCrmModule } from './external-crm/external-crm.module';
 
 @Module({
   imports: [
@@ -133,6 +134,7 @@ import { EnrichmentModule } from './enrichment/enrichment.module';
     AccountsModule,
     AccountBasedMaretingModule,
     EnrichmentModule,
+    ExternalCrmModule,
   ],
   controllers: [AppController],
   providers: [AppService],
