@@ -1,0 +1,8 @@
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="text-center"><img width="24" height="24" [src]="data.iconUrl" [alt]="data.name"/> {{data.name}}</h5>
+        <p class="text-center">{{data.description}}</p>
+        <button class="btn btn-primary btn-block"><i class="fa-solid fa-plug"></i> Connect</button>
+        <button class="btn btn-outline-primary btn-block" [disabled]="!data.isConnected"><i class="fa-solid fa-sitemap"></i> Mappings</button>
+    </div>
+</div>
