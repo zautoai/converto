@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { CreateCRMMappingsDto } from "src/external-crm/dto/create-crm-mappings.dto";
+import { CRMAuthDto } from "src/external-crm/dto/crm-auth.dto";
 
 @Injectable()
 export class ExternalCrmMicroService {
@@ -60,6 +61,17 @@ export class ExternalCrmMicroService {
         }
         catch (error) {
             this.logger.error('Error in getting fields')
+            throw error
+        }
+    }
+
+    async getProfile(orgId: string, crmName: string) {
+        try {
+            this.logger.log('Getting Profile')
+            return this.CRMClient.send({ cmd: 'GET_PROFILE' }, { orgId, crmName }).toPromise()
+        }
+        catch (error) {
+            this.logger.error('Error in getting profile')
             throw error
         }
     }
