@@ -1,6 +1,13 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { FormBuilder, FormGroup,Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -9,22 +16,17 @@ import { SweetAlertService } from '../../shared/services/sweet-alart.service';
 import { DeployScriptType } from '../zautosettings/settings/settings.component';
 import { API } from '../../config/endpoint.config';
 
-
-
 @Component({
   selector: 'app-accounts',
   templateUrl: './account.component.html',
-  styleUrl: './account.component.scss'
+  styleUrl: './account.component.scss',
 })
-
-
 export class AccountsComponent implements OnInit {
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
- @Input()chatBotWidget! : ChatBotWidgetsComponent;
-
+  @Input() chatBotWidget!: ChatBotWidgetsComponent;
 
   user: any = {};
   userList: any = [];
@@ -36,12 +38,10 @@ export class AccountsComponent implements OnInit {
   showHTML: boolean = false;
   showScript: boolean = false;
   currentPage: number = 1;
-  totalPages:number=1;
+  totalPages: number = 1;
   itemPerPage: number = 10;
   submittedData: any[] = [];
-  selectedData: any = null; 
-
-
+  selectedData: any = null;
 
   constructor(
     private avatarService: AvatarService,
@@ -53,53 +53,57 @@ export class AccountsComponent implements OnInit {
     private sweetAlertService: SweetAlertService,
     private changeDetectorRef: ChangeDetectorRef,
   ) {
-    
     this.Form = this.formBuilder.group({
-      parentaccountId:[''],
-      photoUrl:[''],
-      accountname: [''],
-      industry:[''],
-      companySize: ['', [Validators.required, Validators.pattern("^[0-9]*$")]],
-      annualRevenue: ['', [Validators.required, Validators.pattern("^[0-9]*$")]],
-      accountType:[''],
-      website:[''],       
-      address:[''],        
-      city:[''],            
-      state:[''],           
-      zip :[''],  
-      country:[''],                
+      parentAccountId: [''],
+      photoUrl: [''],
+      accountName: [''],
+      industry: [''],
+      companySize: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      annualRevenue: [
+        '',
+        [Validators.required, Validators.pattern('^[0-9]*$')],
+      ],
+      accountType: [''],
+      website: [''],
+      address: [''],
+      city: [''],
+      state: [''],
+      zip: [''],
+      country: [''],
       phone: [''],
-      email:[''],
-      socialMedia:[''],
-      notes :[''],          
-      source :[''],  
-      status:[''],       
-    }); console.log(FormData);
-    
+      email: [''],
+      socialMedia: [''],
+      notes: [''],
+      source: [''],
+      status: [''],
+    });
+    console.log(FormData);
   }
-
 
   ngOnInit(): void {
     this.getAccounts();
   }
   ngAfterViewInit(): void {
-    if(this.chatBotWidget) {
+    if (this.chatBotWidget) {
       this.chatBotWidget.getAgent(this.avatarService.getAvatarId());
     }
   }
   getAccounts(page: number = 1, limit: number = 10): void {
-    this.restService.getAll(API.main.account+`?limit=${limit}&page=${page}`)
-      .subscribe((response: any) => {
-        this.submittedData = response.data; 
-        console.log(response.data);
-        
-        this.totalPages = Math.ceil(response.totalCount / limit);
-      }, (error) => {
-        console.error(error);
-        this.notifService.showError(error.error.message);
-      });
-}
+    this.restService
+      .getAll(API.main.account + `?limit=${limit}&page=${page}`)
+      .subscribe(
+        (response: any) => {
+          this.submittedData = response.data;
+          console.log(response.data);
 
+          this.totalPages = Math.ceil(response.totalCount / limit);
+        },
+        (error) => {
+          console.error(error);
+          this.notifService.showError(error.error.message);
+        },
+      );
+  }
 
   deleteSubmittedData(data: any) {
     const index = this.submittedData.indexOf(data);
@@ -108,13 +112,11 @@ export class AccountsComponent implements OnInit {
     }
   }
 
-  onSubmitForm(Form: any){
+  onSubmitForm(Form: any) {
     this.submittedData.push({ ...this.Form.value });
     this.Form.reset();
-  
   }
 
- 
   openCreateUser() {
     this.Form.reset();
     this.resetErrorFeedback();
@@ -136,7 +138,7 @@ export class AccountsComponent implements OnInit {
       animation: true,
     });
   }
-  
+
   toggleDescription(): void {
     this.showDescription = !this.showDescription;
     this.showHTML = false;
@@ -150,8 +152,6 @@ export class AccountsComponent implements OnInit {
     this.showScript = false;
   }
 
-
-
   toggleScript(): void {
     this.showScript = !this.showScript;
     this.showDescription = false;
@@ -160,98 +160,47 @@ export class AccountsComponent implements OnInit {
 
   onCreateuserSubmit() {
     this.resetErrorFeedback();
-    const parentaccountId = this.Form.value.parentaccountId || null;
-    const photoUrl = this.Form.value.photoUrl || null;
-    const accountname = this.Form.value.accountname || null;
-    const industry = this.Form.value.industry || null;
-    const companySize = this.Form.value.companySize || null;
-    const annualRevenue = this.Form.value.annualRevenue || null;
-    const accountType = this.Form.value.accountType || null;
-    const website = this.Form.value.website || null;
-    const address = this.Form.value.address || null;
-    const city = this.Form.value.city || null;
-    const state = this.Form.value.state || null;
-    const zip = this.Form.value.zip || null;
-    const country = this.Form.value.country || null;
-    const phone = this.Form.value.phone || null;
-    const email = this.Form.value.email || null;
-    const socialMedia = this.Form.value.socialMedia || null;
-    const notes = this.Form.value.notes || null;
-    const source = this.Form.value.source || null;
-    const status = this.Form.value.status || null;
-    
+    const formData: { [key: string]: string | null } = this.Form.value;
 
-    if (this.Form.valid) {
-      const data = {
-        parentaccountId: parentaccountId,
-        photoUrl: photoUrl,
-        accountname: accountname,
-        industry: industry,
-        companySize: companySize,
-        annualRevenue:annualRevenue,
-        accountType: accountType,
-        website: website,
-        address:address,
-        city:city,
-        state:state,
-        zip:zip,
-        country:country,
-        phone:phone,
-        email:email,
-        socialMedia:socialMedia,
-        notes:notes,
-        source:source,
-        status:status,
-      };
-      this.restService.post(API.main.account, data).subscribe({
-        next: (response: any) => {
-          console.log(response);
+    const data = Object.entries(formData)
+      .filter(([_, value]) => value !== null)
+      .reduce((acc, [key, value]) => {
+        if (value !== null) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as { [key: string]: string });
 
-          this.offcanvasService.dismiss();
-          this.notifService.showSuccess('User Added Successfully.');
-          this.getAccounts();
-          this.changeDetectorRef.detectChanges();
-          
-        },
-        error: (error) => {
-          console.error(error);
-          this.notifService.showError(error.error.message);
-        },
-      });
-    } else {
-      if (parentaccountId.length <= 0) {
-        this.errorFeedback.name = 'Name required.';
-      }
-      if (photoUrl.length <= 0) {
-        this.errorFeedback.email = 'photoUrl required.';
-      }
-      if (accountname.length <= 0) {
-        this.errorFeedback.password = 'accountname required.';
-      }
-      if (industry.length <= 0) {
-        this.errorFeedback.password = 'indusrty required.';
-      }
-      if (accountname.length <= 0) {
-        this.errorFeedback.password = 'accountname required.';
-      }
-  
-      
-    }
+    console.log(data);
+
+    this.restService.post(API.main.account, data).subscribe({
+      next: (response: any) => {
+        console.log(response);
+
+        this.offcanvasService.dismiss();
+        this.notifService.showSuccess('User Added Successfully.');
+        this.getAccounts();
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (error) => {
+        console.error(error);
+        this.notifService.showError(error.error.message);
+      },
+    });
   }
 
-
   openUpdateUser(user: any) {
-  this.user = user; // Store the selected user data
-  this.Form.reset();
-  this.resetErrorFeedback();
-  this.Form.patchValue(user); // Pre-fill the form with the user data
-  this.offcanvasService.open(this.updateUserOffcanvas, {
-    position: 'end',
-    backdrop: 'static',
-    panelClass: 'visible',
-    animation: true,
-  });
-}
+    this.user = user; // Store the selected user data
+    this.Form.reset();
+    this.resetErrorFeedback();
+    this.Form.patchValue(user); // Pre-fill the form with the user data
+    this.offcanvasService.open(this.updateUserOffcanvas, {
+      position: 'end',
+      backdrop: 'static',
+      panelClass: 'visible',
+      animation: true,
+    });
+  }
 
   onUpdateuserSubmit(): void {
     if (this.Form.valid) {
@@ -269,7 +218,6 @@ export class AccountsComponent implements OnInit {
     }
   }
 
-
   delete = (user: any) => {
     this.user = user;
 
@@ -284,8 +232,6 @@ export class AccountsComponent implements OnInit {
       },
     );
   };
-
-
 
   closeModal = () => {
     this.user = {};
@@ -310,8 +256,6 @@ export class AccountsComponent implements OnInit {
     this.currentPage = pageNumber;
     this.getAccounts(pageNumber);
   }
-
-
 
   resetErrorFeedback() {
     let keys = Object.keys(this.errorFeedback);
