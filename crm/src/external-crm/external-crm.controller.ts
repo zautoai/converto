@@ -40,6 +40,14 @@ export class ExternalCrmController {
     return await this.externalCrmService.getAccessToken(orgId, crmAuthDto.name);
   }
 
+  @Get('profile')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  async getProfile(@Query() crmAuthDto:CRMAuthDto, @Req() request: IRequest) {
+    const orgId = request.orgId;
+    return await this.externalCrmService.getProfile(orgId, crmAuthDto.name);
+  }
+
   @Get('mappings/:crm_name')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
