@@ -13,11 +13,7 @@ export class ExternalCrmService implements OnModuleInit{
     ){}
 
     async onModuleInit() {
-        await this.createContact('crm',CrmNames.HUBSPOT,{
-            firstName: 'sridhar',
-            lastName: 'dhamodharan',
-            organization: 'ZautoAI'
-        });
+
     }
 
     getAuthUrl(orgId:string,crmName:string): any {
@@ -48,16 +44,26 @@ export class ExternalCrmService implements OnModuleInit{
         const crm = this.crmProvider.getCRM(crmName);
         const contact = await crm.getContact(orgId, id);
         return contact;
+    } 
+    async getContactByEmail(orgId:string, crmName:string, email:string): Promise<any> {
+        const crm = this.crmProvider.getCRM(crmName);
+        const contact = await crm.getContactByEmail(orgId, email);
+        return contact;
     }
     async createContact(orgId:string, crmName:string, data:any): Promise<any> {
         const crm = this.crmProvider.getCRM(crmName);
         const mappedData = await this.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
+        const objects = Object.keys(mappedData);
+        if(objects.length === 0) return null;
         const contact = await crm.createContact(orgId, mappedData);
         return contact;
     } 
     async updateContact(orgId:string, crmName:string, id:any, data:any): Promise<any> {
         const crm = this.crmProvider.getCRM(crmName);
-        const contact = await crm.updateContact(orgId, id, data);
+        const mappedData = await this.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
+        const objects = Object.keys(mappedData);
+        if(objects.length === 0) return null;
+        const contact = await crm.updateContact(orgId, id, mappedData);
         return contact;
     }
     async deleteContact(orgId:string, crmName:string, id:any): Promise<any> {
@@ -78,12 +84,18 @@ export class ExternalCrmService implements OnModuleInit{
     }
     async createCompany(orgId:string, crmName:string, data:any): Promise<any> {
         const crm = this.crmProvider.getCRM(crmName);
-        const company = await crm.createCompany(orgId, data);
+        const mappedData = await this.handleMapping(orgId,crmName, ObjectType.COMPANY, data);
+        const objects = Object.keys(mappedData);
+        if(objects.length === 0) return null;
+        const company = await crm.createCompany(orgId, mappedData);
         return company;
     }
     async updateCompany(orgId:string, crmName:string, id:any, data:any): Promise<any> {
         const crm = this.crmProvider.getCRM(crmName);
-        const company = await crm.updateCompany(orgId, id, data);
+        const mappedData = await this.handleMapping(orgId,crmName, ObjectType.COMPANY, data);
+        const objects = Object.keys(mappedData);
+        if(objects.length === 0) return null;
+        const company = await crm.updateCompany(orgId, id, mappedData);
         return company;
     }
     async deleteCompany(orgId:string, crmName:string, id:any): Promise<any> {
@@ -96,7 +108,6 @@ export class ExternalCrmService implements OnModuleInit{
     {
         return await this.mappingService.getMappingsByCrmName(orgId, crmName);
     }
-
     async createMappings(orgId:string, createCRMMappingsDto:CreateCRMMappingsDto): Promise<any> {
         for(const _mapping of createCRMMappingsDto.mappings) {
             const mapping = await this.mappingService.getMappingByCrmNameAndObjectTypeAndField(orgId, _mapping.crmName, _mapping.objectType, _mapping.fieldName);
@@ -120,7 +131,6 @@ export class ExternalCrmService implements OnModuleInit{
             data:createCRMMappingsDto.mappings
         };
     }
-
     async handleMapping(orgId: string, crmName: string, objectType:string,data: any): Promise<any> {
 
         const mappings = await this.mappingService.getMappingsBycrmNameAndObjectType(orgId, crmName, objectType);
@@ -130,7 +140,7 @@ export class ExternalCrmService implements OnModuleInit{
             const externalCRMFieldName = mapping.externalCRMFieldName;
             const fieldName = mapping.fieldName;
             if(externalCRMFieldName == null) continue;
-            mappedData[externalCRMFieldName] = data[fieldName];
+            mappedData[externalCRMFieldName] = data[fieldName]; 
         }
         return mappedData;       
     }

@@ -3,7 +3,6 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  OnModuleInit,
 } from '@nestjs/common';
 import { EnrichmentProvider } from './enrichment.provider';
 import { IEnrichment } from './interfaces/enrichment.interface';
@@ -11,7 +10,8 @@ import { EnrichmentProviderName } from './enrichment-provider.enum';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
-import { ContactEnrichmentDto } from './dto/contact-enrich.dto';
+import { ExternalCrmService } from 'src/external-crm/external-crm.service';
+import { CrmNames } from 'src/external-crm/enum/external-crm.enum';
 
 @Injectable()
 export class EnrichmentService {
@@ -21,6 +21,7 @@ export class EnrichmentService {
     private readonly enrichmentProvider: EnrichmentProvider,
     private readonly prismaClientManager: PrismaClientManager,
     @InjectQueue('enrichment_queue') private enrichmentQueue: Queue,
+    private readonly externalCrmService:ExternalCrmService
   ) {}
 
   async getPeopleByName(
@@ -77,11 +78,7 @@ export class EnrichmentService {
     return await enrichmentService.getOrganization(matchRequest);
   }
 
-  async enrichContact(
-    orgId: string,
-    contactId: string,
-    provider: string = EnrichmentProviderName.APOLLO,
-  ) {
+  async enrichContact(orgId: string,contactId: string,provider: string = EnrichmentProviderName.APOLLO,) {
     try {
       const prisma = await this.prismaClientManager.getClient(orgId);
       const contact = await prisma.contact.findUnique({
@@ -95,20 +92,7 @@ export class EnrichmentService {
       if (!contact.email) {
         throw new BadRequestException('Contact does not have an email');
       }
-      this.enrichmentQueue.add(
-        provider,
-        {
-          orgId,
-          contactId,
-          matchRequest: { email: contact.email },
-          type: 'contact',
-        },
-        {
-          delay: 1000,
-          removeOnComplete: true,
-          attempts: 2,
-        },
-      );
+      this.enrichmentQueue.add(provider,{orgId,contactId,matchRequest: { email: contact.email },type: 'contact',},{delay: 1000,removeOnComplete: true,attempts: 2,},);
       this.logger.log(
         `Added enrichment task to queue for contact with email: ${contact.email}`,
       );
@@ -122,12 +106,7 @@ export class EnrichmentService {
     }
   }
 
-  async enrichPeopleByContact(
-    orgId: string,
-    contactId: string,
-    matchRequest: { [key: string]: string },
-    provider: string = EnrichmentProviderName.APOLLO,
-  ) {
+  async enrichPeopleByContact(orgId: string,contactId: string,matchRequest: { [key: string]: string },provider: string = EnrichmentProviderName.APOLLO,) {
     try {
       this.logger.log(`Enriching people with contactId: ${contactId}`);
       const enrichmentService: IEnrichment = this.enrichmentProvider.getProvider(provider);
@@ -136,26 +115,36 @@ export class EnrichmentService {
       const existingContact = await prisma.contact.findUnique({
         where: { id: contactId },
       });
+      const data = {
+        ...(!existingContact.firstName ? { firstName: enrichedData.firstName }: {}),
+        ...(!existingContact.lastName ? { lastName: enrichedData.lastName } : {}),
+        ...(!existingContact.fullName ? { fullName: enrichedData.fullName } : {}),
+        ...(!existingContact.phone ? { phone: enrichedData.phone } : {}),
+        ...(!existingContact.address ? { address: enrichedData.address } : {}),
+        ...(!existingContact.website ? { website: enrichedData.website } : {}),
+        ...(!existingContact.city ? { city: enrichedData.city } : {}),
+        ...(!existingContact.state ? { state: enrichedData.state } : {}),
+        ...(!existingContact.zip ? { zip: enrichedData.zip } : {}),
+        ...(!existingContact.country ? { country: enrichedData.country } : {}),
+        ...(!existingContact.organizationName ? { organizationName: enrichedData.organizationName } : {}),
+        ...(!existingContact.jobTitle ? { jobTitle: enrichedData.jobTitle } : {}),
+        ...(!existingContact.photoUrl ? { photoUrl: enrichedData.photoUrl } : {}),
+        ...(!existingContact.socialMedia ? {socialMedia: enrichedData.socialMedia}: {}),
+        ...(!existingContact.notes ? { notes: enrichedData.notes } : {}),
+      };
       const enrichedContact = await prisma.contact.update({
         where: { id: contactId },
-        data: {
-          ...(!existingContact.firstName ? { firstName: enrichedData.firstName }: {}),
-          ...(!existingContact.lastName ? { lastName: enrichedData.lastName } : {}),
-          ...(!existingContact.fullName ? { fullName: enrichedData.fullName } : {}),
-          ...(!existingContact.phone ? { phone: enrichedData.phone } : {}),
-          ...(!existingContact.address ? { address: enrichedData.address } : {}),
-          ...(!existingContact.website ? { website: enrichedData.website } : {}),
-          ...(!existingContact.city ? { city: enrichedData.city } : {}),
-          ...(!existingContact.state ? { state: enrichedData.state } : {}),
-          ...(!existingContact.zip ? { zip: enrichedData.zip } : {}),
-          ...(!existingContact.country ? { country: enrichedData.country } : {}),
-          ...(!existingContact.organizationName ? { organizationName: enrichedData.organizationName } : {}),
-          ...(!existingContact.jobTitle ? { jobTitle: enrichedData.jobTitle } : {}),
-          ...(!existingContact.photoUrl ? { photoUrl: enrichedData.photoUrl } : {}),
-          ...(!existingContact.socialMedia ? {socialMedia: enrichedData.socialMedia}: {}),
-          ...(!existingContact.notes ? { notes: enrichedData.notes } : {}),
-        },
+        data: data,
       });
+      try{
+        const existingCrmContact = await this.externalCrmService.getContactByEmail(orgId, CrmNames.HUBSPOT,existingContact.email);
+        if(existingCrmContact){
+          await this.externalCrmService.updateContact(orgId, CrmNames.HUBSPOT, existingCrmContact.id, enrichedContact);
+        }
+      }
+      catch(err){
+        this.logger.error(err);
+      }
       this.logger.log(`Enriched contact with id: ${contactId}`);
       return enrichedContact;
     } catch (e) {

@@ -3,6 +3,6 @@ export enum CrmNames{
 }
 
 export enum ObjectType {
-    CONTACT = 'contact',
-    COMPANY = 'company',
+    CONTACT = 'Contact',
+    COMPANY = 'Company',
 }

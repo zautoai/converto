@@ -12,14 +12,15 @@ import { MappingService } from './mapping.service';
   imports:[
     CommonModule,
     HttpModule,
-    PrismaModule
+    PrismaModule,
   ],
   controllers: [ExternalCrmController],
   providers: [
     ExternalCrmService, 
     ExternalCrmProvider,
     HubspotService,
-    MappingService
+    MappingService,
   ],
+  exports: [ExternalCrmService],
 })
 export class ExternalCrmModule {}
