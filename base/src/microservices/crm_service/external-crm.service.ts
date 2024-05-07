@@ -75,4 +75,15 @@ export class ExternalCrmMicroService {
             throw error
         }
     }
+
+    async revoke(orgId: string, crmName: string) {
+        try {
+            this.logger.log('Revoking')
+            return this.CRMClient.send({ cmd: 'REVOKE' }, { orgId, crmName }).toPromise()
+        }
+        catch (error) {
+            this.logger.error('Error in revoking')
+            throw error
+        }
+    }
 }

@@ -1,6 +1,4 @@
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { API } from 'src/common/configs/zauto.endpoint';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
 import { WebClientService } from 'src/common/services/web-client.service';
 import { OrganizationService } from 'src/microservices/base-services/organization.service';
@@ -15,48 +13,53 @@ export class StartupService implements OnModuleInit {
     private readonly prismaClientManager: PrismaClientManager,
     private readonly schemaManager: SchemaManagerService,
     private readonly webClient: WebClientService,
-    private readonly organizationService:OrganizationService
-  ) {}
+    private readonly organizationService: OrganizationService
+  ) { }
 
   onModuleInit() {
     this.executeOnStartup();
-  } 
- 
-  async executeOnStartup() {
-    await this.syncOrganizations(); 
-    await this.schemaMigration(); 
   }
- 
+
+  async executeOnStartup() {
+    await this.syncOrganizations();
+    await this.schemaMigration();
+  }
+
   async syncOrganizations() {
     try {
       this.logger.log('Syncing organizations...');
-      const itemPerPage = 10; 
+      const itemPerPage = 10;
       let _total = 1;
       let _page = Math.ceil(_total / itemPerPage);
 
-      let page = 1; 
+      let page = 1;
       while (page <= _page) {
-        const response = await await this.organizationService.getOrganizations({ page: page, limit: itemPerPage });       
+        const response = await this.organizationService.getOrganizations({ page: page, limit: itemPerPage });
         _total = response.total;
         _page = Math.ceil(_total / itemPerPage);
         for (const org of response.data) {
-          const rollback = () => {};
+          const rollback = () => { };
           try {
             await this.schemaManager.create(
-              { name: org.name, orgId: org.id }, 
+              { name: org.name, orgId: org.id },
               rollback,
             );
             this.logger.log(`Organization ${org.name} synced successfully.`);
-          } catch (error) { 
-            this.logger.warn(error);            
+          } catch (error) {
+            this.logger.warn(error);
           }
         }
         page++;
       }
-
       this.logger.log('Organizations sync completed successfully.');
+      return {
+        statusCode: 200
+      }
     } catch (error) {
       this.logger.error(`Organization sync failed: ${error}`);
+      return {
+        statusCode: 500
+      }
     }
   }
 
@@ -71,7 +74,7 @@ export class StartupService implements OnModuleInit {
           this.logger.log(
             `${org.orgName} schema migration completed successfully.`,
           );
-        } catch (error) { 
+        } catch (error) {
           this.logger.warn(error);
           console.warn(error);
         }
@@ -79,7 +82,7 @@ export class StartupService implements OnModuleInit {
     } catch (error) {
       this.logger.error(error);
       console.log(error);
-      
+
     }
   }
 }

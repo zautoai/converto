@@ -1,10 +1,9 @@
 import { BadRequestException, Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { ContactsService } from './contacts.service';
 import { FilterDto } from 'src/common/dtos/filter.dto';
-import { CreateContactDto } from './dto/create-contacts.dto';
-import { UpdateContactDto } from './dto/update-contact.dto';
 import { CreateFieldDto } from 'src/custom-fields/dto/create-fields.dto';
+import { ContactsService } from './contacts.service';
+import { CreateContactDto } from './dto/create-contacts.dto';
 
 @Controller()
 export class ContactMicroserviceController {
