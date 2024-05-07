@@ -120,6 +120,8 @@ import { ContactsComponent } from './contacts/contacts.component';
     PluginsComponent,
     PluginCardComponent,
     CrmMappingComponent
+    PluginCardComponent,
+    CrmMappingComponent
   ],
   imports: [
     CommonModule,
