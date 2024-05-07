@@ -64,7 +64,7 @@ export class ExternalCrmMicroserviceController {
         }
     }
 
-    @MessagePattern({ cmd: 'GET_CONTACT_FIELDS' })
+    @MessagePattern({ cmd: 'GET_CRM_CONTACT_FIELDS' })
     async getFields(data:any) {
         try
         {

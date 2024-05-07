@@ -45,6 +45,7 @@ export class PluginsComponent implements OnInit{
   ];
 
   @ViewChild('crmMappingOffcanvas',{static:false}) crmMappingOffcanvas: ElementRef | any;
+  crmName: string | undefined;
 
   constructor(
     private readonly restService: RestService,
@@ -72,7 +73,8 @@ export class PluginsComponent implements OnInit{
     }
   }
 
-  openCrmMappingOffcanvas(event:any) {
+  openCrmMappingOffcanvas(data:any) {
+    this.crmName = data.key;
     this.offcanvasService.open(this.crmMappingOffcanvas,{
       position: 'end',
       backdrop: 'static',
@@ -81,4 +83,6 @@ export class PluginsComponent implements OnInit{
 
     });
   }
+
+  
 }

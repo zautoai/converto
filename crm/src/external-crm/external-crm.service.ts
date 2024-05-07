@@ -44,7 +44,7 @@ export class ExternalCrmService implements OnModuleInit{
     async getContactFields(orgId:string, crmName:string)
     {
         const crm = this.crmProvider.getCRM(crmName);
-        const fields = await crm.getCompanyProperties(orgId);
+        const fields = await crm.getContactProperties(orgId);
         return fields;
     }
 

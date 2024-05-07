@@ -57,7 +57,7 @@ export class ExternalCrmMicroService {
     async getFields(orgId: string, crmName: string) {
         try {
             this.logger.log('Getting Fields')
-            return this.CRMClient.send({ cmd: 'GET_FIELDS' }, { orgId, crmName }).toPromise()
+            return this.CRMClient.send({ cmd: 'GET_CRM_CONTACT_FIELDS' }, { orgId, crmName }).toPromise()
         }
         catch (error) {
             this.logger.error('Error in getting fields')

@@ -55,6 +55,7 @@ import { AccountsComponent } from './account/account.component';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
 import { PluginCardComponent } from './plugins/plugin-card/plugin-card.component';
 import { PluginsComponent } from './plugins/plugins.component';
+import { CrmMappingComponent } from './plugins/crm-mapping/crm-mapping.component';
 
 @NgModule({
   declarations: [
@@ -116,7 +117,8 @@ import { PluginsComponent } from './plugins/plugins.component';
     CounterFormatPipe,
     ProgressCardComponent,
     PluginsComponent,
-    PluginCardComponent
+    PluginCardComponent,
+    CrmMappingComponent
   ],
   imports: [
     CommonModule,

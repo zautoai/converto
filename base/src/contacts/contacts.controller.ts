@@ -27,7 +27,7 @@ import { CreateFieldDto } from './dto/create-field.dto';
 @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
-@Controller('contacts')
+@Controller('api/contacts')
 export class ContactsController {
   constructor(private readonly contactsService: ContactsService) {}
 

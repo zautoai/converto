@@ -55,7 +55,7 @@ export class ExternalCrmController {
   }
 
   @Get('fields/contacts/:crm_name')
-  async getFields(@Param('crm_name') crmName: string, @Req() request: ZautoRequest) {
+  async getContactFields(@Param('crm_name') crmName: string, @Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
