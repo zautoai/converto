@@ -64,11 +64,20 @@ export class ExternalCrmController {
   }
 
   @Get('profile')
-  async getProfile(@Query() crmAuthDto:CRMAuthDto, @Req() request: ZautoRequest) {
+  async getProfile(@Query() crmAuthDto: CRMAuthDto, @Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
     return await this.externalCrmService.getProfile(orgId, crmAuthDto);
+  }
+
+  @Delete('revoke')
+  async revoke(@Query() crmName: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    return await this.externalCrmService.revoke(orgId, crmName);
   }
 }

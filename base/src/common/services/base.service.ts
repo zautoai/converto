@@ -12,7 +12,7 @@ export class BaseService {
 
     protected handleException(data: any)
     {
-        if(data.statusCode && data.statusCode >= 400)
+        if(data?.statusCode && data?.statusCode >= 400)
         {
             const status = data.statusCode;
             throw new HttpException({ message: data.message, error: data.error }, status);
