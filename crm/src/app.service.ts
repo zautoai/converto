@@ -15,6 +15,6 @@ export class AppService {
       code: 200,
       status: 'success',
       message: 'pong',
-    };
+    }; 
   }
 }

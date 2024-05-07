@@ -141,11 +141,18 @@ export class HubspotService extends BaseExternalCrm {
     }    
 
     async getProfile(orgId:string): Promise<any> {
-        const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
-        const profile = await hubspotClient.settings.users.usersApi.getPage();
-        return profile.results[0];
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            const hubspotClient = new Client({ accessToken:  accessToken});
+            const profile = await hubspotClient.settings.users.usersApi.getPage();
+            return profile.results[0];
+        }
+        catch(err)
+        {
+            return null;
+        }
     }
 
     async getContactProperties(orgId:string): Promise<any> {
