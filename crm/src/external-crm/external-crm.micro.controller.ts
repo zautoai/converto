@@ -31,6 +31,17 @@ export class ExternalCrmMicroserviceController {
         }
     }
 
+    @MessagePattern({ cmd: 'GET_PROFILE' })
+    async getProfile(data:any) {
+        try
+        {
+            return await this.externalCrmService.getProfile(data.orgId, data.crmName);
+        }
+        catch (error) {
+            return error.response || error;
+        }
+    }
+
     @MessagePattern({ cmd: 'GET_MAPPINGS' })
     async getMappings(data:any) {
         try
