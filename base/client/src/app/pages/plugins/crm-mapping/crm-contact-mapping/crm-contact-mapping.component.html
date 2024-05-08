@@ -23,9 +23,9 @@
 </table>
 <div class="p-2 row">
     <div class="col-6">
-        <button class="btn btn-outline-primary w-100" (click)="cancel()">Cancel</button>
+        <button class="btn btn-outline-primary w-100" (click)="cancel()" [disabled]="isLoading">Cancel</button>
     </div>
     <div class="col-6">
-        <button class="btn btn-primary w-100" (click)="submit()">Save</button>
+        <button class="btn btn-primary w-100" (click)="submit()" [disabled]="isLoading">Save</button>
     </div>
 </div>

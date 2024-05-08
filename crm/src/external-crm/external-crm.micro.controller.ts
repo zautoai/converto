@@ -58,7 +58,7 @@ export class ExternalCrmMicroserviceController {
     async getMappings(data:any) {
         try
         {
-            return await this.externalCrmService.getMappingsByCrmName(data.orgId, data.crmName);
+            return await this.externalCrmService.getMappingsByCrmName(data.orgId, data.crmName, data.objectType);
         }
         catch (error) {
             return error.response || error;
@@ -76,11 +76,11 @@ export class ExternalCrmMicroserviceController {
         }
     }
 
-    @MessagePattern({ cmd: 'GET_CRM_CONTACT_FIELDS' })
+    @MessagePattern({ cmd: 'GET_CRM_FIELDS' })
     async getFields(data:any) {
         try
         {
-            return await this.externalCrmService.getContactFields(data.orgId, data.crmName);
+            return await this.externalCrmService.getCrmFields(data.orgId, data.crmName, data.objectType);
         }
         catch (error) {
             return error.response || error;

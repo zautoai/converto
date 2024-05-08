@@ -26,13 +26,14 @@ export class MappingService {
         }
     }
 
-    async getMappingsByCrmName(orgId:string, crmName: string){
+    async getMappingsByCrmName(orgId:string, crmName: string,object_type:string){
         try
         {
             const prisma = await this.prismaClientManager.getClient(orgId);
             const mappings = await prisma.crmMapping.findMany({
                 where: {
-                    crmName
+                    crmName,
+                    objectType: object_type
                 }
             });
             return mappings;

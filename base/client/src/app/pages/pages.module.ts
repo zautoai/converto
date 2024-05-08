@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { PagesRoutingModule } from './pages-routing.module';
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { ZautoDashboardComponent } from './dashboard/dashboard.component';
 import { SharedModule } from '../shared/shared.module';
@@ -55,7 +56,8 @@ import { AccountsComponent } from './account/account.component';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
 import { PluginCardComponent } from './plugins/plugin-card/plugin-card.component';
 import { PluginsComponent } from './plugins/plugins.component';
-import { CrmMappingComponent } from './plugins/crm-mapping/crm-mapping.component';
+import { CrmContactMappingComponent } from './plugins/crm-mapping/crm-contact-mapping/crm-contact-mapping.component';
+import { CrmCompanyMappingComponent } from './plugins/crm-mapping/crm-company-mapping/crm-company-mapping.component';
 
 @NgModule({
   declarations: [
@@ -118,7 +120,8 @@ import { CrmMappingComponent } from './plugins/crm-mapping/crm-mapping.component
     ProgressCardComponent,
     PluginsComponent,
     PluginCardComponent,
-    CrmMappingComponent
+    CrmContactMappingComponent,
+    CrmCompanyMappingComponent
   ],
   imports: [
     CommonModule,
@@ -141,6 +144,7 @@ import { CrmMappingComponent } from './plugins/crm-mapping/crm-mapping.component
     NgxColorsModule,
     NgApexchartsModule,
     NgbProgressbarModule,
+    NgbNavModule
   ],
 })
 export class PagesModule {}
