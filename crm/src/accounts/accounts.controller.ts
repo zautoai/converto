@@ -29,6 +29,8 @@ export class AccountsController {
   @Post()
   @ApiOperation({ description: 'Create Account', summary: 'Create Account' })
   create(@Body() createAccountDto: CreateAccountDto, @Req() req: IRequest) {
+    console.log(createAccountDto);
+
     if (req.orgId) {
       const orgId = req.orgId;
       return this.accountsService.create(orgId, createAccountDto);
@@ -41,10 +43,10 @@ export class AccountsController {
     description: 'Get All Accounts',
     summary: 'Get All Accounts',
   })
-  findAll(@Req() req: IRequest,@Query() filterDto:FilterDto) {
+  findAll(@Req() req: IRequest, @Query() filterDto: FilterDto) {
     if (req.orgId) {
       const orgId = req.orgId;
-      return this.accountsService.findAll(orgId,filterDto);
+      return this.accountsService.findAll(orgId, filterDto);
     }
     throw new UnauthorizedException('Organization not found');
   }

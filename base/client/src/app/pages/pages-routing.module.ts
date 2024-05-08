@@ -28,6 +28,7 @@ import { StartersConfigComponent } from './starters-config/starters-config.compo
 import { CustomiseAvatarComponent } from './customise-avatar/customise-avatar/customise-avatar.component';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
 import { AccountsComponent } from './account/account.component';
+import { PluginsComponent } from './plugins/plugins.component';
 
 const routes: Routes = [
   {
@@ -225,6 +226,12 @@ const routes: Routes = [
     path:'lead-settings',
     title: 'Lead settings',
     component: LeadConfigComponent,
+    canActivate:[SetupGuard]
+  },
+  {
+    path:'plugins',
+    title: 'Plugins',
+    component: PluginsComponent,
     canActivate:[SetupGuard]
   },
 ];

@@ -76,3 +76,12 @@ export enum EnrichmentProviderName {
   CLEARBIT = 'Clearbit',
   ZOOMINFO = 'Zoominfo',
 }
+
+export enum CrmNames {
+  HUBSPOT = 'Hubspot'
+}
+
+export enum ObjectType {
+  CONTACT = 'Contact',
+  COMPANY = 'Company',
+}

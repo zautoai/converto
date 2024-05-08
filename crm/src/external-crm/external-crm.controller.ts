@@ -40,6 +40,14 @@ export class ExternalCrmController {
     return await this.externalCrmService.getAccessToken(orgId, crmAuthDto.name);
   }
 
+  @Get('profile')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  async getProfile(@Query() crmAuthDto:CRMAuthDto, @Req() request: IRequest) {
+    const orgId = request.orgId;
+    return await this.externalCrmService.getProfile(orgId, crmAuthDto.name);
+  }
+
   @Get('mappings/:crm_name')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
@@ -54,6 +62,14 @@ export class ExternalCrmController {
   async createMappings(@Body() createCRMMappingsDto:CreateCRMMappingsDto,@Req() request: IRequest) {
     const orgId = request.orgId;
     return await this.externalCrmService.createMappings(orgId, createCRMMappingsDto);
+  }
+
+  @Get('fields/contacts/:crm_name')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  async getFields(@Param('crm_name')crmName:string, @Req() request: IRequest) {
+    const orgId = request.orgId;
+    return await this.externalCrmService.getContactFields(orgId, crmName);
   }
 }
 

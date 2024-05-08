@@ -10,6 +10,7 @@ import { BullModule } from '@nestjs/bull';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { EnrichmentProcessor } from './enrichment.processor';
 import { EnrichmentMicroserviceController } from './enrichment-provider.micro.controller';
+import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { EnrichmentMicroserviceController } from './enrichment-provider.micro.co
       },
     }),
     BullModule.registerQueue({ name: 'enrichment_queue' }),
+    ExternalCrmModule
   ],
   controllers: [EnrichmentController, EnrichmentMicroserviceController],
   providers: [

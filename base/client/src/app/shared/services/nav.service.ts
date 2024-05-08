@@ -173,9 +173,9 @@ export class NavService implements OnDestroy {
 		// {
 		// 	title: 'Integrations', icon: 'fe fe-download', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/integrations', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		// },
-		// {
-		// 	title: 'External API', icon: 'fa-solid fa-plug', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/external-apis', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		// },
+		{
+			title: 'Plugins', icon: 'fa-solid fa-plug', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/plugins', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+		},
 		{
 			headTitle: 'Calendar',
 			show:false,

@@ -19,9 +19,11 @@ import { OrgAccountService } from 'src/account/account.service';
 import { providers } from 'src/common/configs/oauth.config';
 import { ExternalToolService } from 'src/external-tool/external-tool.service';
 import { CreateToolDto } from 'src/external-tool/Dto/create-tool.dto';
+import { BaseService } from 'src/common/services/base.service';
+import { StartupMicroService } from './../microservices/crm_service/startup.service';
 
 @Injectable()
-export class StartupService implements OnModuleInit {
+export class StartupService extends BaseService implements OnModuleInit {
 
     private readonly foldersToCreate = ['uploads', 'public', 'public/images'];
 
@@ -33,9 +35,13 @@ export class StartupService implements OnModuleInit {
         private platformService: PlatformService,
         private helperService: HelpersService,
         private orgAccountService: OrgAccountService,
-        private subscriptionPlan:SubscriptionPlanService,
-        private externalToolService: ExternalToolService) { }
-        
+        private subscriptionPlan: SubscriptionPlanService,
+        private externalToolService: ExternalToolService,
+        private startupMicroService: StartupMicroService
+    ) {
+        super();
+    }
+
     async onModuleInit() {
         this.executeOnStartup();
     }
@@ -48,6 +54,7 @@ export class StartupService implements OnModuleInit {
         //await this.resyncHelpers();
         await this.createFolders();
         await this.createOrUpdateOauthProviders();
+        await this.handleException(await this.startupMicroService.syncOrganizations())
     }
 
     async createDefaultRoles() {
@@ -64,13 +71,13 @@ export class StartupService implements OnModuleInit {
         ];
         try {
             await this.roleService.createDefaultRoles(defaultRoles);
-        } catch (error) {            
+        } catch (error) {
             console.error('Defailt role not created, mybe it got created already.')
         }
     }
 
     async createZautoOrg() {
-        let zautoAI = await this.orgService.findOneByName(ZAUTO_ORG);        
+        let zautoAI = await this.orgService.findOneByName(ZAUTO_ORG);
         if (!zautoAI) {
             zautoAI = await this.orgService.create({
                 name: ZAUTO_ORG,
@@ -100,48 +107,41 @@ export class StartupService implements OnModuleInit {
             };
             try {
                 const selectedPlan = await this.getSubscription("");
-                if(selectedPlan)
-                {
+                if (selectedPlan) {
                     const createOrgAccountDto = new CreateOrgAccountDto();
                     createOrgAccountDto.orgId = userDeatails.orgId;
                     createOrgAccountDto.subscriptionId = selectedPlan.id;
                     createOrgAccountDto.status = (selectedPlan.price == 0) ? OrgAccountStatus.ACTIVE : OrgAccountStatus.PENDING;
                     const orgAccount = await this.orgAccountService.create(createOrgAccountDto);
-                    if(orgAccount)
-                    {
+                    if (orgAccount) {
                         const superUser = await this.userService.create(userDeatails, true);
                         if (superUser) {
                             console.log('Superuser Created.')
                         }
                     }
-                    else
-                    {
+                    else {
                         console.error('Organization account not created');
                     }
                 }
-                else
-                {
+                else {
                     console.error("Unable to select subscription plan");
                 }
             } catch (exception) {
                 console.info('Super Admin not created, mybe it got created already.')
             }
-        } else {  
+        } else {
             throw 'Super Admin not created.'
         }
     }
 
-    async getSubscription(subId: string) 
-    {
-        const subsPlan = await this.prisma.subscriptionPlan.findUnique({where:{id:subId}});
-        if(subsPlan)
-        {
-        return subsPlan;
+    async getSubscription(subId: string) {
+        const subsPlan = await this.prisma.subscriptionPlan.findUnique({ where: { id: subId } });
+        if (subsPlan) {
+            return subsPlan;
         }
-        else
-        {
-        const freePlan = await this.prisma.subscriptionPlan.findFirst({where:{price:0}});
-        return freePlan;
+        else {
+            const freePlan = await this.prisma.subscriptionPlan.findFirst({ where: { price: 0 } });
+            return freePlan;
         }
     }
 
@@ -175,7 +175,7 @@ export class StartupService implements OnModuleInit {
     async resyncHelpers() {
         try {
             this.helperService.reSyncHelpers();
-        } catch(error) {
+        } catch (error) {
             console.log(error)
         }
     }
@@ -189,8 +189,8 @@ export class StartupService implements OnModuleInit {
                 let _helper = await this.helperService.findByName(helper.name);
 
                 if (_helper) {
-                   await this.helperService.remove(_helper.id, _helper.assistantId);
-                   console.log('ServerStartup: Helper ' + _helper.name + ' Deleted')
+                    await this.helperService.remove(_helper.id, _helper.assistantId);
+                    console.log('ServerStartup: Helper ' + _helper.name + ' Deleted')
                 }
 
                 console.log('ServerStartup: Creating Helper ')
@@ -226,8 +226,8 @@ export class StartupService implements OnModuleInit {
                 createSubscriptionPlanDto.messageCount = plan.messageCount;
                 createSubscriptionPlanDto.sitesCount = plan.sitesCount;
                 createSubscriptionPlanDto.campaignCount = plan.campaignCount;
-                createSubscriptionPlanDto.userCount = plan.userCount;                
-                createSubscriptionPlanDto.price = plan.price;                
+                createSubscriptionPlanDto.userCount = plan.userCount;
+                createSubscriptionPlanDto.price = plan.price;
                 await this.subscriptionPlan.create(createSubscriptionPlanDto)
             }
         } catch (error) {
@@ -252,7 +252,7 @@ export class StartupService implements OnModuleInit {
                 externalToolDto.clientSecret = provider.clientSecret;
                 externalToolDto.scope = provider.scope.join(' ');
                 externalToolDto.level = provider.level;
-    
+
                 try {
                     // Check if the provider already exists
                     const existingProvider = await this.externalToolService.getToolByName(name);
@@ -274,5 +274,5 @@ export class StartupService implements OnModuleInit {
             console.error('ServerStartup: Error creating or updating OAuth providers:', error.message);
         }
     }
-    
+
 } 

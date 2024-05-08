@@ -43,7 +43,6 @@ export class AccountsComponent implements OnInit {
   itemPerPage: number = 10;
   submittedData: any[] = [];
   selectedData: any = null;
-  totalPagesArray: number[] = [];
 
   constructor(
     private avatarService: AvatarService,
@@ -96,7 +95,6 @@ export class AccountsComponent implements OnInit {
           console.log(response.data);
 
           this.totalPages = Math.ceil(response.totalCount / limit);
-          this.totalPagesArray = Array.from({length: this.totalPages}, (_, i) => i + 1);
         },
         (error) => {
           console.error(error);

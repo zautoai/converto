@@ -53,6 +53,9 @@ import { ProgressCardComponent } from './dashboard/widgets/progress-card/progres
 import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
 import { AccountsComponent } from './account/account.component';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
+import { PluginCardComponent } from './plugins/plugin-card/plugin-card.component';
+import { PluginsComponent } from './plugins/plugins.component';
+import { CrmMappingComponent } from './plugins/crm-mapping/crm-mapping.component';
 
 @NgModule({
   declarations: [
@@ -113,6 +116,9 @@ import { FormBuilderComponent } from './form-builder/form-builder.component';
 
     CounterFormatPipe,
     ProgressCardComponent,
+    PluginsComponent,
+    PluginCardComponent,
+    CrmMappingComponent
   ],
   imports: [
     CommonModule,
