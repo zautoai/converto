@@ -63,7 +63,7 @@ export class PluginCardComponent implements OnInit{
       });
   }
     
-    private getProfile() {
+  private getProfile() {
       this.isLoading = true;
       this.restService.getAll(API.main.external_crm + `/profile?${this.data.key}`)
       .subscribe((data: any) => {
@@ -71,7 +71,7 @@ export class PluginCardComponent implements OnInit{
         this.data.profile = data;
       },
       (error) => {
-          this.isLoading = false;
+          this.isLoading = false; 
           console.log(error);
         }
       )
@@ -79,7 +79,14 @@ export class PluginCardComponent implements OnInit{
 
   revoke()
   {
-    alert("Revoke");
+    this.restService.delete(API.main.external_crm + `/revoke`,this.data.key as string)
+      .subscribe((data: any) => {
+        this.data.profile = null;
+      },
+      (error) => {
+          console.log(error);
+        }
+      )
   }
 
   openMapping() {

@@ -34,6 +34,13 @@ export class ExternalCrmService implements OnModuleInit{
         const accessToken = await crm.getAccessToken(orgId);
         return accessToken;
     }
+
+    async revokeAccess(orgId:string, crmName:string): Promise<void>
+    {
+        const crm = this.crmProvider.getCRM(crmName);
+        await crm.revokeAccess(orgId);
+    }
+
     async getProfile(orgId:string, crmName:string)
     {
         const crm = this.crmProvider.getCRM(crmName);

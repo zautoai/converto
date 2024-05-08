@@ -72,8 +72,8 @@ export class ExternalCrmController {
     return await this.externalCrmService.getProfile(orgId, crmAuthDto);
   }
 
-  @Delete('revoke')
-  async revoke(@Query() crmName: string, @Req() request: ZautoRequest) {
+  @Delete('revoke/:crm_name')
+  async revoke(@Param('crm_name') crmName: string, @Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');

@@ -40,6 +40,15 @@ export class ExternalCrmController {
     return await this.externalCrmService.getAccessToken(orgId, crmAuthDto.name);
   }
 
+  @Get('revoke-access')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  async revokeAccess(@Query() crmAuthDto:CRMAuthDto, @Req() request: IRequest)
+  {
+    const orgId = request.orgId;
+    return await this.externalCrmService.revokeAccess(orgId, crmAuthDto.name);
+  }
+
   @Get('profile')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()

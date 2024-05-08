@@ -31,6 +31,18 @@ export class ExternalCrmMicroserviceController {
         }
     }
 
+    @MessagePattern({cmd: 'REVOKE'})
+    async revokeAccess(data:any)
+    {
+        try
+        {
+            return await this.externalCrmService.revokeAccess(data.orgId, data.crmName);
+        }
+        catch (error) {
+            return error.response || error;
+        }
+    }
+
     @MessagePattern({ cmd: 'GET_PROFILE' })
     async getProfile(data:any) {
         try

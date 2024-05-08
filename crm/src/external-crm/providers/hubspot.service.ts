@@ -9,7 +9,7 @@ import { FilterOperatorEnum, PublicGdprDeleteInput, SimplePublicObjectInput, Sim
 
 @Injectable()
 export class HubspotService extends BaseExternalCrm {
-   
+       
     constructor(
         private readonly httpService:HttpService,
         private readonly prismaClientManager: PrismaClientManager
@@ -87,6 +87,7 @@ export class HubspotService extends BaseExternalCrm {
                     crmName: this.crmName 
                 }
             });
+            if(!hubspotToken) throw new Error('Plugin not connected!.');
             if(this.isTokenExpired(hubspotToken.expiresIn, hubspotToken.modifiedAt))
             {
                 const data = await this.exchangeRefreshTokenForAccessToken(orgId,hubspotToken.refreshToken);
@@ -97,7 +98,40 @@ export class HubspotService extends BaseExternalCrm {
         catch(e)
         {
             this.logger.error(e.message);
-            return null;
+            throw new Error(e);
+        }
+    }
+
+    async revokeAccess(orgId: string): Promise<any> {
+
+        try
+        {
+            const prisma = await this.prismaClientManager.getClient(orgId);
+            const existingCredential = await prisma.externalCrmCredential.findFirst({where:{crmName:CrmNames.HUBSPOT}});
+            if(existingCredential)
+            {
+                let tokenEndpoint = 'https://api.hubapi.com/oauth/v1/refresh-tokens/{{token}}';
+                tokenEndpoint = tokenEndpoint.replace("{{token}}",existingCredential.refreshToken);    
+                try {
+                    const response = await this.httpService.delete(tokenEndpoint, {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    }).toPromise();
+                    await this.handleRvokeAccess(orgId,existingCredential.id);
+                    return {
+                        statusCode: 200,
+                        message: 'Access token revoked successfully',
+                        data: null
+                    };
+                } catch (error) {
+                    throw new BadRequestException(error.response?.data || 'Failed to Revoke access token');
+                }
+            }
+        }
+        catch(err)
+        {
+
         }
     }
 
@@ -138,7 +172,20 @@ export class HubspotService extends BaseExternalCrm {
         {
             this.logger.error(e.message);
         }
-    }    
+    } 
+    
+    async handleRvokeAccess(orgId:string,id:string):Promise<void>
+    {
+        try
+        {
+            const prisma = await this.prismaClientManager.getClient(orgId);
+            await prisma.externalCrmCredential.delete({where:{id}});
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+        }
+    }
 
     async getProfile(orgId:string): Promise<any> {
         try
@@ -151,7 +198,7 @@ export class HubspotService extends BaseExternalCrm {
         }
         catch(err)
         {
-            return null;
+            throw new BadRequestException(err.message); 
         }
     }
 
