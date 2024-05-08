@@ -12,7 +12,7 @@ export class CrmCompanyMappingComponent implements OnInit{
 
   isLoading:boolean = false;
   @Input()crmName:string | undefined;
-  contactFields: string[] = [];
+  companyFields: string[] = [];
   externalCrmFields: any[] = [];
 
   selectedOptions: { [key: string]: string } = {};
@@ -33,8 +33,8 @@ export class CrmCompanyMappingComponent implements OnInit{
 
   getContactFields()
   {
-    this.restService.getAll(API.main.contact + '/fields').subscribe((res:any) => {
-      this.contactFields = res.data;
+    this.restService.getAll(API.main.account + '/fields').subscribe((res:any) => {
+      this.companyFields = res.data;
     },
     err => {
       console.log(err);
@@ -46,7 +46,7 @@ export class CrmCompanyMappingComponent implements OnInit{
   {
     if(!this.crmName) return;    
     this.isLoading = true;
-    this.restService.getAll(API.main.external_crm + `/fields/company/${this.crmName}`).subscribe((res:any) => {
+    this.restService.getAll(API.main.external_crm + `/fields/${this.crmName}/Company`).subscribe((res:any) => {
       this.externalCrmFields = [...res];      
       this.isLoading = false;
     },
@@ -57,7 +57,7 @@ export class CrmCompanyMappingComponent implements OnInit{
   }
 
   getMappingData() {
-    this.restService.getAll(API.main.external_crm + `/mappings/${this.crmName as string}`).subscribe((res:any) => {
+    this.restService.getAll(API.main.external_crm + `/mappings/${this.crmName as string}/Company`).subscribe((res:any) => {
       this.handleMapping( res || []);
     });
   }
