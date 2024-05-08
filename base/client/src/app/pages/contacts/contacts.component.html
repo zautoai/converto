@@ -1,0 +1,599 @@
+<div class="col-lg-12 mt-3">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="fa-solid fa-user"></i> Contacts
+      </h3>
+      <div class="card-options">
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#addUser"
+          (click)="openCreateUser()"
+        >
+          <i class="fa fa-plus"></i>
+          Create Contacts
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="table-responsive mb-3">
+        <table
+          class="table border card-table table-vcenter text-nowrap align-items-center"
+        >
+          <thead class="bg-primary text-white">
+            <th class="text-white">Photo Url</th>
+            <th class="text-white">Full Name</th>
+            <th class="text-white">First Name</th>
+            <th class="text-white">Last Name</th>
+            <th class="text-white">Job Title</th>
+            <th class="text-white">Organization Name</th>
+            <th class="text-white">Email</th>
+            <th class="text-white">Phone</th>
+            <th class="text-white">Address</th>
+            <th class="text-white">City</th>
+            <th class="text-white">State</th>
+            <th class="text-white">Zip</th>
+            <th class="text-white">Country</th>
+            <th class="text-white">Website</th>
+            <th class="text-white">Notes</th>
+            <th class="text-white">Lead Source</th>
+            <th class="text-white">Status</th>
+            <th class="text-white">createdAt</th>
+            <th class="text-white">modifiedAt</th>
+            <th class="text-white">Actions</th>
+          </thead>
+          <tbody>
+            <ng-container>
+              <tr *ngFor="let data of submittedData">
+                <td>
+                  {{ data.photoUrl }}
+                </td>
+                <td>
+                  {{ data.fullName }}
+                </td>
+                <td>
+                  {{ data.firstName }}
+                </td>
+                <td>
+                  {{ data.lastName }}
+                </td>
+                <td>
+                  {{ data.jobTitle }}
+                </td>
+                <td>
+                  {{ data.organizationName }}
+                </td>
+                <td>
+                  {{ data.email }}
+                </td>
+                <td>
+                  {{ data.phone }}
+                </td>
+                <td>
+                  {{ data.address }}
+                </td>
+                <td>
+                  {{ data.city }}
+                </td>
+                <td>
+                  {{ data.state }}
+                </td>
+                <td>
+                  {{ data.zip }}
+                </td>
+                <td>
+                  {{ data.country }}
+                </td>
+                <td>
+                  {{ data.website }}
+                </td>
+                <td>
+                  {{ data.notes }}
+                </td>
+                <td>
+                  {{ data.leadSource }}
+                </td>
+                <td>
+                  {{ data.status }}
+                </td>
+                <td>
+                  {{ data.createdAt }}
+                </td>
+                <td>
+                  {{ data.modifiedAt }}
+                </td>
+                <td class="icon w-1">
+                  <button (click)="openViewUser(data)">
+                    <i class="fa fa-eye text-secondary view"></i>
+                  </button>
+
+                  <button (click)="openUpdateUser(data)">
+                    <i class="fa fa-edit text-success update"></i>
+                  </button>
+
+                  <button (click)="delete(data)">
+                    <i class="fa fa-trash-o text-danger delete"></i>
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #deleteModal let-modal>
+  <!--  SMALL MODAL -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4><i class="fa fa-exclamation-triangle"></i> Delete Form</h4>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss('Cross click')"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete ?</p>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="closeModal()"
+      >
+        Cancel
+      </button>
+      <button class="btn btn-danger" type="button">Yes</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #createUserOffcanvas let-offcanvas>
+  <div class="offcanvas-header">
+    <h4 class="offcanvas-title"><i class="fe fe-cube"></i> Create Contacts</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="offcanvas.dismiss()"
+    ></button>
+  </div>
+  <hr class="m-0" />
+  <div class="offcanvas-body">
+    <form [formGroup]="Form" (ngSubmit)="onSubmitForm()">
+      <div class="form-group">
+        <label class="form-label">Photo URL</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="photoUrl"
+          name="title"
+          placeholder="photoUrl"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="fullName"
+          name="title"
+          placeholder="fullName"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="firstName"
+          name="title"
+          placeholder="firstName"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="lastName"
+          name="title"
+          placeholder="lastName"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Job Title</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="jobTitle"
+          name="title"
+          placeholder="jobTitle"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Organization Name</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="organizationName"
+          name="title"
+          placeholder="organizationName"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="email"
+          name="title"
+          placeholder="email"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="phone"
+          name="title"
+          placeholder="phone"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="address"
+          name="title"
+          placeholder="address"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">City</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="city"
+          name="title"
+          placeholder="city"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">State</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="state"
+          name="title"
+          placeholder="state"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Zip</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="zip"
+          name="title"
+          placeholder="zip"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Country</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="country"
+          name="title"
+          placeholder="country"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Website</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="website"
+          name="title"
+          placeholder="website"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="notes"
+          name="title"
+          placeholder="notes"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Source</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="leadSource"
+          name="title"
+          placeholder="leadSource"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <input
+        type="text"
+        class="form-control"
+        formControlName="status"
+        name="title"
+        placeholder="status"
+        />
+      </div>
+      <div class="d-flex justify-content-end mt-4">
+        <button
+          class="btn btn-outline-primary me-3"
+          type="button"
+          (click)="offcanvas.dismiss()"
+        >
+          <i class="fa fa-times"></i>Close
+        </button>
+        <button class="btn btn-primary" type="submit">
+          <i class="fa fa-save"></i> Create
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #updateUserOffcanvas let-offcanvas>
+  <div class="offcanvas-header">
+    <h4 class="offcanvas-title"><i class="fe fe-user"></i>Edit Contacts</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="offcanvas.dismiss()"
+    ></button>
+  </div>
+  <hr class="m-0" />
+  <div class="offcanvas-body">
+    <form (ngSubmit)="onUpdateuserSubmit()">
+      <div class="form-group">
+        <label class="form-label">Photo Url</label>
+        <input
+          type="title"
+          class="form-control"
+          formControlName="photoUrl"
+          name="Title"
+          placeholder="photoUrl"
+          [class.is-invalid]="errorFeedback.photoUrl.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.email }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input
+          type="title"
+          class="form-control"
+          formControlName="fullName"
+          name="Title"
+          placeholder="fullName"
+          [class.is-invalid]="errorFeedback.fullName.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.email }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <input
+          type="title"
+          class="form-control"
+          formControlName="lastName"
+          name="Title"
+          placeholder="lastName"
+          [class.is-invalid]="errorFeedback.lastName.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.email }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Job Title</label>
+        <input
+          placeholder="jobTitle"
+          formcontrolname="jobTitle"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.jobTitle.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Organization Name</label>
+        <input
+          placeholder="organizationName"
+          formcontrolname="organizationName"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.organizationName.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input
+          placeholder="email"
+          formcontrolname="email"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.email.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input
+          placeholder="phone"
+          formcontrolname="phone"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.phone.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <input
+          placeholder="address"
+          formcontrolname="address"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.address.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">City</label>
+        <input
+          placeholder="city"
+          formcontrolname="city"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.city.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">State</label>
+        <input
+          placeholder="state"
+          formcontrolname="state"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.state.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Zip</label>
+        <input
+          placeholder="zip"
+          formcontrolname="zip"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.zip.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Country</label>
+        <input
+          placeholder="country"
+          formcontrolname="country"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.country.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Website</label>
+        <input
+          placeholder="website"
+          formcontrolname="website"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.website.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input
+          placeholder="notes"
+          formcontrolname="notes"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.notes.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Source</label>
+        <input
+          placeholder="leadSource"
+          formcontrolname="leadSource"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.leadSource.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <input
+          placeholder="status"
+          formcontrolname="status"
+          class="form-control ng-pristine ng-invalid ng-touched"
+          ng-reflect-name="instruction"
+          [class.is-invalid]="errorFeedback.status.length > 0"
+        />
+        <div class="invalid-feedback">{{ errorFeedback.password }}</div>
+      </div>
+
+      <div class="d-flex justify-content-end">
+        <button
+          class="btn btn-outline-primary me-3"
+          type="button"
+          (click)="offcanvas.dismiss()"
+        >
+          <i class="fa fa-times"></i> Close
+        </button>
+        <button class="btn btn-primary" type="submit">
+          <i class="fa fa-save"></i> Update
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #viewUserOffcanvas let-offcanvas>
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title"><i class="fe fe-cube"></i> View Contacts</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="offcanvas.dismiss()"
+    ></button>
+  </div>
+  <hr class="m-0" />
+  <div class="offcanvas-body">
+    <div *ngIf="selectedData">
+      <p><strong>PhotoURL:</strong> {{ selectedData.photoUrl }}</p>
+      <p><strong>First Name:</strong> {{ selectedData.fullName }}</p>
+      <p><strong>Last Name:</strong> {{ selectedData.lastName }}</p>
+      <p><strong>Job Title:</strong> {{ selectedData.jobTitle }}</p>
+      <p><strong>Organization Name:</strong> {{ selectedData.organizationName }}</p>
+      <p><strong>Email:</strong> {{ selectedData.email }}</p>
+      <p><strong>Phone:</strong> {{ selectedData.phone }}</p>
+      <p><strong>Address:</strong> {{ selectedData.address }}</p>
+      <p><strong>City:</strong> {{ selectedData.city }}</p>
+      <p><strong>State:</strong> {{ selectedData.state }}</p>
+      <p><strong>Zip:</strong> {{ selectedData.zip }}</p>
+      <p><strong>Country:</strong> {{ selectedData.country }}</p>
+      <p><strong>Website:</strong> {{ selectedData.website }}</p>
+      <p><strong>Notes:</strong> {{ selectedData.notes }}</p>
+      <p><strong>Source:</strong> {{ selectedData.leadSource }}</p>
+      <p><strong>Status:</strong> {{ selectedData.status }}</p>
+    </div>
+  </div>
+</ng-template>
+
