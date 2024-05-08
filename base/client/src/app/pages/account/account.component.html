@@ -50,11 +50,11 @@
                     <i class="fa fa-eye text-secondary view"></i>
                   </button>
 
-                  <button (click)="openUpdateUser(user)">
+                  <button (click)="openUpdateUser(data)">
                     <i class="fa fa-edit text-success update"></i>
                   </button>
 
-                  <button (click)="deleteSubmittedData(data)">
+                  <button (click)="delete(data)">
                     <i class="fa fa-trash-o text-danger delete"></i>
                   </button>
                 </td>
@@ -341,7 +341,7 @@
   </div>
   <hr class="m-0" />
   <div class="offcanvas-body">
-    <form (ngSubmit)="onUpdateuserSubmit()">
+    <form [formGroup]="Form" (ngSubmit)="onUpdateuserSubmit()">
       <div class="form-group">
         <label class="form-label">ParentaccountId</label>
         <input
@@ -350,7 +350,6 @@
           formControlName="parentAccountId"
           name="Title"
           placeholder="parentAccountId"
-          [class.is-invalid]="errorFeedback.email.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.email }}</div>
       </div>
@@ -362,7 +361,6 @@
           formControlName="photoUrl"
           name="Title"
           placeholder="photoUrl"
-          [class.is-invalid]="errorFeedback.email.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.email }}</div>
       </div>
@@ -374,128 +372,127 @@
           formControlName="accountName"
           name="Title"
           placeholder="accountName"
-          [class.is-invalid]="errorFeedback.email.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.email }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Industry</label>
         <input
-          placeholder="Industry"
-          formcontrolname="industry"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
+          type="title"
+          class="form-control"
+          formControlName="industry"
+          name="Title"
+          placeholder="industry"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Companysize</label>
         <input
-          placeholder="Companysize"
-          formcontrolname="companySize"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
+          type="title"
+          class="form-control"
+          formControlName="companySize"
+          name="Title"
+          placeholder="companySize"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Annualreveneue</label>
         <input
-          placeholder="Annualrevenue"
-          formcontrolname="annualRevenue"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
+          type="title"
+          class="form-control"
+          formControlName="annualRevenue"
+          name="Title"
+          placeholder="annualRevenue"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">AccountType</label>
         <input
-          placeholder="AccountType"
-          formcontrolname="accountType"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
+          type="title"
+          class="form-control"
+          formControlName="accountType"
+          name="Title"
+          placeholder="accountType"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Website</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="website"
+          name="Title"
           placeholder="website"
-          formcontrolname="website"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Address</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="address"
+          name="Title"
           placeholder="address"
-          formcontrolname="address"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">City</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="city"
+          name="Title"
           placeholder="city"
-          formcontrolname="city"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">State</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="state"
+          name="Title"
           placeholder="state"
-          formcontrolname="state"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Zip</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="zip"
+          name="Title"
           placeholder="zip"
-          formcontrolname="zip"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Country</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="country"
+          name="Title"
           placeholder="country"
-          formcontrolname="country"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Phone</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="phone"
+          name="Title"
           placeholder="phone"
-          formcontrolname="phone"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
@@ -503,56 +500,55 @@
       <div class="form-group">
         <label class="form-label">Email</label>
         <input
-          rows="5"
+          type="title"
+          class="form-control"
+          formControlName="email"
+          name="Title"
           placeholder="email"
-          formcontrolname="email"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Socialmedia</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="socialMedia"
+          name="Title"
           placeholder="socialMedia"
-          formcontrolname="socialMedia"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Notes</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="notes"
+          name="Title"
           placeholder="notes"
-          formcontrolname="notes"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Source</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="source"
+          name="Title"
           placeholder="source"
-          formcontrolname="source"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Status</label>
         <input
+          type="title"
+          class="form-control"
+          formControlName="status"
+          name="Title"
           placeholder="status"
-          formcontrolname="status"
-          class="form-control ng-pristine ng-invalid ng-touched"
-          ng-reflect-name="instruction"
-          [class.is-invalid]="errorFeedback.name.length > 0"
         />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
