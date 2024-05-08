@@ -59,6 +59,26 @@ export class ExternalCrmService implements OnModuleInit{
         return fields;
     }
 
+    async getCompanyFields(orgId:string, crmName:string)
+    {
+        const crm = this.crmProvider.getCRM(crmName);
+        const fields = await crm.getCompanyProperties(orgId);
+        return fields;
+    }
+
+    async getCrmFields(orgId:string, crmName:string, objectType:string)
+    {
+        switch(objectType)
+        {
+            case ObjectType.CONTACT:
+                return await this.getContactFields(orgId, crmName);
+            case ObjectType.COMPANY:
+                return await this.getCompanyFields(orgId, crmName);
+            default:
+                return [];
+        }
+    }
+
     async getContacts(orgId:string, crmName:string): Promise<any> {
         const crm = this.crmProvider.getCRM(crmName);
         const contacts = await crm.getContacts(orgId);
@@ -128,9 +148,9 @@ export class ExternalCrmService implements OnModuleInit{
         return company;
     }
 
-    async getMappingsByCrmName(orgId:string, crmName: string)
+    async getMappingsByCrmName(orgId:string, crmName: string,object_type:string)
     {
-        return await this.mappingService.getMappingsByCrmName(orgId, crmName);
+        return await this.mappingService.getMappingsByCrmName(orgId, crmName, object_type);
     }
     async createMappings(orgId:string, createCRMMappingsDto:CreateCRMMappingsDto): Promise<any> {
         for(const _mapping of createCRMMappingsDto.mappings) {

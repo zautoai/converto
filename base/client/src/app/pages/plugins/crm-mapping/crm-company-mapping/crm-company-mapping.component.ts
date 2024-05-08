@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { API } from 'src/app/config/endpoint.config';
+import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
 
 @Component({
-  selector: 'app-crm-mapping',
-  templateUrl: './crm-mapping.component.html',
-  styleUrl: './crm-mapping.component.scss'
+  selector: 'app-crm-company-mapping',
+  templateUrl: './crm-company-mapping.component.html',
+  styleUrl: './crm-company-mapping.component.scss'
 })
-export class CrmMappingComponent implements OnInit{
+export class CrmCompanyMappingComponent implements OnInit{
 
   isLoading:boolean = false;
   @Input()crmName:string | undefined;
@@ -20,7 +21,8 @@ export class CrmMappingComponent implements OnInit{
   @Output() onCancel = new EventEmitter<any>();
 
   constructor(
-    private readonly restService: RestService
+    private readonly restService: RestService,
+    private readonly notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -44,7 +46,7 @@ export class CrmMappingComponent implements OnInit{
   {
     if(!this.crmName) return;    
     this.isLoading = true;
-    this.restService.getAll(API.main.external_crm + `/fields/contacts/${this.crmName}`).subscribe((res:any) => {
+    this.restService.getAll(API.main.external_crm + `/fields/company/${this.crmName}`).subscribe((res:any) => {
       this.externalCrmFields = [...res];      
       this.isLoading = false;
     },
@@ -78,20 +80,23 @@ export class CrmMappingComponent implements OnInit{
     const mappings = [];
     for (const field of fields) {
       mappings.push({
-        objectType:'Contact',
+        objectType:'Company',
         fieldName: field,
-        externalCRMObjectType: 'Contact',
+        externalCRMObjectType: 'Company',
         externalCRMFieldName: this.selectedOptions[field],
         crmName: this.crmName
       });
     }   
-
+    this.isLoading = true;
     this.restService.post(API.main.external_crm + `/mappings`, {mappings}).subscribe(res => {
-        console.log(res);
-        this.onSubmit.emit();
-      },
-      err => {
-        console.log(err);
+      console.log(res);
+      this.onSubmit.emit();
+      this.notificationService.showSuccess('Mapping saved successfully');
+      this.isLoading = false;
+    },
+    err => {
+      this.isLoading = false;
+      console.log(err);
       }
     );
   }

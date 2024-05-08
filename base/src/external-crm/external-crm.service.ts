@@ -29,16 +29,16 @@ export class ExternalCrmService extends BaseService {
         return this.handleException(await this.externalCrmMicroService.callback(orgId, hubspotCallBackDto.state, hubspotCallBackDto.code))
     }
 
-    async getMappings(orgId: string, crmName: string) {
-        return this.handleException(await this.externalCrmMicroService.getMappings(orgId, crmName))
+    async getMappings(orgId: string, crmName: string, objectType:string) {
+        return this.handleException(await this.externalCrmMicroService.getMappings(orgId, crmName, objectType))
     }
 
     async createMappings(orgId: string, createCRMMappingsDto: CreateCRMMappingsDto) {
         return this.handleException(await this.externalCrmMicroService.createMappings(orgId, createCRMMappingsDto))
     }
 
-    async getFields(orgId: string, crmName: string) {
-        return this.handleException(await this.externalCrmMicroService.getFields(orgId, crmName))
+    async getFields(orgId: string, crmName: string, objectType: string) {
+        return this.handleException(await this.externalCrmMicroService.getFields(orgId, crmName, objectType))
     }
 
     async getProfile(orgId: string, crmName: CRMAuthDto) {
