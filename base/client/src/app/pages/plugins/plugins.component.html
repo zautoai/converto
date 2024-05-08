@@ -27,6 +27,6 @@
     </div>
     <hr class="m-0">
     <div class="offcanvas-body p-0">
-        <app-crm-mapping [crmName]="crmName"></app-crm-mapping>
+        <app-crm-mapping [crmName]="crmName" (onCancel)="offcanvas.dismiss()" (onSubmit)="offcanvas.dismiss()"></app-crm-mapping>
     </div>
 </ng-template>

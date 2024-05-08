@@ -132,7 +132,7 @@ export class ExternalCrmService implements OnModuleInit{
         for(const _mapping of createCRMMappingsDto.mappings) {
             const mapping = await this.mappingService.getMappingByCrmNameAndObjectTypeAndField(orgId, _mapping.crmName, _mapping.objectType, _mapping.fieldName);
             if(mapping){
-                if(_mapping.externalCRMFieldName == null)
+                if(_mapping.externalCRMFieldName == null || _mapping.externalCRMFieldName === 'null')
                 {
                     await this.mappingService.deleteMapping(orgId, mapping.id);
                 }
