@@ -201,7 +201,7 @@ jobs:
             if curl --fail $HEALTH_CHECK_URL; then
               echo "Container $CRM_APP_CONTAINER is healthy"
             else
-              echo "Container $CRM_APP_CONTAINER is not healthy😭"
+              echo "Container $CRM_APP_CONTAINER is not healthy😭."
               exit 1
             fi
 
