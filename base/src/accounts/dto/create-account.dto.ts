@@ -17,7 +17,7 @@ export class CreateAccountDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  accountName: string;
+  accountName?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()

@@ -20,6 +20,9 @@
     margin: 0 auto;
     text-align: center;
   }
+  .toast-info .toast-icon {
+    color: blue; /* Or your desired info color */
+  }
 
   #glb-loader img {
     position: absolute;

@@ -27,6 +27,8 @@ import { LeadConfigComponent } from './lead-config/lead-config.component';
 import { StartersConfigComponent } from './starters-config/starters-config.component';
 import { CustomiseAvatarComponent } from './customise-avatar/customise-avatar/customise-avatar.component';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
+import { AccountsComponent } from './account/account.component';
+import { PluginsComponent } from './plugins/plugins.component';
 import { ContactsComponent } from './contacts/contacts.component';
 
 const routes: Routes = [
@@ -52,6 +54,12 @@ const routes: Routes = [
     path: 'conversations/:id',
     title: "Conversations",
     component: conversationcomponent,
+    canActivate:[SetupGuard]
+  },
+  {
+    path: 'accounts',
+    title: "accounts",
+    component: AccountsComponent,
     canActivate:[SetupGuard]
   },
   {
@@ -231,6 +239,12 @@ const routes: Routes = [
     path:'lead-settings',
     title: 'Lead settings',
     component: LeadConfigComponent,
+    canActivate:[SetupGuard]
+  },
+  {
+    path:'plugins',
+    title: 'Plugins',
+    component: PluginsComponent,
     canActivate:[SetupGuard]
   },
 ];

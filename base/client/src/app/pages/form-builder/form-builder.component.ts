@@ -1,22 +1,13 @@
-import {
-  Component,
-  ViewChild,
-  ElementRef,
-  AfterViewInit,
-  OnInit,
-  Input,
-  Output,
-} from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { API } from 'src/app/config/endpoint.config';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
-import { API } from 'src/app/config/endpoint.config';
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
-import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { ChatBotWidgetsComponent } from 'src/app/widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { EventEmitter } from 'stream';
 import { DeployScriptType } from '../zautosettings/settings/settings.component';
 
 @Component({
@@ -25,15 +16,15 @@ import { DeployScriptType } from '../zautosettings/settings/settings.component';
   styleUrl: './form-builder.component.scss',
 })
 export class FormBuilderComponent implements OnInit {
-  @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
-  @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
-  @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
+  @ViewChild('createFormOffcanvas') createFormOffcanvas: ElementRef | undefined;
+  @ViewChild('updateFormOffcanvas') updateFormOffcanvas: ElementRef | undefined;
+  @ViewChild('viewFormOffcanvas') viewFormOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
   @Input() chatBotWidget!: ChatBotWidgetsComponent;
 
-  user: any = {};
-  userList: any = [];
-  selectedUser: any = undefined;
+  form: any = {};
+  formList: any = [];
+  selectedForm: any = undefined;
   isEdit: boolean = false;
   Form: FormGroup;
   errorFeedback: any = { name: '', email: '', password: '' };
@@ -45,6 +36,8 @@ export class FormBuilderComponent implements OnInit {
   submittedData: any[] = [];
   selectedData: any = null;
   selectedCheckboxes: string[] = [];
+  htmlData: string = '';
+  jsData: string = '';
 
   constructor(
     private avatarService: AvatarService,
@@ -54,18 +47,19 @@ export class FormBuilderComponent implements OnInit {
     private offcanvasService: NgbOffcanvas,
     private formBuilder: FormBuilder,
     private sweetAlertService: SweetAlertService,
+    private authService: AuthService,
   ) {
     this.Form = this.formBuilder.group({
       title: [''],
       description: [''],
-      name: false,
-      label: false,
-      contactdetails: false,
+      name: [false],
+      label: [false],
+      contactdetails: [false],
     });
   }
 
   ngOnInit(): void {
-    this.getUsers();
+    this.getForms();
   }
   ngAfterViewInit(): void {
     if (this.chatBotWidget) {
@@ -93,14 +87,13 @@ export class FormBuilderComponent implements OnInit {
     if (this.Form.get('contactdetails')?.value) {
       this.selectedCheckboxes.push('Phone Number');
     }
-    this.offcanvasService.dismiss();
     console.log(
       'Form submitted with selected checkboxes:',
       this.selectedCheckboxes,
     );
   }
 
-  getUsers = () => {
+  getForms = () => {
     this.restService
       .getAll(
         API.main.formbuilder +
@@ -108,7 +101,7 @@ export class FormBuilderComponent implements OnInit {
       )
       .subscribe(
         (response: any) => {
-          this.userList = response.data;
+          this.formList = response.data;
           console.log(response);
         },
         (error) => {
@@ -118,21 +111,21 @@ export class FormBuilderComponent implements OnInit {
       );
   };
 
-  openCreateUser() {
+  openCreateForm() {
     this.Form.reset();
     this.resetErrorFeedback();
-    this.offcanvasService.open(this.createUserOffcanvas, {
+    this.offcanvasService.open(this.createFormOffcanvas, {
       position: 'end',
       backdrop: 'static',
       panelClass: 'visible',
       animation: true,
     });
   }
-  openViewUser(data: any) {
+  openViewForm(data: any) {
     this.selectedData = data;
     this.Form.reset();
     this.resetErrorFeedback();
-    this.offcanvasService.open(this.viewUserOffcanvas, {
+    this.offcanvasService.open(this.viewFormOffcanvas, {
       position: 'end',
       backdrop: 'static',
       panelClass: 'visible',
@@ -141,17 +134,13 @@ export class FormBuilderComponent implements OnInit {
   }
 
   toggleDescription(): void {
-    this.showDescription = !this.showDescription;
-
+    this.showDescription = true;
     this.showHTML = false;
     this.showScript = false;
   }
 
   toggleHTML(): void {
-    this.showHTML = !this.showHTML;
-
-    this.showDescription = false;
-    this.showScript = false;
+    this.getHtmlScript(this.selectedData.id);
   }
 
   deplymentType = DeployScriptType;
@@ -181,37 +170,44 @@ export class FormBuilderComponent implements OnInit {
   }
 
   toggleScript(): void {
-    this.showScript = !this.showScript;
-    this.showDescription = false;
-    this.showHTML = false;
+    this.getJsScript(this.selectedData.id);
   }
 
-  onCreateuserSubmit() {
+  onCreateformSubmit() {
     this.resetErrorFeedback();
+    this.onSubmitForm();
     const title = this.Form.value.title || '';
     const description = this.Form.value.description || '';
-
     if (this.Form.valid) {
       const data = {
         title: title,
         description: description,
         isActive: true,
-        createLeadField: [
-          {
-            label: 'string',
-            type: 'TEXT',
-            contactField: 'string',
+        createLeadField: this.selectedCheckboxes.map((checkbox) => {
+          return {
+            label: checkbox,
+            type:
+              checkbox === 'Phone Number'
+                ? 'NUMBER'
+                : checkbox === 'Email'
+                  ? 'EMAIL'
+                  : 'TEXT',
+            contactField:
+              checkbox === 'Phone Number'
+                ? 'phone'
+                : checkbox === 'Email'
+                  ? 'email'
+                  : 'fullName',
             isRequired: true,
-          },
-        ],
+          };
+        }),
       };
-      console.log(data);
       this.restService.post(API.main.formbuilder, data).subscribe({
         next: (response: any) => {
           console.log(response);
           this.offcanvasService.dismiss();
-          this.notifService.showSuccess('User Added Successfully.');
-          this.getUsers();
+          this.notifService.showSuccess('Form Added Successfully.');
+          this.getForms();
         },
         error: (error) => {
           console.error(error);
@@ -228,12 +224,20 @@ export class FormBuilderComponent implements OnInit {
     }
   }
 
-  openUpdateUser(user: any) {
-    this.user = user;
+  openUpdateForm(data: any) {
+    this.selectedData = data;
     this.Form.reset();
-    this.resetErrorFeedback();
-    this.Form.patchValue(user);
-    this.offcanvasService.open(this.updateUserOffcanvas, {
+    this.Form.get('title')?.setValue(data?.title);
+    this.Form.get('description')?.setValue(data?.description);
+    const leadFormFields = data?.LeadFormField.map((field: any) => field.label);
+    console.log(leadFormFields);
+
+    this.Form.get('name')?.setValue(leadFormFields.includes('Name'));
+    this.Form.get('label')?.setValue(leadFormFields.includes('Email'));
+    this.Form.get('contactdetails')?.setValue(
+      leadFormFields.includes('Phone Number'),
+    );
+    this.offcanvasService.open(this.updateFormOffcanvas, {
       position: 'end',
       backdrop: 'static',
       panelClass: 'visible',
@@ -241,26 +245,67 @@ export class FormBuilderComponent implements OnInit {
     });
   }
 
-  onUpdateuserSubmit(): void {
-    if (this.Form.valid) {
-      const updatedUserData = this.Form.value;
-      // Implement your update logic using updatedUserData
-      console.log('Updated User Data:', updatedUserData);
+  onUpdateformSubmit(): void {
+    const updateLeadField: any[] = [];
 
-      // Close the offcanvas
+    if (this.Form.get('name')?.value) {
+      updateLeadField.push({
+        label: 'Name',
+        type: 'TEXT',
+        contactField: 'fullName',
+        isRequired: true,
+      });
+    }
+    if (this.Form.get('label')?.value) {
+      updateLeadField.push({
+        label: 'Email',
+        type: 'EMAIL',
+        contactField: 'email',
+        isRequired: true,
+      });
+    }
+    if (this.Form.get('contactdetails')?.value) {
+      updateLeadField.push({
+        label: 'Phone Number',
+        type: 'NUMBER',
+        contactField: 'phone',
+        isRequired: true,
+      });
+    }
+
+    if (this.Form.valid) {
+      const updatedFormData = {
+        title: this.Form.value.title,
+        description: this.Form.value.description,
+        updateLeadField,
+      };
+      this.restService
+        .patch(API.main.formbuilder, this.selectedData.id, updatedFormData)
+        .subscribe(
+          (response: any) => {
+            console.log(response);
+            this.notifService.showSuccess('Form Updated Successfully.');
+            this.getForms();
+          },
+          (error) => {
+            console.error(error);
+            this.notifService.showError(
+              'Something Went Wrong! Try Again Later',
+            );
+          },
+        );
+
       this.offcanvasService.dismiss();
-      // Reset the form after submission
       this.Form.reset();
     } else {
-      // Mark form controls as touched to display validation errors
       this.Form.markAllAsTouched();
     }
   }
 
   delete = (data: any) => {
-    this.user = data;
+    this.form = data;
     this.sweetAlertService.warning(
-      'Delete user',
+      'Delete form',
       'Are you sure you want to delete ?',
       ['Delete', 'Cancel'],
       (confirm: any) => {
@@ -271,22 +316,22 @@ export class FormBuilderComponent implements OnInit {
     );
   };
 
-  onSubmit = (userForm: any) => {
+  onSubmit = (formForm: any) => {
     this.modalService.dismissAll();
-    this.notifService.showSuccess('User Added Successfully');
+    this.notifService.showSuccess('Form Added Successfully');
   };
 
   closeModal = () => {
-    this.user = {};
+    this.form = {};
     this.isEdit = false;
     this.modalService.dismissAll();
   };
 
   confirmDelete = () => {
-    this.restService.delete(API.main.formbuilder, this.user.id).subscribe(
+    this.restService.delete(API.main.formbuilder, this.form.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Form Deleted Successfully.');
-        this.getUsers();
+        this.getForms();
         this.closeModal();
       },
       (error) => {
@@ -298,7 +343,7 @@ export class FormBuilderComponent implements OnInit {
 
   onPageChange(pageNumber: number) {
     this.currentPage = pageNumber;
-    this.getUsers();
+    this.getForms();
   }
 
   resetErrorFeedback() {
@@ -306,5 +351,43 @@ export class FormBuilderComponent implements OnInit {
     for (let key of keys) {
       this.errorFeedback[key] = '';
     }
+  }
+
+  getHtmlScript(id: string) {
+    const { orgId } = this.authService.getUser();
+    this.restService
+      .get(API.main.formbuilder + `/${orgId}/form/html`, id)
+      .subscribe(
+        (response: any) => {
+          this.showHTML = true;
+          this.showScript = false;
+          this.showDescription = false;
+          this.htmlData = response.data;
+        },
+        (error) => {
+          console.error(error.error);
+          this.notifService.showError(error.error.message);
+        },
+      );
+  }
+
+  getJsScript(id: string) {
+    const { orgId } = this.authService.getUser();
+    const script = `<script type="text/javascript" src="${API.main.formbuilder}/${orgId}/form/script/${id}.js"/></script>
+    <script>
+    function  callback(error, data) {
+        if (error) {
+            console.error('Error occurred:', error);
+        } else {
+            console.log('Data received:', data);
+            alert('Form submited')
+        }
+    }
+    init(callback);
+  </script>`;
+    this.jsData = script;
+    this.showDescription = false;
+    this.showHTML = false;
+    this.showScript = true;
   }
 }

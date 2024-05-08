@@ -144,7 +144,7 @@ model Account {
   industry        String?
   companySize     Int?
   annualRevenue   Float?
-  accountType     accountType?
+  accountType     accountType @default(PROSPECT)
   website         String?
   address         String?
   city            String?
@@ -164,17 +164,41 @@ model Account {
 }
 
 model AccountBasedMarketingTarget {
-  id                   String   @id @default(uuid())
-  photoUrl             String?
-  targetAccountName    String
-  industry             String
-  accountSize          String?
-  revenuePotential     Float?
-  decisionMakers       String[]
-  painPoints           String[]
-  buyingStage          String?
-  campaigns            String[]
-  teamMembers          String[]
-  createdAt            DateTime @default(now())
-  modifiedAt           DateTime @updatedAt
+  id                String   @id @default(uuid())
+  photoUrl          String?
+  targetAccountName String
+  industry          String
+  accountSize       String?
+  revenuePotential  Float?
+  decisionMakers    String[]
+  painPoints        String[]
+  buyingStage       String?
+  campaigns         String[]
+  teamMembers       String[]
+  createdAt         DateTime @default(now())
+  modifiedAt        DateTime @updatedAt
+}
+
+model ExternalCrmCredential {
+  id           String   @id @default(uuid())
+  tokeType     String?
+  refreshToken String
+  accessToken  String
+  expiresIn    Int
+  crmName      String
+  createdAt    DateTime @default(now())
+  modifiedAt   DateTime @updatedAt
+}
+
+model CrmMapping {
+  id                    String   @id @default(uuid())
+  objectType            String
+  fieldName             String
+  externalCRMObjectType String
+  externalCRMFieldName  String
+  crmName               String
+  createdAt             DateTime @default(now())
+  modifiedAt            DateTime @updatedAt
+
+  @@unique([objectType,fieldName,externalCRMObjectType,externalCRMFieldName])
 }

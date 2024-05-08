@@ -22,19 +22,21 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { FilterDto } from 'src/common/dto/filter.dto';
 
-@ApiTags('accounts')
+@ApiTags('crm-accounts')
 @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
-@Controller('accounts')
+@Controller('api/crm-accounts')
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService) {}
+  constructor(private readonly accountsService: AccountsService) { }
 
   @Post()
   async create(
     @Body() createAccountDto: CreateAccountDto,
     @Req() request: ZautoRequest,
   ) {
+    console.log(createAccountDto);
+
     const orgId = request.user.org.id;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');

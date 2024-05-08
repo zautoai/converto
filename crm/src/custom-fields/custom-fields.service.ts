@@ -97,7 +97,7 @@ export class CustomFieldsService {
   async getTableFields(orgId: string, tableName: string): Promise<string[]> {
     try {
       const prisma = await this.prismaClientManager.getClient(orgId);
-      const schemaName = getSchemaName(orgId);
+      const schemaName = orgId.length > 5 ? getSchemaName(orgId) : orgId;
       const tableMetadata: any[] = await prisma.$queryRaw`
         SELECT column_name
         FROM information_schema.columns

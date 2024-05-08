@@ -70,3 +70,18 @@ export enum CustomFieldParent {
   ACCOUNT = 'ACCOUNT',
   ABM = 'ABM',
 }
+
+export enum EnrichmentProviderName {
+  APOLLO = 'Apollo',
+  CLEARBIT = 'Clearbit',
+  ZOOMINFO = 'Zoominfo',
+}
+
+export enum CrmNames {
+  HUBSPOT = 'Hubspot'
+}
+
+export enum ObjectType {
+  CONTACT = 'Contact',
+  COMPANY = 'Company',
+}

@@ -6,9 +6,16 @@ import { EnrichmentModule } from 'src/enrichment/enrichment.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { CustomFieldsModule } from 'src/custom-fields/custom-fields.module';
 import { ContactMicroserviceController } from './contacts.micro.controller';
+import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
 
 @Module({
-  imports: [CommonModule, EnrichmentModule, PrismaModule, CustomFieldsModule],
+  imports: [
+    CommonModule, 
+    EnrichmentModule, 
+    PrismaModule, 
+    CustomFieldsModule,
+    ExternalCrmModule
+  ],
   controllers: [ContactsController, ContactMicroserviceController],
   providers: [ContactsService],
   exports: [ContactsService],

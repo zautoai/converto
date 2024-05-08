@@ -51,13 +51,18 @@ import { WlcomeCardComponent } from './dashboard/widgets/wlcome-card/wlcome-card
 import { CounterFormatPipe } from './dashboard/widgets/pipe/CounterFormat.pipe';
 import { ProgressCardComponent } from './dashboard/widgets/progress-card/progress-card.component';
 import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
+import { AccountsComponent } from './account/account.component';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
+import { PluginCardComponent } from './plugins/plugin-card/plugin-card.component';
+import { PluginsComponent } from './plugins/plugins.component';
+import { CrmMappingComponent } from './plugins/crm-mapping/crm-mapping.component';
 import { ContactsComponent } from './contacts/contacts.component';
 
 @NgModule({
   declarations: [
     ZautoDashboardComponent,
-FormBuilderComponent,
+    AccountsComponent,
+    FormBuilderComponent,
     conversationcomponent,
     ChatContainerComponent,
     SummaryContainerComponent,
@@ -109,10 +114,12 @@ FormBuilderComponent,
     TableCardComponent,
     ChartCardComponent,
     WlcomeCardComponent,
-    
 
     CounterFormatPipe,
-      ProgressCardComponent
+    ProgressCardComponent,
+    PluginsComponent,
+    PluginCardComponent,
+    CrmMappingComponent
   ],
   imports: [
     CommonModule,
@@ -123,20 +130,18 @@ FormBuilderComponent,
     NgSelectModule,
     NgScrollbar,
     ReactiveFormsModule,
-    NgxSkeletonLoaderModule.forRoot(
-      {
-        theme: {
-          extendsFromRoot: true,
-          'background-color': 'var(--primary-1)'
-        }
-      }
-    ),
+    NgxSkeletonLoaderModule.forRoot({
+      theme: {
+        extendsFromRoot: true,
+        'background-color': 'var(--primary-1)',
+      },
+    }),
     MarkdownModule.forRoot(),
     NgCircleProgressModule.forRoot(),
     NgxDropzoneModule,
     NgxColorsModule,
     NgApexchartsModule,
-    NgbProgressbarModule
+    NgbProgressbarModule,
   ],
 })
-export class PagesModule { }
+export class PagesModule {}

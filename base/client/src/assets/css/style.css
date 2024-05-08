@@ -116,7 +116,7 @@
     --primary: var(--primary-bg-color);
     --secondary: #0099ff;
     --success: #8BDB81;
-    --info: #26c2f7;
+    --info: #e12c14;
     --warning: #ecb403;
     --danger: #ff7085;
     --light: #f8f9fa;
@@ -1894,8 +1894,8 @@ fieldset:disabled a.btn {
 
 .btn-info {
     color: #fff;
-    background: #26c2f7;
-    border-color: #26c2f7;
+    background: #575757;
+    border-color: #575757;
 }
 
 .btn-info:hover {

@@ -114,7 +114,10 @@ export class NavService implements OnDestroy {
 			roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
 		{
-			title: 'Conversations', icon: 'fe fe-message-circle', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/conversations', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+			title: 'Conversations', icon: 'fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/conversations', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+		},
+		{
+			title: 'Accounts', icon: 'fa-regular fa-building', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/accounts', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
 		{
 			title: 'Contacts', icon: 'fe fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/leads', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
@@ -173,9 +176,9 @@ export class NavService implements OnDestroy {
 		// {
 		// 	title: 'Integrations', icon: 'fe fe-download', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/integrations', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		// },
-		// {
-		// 	title: 'External API', icon: 'fa-solid fa-plug', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/external-apis', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		// },
+		{
+			title: 'Plugins', icon: 'fa-solid fa-plug', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/plugins', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+		},
 		{
 			headTitle: 'Calendar',
 			show:false,

@@ -10,6 +10,8 @@ import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
 import { EnrichmentService } from 'src/enrichment/enrichment.service';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { CreateFieldDto } from './dto/create-field.dto';
+import { ExternalCrmService } from 'src/external-crm/external-crm.service';
+import { CrmNames } from 'src/external-crm/enum/external-crm.enum';
 
 @Injectable()
 export class ContactsService {
@@ -19,6 +21,7 @@ export class ContactsService {
     private readonly prismaClientManager: PrismaClientManager,
     private readonly enrichmentService: EnrichmentService,
     private readonly customFieldsService: CustomFieldsService,
+    private readonly externalCRMService: ExternalCrmService
   ) {}
 
   async getContacts(orgId: string, filterDto: FilterDto) {
@@ -177,7 +180,16 @@ export class ContactsService {
     }
 
     if (contact.email) {
-      await this.enrichmentService.enrichContact(orgId, contact.id);
+      // await this.enrichmentService.enrichContact(orgId, contact.id);
+    }
+
+    try
+    {
+      await this.externalCRMService.createContact(orgId, CrmNames.HUBSPOT, createContactDto);
+    }
+    catch(err)
+    {
+      this.logger.error(err);
     }
 
     return {
@@ -190,7 +202,7 @@ export class ContactsService {
   async updateContact(orgId: string, id: string, updateContactDto: any) {
     const prisma = await this.prismaClientManager.getClient(orgId);
     const existingContact = await this.getContact(orgId, id);
-    if (!existingContact) {
+    if (!existingContact.data) {
       throw new NotFoundException('Contact not found');
     }
     const tags = updateContactDto.tags;
@@ -212,10 +224,6 @@ export class ContactsService {
       },
       { _defaultFields: {}, _customFields: {} },
     );
-
-    console.log(_customFields);
-    console.log(_defaultFields);
-    console.log(tags);
 
     await prisma.contact.update({
       where: { id },
@@ -271,6 +279,18 @@ export class ContactsService {
       }
     }
 
+    try
+    {
+      const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, CrmNames.HUBSPOT,existingContact.data.email);
+      if(existingCrmContact){
+        await this.externalCRMService.updateContact(orgId, CrmNames.HUBSPOT, existingCrmContact.hs_object_id, updateContactDto);
+      }
+    }
+    catch(err)
+    {
+      this.logger.error(err);
+    }
+
     return {
       code: 200,
       success: true,
@@ -279,9 +299,24 @@ export class ContactsService {
   }
 
   async deleteContact(orgId: string, id: string) {
+    const existingContact = await this.getContact(orgId, id);
+    if (!existingContact.data) {
+      throw new NotFoundException('Contact not found');
+    }
     const prisma = await this.prismaClientManager.getClient(orgId);
     await this.getContact(orgId, id);
     await prisma.contact.delete({ where: { id } });
+    try
+    {
+      const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, CrmNames.HUBSPOT,existingContact.data.email);
+      if(existingCrmContact){
+        await this.externalCRMService.deleteContact(orgId, CrmNames.HUBSPOT, existingCrmContact.hs_object_id);
+      }
+    }
+    catch(err)
+    {
+      this.logger.error(err);
+    }
     return {
       code: 204,
       success: true,

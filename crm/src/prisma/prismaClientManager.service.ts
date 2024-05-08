@@ -15,7 +15,7 @@ export class PrismaClientManager implements OnModuleDestroy {
 
   async getClient(orgId: string): Promise<PrismaClient> {
     const schemaName = orgId != DEFAULT_SCHEMA_NAME ? getSchemaName(orgId) : DEFAULT_SCHEMA_NAME;
-    let client = this.clients[schemaName];
+    let client = this.clients[orgId];
     const databaseUrl = process.env.DATABASE_URL.replaceAll(
       DEFAULT_SCHEMA_NAME,
       schemaName,
@@ -30,7 +30,7 @@ export class PrismaClientManager implements OnModuleDestroy {
       });
       try {
         await client.$connect();
-        this.logger.log(`Connected to schema '${schemaName}'`);
+        this.logger.log(`#Connected to schema '${schemaName}'`);
       } catch (error) {
         this.logger.error(`Failed to connect to schema '${schemaName}'`);
         throw new BadRequestException(

@@ -14,7 +14,7 @@ async function bootstrap() {
       port: +process.env.REDIS_PORT || 6379,
       password: process.env.REDIS_PASSWORD || '',
     },
-  });  
+  });   
   // CORS 
   app.enableCors({
     origin: true,
