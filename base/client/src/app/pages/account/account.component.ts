@@ -1,6 +1,13 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { FormBuilder, FormGroup,Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -8,23 +15,19 @@ import { RestService } from '../../shared/services/rest.service';
 import { SweetAlertService } from '../../shared/services/sweet-alart.service';
 import { DeployScriptType } from '../zautosettings/settings/settings.component';
 import { API } from '../../config/endpoint.config';
-
-
+import { log } from 'console';
 
 @Component({
   selector: 'app-accounts',
   templateUrl: './account.component.html',
-  styleUrl: './account.component.scss'
+  styleUrl: './account.component.scss',
 })
-
-
 export class AccountsComponent implements OnInit {
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
- @Input()chatBotWidget! : ChatBotWidgetsComponent;
-
+  @Input() chatBotWidget!: ChatBotWidgetsComponent;
 
   user: any = {};
   userList: any = [];
@@ -36,12 +39,11 @@ export class AccountsComponent implements OnInit {
   showHTML: boolean = false;
   showScript: boolean = false;
   currentPage: number = 1;
-  totalPages:number=1;
+  totalPages: number = 1;
   itemPerPage: number = 10;
   submittedData: any[] = [];
-  selectedData: any = null; 
-
-
+  selectedData: any = null;
+  totalPagesArray: number[] = [];
 
   constructor(
     private avatarService: AvatarService,
@@ -53,68 +55,64 @@ export class AccountsComponent implements OnInit {
     private sweetAlertService: SweetAlertService,
     private changeDetectorRef: ChangeDetectorRef,
   ) {
-    
     this.Form = this.formBuilder.group({
-      parentaccountId:[''],
-      photoUrl:[''],
-      accountname: [''],
-      industry:[''],
-      companySize: ['', [Validators.required, Validators.pattern("^[0-9]*$")]],
-      annualRevenue: ['', [Validators.required, Validators.pattern("^[0-9]*$")]],
-      accountType:[''],
-      website:[''],       
-      address:[''],        
-      city:[''],            
-      state:[''],           
-      zip :[''],  
-      country:[''],                
+      parentAccountId: [''],
+      photoUrl: [''],
+      accountName: [''],
+      industry: [''],
+      companySize: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      annualRevenue: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      accountType: [''],
+      website: [''],
+      address: [''],
+      city: [''],
+      state: [''],
+      zip: [''],
+      country: [''],
       phone: [''],
-      email:[''],
-      socialMedia:[''],
-      notes :[''],          
-      source :[''],  
-      status:[''],       
-    }); console.log(FormData);
-    
+      email: [''],
+      socialMedia: [''],
+      notes: [''],
+      source: [''],
+      status: [''],
+    });
+    console.log(FormData);
   }
-
 
   ngOnInit(): void {
     this.getAccounts();
   }
   ngAfterViewInit(): void {
-    if(this.chatBotWidget) {
+    if (this.chatBotWidget) {
       this.chatBotWidget.getAgent(this.avatarService.getAvatarId());
     }
   }
   getAccounts(page: number = 1, limit: number = 10): void {
-    this.restService.getAll(API.main.account+`?limit=${limit}&page=${page}`)
-      .subscribe((response: any) => {
-        this.submittedData = response.data; 
-        console.log(response.data);
-        
-        this.totalPages = Math.ceil(response.totalCount / limit);
-      }, (error) => {
-        console.error(error);
-        this.notifService.showError(error.error.message);
-      });
-}
+    this.restService
+      .getAll(API.main.account +`?limit=${limit}&page=${page}`)
+      .subscribe(
+        (response: any) => {
+          this.submittedData = response.data;
+          console.log(response.data);
 
-
-  deleteSubmittedData(data: any) {
-    const index = this.submittedData.indexOf(data);
-    if (index !== -1) {
-      this.submittedData.splice(index, 1);
-    }
+          this.totalPages = Math.ceil(response.totalCount / limit);
+          this.totalPagesArray = Array.from({length: this.totalPages}, (_, i) => i + 1);
+        },
+        (error) => {
+          console.error(error);
+          this.notifService.showError(error.error.message);
+        },
+      );
   }
 
-  onSubmitForm(Form: any){
+
+  
+
+  onSubmitForm(Form: any) {
     this.submittedData.push({ ...this.Form.value });
     this.Form.reset();
-  
   }
 
- 
   openCreateUser() {
     this.Form.reset();
     this.resetErrorFeedback();
@@ -136,7 +134,7 @@ export class AccountsComponent implements OnInit {
       animation: true,
     });
   }
-  
+
   toggleDescription(): void {
     this.showDescription = !this.showDescription;
     this.showHTML = false;
@@ -150,8 +148,6 @@ export class AccountsComponent implements OnInit {
     this.showScript = false;
   }
 
-
-
   toggleScript(): void {
     this.showScript = !this.showScript;
     this.showDescription = false;
@@ -160,118 +156,201 @@ export class AccountsComponent implements OnInit {
 
   onCreateuserSubmit() {
     this.resetErrorFeedback();
-    const parentaccountId = this.Form.value.parentaccountId || null;
-    const photoUrl = this.Form.value.photoUrl || null;
-    const accountname = this.Form.value.accountname || null;
-    const industry = this.Form.value.industry || null;
-    const companySize = this.Form.value.companySize || null;
-    const annualRevenue = this.Form.value.annualRevenue || null;
-    const accountType = this.Form.value.accountType || null;
-    const website = this.Form.value.website || null;
-    const address = this.Form.value.address || null;
-    const city = this.Form.value.city || null;
-    const state = this.Form.value.state || null;
-    const zip = this.Form.value.zip || null;
-    const country = this.Form.value.country || null;
-    const phone = this.Form.value.phone || null;
-    const email = this.Form.value.email || null;
-    const socialMedia = this.Form.value.socialMedia || null;
-    const notes = this.Form.value.notes || null;
-    const source = this.Form.value.source || null;
-    const status = this.Form.value.status || null;
-    
+    const formData: { [key: string]: string | null } = this.Form.value;
 
-    if (this.Form.valid) {
-      const data = {
-        parentaccountId: parentaccountId,
-        photoUrl: photoUrl,
-        accountname: accountname,
-        industry: industry,
-        companySize: companySize,
-        annualRevenue:annualRevenue,
-        accountType: accountType,
-        website: website,
-        address:address,
-        city:city,
-        state:state,
-        zip:zip,
-        country:country,
-        phone:phone,
-        email:email,
-        socialMedia:socialMedia,
-        notes:notes,
-        source:source,
-        status:status,
-      };
-      this.restService.post(API.main.account, data).subscribe({
-        next: (response: any) => {
-          console.log(response);
+    const data = Object.entries(formData)
+      .filter(([_, value]) => value !== null)
+      .reduce((acc, [key, value]) => {
+        if (value !== null) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as { [key: string]: string });
 
-          this.offcanvasService.dismiss();
-          this.notifService.showSuccess('User Added Successfully.');
-          this.getAccounts();
-          this.changeDetectorRef.detectChanges();
-          
-        },
-        error: (error) => {
-          console.error(error);
-          this.notifService.showError(error.error.message);
-        },
-      });
-    } else {
-      if (parentaccountId.length <= 0) {
-        this.errorFeedback.name = 'Name required.';
-      }
-      if (photoUrl.length <= 0) {
-        this.errorFeedback.email = 'photoUrl required.';
-      }
-      if (accountname.length <= 0) {
-        this.errorFeedback.password = 'accountname required.';
-      }
-      if (industry.length <= 0) {
-        this.errorFeedback.password = 'indusrty required.';
-      }
-      if (accountname.length <= 0) {
-        this.errorFeedback.password = 'accountname required.';
-      }
-  
-      
-    }
+    console.log(data);
+
+    this.restService.post(API.main.account, data).subscribe({
+      next: (response: any) => {
+        console.log(response);
+
+        this.offcanvasService.dismiss();
+        this.notifService.showSuccess('Accounts Added Successfully.');
+        this.getAccounts();
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (error) => {
+        console.error(error);
+        this.notifService.showError(error.error.message);
+      },
+    });
   }
 
+  openUpdateUser(data: any) {
+    this.user = data; // Store the selected user data
+    this.Form.reset();
+    console.log(data);
+    
+    this.Form.get('parentAccountId')?.setValue(data?.parentAccountId);
+    this.Form.get('accountName')?.setValue(data?.accountName);
+    this.Form.get('industry')?.setValue(data?.industry);
+    this.Form.get('companySize')?.setValue(data?.companySize);
+    this.Form.get('annualRevenue')?.setValue(data?.annualRevenue);
+    this.Form.get('accountType')?.setValue(data?.accountType);
+    this.Form.get('website')?.setValue(data?.website);
+    this.Form.get('address')?.setValue(data?.address);
+    this.Form.get('city')?.setValue(data?.city);
+    this.Form.get('state')?.setValue(data?.state);
+    this.Form.get('zip')?.setValue(data?.zip);
+    this.Form.get('country')?.setValue(data?.country);
+    this.Form.get('phone')?.setValue(data?.phone);
+    this.Form.get('email')?.setValue(data?.email);
+    this.Form.get('socialMedia')?.setValue(data?.socialMedia);
+    this.Form.get('notes')?.setValue(data?.notes);
+    this.Form.get('source')?.setValue(data?.source);
+    this.Form.get('status')?.setValue(data?.status);
 
-  openUpdateUser(user: any) {
-  this.user = user; // Store the selected user data
-  this.Form.reset();
-  this.resetErrorFeedback();
-  this.Form.patchValue(user); // Pre-fill the form with the user data
-  this.offcanvasService.open(this.updateUserOffcanvas, {
-    position: 'end',
-    backdrop: 'static',
-    panelClass: 'visible',
-    animation: true,
-  });
-}
+  console.log(this.Form);
+  
+    this.resetErrorFeedback();
+    this.offcanvasService.open(this.updateUserOffcanvas, {
+      position: 'end',
+      backdrop: 'static',
+      panelClass: 'visible',
+      animation: true,
+    });
+  }
 
   onUpdateuserSubmit(): void {
-    if (this.Form.valid) {
-      const updatedUserData = this.Form.value;
-      // Implement your update logic using updatedUserData
-      console.log('Updated User Data:', updatedUserData);
+    const updateAccountFields: any[] = [];
+    if (this.Form.get('accountName')?.value) {
+      updateAccountFields.push({
+        label: 'Account Name',
+        value: this.Form.value.accountName,
+      });
+    }
+    if (this.Form.get('industry')?.value) {
+      updateAccountFields.push({
+        label: 'Industry',
+        value: this.Form.value.industry,
+      });
+    }
+    if (this.Form.get('companySize')?.value) {
+      updateAccountFields.push({
+        label: 'Company Size',
+        value: this.Form.value.companySize,
+      });
+    }
+    if (this.Form.get('annualRevenue')?.value) {
+      updateAccountFields.push({
+        label: 'Annual Revenue',
+        value: this.Form.value.annualRevenue,
+      });
+    }
+    if (this.Form.get('accountType')?.value) {
+      updateAccountFields.push({
+        label: 'AccountType',
+        value: this.Form.value.accountType,
+      });
+    }
+    if (this.Form.get('website')?.value) {
+      updateAccountFields.push({
+        label: 'Website',
+        value: this.Form.value.website,
+      });
+    }
+    if (this.Form.get('address')?.value) {
+      updateAccountFields.push({
+        label: 'Address',
+        value: this.Form.value.address,
+      });
+    }
+    if (this.Form.get('city')?.value) {
+      updateAccountFields.push({
+        label: 'City',
+        value: this.Form.value.city,
+      });
+    }
+    if (this.Form.get('state')?.value) {
+      updateAccountFields.push({
+        label: 'state',
+        value: this.Form.value.state,
+      });
+    }
+    if (this.Form.get('zip')?.value) {
+      updateAccountFields.push({
+        label: 'Zip',
+        value: this.Form.value.zip,
+      });
+    }
+    if (this.Form.get('country')?.value) {
+      updateAccountFields.push({
+        label: 'Country',
+        value: this.Form.value.country,
+      });
+    }
+    if (this.Form.get('phone')?.value) {
+      updateAccountFields.push({
+        label: 'Phone',
+        value: this.Form.value.phone,
+      });
+    }
 
-      // Close the offcanvas
+    if (this.Form.get('socialMedia')?.value) {
+      updateAccountFields.push({
+        label: 'SocialMedia',
+        value: this.Form.value.socialMedia,
+      });
+    }
+    if (this.Form.get('notes')?.value) {
+      updateAccountFields.push({
+        label: 'Notes',
+        value: this.Form.value.notes,
+      });
+    }
+    if (this.Form.get('source')?.value) {
+      updateAccountFields.push({
+        label: 'Source',
+        value: this.Form.value.source,
+      });
+    }
+    if (this.Form.get('status')?.value) {
+      updateAccountFields.push({
+        label: 'Status',
+        value: this.Form.value.status,
+      });
+    }
+    if (this.Form.valid) {
+      const updatedAccountData = {
+        accountName: this.Form.value.accountName,
+        email: this.Form.value.email,
+        phone: this.Form.value.phone,
+        updateAccountFields, 
+      };
+      this.restService
+        .patch(API.main.account, this.user.id, updatedAccountData)
+        .subscribe(
+          (response: any) => {
+            console.log(response);
+            this.notifService.showSuccess('Account Updated Successfully.');
+            this.getAccounts();
+          },
+          (error) => {
+            console.error(error);
+            this.notifService.showError(
+              'Something Went Wrong! Try Again Later',
+            );
+          },
+        );
       this.offcanvasService.dismiss();
-      // Reset the form after submission
       this.Form.reset();
     } else {
-      // Mark form controls as touched to display validation errors
       this.Form.markAllAsTouched();
     }
-  }
+}
 
 
-  delete = (user: any) => {
-    this.user = user;
+  delete = (data: any) => {
+    this.user = data;
 
     this.sweetAlertService.warning(
       'Delete user',
@@ -279,13 +358,11 @@ export class AccountsComponent implements OnInit {
       ['Delete', 'Cancel'],
       (confirm: any) => {
         if (confirm.isConfirmed) {
-          this.confirmDelete();
+          this.confirmDelete(data);
         }
       },
     );
   };
-
-
 
   closeModal = () => {
     this.user = {};
@@ -293,11 +370,13 @@ export class AccountsComponent implements OnInit {
     this.modalService.dismissAll();
   };
 
-  confirmDelete = () => {
-    this.restService.delete(API.main.orgUser, this.user.id).subscribe(
+  confirmDelete = (data: any) => {
+    this.restService.delete(API.main.account, data.id).subscribe(
       (response: any) => {
-        this.notifService.showSuccess('User Deleted Successfully.');
+        this.notifService.showSuccess('Accounts Deleted Successfully.');
         this.closeModal();
+        console.log(this.user);
+        this.getAccounts()
       },
       (error) => {
         console.error(error);
@@ -310,8 +389,6 @@ export class AccountsComponent implements OnInit {
     this.currentPage = pageNumber;
     this.getAccounts(pageNumber);
   }
-
-
 
   resetErrorFeedback() {
     let keys = Object.keys(this.errorFeedback);
