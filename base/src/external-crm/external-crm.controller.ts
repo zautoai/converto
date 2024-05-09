@@ -72,6 +72,15 @@ export class ExternalCrmController {
     return await this.externalCrmService.getProfile(orgId, crmAuthDto);
   }
 
+  @Get('auto-mapping/:crm_name/:object_type')
+  async getAutoMapping(@Param('crm_name') crmName: string,  @Param('object_type') objectType:string,@Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    return await this.externalCrmService.getAutoMapping(orgId, crmName, objectType)
+  }
+
   @Delete('revoke/:crm_name')
   async revoke(@Param('crm_name') crmName: string, @Req() request: ZautoRequest) {
     const orgId = request.user.org.id;

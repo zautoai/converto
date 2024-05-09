@@ -11,9 +11,16 @@ import { CommonModule } from 'src/common/common.module';
 import { EndOfConversationService } from './services/endconversation.service';
 import { CalendarObsorverService } from './services/calendar-obsorver.service';
 import { StarterGeneratorService } from './services/starters-generator.service';
+import { MapperService } from './services/mapper.service';
+import { ContactsModule } from 'src/contacts/contacts.module';
 
 @Module({
-  imports: [LlmModule, PrismaModule, HelpersModule, CommonModule],
+  imports: [
+    LlmModule, 
+    PrismaModule, 
+    HelpersModule, 
+    CommonModule,
+  ],
   providers: [
     LeadObsorverService, 
     SummarizerService,
@@ -22,13 +29,15 @@ import { StarterGeneratorService } from './services/starters-generator.service';
     CTASelectorService,
     EndOfConversationService,
     CalendarObsorverService,
-    StarterGeneratorService
+    StarterGeneratorService,
+    MapperService
   ],
   exports: [
     SummarizerService,
     PageGreeterService,
     CTACreatorService,
-    StarterGeneratorService
+    StarterGeneratorService,
+    MapperService
   ]
 })
 export class AssistantsModule {}
