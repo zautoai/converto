@@ -1,0 +1,36 @@
+<div class="card  fixed-vh shadow-sm">
+    <div class="card-header border border-bottom-0">
+        <div class="col-6">
+            <h5 class="card-title">{{title}}</h5>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <ng-content select="buttons"></ng-content>
+        </div>
+
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-bordered align-middlet ">
+                <thead class="table-primary ">
+                    <tr>
+                        <ng-container *ngFor="let column of columns">
+                            <th *ngIf="!column.headerTemplate" [style.width]="column.width" [style.text-align]="column.align || 'left'">{{ column.header }}</th>
+                            <th *ngIf="column.headerTemplate" [ngTemplateOutlet]="column.headerTemplate"></th>
+                        </ng-container>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let row of data">
+                        <ng-container *ngFor="let column of columns">
+                            <td *ngIf="!column.cellTemplate" [style.width]="column.width" [style.text-align]="column.align || 'left'">{{ row[column.field] }}</td>
+                            <td *ngIf="column.cellTemplate" [ngTemplateOutlet]="column.cellTemplate" [ngTemplateOutletContext]="{ $implicit: row }"></td>
+                        </ng-container>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer">
+        <ng-content select="footer"></ng-content>
+    </div>
+</div>

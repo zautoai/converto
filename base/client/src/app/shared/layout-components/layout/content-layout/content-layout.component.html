@@ -1,0 +1,29 @@
+<div class="horizontalMenucontainer">
+    <div class="page">
+      <div class="page-main">
+        <!-- // header -->
+        <app-header></app-header>
+        <!-- //sidebar -->
+        <app-sidebar appHoverEffectSidebar></app-sidebar>
+        <div class="jumps-prevent" style="padding-top: 74px;"></div>
+        <div class="app-content main-content position-relative">
+          <!-- <app-loader></app-loader> -->
+           <div class="side-app"[ngClass]="{ 'pt-60': scrolled }">
+            <div class="main-container container-fluid" id="custom-main-container" (click)="toggleSwitcherBody()">
+
+              <!-- // contetnt  -->
+              <router-outlet *ngIf="isLayoutReady"> 
+                <!-- <app-chatbot></app-chatbot> -->
+              </router-outlet>
+          </div>
+        </div>
+      </div>
+      <app-right-sidebar></app-right-sidebar>
+      <app-footer></app-footer>
+    </div>
+    </div>
+  <app-tab-to-top></app-tab-to-top> 
+  <audio #adminAudioPlayer>
+    <source src="assets/audio/customerrequest.mp3">
+</audio>
+</div>

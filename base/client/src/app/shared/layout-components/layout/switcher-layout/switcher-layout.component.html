@@ -1,0 +1,37 @@
+<!-- <div class="main-body app sidebar-mini" [ngClass]="mainSidebarOpen"> -->
+  <div class="horizontalMenucontainer">
+    <!-- <app-switcher></app-switcher> -->
+    <!-- Page -->
+    <div class="page">
+      <!-- // header -->
+      <app-header-switcher> </app-header-switcher>
+      <!-- main-sidemenu -->
+      <app-sidebar appHoverEffectSidebar></app-sidebar>
+      <!-- main-sidemenu -->
+      <div class="jumps-prevent" style="padding-top: 0px;"></div>
+      <!-- main-content -->
+      <div class="main-content app-content">
+      <div class="side-app">
+        <!-- container -->
+        <div class="main-container container-fluid" id="custom-main-container" >
+          <router-outlet>
+            <app-loader></app-loader>
+          </router-outlet>
+        </div>
+        <!-- /Container -->
+        </div>
+      </div>
+      <!-- /main-content -->
+
+      <!-- Sidebar-right-->
+      <app-right-sidebar></app-right-sidebar>
+      <!--/Sidebar-right-->
+
+      <!-- Footer opened -->
+      <app-footer></app-footer>
+      <!-- Footer closed -->
+
+    </div>
+    <!-- End Page -->
+  </div>
+  <!-- </div> -->

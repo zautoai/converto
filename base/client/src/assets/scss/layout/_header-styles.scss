@@ -1,0 +1,171 @@
+.light-header {
+    .app-header {
+        background-color: $white;
+    }
+    .collapse:not(.show) {
+        background: $white;
+    }
+    .header-icon {
+        color: $color;
+    }
+    .header .form-inline .form-control {
+        border: 1px solid $border;
+        color: $color !important;
+        &::placeholder {
+            color: #bfbfbf !important;
+        }
+    }
+    .header .form-inline .btn i {
+        color: $color;
+    }
+    .navbar-toggler {
+        color: $color;
+    }
+    .header.top-header {
+        border-bottom: 1px solid $border;
+    }
+    @media (max-width: 991px) {
+        .responsive-navbar.navbar .navbar-collapse {
+            background: $white;
+        }
+        .header .form-inline .search-element .form-control {
+            border-color: transparent;
+            color: $color !important;
+            background: $white;
+        }
+        .header-brand .header-brand-img {
+            &.desktop-lgo {
+                display: block;
+            }
+            &.dark-logo, &.mobile-logo, &.darkmobile-logo {
+                display: none;
+            }
+        }
+    }
+    @media (min-width: 992px) {
+        .horizontalMenucontainer .header-brand-img {
+            &.desktop-lgo {
+                display: block;
+            }
+            &.mobile-logo, &.darkmobile-logo, &.dark-logo {
+                display: none;
+            }
+        }
+    }
+}
+
+.color-header {
+    .app-header {
+        background-color: $primary;
+    }
+    .collapse:not(.show) {
+        background: $primary;
+    }
+    .header-icon {
+        color: $white;
+    }
+    .header .form-inline .form-control {
+        background-color: transparent;
+        border: 1px solid $white-2;
+        color: $white !important;
+        &::placeholder {
+            color: $white-5 !important;
+        }
+    }
+    .header .form-inline .btn i {
+        color: $white;
+    }
+    .navbar-toggler {
+        color: $white;
+    }
+    .header.top-header {
+        border-bottom: 1px solid $white-2;
+        background-color: $primary;
+    }
+    @media (max-width: 991px) {
+        .responsive-navbar.navbar .navbar-collapse {
+            background: $primary;
+        }
+        .header .form-inline .search-element .form-control {
+            background: transparent;
+            border-color: $white-1;
+            color: $white !important;
+        }
+        .header-brand .header-brand-img {
+            &.dark-logo {
+                display: block;
+            }
+            &.desktop-lgo, &.mobile-logo, &.darkmobile-logo {
+                display: none;
+            }
+        }
+    }
+    @media (min-width: 992px) {
+        .horizontalMenucontainer .header-brand-img {
+            &.dark-logo {
+                display: block;
+            }
+            &.mobile-logo, &.darkmobile-logo, &.desktop-lgo {
+                display: none;
+            }
+        }
+    }
+}
+
+.dark-header {
+    .app-header {
+        background-color: $dark-theme;
+    }
+    .collapse:not(.show) {
+        background: $dark-theme;
+    }
+    .header-icon {
+        color: $dark-color;
+    }
+    .header .form-inline .form-control {
+        background-color: transparent;
+        border: 1px solid $dark-border;
+        color: $dark-color !important;
+        &::placeholder {
+            color: $white-5 !important;
+        }
+    }
+    .header .form-inline .btn i {
+        color: $dark-color;
+    }
+    .navbar-toggler {
+        color: $dark-color;
+    }
+    .header.top-header {
+        border-bottom: 1px solid $dark-border;
+        background-color: $dark-theme;
+    }
+    @media (max-width: 991px) {
+        .responsive-navbar.navbar .navbar-collapse {
+            background: $dark-theme;
+        }
+        .header .form-inline .search-element .form-control {
+            background: $dark-theme;
+            border-color: $dark-border;
+            color: $dark-color !important;
+        }
+        .header-brand .header-brand-img {
+            &.dark-logo {
+                display: block;
+            }
+            &.desktop-lgo, &.mobile-logo, &.darkmobile-logo {
+                display: none;
+            }
+        }
+    }
+    @media (min-width: 992px) {
+        .horizontalMenucontainer .header-brand-img {
+            &.dark-logo {
+                display: block;
+            }
+            &.mobile-logo, &.darkmobile-logo, &.desktop-lgo {
+                display: none;
+            }
+        }
+    }
+}

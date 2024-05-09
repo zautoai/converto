@@ -1,0 +1,89 @@
+::ng-deep {
+  #glb-loader {
+    display: none;
+  }
+
+  #glb-loader.loaderShow {
+    display: block;
+  }
+
+  #glb-loader {
+    position: fixed;
+    z-index: 50000;
+    background: #060505;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .toast-info .toast-icon {
+    color: blue; /* Or your desired info color */
+  }
+
+  #glb-loader img {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    text-align: center;
+    transform: translateY(-50%);
+  }
+
+  .fixed-vh {
+    height: calc(100vh - 190px);
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .right-line {
+    border-right: 1px #828181 solid;
+  }
+
+  .left-line {
+    border-left: 1px #828181  solid;
+  }
+
+  .bottom-line {
+    border-bottom: 1px #828181  solid;
+  }
+
+  .zauto-card {
+    border-bottom: 1px #828181  solid;
+    padding: 15px;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--primary01);
+    }
+
+    &.active {
+      background: var(--primary01);
+    }
+  }
+
+  .scroll-container-v {
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+
+  .status-loader {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}

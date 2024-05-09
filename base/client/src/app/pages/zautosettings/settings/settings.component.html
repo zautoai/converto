@@ -1,0 +1,56 @@
+<div>
+  <div class="d-flex justify-content-end">
+    <button *ngIf="canEdit" class="btn btn-primary btn-sm me-3" type="submit" [disabled]="!isChanged || isUpdateing"
+      (click)="onSubmit()"><i class="zmdi zmdi-spinner text-white status-loader" *ngIf="isUpdateing"></i>
+      {{!isUpdateing ? 'Save changes' :
+      'Updating'}}</button>
+    <button class="btn btn-primary btn-sm" (click)="toggleEdit()">{{!canEdit?'Edit':'Cancel'}}</button>
+  </div>
+  <div class="row" *ngIf="currentSettings">
+    <div class="col-lg-6">
+
+      <div class="form-group">
+        <label for="displayName">Display name</label>
+        <input type="text" class="form-control" id="displayName" placeholder="Display name" [disabled]="!canEdit"
+          (input)="onChangeAgentData()" [(ngModel)]="currentSettings.displayName">
+      </div>
+
+    </div>
+    <div class="col-lg-6">
+      <div class="form-group">
+        <label for="companyName">Company name</label>
+        <input type="text" id="companyName" class="form-control" placeholder="Company name" [disabled]="!canEdit"
+          (input)="onChangeAgentData()" [(ngModel)]="currentSettings.companyName">
+      </div>
+    </div>
+    <div class="col-lg-12">
+      <div class="form-group">
+        <label for="welcomeMsg">Welcome Message</label>
+        <textarea class="form-control" id="welcomeMsg" rows="3" placeholder="Welcome message" [disabled]="!canEdit"
+          (input)="onChangeAgentData()" [(ngModel)]="currentSettings.welcomeMsg"></textarea>
+      </div>
+    </div>
+    <div class="col-lg-12">
+      <div class="form-group">
+        <label for="companyBusiness">Company bussines </label>
+        <textarea class="form-control" id="companyBusiness" rows="3" placeholder="Company bussines"
+          [disabled]="!canEdit" (input)="onChangeAgentData()" [(ngModel)]="currentSettings.companyBusiness"></textarea>
+      </div>
+    </div>
+
+    <div class="col-lg-12">
+      <div class="form-group">
+        <label for="companyValue">Company value </label>
+        <textarea class="form-control" id="companyValue" rows="3" placeholder="Company value " [disabled]="!canEdit"
+          (input)="onChangeAgentData()" [(ngModel)]="currentSettings.companyValue"></textarea>
+      </div>
+    </div>
+    <div class="col-lg-12">
+      <div class="form-group">
+        <label for="companyPurpouse">Avatar purpose</label>
+        <textarea class="form-control" id="companyPurpouse" rows="3" placeholder="Company purpouse"
+          [disabled]="!canEdit" (input)="onChangeAgentData()" [(ngModel)]="currentSettings.purpouse"></textarea>
+      </div>
+    </div>
+  </div>
+</div>

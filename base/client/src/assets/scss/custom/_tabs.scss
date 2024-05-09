@@ -1,0 +1,108 @@
+.tabs-menu ul li {
+	a {
+		padding: 10px 20px;
+		display: block;
+		border-radius: 3px;
+	}
+
+	.active {
+		color: #fff !important;
+	}
+}
+
+.tabs-menu1 ul li a {
+	padding: 10px 20px;
+	display: block;
+}
+
+.tabs-menu-body {
+	border: 1px solid $border;
+
+	p:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.tab-menu-heading {
+	padding: 20px;
+	border: 1px solid $border;
+	border-bottom: 0;
+}
+
+.tab_wrapper .content_wrapper .tab_content.active p:last-child {
+	margin-bottom: 0;
+}
+
+.tabs-menu2 ul li {
+	a {
+		color: #636262;
+		padding: 10px 20px;
+	}
+
+	.active {
+		font-weight: 600;
+	}
+
+	.fade {
+		color: #eeee;
+	}
+}
+
+@media (max-width: 576px) {
+	.tabs-menu ul li {
+		width: 100%;
+		margin: 15px 15px 0 15px;
+	}
+}
+
+@media (max-width: 480px) {
+	.tabs-menu ul li {
+		width: 100%;
+		margin: 15px 15px 0 15px;
+
+		&:last-child {
+			margin-bottom: 15px;
+		}
+
+		a {
+			width: 100%;
+			border: 1px solid $border;
+		}
+	}
+
+	.tabs-menu1 ul li {
+		width: 100%;
+		margin: 15px 15px 0 15px;
+		border: 1px solid $border;
+
+		&:last-child {
+			margin-bottom: 15px;
+		}
+
+		a {
+			width: 100%;
+		}
+	}
+}
+
+.tab_wrapper>ul li.active {
+	color: #FFF !important;
+}
+
+.tabs-menu.radius-tab ul li a {
+	border-radius: 50px;
+	text-align: center;
+  display: flex;
+}
+
+@media (min-width: 768px) {
+	.vertical-tabs {
+		.tabs-menu ul li a {
+			margin: 3px 0
+		}
+	}
+	.vertical-tabs .tab-menu-heading {
+		border-bottom: 1px solid $border;
+		border-right: 0;
+	}
+}

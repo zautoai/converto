@@ -1,0 +1,21 @@
+.list-container
+{
+    height: 80%;
+    overflow-y: scroll;
+}
+
+.failed {
+  background-color: rgba($color: #F5334F, $alpha: 0.1)
+}
+
+
+.completed
+{
+  background-color: rgba($color: #21C44C, $alpha: 0.1)
+}
+
+.inprogres
+{
+  background-color: rgba($color: #ffe600, $alpha: 0.1)
+
+}

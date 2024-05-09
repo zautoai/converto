@@ -1,0 +1,101 @@
+<div class="row mt-5 fixed-vh">
+    <div class="col-xl-6 col-lg-8 col-md-10 m-auto">
+        <div class="card" *ngIf="!avatar">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fe fe-gitlab"></i> Setup Avatar</h2>
+            </div>
+            <div class="card-body">
+                <form [formGroup]="launchForm" (ngSubmit)="onAvatarCreate()">
+                    <div class="form-group">
+                        <label for="companyName">Company name</label>
+                        <input type="text" class="form-control" id="companyName" placeholder="Company name"
+                            formControlName="companyName"
+                            [class.is-invalid]="isFieldValid('companyName')  || errorFeedback.companyName.length > 0">
+                        <div class="invalid-feedback">{{errorFeedback.companyName}}</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="websiteUrl">Website URL</label>
+                        <input type="text" class="form-control" id="websiteUrl"
+                            placeholder="URL e.g: https://zautoai.com" formControlName="siteUrl"
+                            [class.is-invalid]="isFieldValid('siteUrl')  || errorFeedback.siteUrl.length > 0">
+                        <div class="invalid-feedback">{{errorFeedback.siteUrl}}</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="avatarName">Avatar name</label>
+                        <input type="text" class="form-control" id="avatarName" placeholder="Avatar name"
+                            formControlName="avatarName" (input)="checkAvatarName($event)"
+                            [class.is-invalid]="isFieldValid('avatarName') || errorFeedback.avatarName.length > 0 || !isAvatarNameValid">
+                        <div class="invalid-feedback">{{errorFeedback.avatarName}}</div>
+                    </div>
+                    <button class="btn btn-primary btn-block mt-3" type="submit" [disabled]="isSubmitting">
+                        <ng-container *ngIf="!isSubmitting; else spinner">
+                            Create Avatar
+                        </ng-container>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="card" *ngIf="false">
+            <div class="card-header text-center">
+                <h2 class="card-title"><i class="fe fe-gitlab"></i> Avatar status</h2>
+            </div>
+            <div class="card-body">
+                <circle-progress class="mx-auto chart-circle chart-circle-md mt-3 mb-4 text-center"
+                    [percent]="trainingProgress" [radius]="100" [space]="-14" [outerStrokeWidth]="14"
+                    [innerStrokeWidth]="14" [showInnerStroke]="true" [outerStrokeColor]="'#9752FC '" titleFontSize="50"
+                    unitsFontSize="50" [startFromZero]="false" [innerStrokeColor]="'#edf0f5'" [showTitle]="true"
+                    [showUnits]="true" [showSubtitle]="false" [animation]="true" [animationDuration]="1000">
+                </circle-progress>
+                <div class="text-center mt-3 ">
+                    <h3 class="mb-0">{{avatar.displayName}}</h3>
+                    <h5 class="text-muted">{{avatar.name}}</h5>
+                    <h4>{{avatar.companyName}}</h4>
+                    <p class="mb-4"><i class="fa fa-spinner text-muted status-loader"
+                            *ngIf="avatar.status == 'TRAINING'"></i> {{avatar.message}}</p>
+                    <div><span class="badge badge-{{getStatusColor(avatar.status)}}">{{avatar.status}}</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow" *ngIf="avatar">
+            <div class="card-body status_card position-relative">
+                <div class="progress_card">
+                    <circle-progress class="chart-circle chart-circle-md text-center w-100 h-100"
+                        [percent]="trainingProgress" [radius]="100" [space]="-14" [outerStrokeWidth]="14"
+                        [titleColor]="'#edf0f5'" [unitsColor]="'#edf0f5'" [innerStrokeWidth]="14"
+                        [showInnerStroke]="true" [outerStrokeColor]="'#edf0f5'" titleFontSize="50" unitsFontSize="50"
+                        [startFromZero]="false" [titleFontWeight]="'700'" [unitsFontWeight]="'700'"
+                        [innerStrokeColor]="'#622c9e'" [showTitle]="true" [showUnits]="true" [showSubtitle]="false"
+                        [animation]="true" [animationDuration]="1000" [renderOnClick]="false">
+                    </circle-progress>
+                </div>
+                <div class="card_detail">
+                    <div class="d-flex h-100 mb-3">
+                        <div class="main-img-user avatar-lg me-2 my-auto">
+                            <img alt="avatar" class="rounded-circle" src="{{GLOBAL_IMAGES.default_avatar_image}}">
+                        </div>
+                        <div class="">
+                            <h1 class="mb-0 text-truncate">{{avatar.displayName}}</h1>
+                            <h4 class="text-muted text-truncate mb-0">{{avatar.name}}</h4>
+                        </div>
+                    </div>
+                    <h4><i class="fa fa-building-o"></i> {{avatar.companyName}}</h4>
+                    <div class="d-flex">
+                        <span class="badge badge-{{getStatusColor(avatar.status)}} mb-2 text-truncate my-auto me-2"
+                            style="font-size: 0.8rem;">{{avatar.status}}</span>
+                        <button *ngIf="avatar.status=='TRAININGFAILED'" class="btn btn-outline-primary btn-sm"
+                            (click)="deleteAvatar()"><i class="fa fa-refresh"></i> Retrain</button>
+                    </div>
+                    <p class="mb-4 text-truncate" style="font-size: 1rem !important;"><i
+                            class="fa fa-spinner text-muted status-loader " *ngIf="avatar.status == 'TRAINING'"></i> <i
+                            class="text-muted">{{avatar.message}}</i></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #spinner>
+    <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden" role="status">Loading...</span>
+    </div>
+</ng-template>
