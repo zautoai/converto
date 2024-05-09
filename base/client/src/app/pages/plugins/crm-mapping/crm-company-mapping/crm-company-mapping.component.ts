@@ -48,7 +48,25 @@ export class CrmCompanyMappingComponent implements OnInit{
     this.isLoading = true;
     this.restService.getAll(API.main.external_crm + `/fields/${this.crmName}/Company`).subscribe((res:any) => {
       this.externalCrmFields = [...res];      
+      this.isLoading = false;      
+    },
+    err => {
+      console.log(err);
       this.isLoading = false;
+    });
+  }
+
+  private getAutoMapping()
+  {
+    if(!this.crmName) return;
+    this.isLoading = true;
+    this.restService.getAll(API.main.external_crm + `/auto-mapping/${this.crmName}/Company`).subscribe((res:any) => {
+      const mappings = {...res};
+      this.isLoading = false;
+      for(const key of Object.keys(mappings) as any)
+      {
+        this.selectedOptions[key] = mappings[key];
+      }      
     },
     err => {
       console.log(err);
@@ -58,7 +76,12 @@ export class CrmCompanyMappingComponent implements OnInit{
 
   getMappingData() {
     this.restService.getAll(API.main.external_crm + `/mappings/${this.crmName as string}/Company`).subscribe((res:any) => {
-      this.handleMapping( res || []);
+      const mappings = res || []
+      this.handleMapping(mappings);
+      if(mappings.length <= 0)
+      {
+        this.getAutoMapping();
+      }
     });
   }
 
