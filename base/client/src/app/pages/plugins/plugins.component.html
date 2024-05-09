@@ -27,6 +27,26 @@
     </div>
     <hr class="m-0">
     <div class="offcanvas-body p-0">
-        <app-crm-mapping [crmName]="crmName"></app-crm-mapping>
+        <div class="panel panel-primary">
+            <div class="tab-menu-heading">
+                <div class="tabs-menu1">
+                    <ul ngbNav #nav="ngbNav" class="panel-tabs nav">
+                        <li [ngbNavItem]="1">
+                            <button ngbNavLink>Contact</button>
+                            <ng-template ngbNavContent>
+                                <app-crm-contact-mapping [crmName]="crmName" (onCancel)="offcanvas.dismiss()"></app-crm-contact-mapping>
+                            </ng-template>
+                        </li>
+                        <li [ngbNavItem]="2">
+                            <button ngbNavLink>Company</button>
+                            <ng-template ngbNavContent>
+                                <app-crm-company-mapping [crmName]="crmName" (onCancel)="offcanvas.dismiss()"></app-crm-company-mapping>
+                            </ng-template>
+                        </li>
+                    </ul>
+                </div>
+                <div [ngbNavOutlet]="nav" class="p-0"></div>
+            </div>
+        </div>
     </div>
 </ng-template>

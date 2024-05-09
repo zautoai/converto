@@ -30,4 +30,8 @@ export class AccountsService extends BaseService{
   async remove(orgId: string, id: string) {
     return this.handleException(await this.accountService.deleteAccount(orgId, id));
   }
+
+  async getFields(orgId: string) {
+    return this.handleException(await this.accountService.getAccountField(orgId));
+  }
 }

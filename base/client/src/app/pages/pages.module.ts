@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { PagesRoutingModule } from './pages-routing.module';
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { ZautoDashboardComponent } from './dashboard/dashboard.component';
 import { SharedModule } from '../shared/shared.module';
@@ -119,7 +120,8 @@ import { ContactsComponent } from './contacts/contacts.component';
     ProgressCardComponent,
     PluginsComponent,
     PluginCardComponent,
-    CrmMappingComponent
+    CrmContactMappingComponent,
+    CrmCompanyMappingComponent
   ],
   imports: [
     CommonModule,
@@ -142,6 +144,7 @@ import { ContactsComponent } from './contacts/contacts.component';
     NgxColorsModule,
     NgApexchartsModule,
     NgbProgressbarModule,
+    NgbNavModule
   ],
 })
 export class PagesModule {}

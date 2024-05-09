@@ -6,11 +6,12 @@
         </tr>
     </thead>
     <tbody>
-        @for (item of contactFields; track $index) {
+        @for (item of companyFields; track $index) {
             <tr>
                 <td><input type="text" class="form-control form-control-sm" disabled [value]="item"></td>
                 <td>
-                    <select class="form-control form-control-sm">
+                    <select class="form-control form-control-sm" [disabled]="isLoading" [(ngModel)]="selectedOptions[item]">
+                        <option [value]="null">N/A</option>
                         @for (opt of externalCrmFields; track $index) {
                             <option [value]="opt.name">{{opt?.label}}</option>
                         }
@@ -20,3 +21,11 @@
         }
     </tbody>
 </table>
+<div class="p-2 row">
+    <div class="col-6">
+        <button class="btn btn-outline-primary w-100" (click)="cancel()" [disabled]="isLoading">Cancel</button>
+    </div>
+    <div class="col-6">
+        <button class="btn btn-primary w-100" (click)="submit()" [disabled]="isLoading">Save</button>
+    </div>
+</div>
