@@ -78,12 +78,15 @@ export class ContactsComponent implements OnInit {
 
   getContacts(page: number = 1, limit: number = 10): void {
     this.restService
-      .getAll(API.main.contact) // Pass pagination parameters to the service
+      .get(API.main.contact,`?limit=${this.itemPerPage}&page=${this.currentPage}`) // Pass pagination parameters to the service
       .subscribe(
         (response: any) => {
           this.submittedData = response.data;
-          this.totalPages = Math.ceil(response.totalCount / limit); // Update data with response from API
+          this.totalPages = Math.ceil(response.totalCount / limit);
+          this.getContacts(); // Update data with response from API
           // Update any other pagination-related properties if necessary
+          console.log(response);
+          
         },
         (error) => {
           console.error(error);
@@ -140,32 +143,7 @@ export class ContactsComponent implements OnInit {
     this.showScript = false;
   }
 
-  deplymentType = DeployScriptType;
 
-  getAgentDeploy(type: DeployScriptType) {
-    const botId = this.avatarService.getAvatarId();
-
-    let script = '';
-    if (type == DeployScriptType.BOTTOM_BAR) {
-      script = `
-      <script type="text/javascript">
-        (function()
-        {
-            var rootElement = document.createElement("div");
-            rootElement.id = "zauto_root";
-            document.body.appendChild(rootElement);
-            d = document; 
-            s = d.createElement("script");     
-            s.async = 1;     
-            s.src = "${API.rootURL}api/agents/widget/${botId}.js";
-            d.getElementsByTagName("head")[0].appendChild(s);
-        })();
-      </script>
-      `;
-    }
-
-    return script;
-  }
 
   toggleScript(): void {
     this.showScript = !this.showScript;
@@ -173,16 +151,17 @@ export class ContactsComponent implements OnInit {
     this.showHTML = false;
   }
 
-  onCreateuserSubmit(formData: any) {
-    const data: any = {};
+  onCreateuserSubmit() {
+    const formData: { [key: string]: string | null } = this.Form.value;
+
 
     for (const key in formData) {
       if (formData.hasOwnProperty(key)) {
-        data[key] = formData[key] || '';
+        formData[key] = formData[key] || '';
       }
     }
 
-    this.restService.post(API.main.orgUser, data).subscribe({
+    this.restService.post(API.main.contact, formData).subscribe({
       next: (response: any) => {
         console.log(response);
         this.offcanvasService.dismiss();
@@ -195,52 +174,48 @@ export class ContactsComponent implements OnInit {
     });
   }
 
-
   onUpdateuserSubmit() {
-    this.resetErrorFeedback(); // Reset error feedback messages
-
     const formData: { [key: string]: any } = this.Form.value; // Get form data
+console.log(formData);
 
-    if (this.Form.valid) { // Check if the form is valid
-        const data: { [key: string]: any } = {}; // Initialize data object
+    if (this.Form.valid) {
+      // Check if the form is valid
+      const data: { [key: string]: any } = {}; // Initialize data object
 
-        // Loop through form data to populate the data object
-        for (const key in formData) {
-            if (formData.hasOwnProperty(key)) {
-                data[key] = formData[key] || ''; // Assign form value to data object or empty string
-            }
+      // Loop through form data to populate the data object
+      for (const key in formData) {
+        if (formData.hasOwnProperty(key)) {
+          data[key] = formData[key] || ''; // Assign form value to data object or empty string
         }
+      }
 
-        console.log('Form value:', this.Form.value);
-        console.log('Data to be patched:', data); // Log data before making the API call
+      console.log('Form value:', this.Form.value);
+      console.log('Data to be patched:', data); // Log data before making the API call
 
-        // Make PATCH request to update user data
-        this.restService.patch(API.main.contact, this.user.id, data).subscribe({
-            next: (response: any) => {
-                console.log('Patch response:', response); // Log API response
-                this.offcanvasService.dismiss(); // Dismiss the offcanvas
-                this.notifService.showSuccess('User Updated Successfully.'); // Show success notification
-            },
-            error: (error) => {
-                console.error('Patch error:', error); // Log API error
-                this.notifService.showError(error.error.message); // Show error notification
-            },
-        });
+      // Make PATCH request to update user data
+      this.restService.patch(API.main.contact, this.user.id, data).subscribe({
+        next: (response: any) => {
+          console.log('Patch response:', response); // Log API response
+          this.offcanvasService.dismiss(); // Dismiss the offcanvas
+          this.notifService.showSuccess('User Updated Successfully.'); // Show success notification
+        },
+        error: (error) => {
+          console.error('Patch error:', error); // Log API error
+          this.notifService.showError(error.error.message); // Show error notification
+        },
+      });
     } else {
-        
-        Object.keys(formData).forEach((key) => {
-            if (formData[key].trim().length <= 0) {
-                this.errorFeedback[key] = `${key} is required.`;
-            }
-        });
+      Object.keys(formData).forEach((key) => {
+        if (formData[key].trim().length <= 0) {
+          this.errorFeedback[key] = `${key} is required.`;
+        }
+      });
     }
-}
-
+  }
 
   openUpdateUser(user: any) {
-    this.user = user; // Store the selected user data
+    this.selectedData = user; // Store the selected user data
     this.Form.reset();
-    this.resetErrorFeedback();
     this.Form.patchValue(user); // Pre-fill the form with the user data
     this.offcanvasService.open(this.updateUserOffcanvas, {
       position: 'end',
@@ -249,37 +224,6 @@ export class ContactsComponent implements OnInit {
       animation: true,
     });
   }
-
-  // onUpdateuserSubmit(): void {
-  //   if (this.Form.valid && this.selectedData) {
-  //     const updatedUserData = this.Form.value;
-  //     // Assuming this.selectedData contains the ID of the selected user
-  //     this.restService.put(API.main.contact, this.selectedData.id, updatedUserData)
-  //       .subscribe({
-  //         next: (response: any) => {
-  //           console.log(response);
-  //           // Close the offcanvas
-  //           this.offcanvasService.dismiss();
-  //           // Reset the form after submission
-  //           this.Form.reset();
-  //           // Optionally, update the user list or perform any necessary actions
-  //           this.getContacts(this.currentPage);
-  //           // Show a success notification
-  //           this.notifService.showSuccess('User Updated Successfully.');
-  //         },
-  //         error: (error) => {
-  //           console.error(error);
-  //           // Show an error notification if the update fails
-  //           this.notifService.showError(error.error.message);
-  //         },
-  //       });
-  //   } else {
-  //     // Mark form controls as touched to display validation errors
-  //     this.Form.markAllAsTouched();
-  //   }
-  // }
-
-
 
   delete = (data: any) => {
     this.user = data;
@@ -296,14 +240,13 @@ export class ContactsComponent implements OnInit {
     );
   };
 
-
   confirmDelete = (data: any) => {
     this.restService.delete(API.main.contact, data.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Accounts Deleted Successfully.');
         this.closeModal();
         console.log(this.user);
-        this.getContacts()
+        this.getContacts();
       },
       (error) => {
         console.error(error);
@@ -311,7 +254,6 @@ export class ContactsComponent implements OnInit {
       },
     );
   };
-
 
   onSubmit = (userForm: any) => {
     this.modalService.dismissAll();
