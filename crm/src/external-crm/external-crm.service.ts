@@ -55,26 +55,6 @@ export class ExternalCrmService implements OnModuleInit{
         return fields;
     }
 
-    async getCompanyFields(orgId:string, crmName:string)
-    {
-        const crm = this.crmProvider.getCRM(crmName);
-        const fields = await crm.getCompanyProperties(orgId);
-        return fields;
-    }
-
-    async getCrmFields(orgId:string, crmName:string, objectType:string)
-    {
-        switch(objectType)
-        {
-            case ObjectType.CONTACT:
-                return await this.getContactFields(orgId, crmName);
-            case ObjectType.COMPANY:
-                return await this.getCompanyFields(orgId, crmName);
-            default:
-                return [];
-        }
-    }
-
     async getContacts(orgId:string, crmName:string): Promise<any> {
         const crm = this.crmProvider.getCRM(crmName);
         const contacts = await crm.getContacts(orgId);
@@ -144,15 +124,15 @@ export class ExternalCrmService implements OnModuleInit{
         return company;
     }
 
-    async getMappingsByCrmName(orgId:string, crmName: string,object_type:string)
+    async getMappingsByCrmName(orgId:string, crmName: string)
     {
-        return await this.mappingService.getMappingsByCrmName(orgId, crmName, object_type);
+        return await this.mappingService.getMappingsByCrmName(orgId, crmName);
     }
     async createMappings(orgId:string, createCRMMappingsDto:CreateCRMMappingsDto): Promise<any> {
         for(const _mapping of createCRMMappingsDto.mappings) {
             const mapping = await this.mappingService.getMappingByCrmNameAndObjectTypeAndField(orgId, _mapping.crmName, _mapping.objectType, _mapping.fieldName);
             if(mapping){
-                if(_mapping.externalCRMFieldName == null || _mapping.externalCRMFieldName === 'null')
+                if(_mapping.externalCRMFieldName == null)
                 {
                     await this.mappingService.deleteMapping(orgId, mapping.id);
                 }

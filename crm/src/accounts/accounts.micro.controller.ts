@@ -57,12 +57,4 @@ export class AccountsMicroController {
       return error.response || error;
     }
   }
-  @MessagePattern({ cmd: 'GET_ACCOUNT_FIELDS' })
-  async get_contact_fields(data: { orgId: string }) {
-    try {
-      return await this.accountService.getAccountFields(data.orgId);
-    } catch (error) {
-      return error.response || error;
-    }
-  }
 }

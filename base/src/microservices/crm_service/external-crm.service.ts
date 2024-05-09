@@ -32,10 +32,10 @@ export class ExternalCrmMicroService {
         }
     }
 
-    async getMappings(orgId: string, crmName: string, objectType: string) {
+    async getMappings(orgId: string, crmName: string) {
         try {
             this.logger.log(`Getting mappings`)
-            return this.CRMClient.send({ cmd: 'GET_MAPPINGS' }, { orgId, crmName, objectType }).toPromise()
+            return this.CRMClient.send({ cmd: 'GET_MAPPINGS' }, { orgId, crmName }).toPromise()
         }
         catch (error) {
             this.logger.error('Error in getting mappings')
@@ -54,10 +54,10 @@ export class ExternalCrmMicroService {
         }
     }
 
-    async getFields(orgId: string, crmName: string, objectType:string) {
+    async getFields(orgId: string, crmName: string) {
         try {
             this.logger.log('Getting Fields')
-            return this.CRMClient.send({ cmd: 'GET_CRM_FIELDS' }, { orgId, crmName, objectType }).toPromise()
+            return this.CRMClient.send({ cmd: 'GET_CRM_CONTACT_FIELDS' }, { orgId, crmName }).toPromise()
         }
         catch (error) {
             this.logger.error('Error in getting fields')

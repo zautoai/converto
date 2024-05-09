@@ -53,15 +53,6 @@ export class AccountsController {
     return await this.accountsService.findAll(orgId, filterDto);
   }
 
-  @Get('fields')
-  async getFields(@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
-    if (!orgId) {
-      throw new UnauthorizedException('Org Id not found');
-    }
-    return await this.accountsService.getFields(orgId);
-  }
-
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
@@ -92,5 +83,4 @@ export class AccountsController {
     }
     return await this.accountsService.remove(orgId, id);
   }
-
 }

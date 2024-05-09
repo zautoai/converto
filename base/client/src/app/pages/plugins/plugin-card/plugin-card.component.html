@@ -16,7 +16,7 @@
         }
         @else {
             <div class="p-3 border border-primary rounded-3 mb-2 d-flex justify-content-between">
-                <span class="text-truncate">{{data.profile?.email}}</span> <a role="button" (click)="revoke()"><i class="fa-solid fa-right-from-bracket"></i></a>
+                <span>{{data.profile?.email}}</span> <a role="button" (click)="revoke()"><i class="fa-solid fa-right-from-bracket"></i></a>
             </div>
         }
         <button class="btn btn-outline-primary btn-block" [disabled]="!data.isConnected" (click)="openMapping()"><i class="fa-solid fa-sitemap"></i> Mappings</button>

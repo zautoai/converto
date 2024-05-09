@@ -60,18 +60,6 @@ export class AccountMicroService extends BaseService{
     }
   }
 
-  async getAccountField(orgId: string) {
-    try {
-      return this.CRMClient.send(
-        { cmd: 'GET_ACCOUNT_FIELDS' },
-        { orgId },
-      ).toPromise();
-    } catch (error) {
-      this.logger.error(`Error while fetching account fields: ${error.message}`);
-      throw error;
-    }
-  }
-
   async updateAccount(
     orgId: string,
     id: string,

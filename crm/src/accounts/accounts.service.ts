@@ -148,14 +148,11 @@ export class AccountsService {
       CustomFieldParent.ACCOUNT,
     );
     const customFields = _customFields.map((field) => field.name);
-    const toEliminate = ["id", "parentAccountId", "createdAt", "modifiedAt"];
-    let fields = [...defaultFields, ...customFields];
-    fields = fields.filter((field) => !toEliminate.includes(field));
+    const fields = [...defaultFields, ...customFields];
     return {
       code: 200,
       message: 'Account fields fetched successfully',
       data: fields,
     };
   }
-
 }

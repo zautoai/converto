@@ -408,9 +408,7 @@ export class ContactsService {
       CustomFieldParent.CONTACT,
     );
     const customFields = _customFields.map((field) => field.name);
-    const toEliminate = ["id", "createdAt", "modifiedAt"];
-    let fields = [...defaultFields, ...customFields];
-    fields = fields.filter((field) => !toEliminate.includes(field));
+    const fields = [...defaultFields, ...customFields];
     return {
       code: 200,
       message: 'Contact fields fetched successfully',

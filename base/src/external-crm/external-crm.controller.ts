@@ -36,13 +36,13 @@ export class ExternalCrmController {
     return await this.externalCrmService.callback(orgId, hubspotCallBackDto);
   }
 
-  @Get('mappings/:crm_name/:object_type')
-  async getMappings(@Param('crm_name') crmName: string, @Param('object_type') object_type: string, @Req() request: ZautoRequest) {
+  @Get('mappings/:crm_name')
+  async getMappings(@Param('crm_name') crmName: string, @Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
-    return await this.externalCrmService.getMappings(orgId, crmName,object_type);
+    return await this.externalCrmService.getMappings(orgId, crmName);
   }
 
   @Post('mappings')
@@ -54,13 +54,13 @@ export class ExternalCrmController {
     return await this.externalCrmService.createMappings(orgId, createCRMMappingsDto);
   }
 
-  @Get('fields/:crm_name/:object_type')
-  async getContactFields(@Param('crm_name') crmName: string,  @Param('object_type') objectType:string,@Req() request: ZautoRequest) {
+  @Get('fields/contacts/:crm_name')
+  async getContactFields(@Param('crm_name') crmName: string, @Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
-    return await this.externalCrmService.getFields(orgId, crmName, objectType)
+    return await this.externalCrmService.getFields(orgId, crmName)
   }
 
   @Get('profile')
@@ -70,15 +70,6 @@ export class ExternalCrmController {
       throw new UnauthorizedException('Org Id not found');
     }
     return await this.externalCrmService.getProfile(orgId, crmAuthDto);
-  }
-
-  @Get('auto-mapping/:crm_name/:object_type')
-  async getAutoMapping(@Param('crm_name') crmName: string,  @Param('object_type') objectType:string,@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
-    if (!orgId) {
-      throw new UnauthorizedException('Org Id not found');
-    }
-    return await this.externalCrmService.getAutoMapping(orgId, crmName, objectType)
   }
 
   @Delete('revoke/:crm_name')
