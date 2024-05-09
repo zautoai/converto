@@ -22,8 +22,8 @@ export class CalendarController {
   }
   
   @Get('callback')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
   async callback(@Query() callBackDto:CallBackDto,@Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
     return await this.calendarService.exchangeCodeForAccessToken(orgId,callBackDto.state,callBackDto.code);

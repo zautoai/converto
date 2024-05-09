@@ -120,9 +120,6 @@ export class NavService implements OnDestroy {
 			title: 'Accounts', icon: 'fa-regular fa-building', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/accounts', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
 		{
-			title: 'Contacts', icon: 'fe fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/leads', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		},
-		{
 			title: 'Contacts', icon: 'fe fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/contacts', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
 		{
