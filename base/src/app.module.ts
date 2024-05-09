@@ -59,6 +59,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { AccountBasedMaretingModule } from './account-based-mareting/account-based-mareting.module';
 import { EnrichmentModule } from './enrichment/enrichment.module';
 import { ExternalCrmModule } from './external-crm/external-crm.module';
+import { CalendarModule } from './calendar/calendar.module';
 
 @Module({
   imports: [
@@ -135,6 +136,7 @@ import { ExternalCrmModule } from './external-crm/external-crm.module';
     AccountBasedMaretingModule,
     EnrichmentModule,
     ExternalCrmModule,
+    CalendarModule,
   ],
   controllers: [AppController],
   providers: [AppService],
