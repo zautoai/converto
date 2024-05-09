@@ -70,7 +70,7 @@ export class OauthService {
         if (!organization) {
             throw new NotFoundException('Organization not found.');
         }
-
+ 
         const { clientId, clientSecret, redirectUri, tokenUrl } = tool;
         try {
             const requestBody = new URLSearchParams({
