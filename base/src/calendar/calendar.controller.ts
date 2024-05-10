@@ -18,12 +18,13 @@ export class CalendarController {
   @ApiBearerAuth()
   async getAuthUrl(@Query() crmAuthDto:CalendarAuthDto,@Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
-    return this.calendarService.getAuthUrl(orgId,crmAuthDto.name,{});
+    const state = crmAuthDto.name;
+    return this.calendarService.getAuthUrl(orgId,crmAuthDto.name,{state});
   }
   
   @Get('callback')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async callback(@Query() callBackDto:CallBackDto,@Req() request: ZautoRequest) {
     const orgId = request.user.org.id;
     return await this.calendarService.exchangeCodeForAccessToken(orgId,callBackDto.state,callBackDto.code);

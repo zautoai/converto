@@ -48,7 +48,7 @@ export class CalendarService {
         try
         {
             const calendar = this.provide.getCalendar(calendarName);
-            return await this.getAccessToken(orgId,calendarName);
+            return await calendar.getAccessToken(orgId);
         }
         catch(err)
         {

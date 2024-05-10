@@ -769,3 +769,14 @@ model availableHours {
 
   AvailabilitySchedule AvailabilitySchedule? @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 }
+
+model ExternalToolCredential {
+  id           String   @id @default(uuid())
+  tokeType     String?
+  refreshToken String
+  accessToken  String
+  expiresIn    Int
+  toolName     String
+  createdAt    DateTime @default(now())
+  modifiedAt   DateTime @updatedAt
+}

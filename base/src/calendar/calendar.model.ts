@@ -1,6 +1,7 @@
-import { Logger } from "@nestjs/common";
+import { Inject, Logger } from "@nestjs/common";
 import { ICalendarConfig } from "./interface/calendar-config.interface";
 import { Token } from "./interface/token.inteface";
+import { AvailabilityScheduleService } from "src/availability-schedule/availability-schedule.service";
 
 
 export abstract class BaseCalendar {
@@ -41,4 +42,16 @@ export abstract class BaseCalendar {
         const expirationTime = modifiedTime + expiresIn;
         return expirationTime < currentTime;
     }
+
+    abstract getCalendar(orgId:string): Promise<any>;
+
+    abstract getEvents(orgId:string): Promise<any>;
+
+    abstract getEventById(orgId:string, id: string): Promise<any>;
+
+    abstract addEvent(orgId:string, event: any): Promise<any>;
+
+    abstract updateEvent(orgId:string, id:string, event:any): Promise<any>;
+
+    abstract removeEvent(orgId:string, id:string): Promise<void>;
 }
