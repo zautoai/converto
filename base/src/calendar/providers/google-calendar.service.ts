@@ -1,13 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { BaseCalendar } from '../calendar.model';
 import { CalendarName } from '../enum/calendar.enum';
 import { Token } from '../interface/token.inteface';
 import { HttpService } from '@nestjs/axios';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { google, Auth } from 'googleapis';
+import { GooglEventDto } from '../dto/google.event.dto';
 
 @Injectable()
-export class GoogleCalendarService extends BaseCalendar{
+export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
 
+
+    private googleClient: Auth.OAuth2Client;
     constructor(
         private readonly httpService:HttpService,
         private readonly prisma: PrismaService
@@ -21,6 +25,15 @@ export class GoogleCalendarService extends BaseCalendar{
             scope: 'profile email https://www.googleapis.com/auth/calendar'
         }
     );
+    }
+
+    async onModuleInit() {
+        // const calendars = await this.getCalendars('a3ccfcf5-4e1c-43bd-a1c1-1e30c236ca26');
+        // const calendar = await this.getCalendar('a3ccfcf5-4e1c-43bd-a1c1-1e30c236ca26','781c5c0a430bb1b48df3d59df73274b7b047589c42ffe3f92abb48d0997474cf@group.calendar.google.com');
+        // const events = await this.getEvents('a3ccfcf5-4e1c-43bd-a1c1-1e30c236ca26','781c5c0a430bb1b48df3d59df73274b7b047589c42ffe3f92abb48d0997474cf@group.calendar.google.com');
+        // const event = await this.getEventById('a3ccfcf5-4e1c-43bd-a1c1-1e30c236ca26','781c5c0a430bb1b48df3d59df73274b7b047589c42ffe3f92abb48d0997474cf@group.calendar.google.com','3d0v10om2t9q3semomq7n871q4');
+        // console.log(event);
+        
     }
 
     getAuthUrl(orgId: string, additionalInfo: any): string {
@@ -91,12 +104,14 @@ export class GoogleCalendarService extends BaseCalendar{
     async handleToken(orgId: string, tokenData: Token): Promise<void> {
         const googleCalendar = await this.prisma.externalToolCredential.findFirst({
             where: {
+                orgId:orgId,
                 toolName: this.calendarName
             }
         })
         if (googleCalendar) {
             await this.prisma.externalToolCredential.update({
                 where: {
+                    orgId: orgId,
                     id: googleCalendar.id
                 },
                 data: {
@@ -109,6 +124,7 @@ export class GoogleCalendarService extends BaseCalendar{
         } else {
             await this.prisma.externalToolCredential.create({
                 data: {
+                    orgId: orgId,
                     toolName: this.calendarName,
                     accessToken: tokenData.access_token,
                     refreshToken: tokenData.refresh_token,
@@ -124,6 +140,7 @@ export class GoogleCalendarService extends BaseCalendar{
         {
             const googleCalendarToken = await this.prisma.externalToolCredential.findFirst({
                 where: {
+                    orgId,
                     toolName: this.calendarName 
                 }
             });
@@ -185,22 +202,158 @@ export class GoogleCalendarService extends BaseCalendar{
         }
     }
 
-    async getCalendar(orgId: string): Promise<any> {
-        throw new Error('Method not implemented.');
+    async getCalendars(orgId: string): Promise<any> {
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            this.googleClient = new google.auth.OAuth2();
+            this.googleClient.setCredentials({
+                access_token: accessToken,
+            });
+            const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
+            const response = await calendar.calendarList.list();
+            return response.data;
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+            throw new Error(err);
+        }
     }
-    async getEvents(orgId: string): Promise<any> {
-        throw new Error('Method not implemented.');
+
+    async getCalendar(orgId: string, id: string): Promise<any> {
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            this.googleClient = new google.auth.OAuth2();
+            this.googleClient.setCredentials({
+                access_token: accessToken,
+            });
+            const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
+            const response = await calendar.calendars.get({
+                calendarId: id,
+            })
+            return response.data;
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+            throw new Error(err);
+        }
     }
-    async getEventById(orgId: string, id: string): Promise<any> {
-        throw new Error('Method not implemented.');
+
+    async getEvents(orgId: string,calendarId:string,startDate?:string, endDate?:string): Promise<any> {
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            this.googleClient = new google.auth.OAuth2();
+            this.googleClient.setCredentials({
+                access_token: accessToken,
+            });
+            const hasBothDate = !!(startDate && endDate);
+            const selectedDate = this.getStartEndTimesForDay(new Date((!hasBothDate && startDate) ? startDate : new Date())); 
+            const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
+            const response = await calendar.events.list({
+                calendarId: calendarId,
+                timeMin: hasBothDate ? startDate : selectedDate.timeMin,
+                timeMax: hasBothDate ? endDate : selectedDate.timeMax
+            });
+            return response.data;
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+            throw new Error(err);
+        }
     }
-    async addEvent(orgId: string, event: any): Promise<any> {
-        throw new Error('Method not implemented.');
+    async getEventById(orgId: string, calendarId: string,eventId:string): Promise<any> {
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            this.googleClient = new google.auth.OAuth2();
+            this.googleClient.setCredentials({
+                access_token: accessToken,
+            });
+            const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
+            const response = await calendar.events.get({
+                calendarId,
+                eventId
+            })
+            return response.data;
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+            throw new Error(err);
+        }
     }
-    async updateEvent(orgId: string, id: string, event: any): Promise<any> {
-        throw new Error('Method not implemented.');
+    async addEvent(orgId: string, calendarId:string, event: GooglEventDto): Promise<any> {
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            this.googleClient = new google.auth.OAuth2();
+            this.googleClient.setCredentials({
+                access_token: accessToken,
+            });
+            const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
+            const response = await calendar.events.insert({
+                calendarId: calendarId,
+                requestBody: event
+            });
+            return response.data;
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+            throw new Error(err);
+        }
     }
-    async removeEvent(orgId: string, id: string): Promise<void> {
-        throw new Error('Method not implemented.');
+    async updateEvent(orgId: string,calendarId: string, eventId:string, event: GooglEventDto): Promise<any> {
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            this.googleClient = new google.auth.OAuth2();
+            this.googleClient.setCredentials({
+                access_token: accessToken,
+            });
+            const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
+            const response = await calendar.events.update({
+                calendarId: calendarId,
+                requestBody: event
+            });
+            return response.data;
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+            throw new Error(err);
+        }
+    }
+    async removeEvent(orgId: string,calendarId: string,eventId:string): Promise<void> {
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            this.googleClient = new google.auth.OAuth2();
+            this.googleClient.setCredentials({
+                access_token: accessToken,
+            });
+            const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
+            const response = await calendar.events.delete({
+                calendarId: calendarId,
+                eventId: eventId
+            });
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+            throw new Error(err);
+        }
     }
 }

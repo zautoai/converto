@@ -7,13 +7,13 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
- 
+
 model Role {
   id         String   @id @default(uuid())
   name       String   @unique @db.VarChar(50)
   createdAt  DateTime @default(now())
   modifiedAt DateTime @updatedAt
-  Users      User[] 
+  Users      User[]
 }
 
 model User {
@@ -63,26 +63,27 @@ model Organization {
   modifiedAt DateTime    @updatedAt
   OrgAccount OrgAccount?
 
-  Agents               Agent[]
-  Users                User[]
-  Campaigns            Campaign[]
-  OrgPlatforms         OrgPlatform[]
-  LeadConfigs          LeadConfig[]
-  Sites                Site[]
-  AgentPrompts         AgentPrompt[]
-  Visitors             Visitor[]
-  Conversations        Conversation[]
-  Leads                Lead[]
-  ZautoMessages        ZautoMessage[]
-  Stages               Stage[]
-  Visits               Visit[]
-  CallToAction         CallToAction[]
-  KeyMapping           KeyMapping[]
-  OrgTool              OrgTool[]
-  ExternalApi          ExternalApi[]
-  AvailabilitySchedule AvailabilitySchedule[]
-  LeradCategory        LeadCategory[]
-  LeadCategoryMap      LeadCategoryMap[]
+  Agents                 Agent[]
+  Users                  User[]
+  Campaigns              Campaign[]
+  OrgPlatforms           OrgPlatform[]
+  LeadConfigs            LeadConfig[]
+  Sites                  Site[]
+  AgentPrompts           AgentPrompt[]
+  Visitors               Visitor[]
+  Conversations          Conversation[]
+  Leads                  Lead[]
+  ZautoMessages          ZautoMessage[]
+  Stages                 Stage[]
+  Visits                 Visit[]
+  CallToAction           CallToAction[]
+  KeyMapping             KeyMapping[]
+  OrgTool                OrgTool[]
+  ExternalApi            ExternalApi[]
+  AvailabilitySchedule   AvailabilitySchedule[]
+  LeradCategory          LeadCategory[]
+  LeadCategoryMap        LeadCategoryMap[]
+  ExternalToolCredential ExternalToolCredential[]
 }
 
 model ActiveClient {
@@ -771,12 +772,14 @@ model availableHours {
 }
 
 model ExternalToolCredential {
-  id           String   @id @default(uuid())
+  id           String        @id @default(uuid())
+  orgId        String
   tokeType     String?
   refreshToken String
   accessToken  String
   expiresIn    Int
   toolName     String
-  createdAt    DateTime @default(now())
-  modifiedAt   DateTime @updatedAt
+  createdAt    DateTime      @default(now())
+  modifiedAt   DateTime      @updatedAt
+  org          Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
 }

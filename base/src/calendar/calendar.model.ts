@@ -43,15 +43,25 @@ export abstract class BaseCalendar {
         return expirationTime < currentTime;
     }
 
-    abstract getCalendar(orgId:string): Promise<any>;
+    protected getStartEndTimesForDay(date: Date): { timeMin: string; timeMax: string } {
+        const targetDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const timeMin = new Date(targetDate.setUTCHours(0, 0, 0, 0)).toISOString();
+        const timeMax = new Date(targetDate.setUTCHours(23, 59, 59, 999)).toISOString();
 
-    abstract getEvents(orgId:string): Promise<any>;
+        return { timeMin, timeMax };
+    }
 
-    abstract getEventById(orgId:string, id: string): Promise<any>;
+    abstract getCalendars(orgId:string): Promise<any>;
 
-    abstract addEvent(orgId:string, event: any): Promise<any>;
+    abstract getCalendar(orgId:string,id:string): Promise<any>;
 
-    abstract updateEvent(orgId:string, id:string, event:any): Promise<any>;
+    abstract getEvents(orgId:string,calendarId:string,startDate?:string, endDate?:string): Promise<any>;
 
-    abstract removeEvent(orgId:string, id:string): Promise<void>;
+    abstract getEventById(orgId:string, calendarId: string,eventId:string): Promise<any>;
+
+    abstract addEvent(orgId:string,calendarId:string, event: any): Promise<any>;
+
+    abstract updateEvent(orgId:string,calendarId:string, id:string, event:any): Promise<any>;
+
+    abstract removeEvent(orgId:string,calendarId:string, id:string): Promise<void>;
 }
