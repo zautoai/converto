@@ -1,17 +1,19 @@
+import { InjectQueue } from '@nestjs/bull';
 import {
   BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { Queue } from 'bull';
 import { FilterDto } from 'src/common/dtos/filter.dto';
 import { CustomFieldParent } from 'src/common/enum/enums';
 import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
 import { EnrichmentService } from 'src/enrichment/enrichment.service';
-import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
-import { CreateFieldDto } from './dto/create-field.dto';
-import { ExternalCrmService } from 'src/external-crm/external-crm.service';
 import { CrmNames } from 'src/external-crm/enum/external-crm.enum';
+import { ExternalCrmService } from 'src/external-crm/external-crm.service';
+import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
+
 
 @Injectable()
 export class ContactsService {
@@ -180,7 +182,7 @@ export class ContactsService {
     }
 
     if (contact.email) {
-      // await this.enrichmentService.enrichContact(orgId, contact.id);
+      await this.enrichmentService.enrichContact(orgId, contact.id);
     }
 
     try
