@@ -27,6 +27,10 @@ export class ExternalCrmService implements OnModuleInit{
     async exchangeCodeForAccessToken(orgId:string,crmName:string, code:string): Promise<any> {
         const crm = this.crmProvider.getCRM(crmName);
         const accessToken = await crm.exchangeCodeForAccessToken(orgId,code);
+        if(accessToken)
+        {
+            await this.syncContacts(orgId, crmName);
+        }
         return accessToken;
     }
     async getAccessToken(orgId:string, crmName:string): Promise<any> {
@@ -165,4 +169,11 @@ export class ExternalCrmService implements OnModuleInit{
         return mappedData;       
     }
  
+
+    async syncContacts(orgId:string, crmName:string): Promise<any> {
+        const crm = this.crmProvider.getCRM(crmName);
+        const contacts = await crm.getContacts(orgId);
+        console.log(contacts);
+        
+    }
 }

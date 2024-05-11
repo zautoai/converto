@@ -194,7 +194,7 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
     {
         try
         {
-            await this.prisma.externalToolCredential.delete({where:{id}});
+            await this.prisma.externalToolCredential.delete({where:{orgId,id}});
         }
         catch(err)
         {
@@ -221,7 +221,6 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
             throw new Error(err);
         }
     }
-
     async getCalendar(orgId: string, id: string): Promise<any> {
         try
         {
@@ -243,7 +242,6 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
             throw new Error(err);
         }
     }
-
     async getEvents(orgId: string,calendarId:string,startDate?:string, endDate?:string): Promise<any> {
         try
         {
@@ -325,6 +323,7 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
             const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
             const response = await calendar.events.update({
                 calendarId: calendarId,
+                eventId: eventId,
                 requestBody: event
             });
             return response.data;
