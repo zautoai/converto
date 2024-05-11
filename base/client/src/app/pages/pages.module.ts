@@ -58,6 +58,7 @@ import { PluginCardComponent } from './plugins/plugin-card/plugin-card.component
 import { PluginsComponent } from './plugins/plugins.component';
 import { CrmContactMappingComponent } from './plugins/crm-mapping/crm-contact-mapping/crm-contact-mapping.component';
 import { CrmCompanyMappingComponent } from './plugins/crm-mapping/crm-company-mapping/crm-company-mapping.component';
+import { ContactsComponent } from './contacts/contacts.component';
 
 @NgModule({
   declarations: [
@@ -121,7 +122,8 @@ import { CrmCompanyMappingComponent } from './plugins/crm-mapping/crm-company-ma
     PluginsComponent,
     PluginCardComponent,
     CrmContactMappingComponent,
-    CrmCompanyMappingComponent
+    CrmCompanyMappingComponent,
+    ContactsComponent
   ],
   imports: [
     CommonModule,
