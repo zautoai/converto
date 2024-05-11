@@ -41,6 +41,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          platforms: linux/arm64/v8
           context: ./base
           file: ./base/Dockerfile
           tags: |
@@ -95,6 +96,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          platforms: linux/arm64/v8
           context: ./crm
           file: ./crm/Dockerfile
           tags: |
