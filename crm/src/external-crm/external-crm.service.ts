@@ -121,16 +121,16 @@ export class ExternalCrmService implements OnModuleInit{
     async createContact(orgId:string, data:any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
-        const mappedData = await this.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
+        const mappedData = await this.mappingService.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
         const objects = Object.keys(mappedData);
         if(objects.length === 0) return null;
-        const contact = await crm.createContact(orgId, mappedData);
+        const contact = await crm.createContact(orgId, mappedData); 
         return contact;
     } 
     async updateContact(orgId:string, id:any, data:any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
-        const mappedData = await this.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
+        const mappedData = await this.mappingService.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
         const objects = Object.keys(mappedData);
         if(objects.length === 0) return null;
         const contact = await crm.updateContact(orgId, id, mappedData);

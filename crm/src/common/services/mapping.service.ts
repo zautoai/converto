@@ -159,11 +159,10 @@ export class MappingService {
     async handleMapping(orgId: string, crmName: string, objectType:string,data: any): Promise<any> {
         const mappings = await this.getMappingsBycrmNameAndObjectType(orgId, crmName, objectType);
         let mappedData = {};
-        for(const mapping of mappings)
-        {
+        for(const mapping of mappings) {
             const externalCRMFieldName = mapping.externalCRMFieldName;
             const fieldName = mapping.fieldName;
-            if(externalCRMFieldName == null) continue;
+            if(externalCRMFieldName == null || data[fieldName] == null) continue;
             mappedData[externalCRMFieldName] = data[fieldName]; 
         }
         return mappedData;       

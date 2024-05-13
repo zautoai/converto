@@ -87,9 +87,7 @@ export class ContactsService {
             ],
           }
           : {}),
-      },
-      take: limit,
-      skip: skip,
+      } 
     });
     return {
       code: 200,
@@ -456,22 +454,36 @@ export class ContactsService {
           searchTerm: '',
           sort: 'asc'
         });
-
+ 
         if (contacts.data && contacts.data.length > 0) {
           for (let contact of contacts.data) {
             const existingContact = await this.externalCRMService.getContactByEmail(orgId, contact.email);
             const hasPriority = await this.externalCRMService.hasPriority(orgId);
             if(hasPriority)
             {
-              if(existingContact)
+              if(existingContact) 
               {
-                await this.externalCRMService.updateContact(orgId, existingContact.hs_object_id, contact);
+                try
+                {
+                  await this.externalCRMService.updateContact(orgId, existingContact.hs_object_id, contact);
+                }
+                catch(e)
+                {
+                  this.logger.error(e);
+                }
               }
               else
               {
-                await this.externalCRMService.createContact(orgId, contact);
+                try
+                {
+                  await this.externalCRMService.createContact(orgId, contact);
+                }
+                catch(e)
+                {
+                  this.logger.error(e);
+                }
               }
-            }
+            } 
             else
             {
               if (existingContact) continue; 
