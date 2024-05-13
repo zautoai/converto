@@ -87,7 +87,7 @@ export class HubspotService extends BaseExternalCrm {
                     crmName: this.crmName 
                 }
             });
-            if(!hubspotToken) throw new Error('Plugin not connected!.');
+            if(!hubspotToken) throw new Error('Plugin not connected!.'); 
             if(this.isTokenExpired(hubspotToken.expiresIn, hubspotToken.modifiedAt))
             {
                 const data = await this.exchangeRefreshTokenForAccessToken(orgId,hubspotToken.refreshToken);
@@ -98,7 +98,7 @@ export class HubspotService extends BaseExternalCrm {
         catch(e)
         {
             this.logger.error(e.message);
-            throw new Error(e);
+            throw new Error(e.message); 
         }
     }
 

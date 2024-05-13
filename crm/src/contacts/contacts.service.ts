@@ -426,8 +426,52 @@ export class ContactsService {
     return name.toLowerCase().replaceAll(' ', '_');
   }
 
-  async syncContactsToExternal(orgId: string) {
-    this.logger.log('Syncing contacts to external CRM');
-    
+  async syncContactsToExternalCrm(orgId: string) {
+    this.logger.debug('Syncing contacts to external CRM');
+    try
+    {
+      let page = 1;
+
+      const contacts = await this.getContacts(orgId,{
+        page: page,
+        limit: 10,
+        searchTerm: '',
+        sort: 'asc'
+      });
+      if(contacts.data)
+      {
+        for (let contact of contacts.data) {
+          const existingContact = await this.externalCRMService.getContactByEmail(orgId, CrmNames.HUBSPOT, contact.email);
+          if(existingContact) continue;  
+          await this.externalCRMService.createContact(orgId, CrmNames.HUBSPOT, contact);
+          this.logger.log(`Contact ${contact.email} synced to external CRM`);
+        }
+      }
+    }
+    catch(err) 
+    {
+      this.logger.error(err);
+    }
+  }
+
+  async syncExternalCrmToContacts(orgId: string) {
+    this.logger.debug('Syncing external CRM to contacts');
+    try
+    {
+      const contacts = await this.externalCRMService.getContacts(orgId, CrmNames.HUBSPOT);
+      if(contacts)
+      { 
+        for (let contact of contacts) {
+          const existingContact = await this.getContactByEmail(orgId, contact.email);
+          if(existingContact) continue; 
+          await this.createContact(orgId,contact);
+          this.logger.log(`Contact ${contact.email} synced to external CRM`);
+        }  
+      }
+    }
+    catch(err) 
+    {
+      this.logger.error(err);
+    }
   }
 }
