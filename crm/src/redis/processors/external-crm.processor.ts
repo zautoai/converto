@@ -14,7 +14,7 @@ export class ExternalCrmProcessor {
 
   @Process('SyncContact')
   async handleCreateContact(job: any) {
-    this.logger.log(`Syncing contact from ${job.data.crmName} to Zauto`);
+    this.logger.log(``);
     await this.contactService.syncExternalCrmToContacts(job.data.orgId);
   }
 }
