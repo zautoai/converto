@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -52,7 +52,7 @@ export class ContactsComponent implements OnInit {
       lastName: [''],
       jobTitle: [''],
       organizationName: [''],
-      email: [''],
+      email: ['', [ Validators.email]], 
       phone: [''],
       address: [''],
       city: [''],
@@ -328,6 +328,7 @@ export class ContactsComponent implements OnInit {
     this.currentPage = pageNumber;
     this.getContacts(pageNumber);
   }
+  
 
   resetErrorFeedback() {
     let keys = Object.keys(this.errorFeedback);
@@ -335,4 +336,11 @@ export class ContactsComponent implements OnInit {
       this.errorFeedback[key] = '';
     }
   }
+  preventDefault(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+    }
+  }
+
+  
 }
