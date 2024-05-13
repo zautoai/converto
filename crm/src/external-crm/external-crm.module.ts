@@ -6,7 +6,6 @@ import { HubspotService } from './providers/hubspot.service';
 import { CommonModule } from 'src/common/common.module';
 import { HttpModule } from '@nestjs/axios';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { MappingService } from './mapping.service';
 import { ExternalCrmMicroserviceController } from './external-crm.micro.controller';
 import { BullModule } from '@nestjs/bull';
 
@@ -22,7 +21,6 @@ import { BullModule } from '@nestjs/bull';
     ExternalCrmService, 
     ExternalCrmProvider,
     HubspotService,
-    MappingService
   ],
   exports: [ExternalCrmService],
 })

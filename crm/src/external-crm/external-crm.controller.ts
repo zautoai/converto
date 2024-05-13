@@ -6,7 +6,7 @@ import { HubspotCallBackDto } from './dto/hubspot-callback.dto';
 import { CRMAuthDto } from './dto/crm-auth.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { IRequest } from 'src/common/model/request.model';
-import { MappingService } from './mapping.service';
+import { MappingService } from '../common/services/mapping.service';
 import { CreateCRMMappingsDto } from './dto/create-crm-mappings.dto';
 
 @ApiTags('External CRM')

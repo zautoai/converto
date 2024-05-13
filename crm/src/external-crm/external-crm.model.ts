@@ -1,7 +1,7 @@
 import { Inject, Logger } from "@nestjs/common";
 import { ICRMConfig } from "./interfaces/appconfig.inteface";
 import { Token } from "./interfaces/token.interface";
-import { MappingService } from "./mapping.service";
+import { MappingService } from "../common/services/mapping.service";
 import { PrismaClientManager } from "src/prisma/prismaClientManager.service";
 
 export abstract class BaseExternalCrm {

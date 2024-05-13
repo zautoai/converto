@@ -189,7 +189,7 @@ export class ContactsService {
     try
     {
       // push to external crm
-      await this.externalCRMService.createContact(orgId, CrmNames.HUBSPOT, createContactDto);
+      this.externalCRMService.createContact(orgId, CrmNames.HUBSPOT, createContactDto);
     }
     catch(err)
     {
@@ -287,7 +287,7 @@ export class ContactsService {
     {
       const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, CrmNames.HUBSPOT,existingContact.data.email);
       if(existingCrmContact){
-        await this.externalCRMService.updateContact(orgId, CrmNames.HUBSPOT, existingCrmContact.hs_object_id, updateContactDto);
+        this.externalCRMService.updateContact(orgId, CrmNames.HUBSPOT, existingCrmContact.hs_object_id, updateContactDto);
       }
     }
     catch(err)
@@ -424,5 +424,10 @@ export class ContactsService {
 
   convertToKey(name: string) {
     return name.toLowerCase().replaceAll(' ', '_');
+  }
+
+  async syncContactsToExternal(orgId: string) {
+    this.logger.log('Syncing contacts to external CRM');
+    
   }
 }

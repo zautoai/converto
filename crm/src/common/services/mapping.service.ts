@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
-import { CrmMappingDto } from './dto/crm-mapping.dto';
+import { CrmMappingDto } from '../../external-crm/dto/crm-mapping.dto';
 
 @Injectable()
 export class MappingService {
