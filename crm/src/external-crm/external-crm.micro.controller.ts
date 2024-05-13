@@ -80,7 +80,7 @@ export class ExternalCrmMicroserviceController {
     async getFields(data:any) {
         try
         {
-            return await this.externalCrmService.getCrmFields(data.orgId, data.crmName, data.objectType);
+            return await this.externalCrmService.getCrmFields(data.orgId, data.objectType);
         }
         catch (error) {
             return error.response || error;

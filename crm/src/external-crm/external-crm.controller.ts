@@ -73,12 +73,12 @@ export class ExternalCrmController {
     return await this.externalCrmService.createMappings(orgId, createCRMMappingsDto);
   }
 
-  @Get('fields/:crm_name/:object_type')
+  @Get('fields/:object_type')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  async getFields(@Param('crm_name')crmName:string, @Param('object_type') objectType:string,@Req() request: IRequest) {
+  async getFields(@Param('object_type') objectType:string,@Req() request: IRequest) {
     const orgId = request.orgId;
-    return await this.externalCrmService.getCrmFields(orgId, crmName, objectType);
+    return await this.externalCrmService.getCrmFields(orgId, objectType);
   }
 }
 

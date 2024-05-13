@@ -251,27 +251,34 @@ export class HubspotService extends BaseExternalCrm {
         return contact.properties;
     }
     async getContactByEmail(orgId: string, email: string): Promise<any> {
-        const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
-        const contact = await hubspotClient.crm.contacts.searchApi.doSearch({
-            filterGroups: [
-                {
-                    filters: [
-                        {
-                            propertyName: 'email',
-                            operator: FilterOperatorEnum.Eq,
-                            value: email,
-                        }
-                    ]
-                }
-            ],
-            limit: 100,
-            after: '',
-            sorts: [],
-            properties: []
-        });
-        return contact.results[0].properties || null; 
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            const hubspotClient = new Client({ accessToken:  accessToken});
+            const contact = await hubspotClient.crm.contacts.searchApi.doSearch({
+                filterGroups: [
+                    {
+                        filters: [
+                            {
+                                propertyName: 'email',
+                                operator: FilterOperatorEnum.Eq,
+                                value: email,
+                            }
+                        ]
+                    }
+                ],
+                limit: 100,
+                after: '',
+                sorts: [],
+                properties: []
+            });
+            return contact.results[0].properties || null; 
+        }
+        catch(e)
+        {
+            return null;
+        }
     }
     async createContact(orgId: string, data: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);

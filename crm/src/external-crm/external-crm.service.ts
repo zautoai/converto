@@ -3,6 +3,7 @@ import { ExternalCrmProvider } from './external-crm.provider';
 import { CreateCRMMappingsDto } from './dto/create-crm-mappings.dto';
 import { MappingService } from '../common/services/mapping.service';
 import { ObjectType } from './enum/external-crm.enum';
+import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 
 
 @Injectable()
@@ -11,6 +12,7 @@ export class ExternalCrmService implements OnModuleInit{
     private logger = new Logger(ExternalCrmService.name);
 
     constructor(
+        private readonly prismaClientManager: PrismaClientManager,
         private readonly crmProvider:ExternalCrmProvider,
         private readonly mappingService: MappingService,
     ){}
@@ -51,57 +53,79 @@ export class ExternalCrmService implements OnModuleInit{
         return profile;
     }
 
-    async getContactFields(orgId:string, crmName:string)
+    async getActiveCRM(orgId:string):Promise<string>
     {
+        try
+        {
+            const prisma = await this.prismaClientManager.getClient(orgId);
+            const crm = await prisma.externalCrmCredential.findFirst({});
+            return crm.crmName;
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+            throw new Error(err);
+        }
+    }
+
+    async getContactFields(orgId:string)
+    {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const fields = await crm.getContactProperties(orgId);
         return fields;
     }
 
-    async getCompanyFields(orgId:string, crmName:string)
+    async getCompanyFields(orgId:string)
     {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const fields = await crm.getCompanyProperties(orgId);
         return fields;
     }
 
-    async getCrmFields(orgId:string, crmName:string, objectType:string)
+    async getCrmFields(orgId:string, objectType:string)
     {
         switch(objectType)
         {
             case ObjectType.CONTACT:
-                return await this.getContactFields(orgId, crmName);
+                return await this.getContactFields(orgId);
             case ObjectType.COMPANY:
-                return await this.getCompanyFields(orgId, crmName);
+                return await this.getCompanyFields(orgId);
             default:
                 return [];
         }
     }
 
-    async getContacts(orgId:string, crmName:string): Promise<any> {
+    async getContacts(orgId:string): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const contacts = await crm.getContacts(orgId);
         return contacts;
     }
-    async getContact(orgId:string, crmName:string, id:any): Promise<any> {
+    async getContact(orgId:string, id:any): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const contact = await crm.getContact(orgId, id);
         return contact;
     } 
-    async getContactByEmail(orgId:string, crmName:string, email:string): Promise<any> {
-        const crm = this.crmProvider.getCRM(crmName);
+    async getContactByEmail(orgId:string, email:string): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
+        const crm = this.crmProvider.getCRM(crmName); 
         const contact = await crm.getContactByEmail(orgId, email);
         return contact;
     }
-    async createContact(orgId:string, crmName:string, data:any): Promise<any> {
+    async createContact(orgId:string, data:any): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const mappedData = await this.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
         const objects = Object.keys(mappedData);
-        if(objects.length === 0) return null;
+        if(objects.length === 0) return null; 
         const contact = await crm.createContact(orgId, mappedData);
         return contact;
     } 
-    async updateContact(orgId:string, crmName:string, id:any, data:any): Promise<any> {
+    async updateContact(orgId:string, id:any, data:any): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const mappedData = await this.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
         const objects = Object.keys(mappedData);
@@ -109,23 +133,27 @@ export class ExternalCrmService implements OnModuleInit{
         const contact = await crm.updateContact(orgId, id, mappedData);
         return contact;
     }
-    async deleteContact(orgId:string, crmName:string, id:any): Promise<any> {
+    async deleteContact(orgId:string, id:any): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const contact = await crm.deleteContact(orgId, id);
         return contact;
     }
 
-    async getCompanies(orgId:string, crmName:string): Promise<any> {
+    async getCompanies(orgId:string): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const companies = await crm.getCompanies(orgId);
         return companies;
     }
-    async getCompany(orgId:string, crmName:string, id:any): Promise<any> {
+    async getCompany(orgId:string, id:any): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const company = await crm.getCompany(orgId, id);
         return company;
     }
-    async createCompany(orgId:string, crmName:string, data:any): Promise<any> {
+    async createCompany(orgId:string,data:any): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const mappedData = await this.handleMapping(orgId,crmName, ObjectType.COMPANY, data);
         const objects = Object.keys(mappedData);
@@ -133,7 +161,8 @@ export class ExternalCrmService implements OnModuleInit{
         const company = await crm.createCompany(orgId, mappedData);
         return company;
     }
-    async updateCompany(orgId:string, crmName:string, id:any, data:any): Promise<any> {
+    async updateCompany(orgId:string, id:any, data:any): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const mappedData = await this.handleMapping(orgId,crmName, ObjectType.COMPANY, data);
         const objects = Object.keys(mappedData);
@@ -141,7 +170,8 @@ export class ExternalCrmService implements OnModuleInit{
         const company = await crm.updateCompany(orgId, id, mappedData);
         return company;
     }
-    async deleteCompany(orgId:string, crmName:string, id:any): Promise<any> {
+    async deleteCompany(orgId:string, id:any): Promise<any> {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
         const company = await crm.deleteCompany(orgId, id);
         return company;
@@ -179,7 +209,6 @@ export class ExternalCrmService implements OnModuleInit{
         };
     }
     async handleMapping(orgId: string, crmName: string, objectType:string,data: any): Promise<any> {
-
         const mappings = await this.mappingService.getMappingsBycrmNameAndObjectType(orgId, crmName, objectType);
         let mappedData = {};
         for(const mapping of mappings)
