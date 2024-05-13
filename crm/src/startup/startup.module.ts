@@ -5,6 +5,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { CommonModule } from 'src/common/common.module';
 import { MicroservicesModule } from 'src/microservices/microservices.module';
 import { StartupMicroserviceController } from './startup.micro.controller';
+import { ContactsModule } from 'src/contacts/contacts.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { StartupMicroserviceController } from './startup.micro.controller';
     SchemaManagerModule,
     CommonModule,
     MicroservicesModule,
+    ContactsModule
   ],
   controllers: [StartupMicroserviceController],
   providers: [

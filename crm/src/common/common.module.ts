@@ -4,9 +4,12 @@ import { HttpModule } from '@nestjs/axios';
 import { JwtTokenService } from './services/jwt-token.service';
 import { JwtModule } from '@nestjs/jwt';
 import { MicroservicesModule } from 'src/microservices/microservices.module';
+import { MappingService } from './services/mapping.service';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   imports: [
+    PrismaModule,
     MicroservicesModule,
     HttpModule,
     JwtModule.register({
@@ -15,7 +18,16 @@ import { MicroservicesModule } from 'src/microservices/microservices.module';
     }),
   ],
   controllers: [],
-  providers: [WebClientService, JwtTokenService],
-  exports: [WebClientService, JwtTokenService,MicroservicesModule],
+  providers: [
+    WebClientService,
+    JwtTokenService,
+    MappingService
+  ],
+  exports: [
+    WebClientService, 
+    JwtTokenService,
+    MicroservicesModule,
+    MappingService
+  ],
 })
 export class CommonModule {}

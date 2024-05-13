@@ -87,7 +87,7 @@ export class HubspotService extends BaseExternalCrm {
                     crmName: this.crmName 
                 }
             });
-            if(!hubspotToken) throw new Error('Plugin not connected!.');
+            if(!hubspotToken) throw new Error('Plugin not connected!.'); 
             if(this.isTokenExpired(hubspotToken.expiresIn, hubspotToken.modifiedAt))
             {
                 const data = await this.exchangeRefreshTokenForAccessToken(orgId,hubspotToken.refreshToken);
@@ -98,7 +98,7 @@ export class HubspotService extends BaseExternalCrm {
         catch(e)
         {
             this.logger.error(e.message);
-            throw new Error(e);
+            throw new Error(e.message); 
         }
     }
 
@@ -251,27 +251,34 @@ export class HubspotService extends BaseExternalCrm {
         return contact.properties;
     }
     async getContactByEmail(orgId: string, email: string): Promise<any> {
-        const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
-        const contact = await hubspotClient.crm.contacts.searchApi.doSearch({
-            filterGroups: [
-                {
-                    filters: [
-                        {
-                            propertyName: 'email',
-                            operator: FilterOperatorEnum.Eq,
-                            value: email,
-                        }
-                    ]
-                }
-            ],
-            limit: 100,
-            after: '',
-            sorts: [],
-            properties: []
-        });
-        return contact.results[0].properties || null; 
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            const hubspotClient = new Client({ accessToken:  accessToken});
+            const contact = await hubspotClient.crm.contacts.searchApi.doSearch({
+                filterGroups: [
+                    {
+                        filters: [
+                            {
+                                propertyName: 'email',
+                                operator: FilterOperatorEnum.Eq,
+                                value: email,
+                            }
+                        ]
+                    }
+                ],
+                limit: 100,
+                after: '',
+                sorts: [],
+                properties: []
+            });
+            return contact.results[0].properties || null; 
+        }
+        catch(e)
+        {
+            return null;
+        }
     }
     async createContact(orgId: string, data: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);

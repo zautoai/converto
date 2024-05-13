@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
 import { WebClientService } from 'src/common/services/web-client.service';
+import { ContactsService } from 'src/contacts/contacts.service';
 import { OrganizationService } from 'src/microservices/base-services/organization.service';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { SchemaManagerService } from 'src/schema-manager/schema-manager.service';
@@ -12,8 +13,8 @@ export class StartupService implements OnModuleInit {
   constructor(
     private readonly prismaClientManager: PrismaClientManager,
     private readonly schemaManager: SchemaManagerService,
-    private readonly webClient: WebClientService,
-    private readonly organizationService: OrganizationService
+    private readonly organizationService: OrganizationService,
+    private readonly contactService: ContactsService
   ) { }
 
   onModuleInit() {
@@ -45,6 +46,7 @@ export class StartupService implements OnModuleInit {
               rollback,
             );
             this.logger.log(`Organization ${org.name} synced successfully.`);
+            await this.syncDataFromCRM(org.id);
           } catch (error) {
             this.logger.warn(error);
           }
@@ -84,5 +86,11 @@ export class StartupService implements OnModuleInit {
       console.log(error);
 
     }
+  }
+
+  async syncDataFromCRM(orgId: string)
+  {
+    this.contactService.syncExternalCrmToContacts(orgId);
+    this.contactService.syncContactsToExternalCrm(orgId);
   }
 }

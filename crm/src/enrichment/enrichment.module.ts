@@ -8,9 +8,9 @@ import { ClearBitService } from './providers/clearbit.service';
 import { ZoomInfoService } from './providers/zoominfo.service';
 import { BullModule } from '@nestjs/bull';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { EnrichmentProcessor } from './enrichment.processor';
 import { EnrichmentMicroserviceController } from './enrichment-provider.micro.controller';
 import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -33,7 +33,6 @@ import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
     ApolloService,
     ClearBitService,
     ZoomInfoService,
-    EnrichmentProcessor,
   ],
   exports: [EnrichmentService, ClearBitService, ZoomInfoService],
 })

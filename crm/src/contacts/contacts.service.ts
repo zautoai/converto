@@ -10,7 +10,7 @@ import { FilterDto } from 'src/common/dtos/filter.dto';
 import { CustomFieldParent } from 'src/common/enum/enums';
 import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
 import { EnrichmentService } from 'src/enrichment/enrichment.service';
-import { CrmNames } from 'src/external-crm/enum/external-crm.enum';
+import { CrmNames, ObjectType } from 'src/external-crm/enum/external-crm.enum';
 import { ExternalCrmService } from 'src/external-crm/external-crm.service';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 
@@ -24,7 +24,7 @@ export class ContactsService {
     private readonly enrichmentService: EnrichmentService,
     private readonly customFieldsService: CustomFieldsService,
     private readonly externalCRMService: ExternalCrmService
-  ) {}
+  ) { }
 
   async getContacts(orgId: string, filterDto: FilterDto) {
     const { page, limit, sort, searchTerm } = filterDto;
@@ -34,20 +34,20 @@ export class ContactsService {
       where: {
         ...(searchTerm
           ? {
-              OR: [
-                { firstName: { contains: searchTerm } },
-                { lastName: { contains: searchTerm } },
-                { jobTitle: { contains: searchTerm } },
-                { organizationName: { contains: searchTerm } },
-                { email: { contains: searchTerm } },
-                { phone: { contains: searchTerm } },
-                { address: { contains: searchTerm } },
-                { website: { contains: searchTerm } },
-                { notes: { contains: searchTerm } },
-                { leadSource: { contains: searchTerm } },
-                { status: { contains: searchTerm } },
-              ],
-            }
+            OR: [
+              { firstName: { contains: searchTerm } },
+              { lastName: { contains: searchTerm } },
+              { jobTitle: { contains: searchTerm } },
+              { organizationName: { contains: searchTerm } },
+              { email: { contains: searchTerm } },
+              { phone: { contains: searchTerm } },
+              { address: { contains: searchTerm } },
+              { website: { contains: searchTerm } },
+              { notes: { contains: searchTerm } },
+              { leadSource: { contains: searchTerm } },
+              { status: { contains: searchTerm } },
+            ],
+          }
           : {}),
       },
       take: limit,
@@ -70,20 +70,20 @@ export class ContactsService {
       where: {
         ...(searchTerm
           ? {
-              OR: [
-                { firstName: { contains: searchTerm } },
-                { lastName: { contains: searchTerm } },
-                { jobTitle: { contains: searchTerm } },
-                { organizationName: { contains: searchTerm } },
-                { email: { contains: searchTerm } },
-                { phone: { contains: searchTerm } },
-                { address: { contains: searchTerm } },
-                { website: { contains: searchTerm } },
-                { notes: { contains: searchTerm } },
-                { leadSource: { contains: searchTerm } },
-                { status: { contains: searchTerm } },
-              ],
-            }
+            OR: [
+              { firstName: { contains: searchTerm } },
+              { lastName: { contains: searchTerm } },
+              { jobTitle: { contains: searchTerm } },
+              { organizationName: { contains: searchTerm } },
+              { email: { contains: searchTerm } },
+              { phone: { contains: searchTerm } },
+              { address: { contains: searchTerm } },
+              { website: { contains: searchTerm } },
+              { notes: { contains: searchTerm } },
+              { leadSource: { contains: searchTerm } },
+              { status: { contains: searchTerm } },
+            ],
+          }
           : {}),
       },
       take: limit,
@@ -181,16 +181,16 @@ export class ContactsService {
       });
     }
 
+    // enriche
     if (contact.email) {
       await this.enrichmentService.enrichContact(orgId, contact.id);
     }
 
-    try
-    {
-      await this.externalCRMService.createContact(orgId, CrmNames.HUBSPOT, createContactDto);
+    try {
+      // push to external crm
+      this.externalCRMService.createContact(orgId, createContactDto);
     }
-    catch(err)
-    {
+    catch (err) {
       this.logger.error(err);
     }
 
@@ -281,15 +281,13 @@ export class ContactsService {
       }
     }
 
-    try
-    {
-      const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, CrmNames.HUBSPOT,existingContact.data.email);
-      if(existingCrmContact){
-        await this.externalCRMService.updateContact(orgId, CrmNames.HUBSPOT, existingCrmContact.hs_object_id, updateContactDto);
+    try {
+      const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, existingContact.data.email);
+      if (existingCrmContact) {
+        this.externalCRMService.updateContact(orgId, existingCrmContact.hs_object_id, updateContactDto);
       }
     }
-    catch(err)
-    {
+    catch (err) {
       this.logger.error(err);
     }
 
@@ -308,15 +306,13 @@ export class ContactsService {
     const prisma = await this.prismaClientManager.getClient(orgId);
     await this.getContact(orgId, id);
     await prisma.contact.delete({ where: { id } });
-    try
-    {
-      const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, CrmNames.HUBSPOT,existingContact.data.email);
-      if(existingCrmContact){
-        await this.externalCRMService.deleteContact(orgId, CrmNames.HUBSPOT, existingCrmContact.hs_object_id);
+    try {
+      const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, existingContact.data.email);
+      if (existingCrmContact) {
+        await this.externalCRMService.deleteContact(orgId, existingCrmContact.hs_object_id);
       }
     }
-    catch(err)
-    {
+    catch (err) {
       this.logger.error(err);
     }
     return {
@@ -422,5 +418,76 @@ export class ContactsService {
 
   convertToKey(name: string) {
     return name.toLowerCase().replaceAll(' ', '_');
+  }
+
+  async hasMapping(orgId:string):Promise<Boolean>
+  {
+    try
+    {
+      const crmName = await this.externalCRMService.getActiveCRM(orgId);
+      const prisma = await this.prismaClientManager.getClient(orgId);
+      const contacts = await prisma.crmMapping.count({
+        where: {
+          crmName,
+          objectType: ObjectType.CONTACT
+        }
+      });
+      return contacts > 0;
+    }
+    catch(e)
+    {
+      return false;
+    }
+  }
+
+  async syncContactsToExternalCrm(orgId: string) {
+    this.logger.debug('Syncing contacts to external CRM');
+    try {
+      if(!await this.hasMapping(orgId)) return;
+      let page = 1;
+      let hasNextPage = true;
+
+      while (hasNextPage) {
+        const contacts = await this.getContacts(orgId, {
+          page: page,
+          limit: 10,
+          searchTerm: '',
+          sort: 'asc'
+        });
+
+        if (contacts.data && contacts.data.length > 0) {
+          for (let contact of contacts.data) {
+            const existingContact = await this.externalCRMService.getContactByEmail(orgId, contact.email);
+            if (existingContact) continue;
+            await this.externalCRMService.createContact(orgId, contact);
+            this.logger.log(`Contact ${contact.email} synced to external CRM`);
+          }
+          page++;
+        } else {
+          hasNextPage = false;
+        }
+      }
+    } catch (err) {
+      this.logger.error(err);
+    }
+  }
+
+  async syncExternalCrmToContacts(orgId: string) {
+    this.logger.debug('Syncing external CRM to contacts');
+    try {
+      if(!await this.hasMapping(orgId)) return;
+      const contacts = await this.externalCRMService.getContacts(orgId);
+      if (contacts) {
+        for (let contact of contacts) {
+          const existingContact = await this.getContactByEmail(orgId, contact.email);
+          if (existingContact) continue;
+          await this.createContact(orgId, contact);
+          this.logger.log(`Contact ${contact.email} synced to external CRM`);
+        }
+      }
+    }
+    catch (err) {
+      this.logger.error(err);
+    }
   }
 }
