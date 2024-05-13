@@ -60,5 +60,6 @@ export abstract class BaseExternalCrm {
     abstract createCompany(orgId: string, data: any): Promise<any>;
     abstract updateCompany(orgId: string, id: any, data: any): Promise<any>;
     abstract deleteCompany(orgId: string, id: any): Promise<any>;
+    abstract hasPriority(orgId: string): Promise<boolean>;
 }
 

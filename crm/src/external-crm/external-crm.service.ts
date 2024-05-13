@@ -55,11 +55,11 @@ export class ExternalCrmService implements OnModuleInit{
 
     async getActiveCRM(orgId:string):Promise<string>
     {
-        try
+        try 
         {
             const prisma = await this.prismaClientManager.getClient(orgId);
-            const crm = await prisma.externalCrmCredential.findFirst({});
-            return crm.crmName;
+            const crm = await prisma.externalCrmCredential.findMany();
+            return crm[0].crmName; 
         }
         catch(err)
         {
@@ -120,7 +120,7 @@ export class ExternalCrmService implements OnModuleInit{
         const crm = this.crmProvider.getCRM(crmName);
         const mappedData = await this.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
         const objects = Object.keys(mappedData);
-        if(objects.length === 0) return null; 
+        if(objects.length === 0) return null;
         const contact = await crm.createContact(orgId, mappedData);
         return contact;
     } 
@@ -139,7 +139,6 @@ export class ExternalCrmService implements OnModuleInit{
         const contact = await crm.deleteContact(orgId, id);
         return contact;
     }
-
     async getCompanies(orgId:string): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
@@ -216,7 +215,10 @@ export class ExternalCrmService implements OnModuleInit{
             const externalCRMFieldName = mapping.externalCRMFieldName;
             const fieldName = mapping.fieldName;
             if(externalCRMFieldName == null) continue;
-            mappedData[externalCRMFieldName] = data[fieldName]; 
+            const mappedValue = data[fieldName];
+            if (mappedValue !== undefined && mappedValue !== null) {
+                mappedData[externalCRMFieldName] = mappedValue;
+            }
         }
         return mappedData;       
     }
@@ -248,5 +250,12 @@ export class ExternalCrmService implements OnModuleInit{
             this.logger.log(`Created contact with email ${email}`);
         }
         
+    }
+
+    async hasPriority(orgId:string):Promise<Boolean>
+    {
+        const crmName = await this.getActiveCRM(orgId);
+        const crm = this.crmProvider.getCRM(crmName);
+        return await crm.hasPriority(orgId);
     }
 }

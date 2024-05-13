@@ -71,7 +71,7 @@ export class StartupService implements OnModuleInit {
       const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
       const orgs = await prisma.info.findMany();
       for (const org of orgs) {
-        try {
+        try { 
           await this.schemaManager.applyMigration(org.orgId, true);
           this.logger.log(
             `${org.orgName} schema migration completed successfully.`,

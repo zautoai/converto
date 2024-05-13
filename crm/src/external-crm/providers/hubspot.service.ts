@@ -353,4 +353,21 @@ export class HubspotService extends BaseExternalCrm {
         const company = await hubspotClient.crm.companies.gdprApi.purge(payload);
         return company;
     }
+
+    async hasPriority(orgId: string): Promise<boolean> {
+        try
+        {
+            const prisma = await this.prismaClientManager.getClient(orgId);
+            const hubspotToken = await prisma.externalCrmCredential.findFirst({
+                where: {
+                    crmName: this.crmName
+                }
+            });
+            return hubspotToken.isPriority;
+        }
+        catch(e)
+        {
+            return false;
+        }
+    }
 }

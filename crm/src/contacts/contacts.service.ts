@@ -8,6 +8,7 @@ import {
 import { Queue } from 'bull';
 import { FilterDto } from 'src/common/dtos/filter.dto';
 import { CustomFieldParent } from 'src/common/enum/enums';
+import { MappingService } from 'src/common/services/mapping.service';
 import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
 import { EnrichmentService } from 'src/enrichment/enrichment.service';
 import { CrmNames, ObjectType } from 'src/external-crm/enum/external-crm.enum';
@@ -23,7 +24,8 @@ export class ContactsService {
     private readonly prismaClientManager: PrismaClientManager,
     private readonly enrichmentService: EnrichmentService,
     private readonly customFieldsService: CustomFieldsService,
-    private readonly externalCRMService: ExternalCrmService
+    private readonly externalCRMService: ExternalCrmService,
+    private readonly mappingService: MappingService,
   ) { }
 
   async getContacts(orgId: string, filterDto: FilterDto) {
@@ -188,7 +190,7 @@ export class ContactsService {
 
     try {
       // push to external crm
-      this.externalCRMService.createContact(orgId, createContactDto);
+      await this.externalCRMService.createContact(orgId, createContactDto);
     }
     catch (err) {
       this.logger.error(err);
@@ -425,7 +427,7 @@ export class ContactsService {
     try
     {
       const crmName = await this.externalCRMService.getActiveCRM(orgId);
-      const prisma = await this.prismaClientManager.getClient(orgId);
+      const prisma = await this.prismaClientManager.getClient(orgId); 
       const contacts = await prisma.crmMapping.count({
         where: {
           crmName,
@@ -443,7 +445,7 @@ export class ContactsService {
   async syncContactsToExternalCrm(orgId: string) {
     this.logger.debug('Syncing contacts to external CRM');
     try {
-      if(!await this.hasMapping(orgId)) return;
+      if(!await this.hasMapping(orgId)) return; 
       let page = 1;
       let hasNextPage = true;
 
@@ -458,13 +460,28 @@ export class ContactsService {
         if (contacts.data && contacts.data.length > 0) {
           for (let contact of contacts.data) {
             const existingContact = await this.externalCRMService.getContactByEmail(orgId, contact.email);
-            if (existingContact) continue;
-            await this.externalCRMService.createContact(orgId, contact);
+            const hasPriority = await this.externalCRMService.hasPriority(orgId);
+            if(hasPriority)
+            {
+              if(existingContact)
+              {
+                await this.externalCRMService.updateContact(orgId, existingContact.hs_object_id, contact);
+              }
+              else
+              {
+                await this.externalCRMService.createContact(orgId, contact);
+              }
+            }
+            else
+            {
+              if (existingContact) continue; 
+              await this.externalCRMService.createContact(orgId, contact);
+            }
             this.logger.log(`Contact ${contact.email} synced to external CRM`);
           }
           page++;
         } else {
-          hasNextPage = false;
+          hasNextPage = false; 
         }
       }
     } catch (err) {
@@ -480,8 +497,27 @@ export class ContactsService {
       if (contacts) {
         for (let contact of contacts) {
           const existingContact = await this.getContactByEmail(orgId, contact.email);
-          if (existingContact) continue;
-          await this.createContact(orgId, contact);
+          const hasPriority = await this.externalCRMService.hasPriority(orgId);
+          const crmName = await this.externalCRMService.getActiveCRM(orgId);
+          const mappedData = await this.mappingService.handleReverseMapping(orgId,crmName, ObjectType.CONTACT, contact);
+          const objects = Object.keys(mappedData); 
+          if(objects.length === 0) continue; 
+          if(!hasPriority)
+          {
+            if(existingContact)
+            {
+              await this.updateContact(orgId, existingContact.id, mappedData);
+            }
+            else
+            {
+              await this.createContact(orgId, mappedData);
+            }
+          }
+          else
+          {
+            if (existingContact) continue;
+            await this.createContact(orgId, mappedData);
+          }
           this.logger.log(`Contact ${contact.email} synced to external CRM`);
         }
       }

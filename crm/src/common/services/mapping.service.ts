@@ -147,4 +147,32 @@ export class MappingService {
             throw e;
         }
     }
+
+    async handleMapping(orgId: string, crmName: string, objectType:string,data: any): Promise<any> {
+        const mappings = await this.getMappingsBycrmNameAndObjectType(orgId, crmName, objectType);
+        let mappedData = {};
+        for(const mapping of mappings)
+        {
+            const externalCRMFieldName = mapping.externalCRMFieldName;
+            const fieldName = mapping.fieldName;
+            if(externalCRMFieldName == null) continue;
+            mappedData[externalCRMFieldName] = data[fieldName]; 
+        }
+        return mappedData;       
+    }
+
+    async handleReverseMapping(orgId: string, crmName: string, objectType:string, mappedData: any): Promise<any> {
+        const reverseMappings = await this.getMappingsBycrmNameAndObjectType(orgId, crmName, objectType);
+        let originalData = {};
+        for (const reverseMapping of reverseMappings) {
+            const externalCRMFieldName = reverseMapping.externalCRMFieldName;
+            const fieldName = reverseMapping.fieldName;
+            if (externalCRMFieldName == null) continue;
+            const mappedValue = mappedData[externalCRMFieldName];
+            if (mappedValue !== undefined) {
+                originalData[fieldName] = mappedValue;
+            }
+        }
+        return originalData;
+    }
 }
