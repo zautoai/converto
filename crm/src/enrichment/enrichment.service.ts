@@ -96,7 +96,7 @@ export class EnrichmentService {
       this.logger.log(
         `Added enrichment task to queue for contact with email: ${contact.email}`,
       );
-      return {
+      return { 
         statusCode: 200,
         status: 'success',
         message: 'Contact enrichment successful',

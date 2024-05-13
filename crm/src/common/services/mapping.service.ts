@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { CrmMappingDto } from '../../external-crm/dto/crm-mapping.dto';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 @Injectable()
 export class MappingService {
@@ -105,6 +107,7 @@ export class MappingService {
             const mapping = await prisma.crmMapping.create({
                 data:crmMappingDto
             });
+
             return mapping;
         }
         catch(e)
@@ -123,6 +126,11 @@ export class MappingService {
                 },
                 data:crmMappingDto
             });
+            // this.crmSyncQueue.add('SyncContact',{
+            //     orgId: orgId,
+            //     crmName: crmMappingDto.crmName,
+            //     objectType: crmMappingDto.objectType,
+            // });
             return mapping;
         }
         catch(e)

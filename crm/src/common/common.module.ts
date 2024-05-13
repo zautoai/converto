@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MicroservicesModule } from 'src/microservices/microservices.module';
 import { MappingService } from './services/mapping.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [

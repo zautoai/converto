@@ -4,6 +4,8 @@ import { CreateCRMMappingsDto } from './dto/create-crm-mappings.dto';
 import { MappingService } from '../common/services/mapping.service';
 import { ObjectType } from './enum/external-crm.enum';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 
 @Injectable()
@@ -15,6 +17,7 @@ export class ExternalCrmService implements OnModuleInit{
         private readonly prismaClientManager: PrismaClientManager,
         private readonly crmProvider:ExternalCrmProvider,
         private readonly mappingService: MappingService,
+        @InjectQueue('crm_sync_queue') private crmSyncQueue: Queue,
     ){}
 
     async onModuleInit() {
@@ -239,17 +242,10 @@ export class ExternalCrmService implements OnModuleInit{
     }
     
     async syncContacts(orgId:string, crmName:string): Promise<any> {
-        const crm = this.crmProvider.getCRM(crmName);
-        const contacts = await crm.getContacts(orgId);
-        for(const contact of contacts)
-        {
-            const email = contact.email;
-            const mappedData = await this.handleReverseMapping(orgId,crmName, ObjectType.CONTACT, contact);
-            const objects = Object.keys(mappedData);
-            if(objects.length === 0) return null;
-            this.logger.log(`Created contact with email ${email}`);
-        }
-        
+        this.crmSyncQueue.add('SyncContact',{
+            orgId: orgId,
+            crmName: crmName
+        });        
     }
 
     async hasPriority(orgId:string):Promise<Boolean>

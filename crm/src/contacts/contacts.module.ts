@@ -14,7 +14,8 @@ import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
     EnrichmentModule, 
     PrismaModule, 
     CustomFieldsModule,
-    ExternalCrmModule
+    ExternalCrmModule,
+ 
   ],
   controllers: [ContactsController, ContactMicroserviceController],
   providers: [ContactsService],
