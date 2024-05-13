@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -8,6 +8,7 @@ import { RestService } from '../../shared/services/rest.service';
 import { SweetAlertService } from '../../shared/services/sweet-alart.service';
 import { DeployScriptType } from '../zautosettings/settings/settings.component';
 import { API } from '../../config/endpoint.config';
+import { error } from 'console';
 
 @Component({
   selector: 'app-contacts',
@@ -52,7 +53,7 @@ export class ContactsComponent implements OnInit {
       lastName: [''],
       jobTitle: [''],
       organizationName: [''],
-      email: ['', [ Validators.email]], 
+      email: ['', [Validators.required, Validators.email,]], 
       phone: [''],
       address: [''],
       city: [''],
@@ -101,8 +102,14 @@ export class ContactsComponent implements OnInit {
   }
 
   onSubmitForm(): void {
-    this.submittedData.push({ ...this.Form.value });
-    this.Form.reset();
+    if (this.Form.valid) {
+      this.submittedData.push({ ...this.Form.value });
+      this.Form.reset();
+    } else {
+      console.log('Form is not valid');
+      this.notifService.showError('Please fill out all required fields correctly');
+
+    }
   }
 
   openCreateUser() {
@@ -341,6 +348,12 @@ export class ContactsComponent implements OnInit {
       event.preventDefault();
     }
   }
+  emailFormControl = new FormControl('', [
+  
+    Validators.email,
 
+    Validators.required,
+  ]);
+  
   
 }
