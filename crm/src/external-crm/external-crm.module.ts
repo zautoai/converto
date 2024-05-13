@@ -8,7 +8,6 @@ import { HttpModule } from '@nestjs/axios';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { MappingService } from './mapping.service';
 import { ExternalCrmMicroserviceController } from './external-crm.micro.controller';
-import { ExternalCrmProcessor } from './external-crm.processor';
 import { BullModule } from '@nestjs/bull';
 
 @Module({
@@ -16,22 +15,14 @@ import { BullModule } from '@nestjs/bull';
     CommonModule,
     HttpModule,
     PrismaModule,
-    BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_IP,
-        port: parseInt(process.env.REDIS_PORT, 10) || 6379,
-        password: process.env.REDIS_PASSWORD,
-      },
-    }),
-    BullModule.registerQueue({ name: 'crm_queue' }),
+
   ],
   controllers: [ExternalCrmController, ExternalCrmMicroserviceController],
   providers: [
     ExternalCrmService, 
     ExternalCrmProvider,
     HubspotService,
-    MappingService,
-    ExternalCrmProcessor
+    MappingService
   ],
   exports: [ExternalCrmService],
 })

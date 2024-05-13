@@ -1,6 +1,6 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
-import { EnrichmentService } from './enrichment.service';
+import { EnrichmentService } from '../../enrichment/enrichment.service';
 
 @Processor('enrichment_queue')
 export class EnrichmentProcessor {

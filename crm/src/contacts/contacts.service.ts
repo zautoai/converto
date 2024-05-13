@@ -181,12 +181,14 @@ export class ContactsService {
       });
     }
 
+    // enriche
     if (contact.email) {
       await this.enrichmentService.enrichContact(orgId, contact.id);
     }
 
     try
     {
+      // push to external crm
       await this.externalCRMService.createContact(orgId, CrmNames.HUBSPOT, createContactDto);
     }
     catch(err)

@@ -2,7 +2,9 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ExternalCrmProvider } from './external-crm.provider';
 import { CreateCRMMappingsDto } from './dto/create-crm-mappings.dto';
 import { MappingService } from './mapping.service';
-import { CrmNames, ObjectType } from './enum/external-crm.enum';
+import { ObjectType } from './enum/external-crm.enum';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 @Injectable()
 export class ExternalCrmService implements OnModuleInit{
