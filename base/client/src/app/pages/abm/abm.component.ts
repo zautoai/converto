@@ -1,26 +1,19 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  Input,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { API } from '../../config/endpoint.config';
-import { AvatarService } from '../../shared/services/avatar.service';
-import { NotificationService } from '../../shared/services/notification.service';
-import { RestService } from '../../shared/services/rest.service';
-import { SweetAlertService } from '../../shared/services/sweet-alart.service';
 import { ActivatedRoute } from '@angular/router';
+import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { API } from 'src/app/config/endpoint.config';
+import { AvatarService } from 'src/app/shared/services/avatar.service';
+import { NotificationService } from 'src/app/shared/services/notification.service';
+import { RestService } from 'src/app/shared/services/rest.service';
+import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 
 @Component({
-  selector: 'app-accounts',
-  templateUrl: './account.component.html',
-  styleUrl: './account.component.scss',
+  selector: 'app-abm',
+  templateUrl: './abm.component.html',
+  styleUrl: './abm.component.scss'
 })
-export class AccountsComponent implements OnInit {
+export class AbmComponent {
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
@@ -69,7 +62,6 @@ export class AccountsComponent implements OnInit {
       notes: [''],
       source: [''],
       status: [''],
-      isabm:[false]
     });
   }
 
@@ -170,7 +162,6 @@ export class AccountsComponent implements OnInit {
     this.Form.get('notes')?.setValue(data?.notes);
     this.Form.get('source')?.setValue(data?.source);
     this.Form.get('status')?.setValue(data?.status);
-    this.Form.get('isabm')?.setValue(data?.abm);
 
 
     this.resetErrorFeedback();
@@ -273,12 +264,6 @@ export class AccountsComponent implements OnInit {
       updateAccountFields.push({
         label: 'Source',
         value: this.Form.value.source,
-      });
-    }
-    if (this.Form.get('abm')?.value) {
-      updateAccountFields.push({
-        label: 'abm',
-        value: this.Form.value.abm,
       });
     }
     if (this.Form.get('status')?.value) {

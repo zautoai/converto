@@ -169,6 +169,13 @@
         <label class="form-label">Status</label>
         <input placeholder="status" formControlName="status"   (keydown)="preventDefault($event)" class="form-control ng-pristine ng-invalid ng-touched" />
       </div>
+     
+        <label class="custom-control custom-checkbox mb-2">
+          <input type="checkbox" name="label" class="custom-control-input" formControlName="isabm" />
+          <span class="custom-control-label">Is Account Based Marketing</span>
+        </label>
+      
+
       <div class="d-flex justify-content-end mt-4">
         <button class="btn btn-outline-primary me-3" type="button"  (click)="offcanvas.dismiss()">
           <i class="fa fa-times"></i>Close
