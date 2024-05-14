@@ -75,6 +75,7 @@ export class AccountsComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.currentPage = +params['page'] || 1;
+      this.limit = +params['limit'] || this.limit;
       this.getAccounts();
       this.onPageChange({ page: this.currentPage })
     });

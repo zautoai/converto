@@ -10,69 +10,70 @@ import { DeployScriptType } from '../zautosettings/settings/settings.component';
 import { API } from '../../config/endpoint.config';
 import { error } from 'console';
 import { PaginationData } from 'src/app/common/intefaces';
+import { ActivatedRoute } from '@angular/router';
 
 export interface Contacts {
-    photoUrl: string;
-    fullName: string;
-    firstName: string;
-    lastName: string;
-    jobTitle: string;
-    organizationName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-    website: string;
-    socialMedia: any;
-    notes: string;
-    leadSource: string;
-    status: string;
+  photoUrl: string;
+  fullName: string;
+  firstName: string;
+  lastName: string;
+  jobTitle: string;
+  organizationName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+  website: string;
+  socialMedia: any;
+  notes: string;
+  leadSource: string;
+  status: string;
+}
+
+export class Contacts {
+  photoUrl: string;
+  fullName: string;
+  firstName: string;
+  lastName: string;
+  jobTitle: string;
+  organizationName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+  website: string;
+  socialMedia: any;
+  notes: string;
+  leadSource: string;
+  status: string;
+
+  constructor(data: Partial<Contacts> = {}) {
+    this.photoUrl = data.photoUrl || '';
+    this.fullName = data.fullName || '';
+    this.firstName = data.firstName || '';
+    this.lastName = data.lastName || '';
+    this.jobTitle = data.jobTitle || '';
+    this.organizationName = data.organizationName || '';
+    this.email = data.email || '';
+    this.phone = data.phone || '';
+    this.address = data.address || '';
+    this.city = data.city || '';
+    this.state = data.state || '';
+    this.zip = data.zip || '';
+    this.country = data.country || '';
+    this.website = data.website || '';
+    this.socialMedia = data.socialMedia || {};
+    this.notes = data.notes || '';
+    this.leadSource = data.leadSource || '';
+    this.status = data.status || '';
   }
-  
-  export class Contacts {
-    photoUrl: string;
-    fullName: string;
-    firstName: string;
-    lastName: string;
-    jobTitle: string;
-    organizationName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    state: string;
-    zip: string;
-    country: string;
-    website: string;
-    socialMedia: any;
-    notes: string;
-    leadSource: string;
-    status: string;
-  
-    constructor(data: Partial<Contacts> = {}) {
-      this.photoUrl = data.photoUrl || '';
-      this.fullName = data.fullName || '';
-      this.firstName = data.firstName || '';
-      this.lastName = data.lastName || '';
-      this.jobTitle = data.jobTitle || '';
-      this.organizationName = data.organizationName || '';
-      this.email = data.email || '';
-      this.phone = data.phone || '';
-      this.address = data.address || '';
-      this.city = data.city || '';
-      this.state = data.state || '';
-      this.zip = data.zip || '';
-      this.country = data.country || '';
-      this.website = data.website || '';
-      this.socialMedia = data.socialMedia || {};
-      this.notes = data.notes || '';
-      this.leadSource = data.leadSource || '';
-      this.status = data.status || '';
-    }
-  }
+}
 
 
 @Component({
@@ -102,7 +103,7 @@ export class ContactsComponent implements OnInit {
   submittedData: any[] = [];
   selectedData: any = '';
   limit = 2;
-  contacts:Contacts= new Contacts()
+  contacts: Contacts = new Contacts()
 
 
   constructor(
@@ -113,6 +114,7 @@ export class ContactsComponent implements OnInit {
     private offcanvasService: NgbOffcanvas,
     private formBuilder: FormBuilder,
     private sweetAlertService: SweetAlertService,
+    private route: ActivatedRoute,
   ) {
     this.Form = this.formBuilder.group({
       photoUrl: [''],
@@ -121,7 +123,7 @@ export class ContactsComponent implements OnInit {
       lastName: [''],
       jobTitle: [''],
       organizationName: [''],
-      email: ['', [Validators.required, Validators.email,]], 
+      email: ['', [Validators.required, Validators.email,]],
       phone: [''],
       address: [''],
       city: [''],
@@ -136,7 +138,12 @@ export class ContactsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getContacts(this.currentPage,this.limit);
+    this.route.queryParams.subscribe(params => {
+      this.currentPage = +params['page'] || 1;
+      this.limit = +params['limit'] || this.limit;
+      this.getContacts(this.currentPage, this.limit);
+      this.onPageChange({ page: this.currentPage })
+    });
   }
 
   ngAfterViewInit(): void {
@@ -147,7 +154,7 @@ export class ContactsComponent implements OnInit {
 
   getContacts(page: number = 1, limit: number = this.limit): void {
     this.restService
-      .getAll(API.main.contact+`?page=${page}&limit=${limit}`) // Pass pagination parameters to the service
+      .getAll(API.main.contact + `?page=${page}&limit=${limit}`) // Pass pagination parameters to the service
       .subscribe(
         (response: any) => {
           this.submittedData = response.data;
@@ -277,39 +284,39 @@ export class ContactsComponent implements OnInit {
     const formData: { [key: string]: any } = this.Form.value; // Get form data
 
     if (this.Form.valid) { // Check if the form is valid
-        const data: { [key: string]: any } = {}; // Initialize data object
+      const data: { [key: string]: any } = {}; // Initialize data object
 
-        // Loop through form data to populate the data object
-        for (const key in formData) {
-            if (formData.hasOwnProperty(key)) {
-                data[key] = formData[key] || ''; // Assign form value to data object or empty string
-            }
+      // Loop through form data to populate the data object
+      for (const key in formData) {
+        if (formData.hasOwnProperty(key)) {
+          data[key] = formData[key] || ''; // Assign form value to data object or empty string
         }
+      }
 
-        console.log('Form value:', this.Form.value);
-        console.log('Data to be patched:', data); // Log data before making the API call
+      console.log('Form value:', this.Form.value);
+      console.log('Data to be patched:', data); // Log data before making the API call
 
-        // Make PATCH request to update user data
-        this.restService.patch(API.main.contact, this.user.id, data).subscribe({
-            next: (response: any) => {
-                console.log('Patch response:', response); // Log API response
-                this.offcanvasService.dismiss(); // Dismiss the offcanvas
-                this.notifService.showSuccess('User Updated Successfully.'); // Show success notification
-            },
-            error: (error) => {
-                console.error('Patch error:', error); // Log API error
-                this.notifService.showError(error.error.message); // Show error notification
-            },
-        });
+      // Make PATCH request to update user data
+      this.restService.patch(API.main.contact, this.user.id, data).subscribe({
+        next: (response: any) => {
+          console.log('Patch response:', response); // Log API response
+          this.offcanvasService.dismiss(); // Dismiss the offcanvas
+          this.notifService.showSuccess('User Updated Successfully.'); // Show success notification
+        },
+        error: (error) => {
+          console.error('Patch error:', error); // Log API error
+          this.notifService.showError(error.error.message); // Show error notification
+        },
+      });
     } else {
-        
-        Object.keys(formData).forEach((key) => {
-            if (formData[key].trim().length <= 0) {
-                this.errorFeedback[key] = `${key} is required.`;
-            }
-        });
+
+      Object.keys(formData).forEach((key) => {
+        if (formData[key].trim().length <= 0) {
+          this.errorFeedback[key] = `${key} is required.`;
+        }
+      });
     }
-}
+  }
 
 
   openUpdateUser(user: any) {
@@ -399,11 +406,11 @@ export class ContactsComponent implements OnInit {
     this.modalService.dismissAll();
   };
 
-onPageChanged(data:PaginationData){
-  this.currentPage=data.page;
-  this.getContacts(this.currentPage,this.limit)
- 
-}
+  onPageChange(event: any) {
+    this.currentPage = event.page;
+    this.getContacts(this.currentPage, this.limit)
+
+  }
 
   resetErrorFeedback() {
     let keys = Object.keys(this.errorFeedback);
@@ -417,12 +424,12 @@ onPageChanged(data:PaginationData){
     }
   }
   emailFormControl = new FormControl('', [
-  
+
     Validators.email,
 
     Validators.required,
   ]);
-  
-  
-  
+
+
+
 }

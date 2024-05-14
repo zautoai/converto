@@ -9,7 +9,7 @@ import { PaginationData } from '../../../common/intefaces';
 })
 export class PaginationComponent implements OnInit {
 
-  @Input() totalItems = 0;
+  @Input() totalPages = 0;
   @Input() limit = 10;
   currentPage = 1;
   @Output() pageChanged: EventEmitter<PaginationData> = new EventEmitter<PaginationData>();
@@ -23,6 +23,7 @@ export class PaginationComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.currentPage = +params['page'] || 1;
+      this.limit = +params['limit'] || this.limit;
     });
   }
 
