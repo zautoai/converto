@@ -21,7 +21,7 @@
           </thead>
           <tbody>
             <ng-container>
-              <tr *ngFor="let data of formList">
+              <tr *ngFor="let data of submittedData">
                 <td>
                   {{ data.title }}
                 </td>
@@ -43,15 +43,14 @@
                 </td>
               </tr>
             </ng-container>
-            <tr *ngIf="formList?.length <= 0">
-              <td class="text-center" colspan="4">No Form found.</td>
-            </tr>
+            
           </tbody>
         </table>
       </div>
 
-      <app-pagination [totalPages]="totalPages" [limit]="limit"
-      (pageChanged)="onPageChanged($event)"></app-pagination>
+      
+
+      <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
     </div>
   </div>
 </div>
