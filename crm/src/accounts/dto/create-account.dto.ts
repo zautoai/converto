@@ -47,6 +47,11 @@ export class CreateAccountDto {
     @ApiProperty({required:false})
     @IsString()
     @IsOptional()
+    domain?: string;
+
+    @ApiProperty({required:false})
+    @IsString()
+    @IsOptional()
     address?: string;
 
     @ApiProperty({required:false})
