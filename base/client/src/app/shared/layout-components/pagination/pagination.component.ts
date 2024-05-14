@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PaginationData } from './pagination.interface';
 
+import { PaginationData } from '../../../common/intefaces';
 @Component({
   selector: 'app-pagination',
   templateUrl: './pagination.component.html',

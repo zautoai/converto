@@ -50,7 +50,8 @@
         </table>
       </div>
 
-
+      <app-pagination [totalPages]="totalPages" [limit]="limit"
+      (pageChanged)="onPageChanged($event)"></app-pagination>
     </div>
   </div>
 </div>

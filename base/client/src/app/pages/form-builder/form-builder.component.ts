@@ -9,12 +9,30 @@ import { RestService } from 'src/app/shared/services/rest.service';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { ChatBotWidgetsComponent } from 'src/app/widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
 import { DeployScriptType } from '../zautosettings/settings/settings.component';
+import { PaginationData } from 'src/app/common/intefaces';
+
+interface LeadFormSchema {
+  title: string;
+  description: string;
+  isActive: boolean;
+  createLeadField: LeadFormField[];
+}
+
+interface LeadFormField {
+  label: string;
+  type: 'TEXT' | string; // Restrict type to 'TEXT' or allow for future expansion
+  contactField: string;
+  isRequired: boolean;
+}
 
 @Component({
   selector: 'app-form-builder',
   templateUrl: './form-builder.component.html',
   styleUrl: './form-builder.component.scss',
 })
+
+
+
 export class FormBuilderComponent implements OnInit {
   @ViewChild('createFormOffcanvas') createFormOffcanvas: ElementRef | undefined;
   @ViewChild('updateFormOffcanvas') updateFormOffcanvas: ElementRef | undefined;
@@ -35,6 +53,8 @@ export class FormBuilderComponent implements OnInit {
   itemPerPage: number = 10;
   submittedData: any[] = [];
   selectedData: any = null;
+  totalPages: number = 1;
+  limit = 5;
   selectedCheckboxes: string[] = [];
   htmlData: string = '';
   jsData: string = '';
@@ -341,9 +361,14 @@ export class FormBuilderComponent implements OnInit {
     );
   };
 
-  onPageChange(pageNumber: number) {
-    this.currentPage = pageNumber;
-    this.getForms();
+  // onPageChange(pageNumber: number) {
+  //   this.currentPage = pageNumber;
+  //   this.getForms();
+  // }
+  onPageChanged(data:PaginationData){
+    this.currentPage=data.page;
+    this.limit=data.limit
+    this.getForms()
   }
 
   resetErrorFeedback() {

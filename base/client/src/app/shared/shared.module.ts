@@ -54,6 +54,8 @@ import { DataTableModule } from './data-table/data-table.module';
 
 
 
+
+
 @NgModule({
   declarations: [
     FooterComponent,
@@ -85,6 +87,7 @@ import { DataTableModule } from './data-table/data-table.module';
     ImageGeneratorDirective,
     MarkdownDirective,
     LeadPipe,
+    
 
 
   ],

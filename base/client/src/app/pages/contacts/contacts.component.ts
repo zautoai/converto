@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -8,6 +8,72 @@ import { RestService } from '../../shared/services/rest.service';
 import { SweetAlertService } from '../../shared/services/sweet-alart.service';
 import { DeployScriptType } from '../zautosettings/settings/settings.component';
 import { API } from '../../config/endpoint.config';
+import { error } from 'console';
+import { PaginationData } from 'src/app/common/intefaces';
+
+export interface Contacts {
+    photoUrl: string;
+    fullName: string;
+    firstName: string;
+    lastName: string;
+    jobTitle: string;
+    organizationName: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+    website: string;
+    socialMedia: any;
+    notes: string;
+    leadSource: string;
+    status: string;
+  }
+  
+  export class Contacts {
+    photoUrl: string;
+    fullName: string;
+    firstName: string;
+    lastName: string;
+    jobTitle: string;
+    organizationName: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+    website: string;
+    socialMedia: any;
+    notes: string;
+    leadSource: string;
+    status: string;
+  
+    constructor(data: Partial<Contacts> = {}) {
+      this.photoUrl = data.photoUrl || '';
+      this.fullName = data.fullName || '';
+      this.firstName = data.firstName || '';
+      this.lastName = data.lastName || '';
+      this.jobTitle = data.jobTitle || '';
+      this.organizationName = data.organizationName || '';
+      this.email = data.email || '';
+      this.phone = data.phone || '';
+      this.address = data.address || '';
+      this.city = data.city || '';
+      this.state = data.state || '';
+      this.zip = data.zip || '';
+      this.country = data.country || '';
+      this.website = data.website || '';
+      this.socialMedia = data.socialMedia || {};
+      this.notes = data.notes || '';
+      this.leadSource = data.leadSource || '';
+      this.status = data.status || '';
+    }
+  }
+
 
 @Component({
   selector: 'app-contacts',
@@ -35,6 +101,9 @@ export class ContactsComponent implements OnInit {
   itemPerPage: number = 10;
   submittedData: any[] = [];
   selectedData: any = '';
+  limit = 2;
+  contacts:Contacts= new Contacts()
+
 
   constructor(
     private avatarService: AvatarService,
@@ -52,7 +121,7 @@ export class ContactsComponent implements OnInit {
       lastName: [''],
       jobTitle: [''],
       organizationName: [''],
-      email: ['', [ Validators.email]], 
+      email: ['', [Validators.required, Validators.email,]], 
       phone: [''],
       address: [''],
       city: [''],
@@ -67,7 +136,7 @@ export class ContactsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getContacts();
+    this.getContacts(this.currentPage,this.limit);
   }
 
   ngAfterViewInit(): void {
@@ -76,13 +145,13 @@ export class ContactsComponent implements OnInit {
     }
   }
 
-  getContacts(page: number = 1, limit: number = 10): void {
+  getContacts(page: number = 1, limit: number = this.limit): void {
     this.restService
-      .getAll(API.main.contact) // Pass pagination parameters to the service
+      .getAll(API.main.contact+`?page=${page}&limit=${limit}`) // Pass pagination parameters to the service
       .subscribe(
         (response: any) => {
           this.submittedData = response.data;
-          this.totalPages = Math.ceil(response.totalCount / limit); // Update data with response from API
+          this.totalPages = response.total; // Update data with response from API
           // Update any other pagination-related properties if necessary
         },
         (error) => {
@@ -101,8 +170,14 @@ export class ContactsComponent implements OnInit {
   }
 
   onSubmitForm(): void {
-    this.submittedData.push({ ...this.Form.value });
-    this.Form.reset();
+    if (this.Form.valid) {
+      this.submittedData.push({ ...this.Form.value });
+      this.Form.reset();
+    } else {
+      console.log('Form is not valid');
+      this.notifService.showError('Please fill out all required fields correctly');
+
+    }
   }
 
   openCreateUser() {
@@ -324,11 +399,11 @@ export class ContactsComponent implements OnInit {
     this.modalService.dismissAll();
   };
 
-  onPageChange(pageNumber: number) {
-    this.currentPage = pageNumber;
-    this.getContacts(pageNumber);
-  }
-  
+onPageChanged(data:PaginationData){
+  this.currentPage=data.page;
+  this.getContacts(this.currentPage,this.limit)
+ 
+}
 
   resetErrorFeedback() {
     let keys = Object.keys(this.errorFeedback);
@@ -341,6 +416,13 @@ export class ContactsComponent implements OnInit {
       event.preventDefault();
     }
   }
+  emailFormControl = new FormControl('', [
+  
+    Validators.email,
 
+    Validators.required,
+  ]);
+  
+  
   
 }
