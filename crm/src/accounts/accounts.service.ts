@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,6 +14,8 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { MappingService } from 'src/common/services/mapping.service';
 import { ExternalCrmService } from 'src/external-crm/external-crm.service';
 import { ObjectType } from 'src/external-crm/enum/external-crm.enum';
+import { EnrichmentProviderName } from 'src/enrichment/enrichment-provider.enum';
+import { EnrichmentService } from 'src/enrichment/enrichment.service';
 
 @Injectable()
 export class AccountsService {
@@ -24,6 +27,7 @@ export class AccountsService {
     private readonly customFieldsService: CustomFieldsService,
     private readonly externalCRMService: ExternalCrmService,
     private readonly mappingService: MappingService,
+    private readonly enrichmentService: EnrichmentService
   ) {}
 
   async create(orgId: string, createAccountDto: CreateAccountDto) {
@@ -213,6 +217,38 @@ export class AccountsService {
       message: 'Account fields fetched successfully',
       data: fields,
     };
+  }
+
+  async enrichAccountById(orgId: string, domain: string, matchRequest: { [key: string]: string }, provider: string = EnrichmentProviderName.APOLLO,) {
+    try {
+      this.logger.log(`Enriching account with domain: ${domain}`);
+      const existingAccount = await this.getAccountByDomain(orgId, domain);
+      const enrichedData = await this.enrichmentService.getOrganization(matchRequest, provider);
+      const data = { 
+        ...(!existingAccount.photoUrl ? { photoUrl: enrichedData.logUrl }: {}),
+        ...(!existingAccount.accountName ? { accountName: enrichedData.name }: {}),
+        ...(!existingAccount.industry ? { industry: enrichedData.industry }: {}),
+        ...(!existingAccount.companySize ? { companySize: +enrichedData.size }: {}),
+        ...(!existingAccount.website ? { website: enrichedData.website }: {}),
+        ...(!existingAccount.address ? { address: enrichedData.address }: {}),
+        ...(!existingAccount.city ? { city: enrichedData.city }: {}),
+        ...(!existingAccount.state ? { state: enrichedData.state }: {}),
+        ...(!existingAccount.zip ? { zip: enrichedData.zip }: {}),
+        ...(!existingAccount.country ? { country: enrichedData.country }: {}),
+        ...(!existingAccount.phone ? { phone: enrichedData.phone }: {}),
+       };
+      await this.update(orgId, existingAccount.id,data);
+      return {
+        code: 200,
+        message: 'Account enriched successfully',
+        data: data,
+      };
+    } catch (err) {
+      this.logger.error(err);
+      throw new InternalServerErrorException(
+        'Error while enriching account',
+      );
+    }
   }
 
 

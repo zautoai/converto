@@ -6,6 +6,7 @@ import { CommonModule } from 'src/common/common.module';
 import { CustomFieldsModule } from 'src/custom-fields/custom-fields.module';
 import { AccountsMicroController } from './accounts.micro.controller';
 import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
+import { EnrichmentModule } from 'src/enrichment/enrichment.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
     PrismaModule, 
     CustomFieldsModule,
     ExternalCrmModule,
+    EnrichmentModule
   ],
   controllers: [AccountsController,AccountsMicroController],
   providers: [AccountsService],

@@ -6,12 +6,14 @@ import { ContactsModule } from 'src/contacts/contacts.module';
 import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
 import { EnrichmentProcessor } from './processors/enrichment.processor';
 import { EnrichmentModule } from 'src/enrichment/enrichment.module';
+import { AccountsModule } from 'src/accounts/accounts.module';
 
 @Module({
   imports: [
     ContactsModule,
     ExternalCrmModule,
     EnrichmentModule,
+    AccountsModule,
     BullModule.forRoot({
       redis: {
         host: process.env.REDIS_IP,
