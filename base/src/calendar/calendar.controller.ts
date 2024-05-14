@@ -74,8 +74,9 @@ export class CalendarController {
   @Get('events/')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async getEvents(@Query() dateFilterDto:DateFilterDto,@Req() request: ZautoRequest)
+  async getEvents(@Req() request: ZautoRequest)
   {
-
+      const orgId = request.user.org.id;
+      return await this.calendarService.getEvents(orgId,'2024-05-14')
   }
 }

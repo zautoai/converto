@@ -2,6 +2,7 @@ import { Inject, Logger } from "@nestjs/common";
 import { ICalendarConfig } from "./interface/calendar-config.interface";
 import { Token } from "./interface/token.inteface";
 import { AvailabilityScheduleService } from "src/availability-schedule/availability-schedule.service";
+import { CalendarEvent } from "./interface/event.interface";
 
 
 export abstract class BaseCalendar {
@@ -59,9 +60,14 @@ export abstract class BaseCalendar {
 
     abstract getEventById(orgId:string, calendarId: string,eventId:string): Promise<any>;
 
-    abstract addEvent(orgId:string,calendarId:string, event: any): Promise<any>;
+    abstract addEvent(orgId:string,calendarId:string, event: CalendarEvent): Promise<any>;
 
-    abstract updateEvent(orgId:string,calendarId:string, id:string, event:any): Promise<any>;
+    abstract updateEvent(orgId:string,calendarId:string, id:string, event:CalendarEvent): Promise<any>;
 
     abstract removeEvent(orgId:string,calendarId:string, id:string): Promise<void>;
+    abstract getFreeBusy(orgId: string, calendarId: string, startDate: string, endDate: string): Promise<any>;
+
+    getCurrentTimeZone(): string {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
 }

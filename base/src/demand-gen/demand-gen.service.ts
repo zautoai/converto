@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateDemandGenDto } from './dto/create-demand-gen.dto';
 import { generateUniqueId, parseURLParams } from 'src/common/helpers/demand-gen.utils';
 import { LlmService } from 'src/llm/llm.service';
@@ -7,12 +7,21 @@ import { DEMAND_GENT_CAMPAIGN_FINDR_PROMPT } from 'src/common/templates/demand-g
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class DemandGenService {
+export class DemandGenService implements OnModuleInit{
 
   constructor(
     private readonly llmService: LlmService,
     private readonly prisma: PrismaService
   ) { }
+
+  async onModuleInit() {
+    // const cmpaign = await this.create({
+    //   orgId: 'a3ccfcf5-4e1c-43bd-a1c1-1e30c236ca26',
+    //   url: 'https://6sense.com/platform/sales/?utm_source=linkedinad&utm_medium=cpc&utm_campaign=baddata&li_fat_id=7bb133b8-978f-473e-abf9-f0c4308bc3c2'
+    // })
+    // console.log(cmpaign);
+    
+  }
 
   async create(createDemandGenDto: CreateDemandGenDto) {
     try {

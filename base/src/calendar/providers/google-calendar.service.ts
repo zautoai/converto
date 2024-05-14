@@ -6,6 +6,7 @@ import { HttpService } from '@nestjs/axios';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { google, Auth } from 'googleapis';
 import { GooglEventDto } from '../dto/google.event.dto';
+import { CalendarEvent } from '../interface/event.interface';
 
 @Injectable()
 export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
@@ -259,7 +260,9 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
                 timeMin: hasBothDate ? startDate : selectedDate.timeMin,
                 timeMax: hasBothDate ? endDate : selectedDate.timeMax
             });
-            return response.data;
+            const events = response.data.items;
+            const _events = events.map(event => this.formatCalendarEvent(event));
+            return _events;
         }
         catch(err)
         {
@@ -281,7 +284,9 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
                 calendarId,
                 eventId
             })
-            return response.data;
+            const event = response.data;
+            const _event = event ? this.formatCalendarEvent(event) : null;
+            return _event;
         }
         catch(err)
         {
@@ -289,9 +294,10 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
             throw new Error(err);
         }
     }
-    async addEvent(orgId: string, calendarId:string, event: GooglEventDto): Promise<any> {
+    async addEvent(orgId: string, calendarId:string, event: CalendarEvent): Promise<any> {
         try
         {
+            const formattedEvent = this.reverseFormatCalendarEvent(event);
             const accessToken = await this.getAccessToken(orgId);
             if(!accessToken) return null;
             this.googleClient = new google.auth.OAuth2();
@@ -301,7 +307,7 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
             const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
             const response = await calendar.events.insert({
                 calendarId: calendarId,
-                requestBody: event
+                requestBody: formattedEvent
             });
             return response.data;
         }
@@ -311,9 +317,10 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
             throw new Error(err);
         }
     }
-    async updateEvent(orgId: string,calendarId: string, eventId:string, event: GooglEventDto): Promise<any> {
+    async updateEvent(orgId: string,calendarId: string, eventId:string, event: CalendarEvent): Promise<any> {
         try
         {
+            const formattedEvent = this.reverseFormatCalendarEvent(event);
             const accessToken = await this.getAccessToken(orgId);
             if(!accessToken) return null;
             this.googleClient = new google.auth.OAuth2();
@@ -324,7 +331,7 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
             const response = await calendar.events.update({
                 calendarId: calendarId,
                 eventId: eventId,
-                requestBody: event
+                requestBody: formattedEvent
             });
             return response.data;
         }
@@ -332,7 +339,7 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
         {
             this.logger.error(err);
             throw new Error(err);
-        }
+        } 
     }
     async removeEvent(orgId: string,calendarId: string,eventId:string): Promise<void> {
         try
@@ -355,4 +362,76 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
             throw new Error(err);
         }
     }
+
+    async getFreeBusy(orgId: string, calendarId: string, startDate: string, endDate: string): Promise<any> {
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            this.googleClient = new google.auth.OAuth2();
+            this.googleClient.setCredentials({
+                access_token: accessToken,
+            });
+            const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
+            const response = await calendar.freebusy.query({
+                requestBody:{
+                    timeMin: startDate,
+                    timeMax: endDate,
+                    items: [{ id: calendarId }]
+                }
+            });
+            return response.data.calendars[calendarId].busy;
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+            throw new Error(err);
+        }
+    }
+
+    formatCalendarEvent(event:any):CalendarEvent
+    {
+        const calendarEvent: CalendarEvent = {
+            id: event.id,
+            title: event.summary,
+            description: event.description,
+            start: event.start.dateTime,
+            end: event.end.dateTime,
+            timezone: this.getCurrentTimeZone()
+        }
+        return calendarEvent;
+    }
+
+    reverseFormatCalendarEvent(calendarEvent: CalendarEvent): any {
+        const googleEvent: any = {};
+
+        if (calendarEvent.id != null && calendarEvent.id !== '') {
+            googleEvent.id = calendarEvent.id;
+        }
+
+        if (calendarEvent.title != null && calendarEvent.title !== '') {
+            googleEvent.summary = calendarEvent.title;
+        }
+
+        if (calendarEvent.description != null && calendarEvent.description !== '') {
+            googleEvent.description = calendarEvent.description;
+        }
+
+        if (calendarEvent.start != null && calendarEvent.start !== '') {
+            googleEvent.start = {
+                dateTime: calendarEvent.start,
+                timeZone: calendarEvent.timezone
+            };
+        }
+
+        if (calendarEvent.end != null && calendarEvent.end !== '') {
+            googleEvent.end = {
+                dateTime: calendarEvent.end,
+                timeZone: calendarEvent.timezone
+            };
+        }
+
+        return googleEvent;
+    }
+    
 }
