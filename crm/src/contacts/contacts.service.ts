@@ -10,7 +10,9 @@ import { FilterDto } from 'src/common/dtos/filter.dto';
 import { CustomFieldParent } from 'src/common/enum/enums';
 import { MappingService } from 'src/common/services/mapping.service';
 import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
+import { EnrichmentProviderName } from 'src/enrichment/enrichment-provider.enum';
 import { EnrichmentService } from 'src/enrichment/enrichment.service';
+import { IEnrichment } from 'src/enrichment/interfaces/enrichment.interface';
 import { CrmNames, ObjectType } from 'src/external-crm/enum/external-crm.enum';
 import { ExternalCrmService } from 'src/external-crm/external-crm.service';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
@@ -295,6 +297,7 @@ export class ContactsService {
       code: 200,
       success: true,
       message: 'Contact updated successfully',
+      data: updateContactDto,
     };
   }
 
@@ -378,24 +381,6 @@ export class ContactsService {
     });
   }
 
-  async enrichContact(
-    orgId: string,
-    contactId: string,
-    matchRequest: { [key: string]: string },
-  ) {
-    try {
-      this.logger.log('Enriching contact');
-      const response = await this.enrichmentService.enrichPeopleByContact(
-        orgId,
-        contactId,
-        matchRequest,
-      );
-      this.logger.log('Contact enriched');
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   async getContactFields(orgId: string) {
     const defaultFields = await this.customFieldsService.getTableFields(
       orgId,
@@ -418,6 +403,44 @@ export class ContactsService {
 
   convertToKey(name: string) {
     return name.toLowerCase().replaceAll(' ', '_');
+  }
+
+  async enrichPeopleByContact(orgId: string,contactId: string,matchRequest: { [key: string]: string },provider: string = EnrichmentProviderName.APOLLO,) {
+    try {
+      this.logger.log(`Enriching people with contactId: ${contactId}`);
+      const enrichedData = await this.enrichmentService.getPeople(matchRequest);
+      const prisma = await this.prismaClientManager.getClient(orgId);
+      const existingContact = await prisma.contact.findUnique({
+        where: { id: contactId },
+      });
+      const data = {
+        ...(!existingContact.firstName ? { firstName: enrichedData.firstName }: {}),
+        ...(!existingContact.lastName ? { lastName: enrichedData.lastName } : {}),
+        ...(!existingContact.fullName ? { fullName: enrichedData.fullName } : {}),
+        ...(!existingContact.phone ? { phone: enrichedData.phone } : {}),
+        ...(!existingContact.address ? { address: enrichedData.address } : {}),
+        ...(!existingContact.website ? { website: enrichedData.website } : {}),
+        ...(!existingContact.city ? { city: enrichedData.city } : {}),
+        ...(!existingContact.state ? { state: enrichedData.state } : {}),
+        ...(!existingContact.zip ? { zip: enrichedData.zip } : {}),
+        ...(!existingContact.country ? { country: enrichedData.country } : {}),
+        ...(!existingContact.organizationName ? { organizationName: enrichedData.organizationName } : {}),
+        ...(!existingContact.jobTitle ? { jobTitle: enrichedData.jobTitle } : {}),
+        ...(!existingContact.photoUrl ? { photoUrl: enrichedData.photoUrl } : {}),
+        ...(!existingContact.socialMedia ? {socialMedia: enrichedData.socialMedia}: {}),
+        ...(!existingContact.notes ? { notes: enrichedData.notes } : {}),
+      };
+      // const enrichedContact = await prisma.contact.update({
+      //   where: { id: contactId },
+      //   data: {...data},
+      // });
+      const enrichedContact = (await this.updateContact(orgId, contactId, data)).data;
+
+      this.logger.log(`Enriched contact with id: ${enrichedContact.email}`);
+      return enrichedContact;
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async hasMapping(orgId:string):Promise<Boolean>

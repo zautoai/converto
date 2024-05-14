@@ -136,15 +136,7 @@ export class EnrichmentService {
         where: { id: contactId },
         data: {...data},
       });
-      try{
-        const existingCrmContact = await this.externalCrmService.getContactByEmail(orgId,existingContact.email);
-        if(existingCrmContact){
-          await this.externalCrmService.updateContact(orgId, existingCrmContact.id, {...enrichedContact});
-        }
-      }
-      catch(err){
-        this.logger.error(err);
-      }
+
       this.logger.log(`Enriched contact with id: ${contactId}`);
       return enrichedContact;
     } catch (e) {
