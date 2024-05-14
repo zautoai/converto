@@ -5,9 +5,15 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { CommonModule } from 'src/common/common.module';
 import { CustomFieldsModule } from 'src/custom-fields/custom-fields.module';
 import { AccountsMicroController } from './accounts.micro.controller';
+import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
 
 @Module({
-  imports: [CommonModule, PrismaModule, CustomFieldsModule],
+  imports: [
+    CommonModule,
+    PrismaModule, 
+    CustomFieldsModule,
+    ExternalCrmModule,
+  ],
   controllers: [AccountsController,AccountsMicroController],
   providers: [AccountsService],
   exports: [AccountsService],

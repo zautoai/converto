@@ -1,4 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { AccountsService } from 'src/accounts/accounts.service';
 import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
 import { WebClientService } from 'src/common/services/web-client.service';
 import { ContactsService } from 'src/contacts/contacts.service';
@@ -14,7 +15,8 @@ export class StartupService implements OnModuleInit {
     private readonly prismaClientManager: PrismaClientManager,
     private readonly schemaManager: SchemaManagerService,
     private readonly organizationService: OrganizationService,
-    private readonly contactService: ContactsService
+    private readonly contactService: ContactsService,
+    private readonly accountService: AccountsService,
   ) { }
 
   onModuleInit() {
@@ -92,5 +94,7 @@ export class StartupService implements OnModuleInit {
   {
     this.contactService.syncExternalCrmToContacts(orgId);
     this.contactService.syncContactsToExternalCrm(orgId);
+    this.accountService.syncExternalCrmToAccounts(orgId);
+    this.accountService.syncAccountsToExternalCrm(orgId);
   }
 }
