@@ -126,11 +126,6 @@ export class MappingService {
                 },
                 data:crmMappingDto
             });
-            // this.crmSyncQueue.add('SyncContact',{
-            //     orgId: orgId,
-            //     crmName: crmMappingDto.crmName,
-            //     objectType: crmMappingDto.objectType,
-            // });
             return mapping;
         }
         catch(e)
@@ -158,7 +153,7 @@ export class MappingService {
 
     async handleMapping(orgId: string, crmName: string, objectType:string,data: any): Promise<any> {
         const mappings = await this.getMappingsBycrmNameAndObjectType(orgId, crmName, objectType);
-        let mappedData = {};
+        let mappedData = {}; 
         for(const mapping of mappings) {
             const externalCRMFieldName = mapping.externalCRMFieldName;
             const fieldName = mapping.fieldName;
