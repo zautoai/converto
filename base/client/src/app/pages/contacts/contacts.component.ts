@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild , ChangeDetectorRef,} from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
@@ -113,6 +113,7 @@ export class ContactsComponent implements OnInit {
     private restService: RestService,
     private offcanvasService: NgbOffcanvas,
     private formBuilder: FormBuilder,
+    private changeDetectorRef: ChangeDetectorRef,
     private sweetAlertService: SweetAlertService,
     private route: ActivatedRoute,
   ) {
@@ -176,16 +177,16 @@ export class ContactsComponent implements OnInit {
     }
   }
 
-  onSubmitForm(): void {
-    if (this.Form.valid) {
-      this.submittedData.push({ ...this.Form.value });
-      this.Form.reset();
-    } else {
-      console.log('Form is not valid');
-      this.notifService.showError('Please fill out all required fields correctly');
+  // onSubmitForm(): void {
+  //   if (this.Form.valid) {
+  //     this.submittedData.push({ ...this.Form.value });
+  //     this.Form.reset();
+  //   } else {
+  //     console.log('Form is not valid');
+  //     this.notifService.showError('Please fill out all required fields correctly');
 
-    }
-  }
+  //   }
+  // }
 
   openCreateUser() {
     this.Form.reset();
@@ -255,20 +256,26 @@ export class ContactsComponent implements OnInit {
     this.showHTML = false;
   }
 
-  onCreateuserSubmit(formData: any) {
-    const data: any = {};
+  onCreateuserSubmit() {
+    this.resetErrorFeedback();
+    const formData: { [key: string]: string | null } = this.Form.value;
 
-    for (const key in formData) {
-      if (formData.hasOwnProperty(key)) {
-        data[key] = formData[key] || '';
-      }
-    }
+    const data = Object.entries(formData)
+      .filter(([_, value]) => value !== null)
+      .reduce((acc, [key, value]) => {
+        if (value !== null) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as { [key: string]: string });
 
-    this.restService.post(API.main.orgUser, data).subscribe({
+    this.restService.post(API.main.contact, data).subscribe({
       next: (response: any) => {
-        console.log(response);
+        console.log("response" ,response);
         this.offcanvasService.dismiss();
         this.notifService.showSuccess('User Added Successfully.');
+        this.getContacts();
+        this.changeDetectorRef.detectChanges();
       },
       error: (error) => {
         console.error(error);
