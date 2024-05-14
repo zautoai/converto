@@ -6,6 +6,11 @@ export interface IntegrationConfig {
   description:string;
   btntext:string;
 }
+export interface PaginationData {
+  page: number;
+  limit: number;
+}
+
 
   export interface availableHour{
     id?:string;

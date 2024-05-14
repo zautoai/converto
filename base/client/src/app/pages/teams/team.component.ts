@@ -6,6 +6,7 @@ import { RestService } from 'src/app/shared/services/rest.service';
 import { API } from 'src/app/config/endpoint.config';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
+import { PaginationData } from 'src/app/common/intefaces';
 
 @Component({
   selector: 'app-team',
@@ -22,6 +23,8 @@ export class TeamComponent implements OnInit {
   userList : any= [];
   selectedUser : any = undefined;
   isEdit: boolean = false;
+  totalPages: number = 1;
+  limit = 5;
 
   userForm: FormGroup;
   errorFeedback:any = {name:"",email:"",password:""};
@@ -151,6 +154,11 @@ export class TeamComponent implements OnInit {
         this.notifService.showError(error.error.message);
       })
     }
+  }
+  onPageChanged(data:PaginationData){
+    this.currentPage=data.page;
+    this.limit=data.limit
+    this.getUsers()
   }
 
   delete = (user: any) => {

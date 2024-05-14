@@ -34,7 +34,6 @@ export class ContentLayoutComponent implements OnInit, AfterViewInit {
   ) {
     
     let path = router.url;
-    console.log(path)
     // if(path.includes('agents')) {
     //   this.navServices.botItems.subscribe((menuItems: any[]) => {
     //     menuItems = menuItems.map(item => {

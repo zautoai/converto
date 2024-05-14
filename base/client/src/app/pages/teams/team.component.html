@@ -48,8 +48,8 @@
         </table>
       </div>
 
-      <app-pagination [totalItem]="userList.total" [limit]="itemPerPage" (pageChange)="onPageChange($event)">
-      </app-pagination>
+      <app-pagination [totalPages]="totalPages" [limit]="limit"
+      (pageChanged)="onPageChanged($event)"></app-pagination>
     </div>
   </div>
 </div>

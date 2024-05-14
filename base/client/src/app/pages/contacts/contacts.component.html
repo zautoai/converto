@@ -123,7 +123,14 @@
           </tbody>
         </table>
       </div>
+      <div class="p-2">
+        
+        <app-pagination [totalPages]="totalPages" [limit]="limit"
+            (pageChanged)="onPageChanged($event)"></app-pagination>
+        
     </div>
+    </div>
+    
   </div>
 </div>
 
@@ -156,6 +163,7 @@
 </ng-template>
 
 <ng-template #createUserOffcanvas let-offcanvas>
+  
   <div class="offcanvas-header">
     <h4 class="offcanvas-title"><i class="fe fe-cube"></i> Create Contacts</h4>
     <button
@@ -177,7 +185,10 @@
           name="title"
           placeholder="photoUrl"
           (keydown)="preventDefault($event)"
+          [formControl]="emailFormControl"
+          
         />
+        
       </div>
       <div class="form-group">
         <label class="form-label">Full Name</label>
@@ -187,6 +198,8 @@
           formControlName="fullName"
           name="title"
           placeholder="fullName"
+          (keydown)="preventDefault($event)"
+
         />
       </div>
       <div class="form-group">
@@ -197,6 +210,7 @@
           formControlName="firstName"
           name="title"
           placeholder="firstName"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -207,6 +221,7 @@
           formControlName="lastName"
           name="title"
           placeholder="lastName"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -217,6 +232,7 @@
           formControlName="jobTitle"
           name="title"
           placeholder="jobTitle"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -227,17 +243,26 @@
           formControlName="organizationName"
           name="title"
           placeholder="organizationName"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
         <input
-        type="email"
-          placeholder="Email"
-          formControlName="email"
-          class="form-control ng-pristine ng-invalid ng-touched"
+            type="email"
+            placeholder="Email"
+            formControlName="email"
+            class="form-control"
+            (keydown)="preventDefault($event)"
         />
-      </div>
+        <div *ngIf="emailFormControl.hasError('required')">
+          Email is required.
+        </div>
+        <div *ngIf="emailFormControl.hasError('email')">
+          Please enter a valid email address.
+        </div>
+       </div>
+     
       <div class="form-group">
         <label class="form-label">Phone</label>
         <input
@@ -246,6 +271,7 @@
           formControlName="phone"
           name="title"
           placeholder="phone"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -256,6 +282,7 @@
           formControlName="address"
           name="title"
           placeholder="address"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -266,6 +293,7 @@
           formControlName="city"
           name="title"
           placeholder="city"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -276,6 +304,7 @@
           formControlName="state"
           name="title"
           placeholder="state"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -286,6 +315,7 @@
           formControlName="zip"
           name="title"
           placeholder="zip"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -296,6 +326,7 @@
           formControlName="country"
           name="title"
           placeholder="country"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -306,6 +337,7 @@
           formControlName="website"
           name="title"
           placeholder="website"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -316,6 +348,7 @@
           formControlName="notes"
           name="title"
           placeholder="notes"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -326,6 +359,7 @@
           formControlName="leadSource"
           name="title"
           placeholder="leadSource"
+          (keydown)="preventDefault($event)"
         />
       </div>
       <div class="form-group">
@@ -336,6 +370,7 @@
         formControlName="status"
         name="title"
         placeholder="status"
+        (keydown)="preventDefault($event)"
         />
       </div>
       <div class="d-flex justify-content-end mt-4">
@@ -352,6 +387,7 @@
       </div>
     </form>
   </div>
+
 </ng-template>
 
 <ng-template #updateUserOffcanvas let-offcanvas>

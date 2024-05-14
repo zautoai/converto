@@ -6,16 +6,14 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AvatarService } from '../../shared/services/avatar.service';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { API } from '../../config/endpoint.config';
+import { AvatarService } from '../../shared/services/avatar.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { RestService } from '../../shared/services/rest.service';
 import { SweetAlertService } from '../../shared/services/sweet-alart.service';
-import { DeployScriptType } from '../zautosettings/settings/settings.component';
-import { API } from '../../config/endpoint.config';
-import { log } from 'console';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-accounts',
@@ -27,7 +25,6 @@ export class AccountsComponent implements OnInit {
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
-  @Input() chatBotWidget!: ChatBotWidgetsComponent;
 
   user: any = {};
   userList: any = [];
@@ -35,14 +32,11 @@ export class AccountsComponent implements OnInit {
   isEdit: boolean = false;
   Form: FormGroup;
   errorFeedback: any = { title: '', describe: '' };
-  showDescription: boolean = true;
-  showHTML: boolean = false;
-  showScript: boolean = false;
-  currentPage: number = 1;
-  totalPages: number = 1;
-  itemPerPage: number = 10;
+  currentPage: number = 0;
+  limit: number = 1;
   submittedData: any[] = [];
   selectedData: any = null;
+  totalItems: number = 0;
 
   constructor(
     private avatarService: AvatarService,
@@ -53,6 +47,7 @@ export class AccountsComponent implements OnInit {
     private formBuilder: FormBuilder,
     private sweetAlertService: SweetAlertService,
     private changeDetectorRef: ChangeDetectorRef,
+    private route: ActivatedRoute,
   ) {
     this.Form = this.formBuilder.group({
       parentAccountId: [''],
@@ -75,40 +70,29 @@ export class AccountsComponent implements OnInit {
       source: [''],
       status: [''],
     });
-    console.log(FormData);
   }
 
   ngOnInit(): void {
-    this.getAccounts();
+    this.route.queryParams.subscribe(params => {
+      this.currentPage = +params['page'] || 1;
+      this.getAccounts();
+      this.onPageChange({ page: this.currentPage })
+    });
   }
-  ngAfterViewInit(): void {
-    if (this.chatBotWidget) {
-      this.chatBotWidget.getAgent(this.avatarService.getAvatarId());
-    }
-  }
-  getAccounts(page: number = 1, limit: number = 10): void {
+
+  getAccounts(): void {
     this.restService
-      .getAll(API.main.account +`?limit=${limit}&page=${page}`)
+      .get(API.main.account, `?limit=${this.limit}&page=${this.currentPage}`)
       .subscribe(
         (response: any) => {
           this.submittedData = response.data;
-          console.log(response.data);
-
-          this.totalPages = Math.ceil(response.totalCount / limit);
+          this.totalItems = response.total
         },
         (error) => {
           console.error(error);
           this.notifService.showError(error.error.message);
         },
       );
-  }
-
-
-  
-
-  onSubmitForm(Form: any) {
-    this.submittedData.push({ ...this.Form.value });
-    this.Form.reset();
   }
 
   openCreateUser() {
@@ -133,25 +117,6 @@ export class AccountsComponent implements OnInit {
     });
   }
 
-  toggleDescription(): void {
-    this.showDescription = !this.showDescription;
-    this.showHTML = false;
-    this.showScript = false;
-  }
-
-  toggleHTML(): void {
-    this.showHTML = !this.showHTML;
-
-    this.showDescription = false;
-    this.showScript = false;
-  }
-
-  toggleScript(): void {
-    this.showScript = !this.showScript;
-    this.showDescription = false;
-    this.showHTML = false;
-  }
-
   onCreateuserSubmit() {
     this.resetErrorFeedback();
     const formData: { [key: string]: string | null } = this.Form.value;
@@ -165,11 +130,9 @@ export class AccountsComponent implements OnInit {
         return acc;
       }, {} as { [key: string]: string });
 
-    console.log(data);
 
     this.restService.post(API.main.account, data).subscribe({
       next: (response: any) => {
-        console.log(response);
 
         this.offcanvasService.dismiss();
         this.notifService.showSuccess('Accounts Added Successfully.');
@@ -186,8 +149,7 @@ export class AccountsComponent implements OnInit {
   openUpdateUser(data: any) {
     this.user = data; // Store the selected user data
     this.Form.reset();
-    console.log(data);
-    
+
     this.Form.get('parentAccountId')?.setValue(data?.parentAccountId);
     this.Form.get('accountName')?.setValue(data?.accountName);
     this.Form.get('industry')?.setValue(data?.industry);
@@ -207,8 +169,7 @@ export class AccountsComponent implements OnInit {
     this.Form.get('source')?.setValue(data?.source);
     this.Form.get('status')?.setValue(data?.status);
 
-  console.log(this.Form);
-  
+
     this.resetErrorFeedback();
     this.offcanvasService.open(this.updateUserOffcanvas, {
       position: 'end',
@@ -322,13 +283,12 @@ export class AccountsComponent implements OnInit {
         accountName: this.Form.value.accountName,
         email: this.Form.value.email,
         phone: this.Form.value.phone,
-        updateAccountFields, 
+        updateAccountFields,
       };
       this.restService
         .patch(API.main.account, this.user.id, updatedAccountData)
         .subscribe(
           (response: any) => {
-            console.log(response);
             this.notifService.showSuccess('Account Updated Successfully.');
             this.getAccounts();
           },
@@ -344,7 +304,7 @@ export class AccountsComponent implements OnInit {
     } else {
       this.Form.markAllAsTouched();
     }
-}
+  }
 
 
   delete = (data: any) => {
@@ -373,7 +333,6 @@ export class AccountsComponent implements OnInit {
       (response: any) => {
         this.notifService.showSuccess('Accounts Deleted Successfully.');
         this.closeModal();
-        console.log(this.user);
         this.getAccounts()
       },
       (error) => {
@@ -383,9 +342,9 @@ export class AccountsComponent implements OnInit {
     );
   };
 
-  onPageChange(pageNumber: number) {
-    this.currentPage = pageNumber;
-    this.getAccounts(pageNumber);
+  onPageChange(event: any) {
+    this.currentPage = event.page;
+    this.getAccounts();
   }
 
   resetErrorFeedback() {

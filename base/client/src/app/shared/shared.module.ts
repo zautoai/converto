@@ -28,7 +28,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { ChatbotComponent } from './layout-components/chatbot/chatbot.component';
 import { PaginationComponent } from './layout-components/pagination/pagination.component';
 
-import { HttpClientModule,HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { ZautoLayoutComponent } from './layout-components/layout/zauto-layout/zauto-layout.component';
 import { AgentInterceptor } from './interceptors/agent.interceptor';
@@ -51,6 +51,8 @@ import { LeadPipe } from './pipes/lead.pipe';
 
 import { WidgetsModule } from '../widgets/widgets.module';
 import { DataTableModule } from './data-table/data-table.module';
+
+
 
 
 
@@ -85,8 +87,9 @@ import { DataTableModule } from './data-table/data-table.module';
     ImageGeneratorDirective,
     MarkdownDirective,
     LeadPipe,
-
     
+
+
   ],
   imports: [
     CommonModule,
@@ -143,7 +146,7 @@ import { DataTableModule } from './data-table/data-table.module';
     DataTableModule
   ],
 
-  providers:[
+  providers: [
     LoaderService,
     {
       provide: HTTP_INTERCEPTORS,
@@ -160,9 +163,10 @@ import { DataTableModule } from './data-table/data-table.module';
       useClass: AvatarInterceptor,
       multi: true,
     },
-    {provide: HTTP_INTERCEPTORS, 
-      useClass: LoaderInterceptor, 
-      multi: true 
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoaderInterceptor,
+      multi: true
     },
   ],
 
