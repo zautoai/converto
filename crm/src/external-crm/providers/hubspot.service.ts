@@ -9,6 +9,7 @@ import { FilterOperatorEnum, PublicGdprDeleteInput, SimplePublicObjectInput, Sim
 
 @Injectable()
 export class HubspotService extends BaseExternalCrm {
+    
        
     constructor(
         private readonly httpService:HttpService,
@@ -325,6 +326,36 @@ export class HubspotService extends BaseExternalCrm {
         const hubspotClient = new Client({ accessToken:  accessToken});
         const company = await hubspotClient.crm.companies.basicApi.getById(id);
         return company.properties;
+    }
+    async getCompanyByName(orgId: string, name: string): Promise<any> {
+        try
+        {
+            const accessToken = await this.getAccessToken(orgId);
+            if(!accessToken) return null;
+            const hubspotClient = new Client({ accessToken:  accessToken});
+            const company = await hubspotClient.crm.companies.searchApi.doSearch({
+                filterGroups: [
+                    {
+                        filters: [
+                            {
+                                propertyName: 'name',
+                                operator: FilterOperatorEnum.Eq,
+                                value: name,
+                            }
+                        ]
+                    }
+                ],
+                limit: 100,
+                after: '',
+                sorts: [],
+                properties: []
+            });
+            return company.results[0].properties || null; 
+        }
+        catch(e)
+        {
+            return null;
+        }
     }
     async createCompany(orgId: string, data: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
