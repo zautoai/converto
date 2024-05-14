@@ -153,11 +153,11 @@
   </div>
   <hr class="m-0" />
   <div class="offcanvas-body">
-    <form [formGroup]="Form" (ngSubmit)="onSubmitForm()">
+    <form [formGroup]="Form" (ngSubmit)="onCreateuserSubmit()">
       <div class="form-group">
         <label class="form-label">Photo URL</label>
         <input type="text" class="form-control" formControlName="photoUrl" name="title" placeholder="photoUrl"
-          (keydown)="preventDefault($event)" [formControl]="emailFormControl" />
+          (keydown)="preventDefault($event)"  />
 
       </div>
       <div class="form-group">
@@ -189,12 +189,7 @@
         <label class="form-label">Email</label>
         <input type="email" placeholder="Email" formControlName="email" class="form-control"
           (keydown)="preventDefault($event)" />
-        <div *ngIf="emailFormControl.hasError('required')">
-          Email is required.
-        </div>
-        <div *ngIf="emailFormControl.hasError('email')">
-          Please enter a valid email address.
-        </div>
+        
       </div>
 
       <div class="form-group">

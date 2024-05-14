@@ -354,4 +354,9 @@ export class AccountsComponent implements OnInit {
       this.errorFeedback[key] = '';
     }
   }
+  preventDefault(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+    }
+  }
 }

@@ -10,6 +10,7 @@ import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { ChatBotWidgetsComponent } from 'src/app/widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
 import { DeployScriptType } from '../zautosettings/settings/settings.component';
 import { PaginationData } from 'src/app/common/intefaces';
+import { ActivatedRoute } from '@angular/router';
 
 interface LeadFormSchema {
   title: string;
@@ -53,8 +54,8 @@ export class FormBuilderComponent implements OnInit {
   itemPerPage: number = 10;
   submittedData: any[] = [];
   selectedData: any = null;
-  totalPages: number = 1;
-  limit = 5;
+  totalItems: number = 1;
+  limit = 2;
   selectedCheckboxes: string[] = [];
   htmlData: string = '';
   jsData: string = '';
@@ -68,6 +69,7 @@ export class FormBuilderComponent implements OnInit {
     private formBuilder: FormBuilder,
     private sweetAlertService: SweetAlertService,
     private authService: AuthService,
+    private route: ActivatedRoute,
   ) {
     this.Form = this.formBuilder.group({
       title: [''],
@@ -79,7 +81,13 @@ export class FormBuilderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getForms();
+    this.route.queryParams.subscribe(params => {
+      this.currentPage = +params['page'] || 1;
+      this.limit = +params['limit'] || this.limit;
+      this.getForms();
+      this.onPageChange({ page: this.currentPage })
+    });
+
   }
   ngAfterViewInit(): void {
     if (this.chatBotWidget) {
@@ -113,22 +121,19 @@ export class FormBuilderComponent implements OnInit {
     );
   }
 
-  getForms = () => {
+  getForms = () :void=> {
     this.restService
-      .getAll(
-        API.main.formbuilder +
-          `?limit=${this.itemPerPage}&page=${this.currentPage}`,
-      )
-      .subscribe(
-        (response: any) => {
-          this.formList = response.data;
-          console.log(response);
-        },
-        (error) => {
-          console.log(error);
-          this.notifService.showError(error.error.message);
-        },
-      );
+    .get(API.main.formbuilder, `?limit=${this.limit}&page=${this.currentPage}`)
+    .subscribe(
+      (response: any) => {
+        this.submittedData = response.data;
+        this.totalItems = response.total
+      },
+      (error) => {
+        console.error(error);
+        this.notifService.showError(error.error.message);
+      },
+    );
   };
 
   openCreateForm() {
@@ -365,9 +370,9 @@ export class FormBuilderComponent implements OnInit {
   //   this.currentPage = pageNumber;
   //   this.getForms();
   // }
-  onPageChanged(data:PaginationData){
-    this.currentPage=data.page;
-    this.limit=data.limit
+  onPageChange(event:any){
+    this.currentPage=event.page;
+    
     this.getForms()
   }
 

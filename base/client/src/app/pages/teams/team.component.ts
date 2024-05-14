@@ -28,7 +28,7 @@ export class TeamComponent implements OnInit {
 
   userForm: FormGroup;
   errorFeedback:any = {name:"",email:"",password:""};
-
+  totalItems: number = 0;
   currentPage:number = 1;
   itemPerPage:number = 10;
 
@@ -195,11 +195,12 @@ export class TeamComponent implements OnInit {
     })
   }
 
-  onPageChange(pageNumber:number)
+  onPageChange(event:any)
   {
-    this.currentPage = pageNumber;
+    this.currentPage = event.page;
     this.getUsers();
   }
+  
 
   resetErrorFeedback()
   {

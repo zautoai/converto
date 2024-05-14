@@ -126,7 +126,7 @@
         <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> Create</button>
       </div>
     </form>
-
+    <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
   </div>
 </ng-template>
 
