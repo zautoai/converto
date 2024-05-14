@@ -89,11 +89,7 @@ export class SchemaManagerService {
     }
   }
 
-  async applyMigration(
-    orgId: string,
-    init: boolean = false,
-    rollback?: Function,
-  ) {
+  async applyMigration(orgId: string,init: boolean = false,rollback?: Function) {
     try {
       const schemaName = getSchemaName(orgId);
       const migrationBasePath = 'prisma/migrations';
@@ -113,14 +109,14 @@ export class SchemaManagerService {
           const migrationSQL = fs.readFileSync(migrationFilePath, 'utf8');
           const sqlStatements = migrationSQL
             .split(';')
-            .filter((statement) => statement.trim() !== '');
+            .filter((statement) => statement.trim() !== ''); 
 
           for (const statement of sqlStatements) {
             const query: Sql = Prisma.sql`${raw(statement)}`;
             try {
               await prisma.$executeRaw(query);
             } catch (error) {
-              // console.error('Error applying migration:');
+              // console.error(`[${migrationFolder}]Error applying migration:`+error.message);
             }
           }
         }

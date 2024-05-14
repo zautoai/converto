@@ -186,6 +186,7 @@ model ExternalCrmCredential {
   accessToken  String
   expiresIn    Int
   crmName      String
+  isPriority   Boolean  @default(true)
   createdAt    DateTime @default(now())
   modifiedAt   DateTime @updatedAt
 }

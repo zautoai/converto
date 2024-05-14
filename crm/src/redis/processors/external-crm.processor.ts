@@ -12,11 +12,9 @@ export class ExternalCrmProcessor {
     private readonly contactService: ContactsService
   ) {}
 
-  @Process('CreateContact')
+  @Process('SyncContact')
   async handleCreateContact(job: any) {
-    this.logger.log(`CreateContact job started`);
-    const { orgId, crmName, data } = job.data;
-    console.log(data);
-    
+    this.logger.log(``);
+    await this.contactService.syncExternalCrmToContacts(job.data.orgId);
   }
 }

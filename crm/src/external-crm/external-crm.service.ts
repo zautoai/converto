@@ -4,6 +4,8 @@ import { CreateCRMMappingsDto } from './dto/create-crm-mappings.dto';
 import { MappingService } from '../common/services/mapping.service';
 import { ObjectType } from './enum/external-crm.enum';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 
 @Injectable()
@@ -15,6 +17,7 @@ export class ExternalCrmService implements OnModuleInit{
         private readonly prismaClientManager: PrismaClientManager,
         private readonly crmProvider:ExternalCrmProvider,
         private readonly mappingService: MappingService,
+        @InjectQueue('crm_sync_queue') private crmSyncQueue: Queue,
     ){}
 
     async onModuleInit() {
@@ -55,11 +58,11 @@ export class ExternalCrmService implements OnModuleInit{
 
     async getActiveCRM(orgId:string):Promise<string>
     {
-        try
+        try 
         {
             const prisma = await this.prismaClientManager.getClient(orgId);
-            const crm = await prisma.externalCrmCredential.findFirst({});
-            return crm.crmName;
+            const crm = await prisma.externalCrmCredential.findMany();
+            return crm[0].crmName; 
         }
         catch(err)
         {
@@ -118,16 +121,16 @@ export class ExternalCrmService implements OnModuleInit{
     async createContact(orgId:string, data:any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
-        const mappedData = await this.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
+        const mappedData = await this.mappingService.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
         const objects = Object.keys(mappedData);
-        if(objects.length === 0) return null; 
-        const contact = await crm.createContact(orgId, mappedData);
+        if(objects.length === 0) return null;
+        const contact = await crm.createContact(orgId, mappedData); 
         return contact;
     } 
     async updateContact(orgId:string, id:any, data:any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
-        const mappedData = await this.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
+        const mappedData = await this.mappingService.handleMapping(orgId,crmName, ObjectType.CONTACT, data);
         const objects = Object.keys(mappedData);
         if(objects.length === 0) return null;
         const contact = await crm.updateContact(orgId, id, mappedData);
@@ -139,7 +142,6 @@ export class ExternalCrmService implements OnModuleInit{
         const contact = await crm.deleteContact(orgId, id);
         return contact;
     }
-
     async getCompanies(orgId:string): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
@@ -186,7 +188,7 @@ export class ExternalCrmService implements OnModuleInit{
         for(const _mapping of createCRMMappingsDto.mappings) {
             const mapping = await this.mappingService.getMappingByCrmNameAndObjectTypeAndField(orgId, _mapping.crmName, _mapping.objectType, _mapping.fieldName);
             if(mapping){
-                if(_mapping.externalCRMFieldName == null || _mapping.externalCRMFieldName === 'null')
+                if(_mapping.externalCRMFieldName == null || _mapping.externalCRMFieldName == 'null')
                 {
                     await this.mappingService.deleteMapping(orgId, mapping.id);
                 }
@@ -216,7 +218,10 @@ export class ExternalCrmService implements OnModuleInit{
             const externalCRMFieldName = mapping.externalCRMFieldName;
             const fieldName = mapping.fieldName;
             if(externalCRMFieldName == null) continue;
-            mappedData[externalCRMFieldName] = data[fieldName]; 
+            const mappedValue = data[fieldName];
+            if (mappedValue !== undefined && mappedValue !== null) {
+                mappedData[externalCRMFieldName] = mappedValue;
+            }
         }
         return mappedData;       
     }
@@ -237,16 +242,16 @@ export class ExternalCrmService implements OnModuleInit{
     }
     
     async syncContacts(orgId:string, crmName:string): Promise<any> {
+        this.crmSyncQueue.add('SyncContact',{
+            orgId: orgId,
+            crmName: crmName
+        });        
+    }
+
+    async hasPriority(orgId:string):Promise<Boolean>
+    {
+        const crmName = await this.getActiveCRM(orgId);
         const crm = this.crmProvider.getCRM(crmName);
-        const contacts = await crm.getContacts(orgId);
-        for(const contact of contacts)
-        {
-            const email = contact.email;
-            const mappedData = await this.handleReverseMapping(orgId,crmName, ObjectType.CONTACT, contact);
-            const objects = Object.keys(mappedData);
-            if(objects.length === 0) return null;
-            this.logger.log(`Created contact with email ${email}`);
-        }
-        
+        return await crm.hasPriority(orgId);
     }
 }

@@ -21,7 +21,7 @@ export class EnrichmentService {
     private readonly enrichmentProvider: EnrichmentProvider,
     private readonly prismaClientManager: PrismaClientManager,
     @InjectQueue('enrichment_queue') private enrichmentQueue: Queue,
-    // private readonly externalCrmService:ExternalCrmService
+    private readonly externalCrmService:ExternalCrmService
   ) {}
 
   async getPeopleByName(
@@ -96,7 +96,7 @@ export class EnrichmentService {
       this.logger.log(
         `Added enrichment task to queue for contact with email: ${contact.email}`,
       );
-      return {
+      return { 
         statusCode: 200,
         status: 'success',
         message: 'Contact enrichment successful',
@@ -137,10 +137,10 @@ export class EnrichmentService {
         data: {...data},
       });
       try{
-        // const existingCrmContact = await this.externalCrmService.getContactByEmail(orgId, CrmNames.HUBSPOT,existingContact.email);
-        // if(existingCrmContact){
-        //   await this.externalCrmService.updateContact(orgId, CrmNames.HUBSPOT, existingCrmContact.id, {...enrichedContact});
-        // }
+        const existingCrmContact = await this.externalCrmService.getContactByEmail(orgId,existingContact.email);
+        if(existingCrmContact){
+          await this.externalCrmService.updateContact(orgId, existingCrmContact.id, {...enrichedContact});
+        }
       }
       catch(err){
         this.logger.error(err);

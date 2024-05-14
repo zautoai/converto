@@ -22,7 +22,8 @@ import { EnrichmentModule } from 'src/enrichment/enrichment.module';
   ],
   providers: [
     RedisService,
-    EnrichmentProcessor
+    EnrichmentProcessor,
+    ExternalCrmProcessor
   ],
   exports: [RedisService],
 })
