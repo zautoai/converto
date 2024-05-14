@@ -123,7 +123,14 @@
           </tbody>
         </table>
       </div>
+      <div class="p-2">
+        
+        <app-pagination [totalPages]="totalPages" [limit]="limit"
+            (pageChanged)="onPageChanged($event)"></app-pagination>
+        
     </div>
+    </div>
+    
   </div>
 </div>
 
