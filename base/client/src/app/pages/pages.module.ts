@@ -59,6 +59,7 @@ import { PluginsComponent } from './plugins/plugins.component';
 import { CrmContactMappingComponent } from './plugins/crm-mapping/crm-contact-mapping/crm-contact-mapping.component';
 import { CrmCompanyMappingComponent } from './plugins/crm-mapping/crm-company-mapping/crm-company-mapping.component';
 import { ContactsComponent } from './contacts/contacts.component';
+import { CalendarScheduleComponent } from './plugins/calendar-schedule/calendar-schedule.component';
 
 @NgModule({
   declarations: [
@@ -123,7 +124,8 @@ import { ContactsComponent } from './contacts/contacts.component';
     PluginCardComponent,
     CrmContactMappingComponent,
     CrmCompanyMappingComponent,
-    ContactsComponent
+    ContactsComponent,
+    CalendarScheduleComponent
   ],
   imports: [
     CommonModule,

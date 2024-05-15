@@ -57,6 +57,7 @@ export class PluginsComponent implements OnInit{
 
 
   @ViewChild('crmMappingOffcanvas',{static:false}) crmMappingOffcanvas: ElementRef | any;
+  @ViewChild('calendarScheduleOffcanvas',{static:false}) calendarScheduleOffcanvas: ElementRef | any;
   crmName: string | undefined;
 
   constructor(
@@ -114,5 +115,13 @@ export class PluginsComponent implements OnInit{
     });
   }
 
-  
+  openCalendarScheduleOffcanvas(data:any) {
+    this.crmName = data.key;
+    this.offcanvasService.open(this.calendarScheduleOffcanvas,{
+      position: 'end',
+      backdrop: 'static',
+      panelClass: 'visible crm_mapping',
+      animation: true,
+    });
+  }
 }

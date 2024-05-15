@@ -14,6 +14,14 @@ import { BookEventDto } from './dto/book-event.dto';
 export class CalendarController {
   constructor(private readonly calendarService: CalendarService) {}
 
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getCalendars(@Query() crmAuthDto:CalendarAuthDto,@Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return this.calendarService.getCalendars(orgId);
+  }
+
   @Get('auth-url')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

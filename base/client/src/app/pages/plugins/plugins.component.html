@@ -11,6 +11,7 @@
                             <app-plugin-card 
                             [data]="item" 
                             (mappingOpen)="openCrmMappingOffcanvas($event)"
+                            (onScheduleOpen)="openCalendarScheduleOffcanvas($event)"
                             ></app-plugin-card>
                         </div>
                     }
@@ -51,5 +52,16 @@
                 <div [ngbNavOutlet]="nav" class="p-0"></div>
             </div>
         </div>
+    </div>
+</ng-template>
+
+<ng-template #calendarScheduleOffcanvas Offcanvas let-offcanvas>
+    <div class="offcanvas-header">
+        <h4 class="offcanvas-title">Calendar Schedule</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    </div>
+    <hr class="m-0">
+    <div class="offcanvas-body">
+        <app-calendar-schedule></app-calendar-schedule>
     </div>
 </ng-template>

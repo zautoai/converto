@@ -15,6 +15,7 @@ export class PluginCardComponent implements OnInit{
   isLoading:boolean = false;
 
   @Output() mappingOpen = new EventEmitter<any>();
+  @Output() onScheduleOpen = new EventEmitter<any>();
 
   constructor(
     private readonly restService: RestService,
@@ -190,5 +191,9 @@ export class PluginCardComponent implements OnInit{
 
   openMapping() {
     this.mappingOpen.emit(this.data);
+  }
+
+  openSchedule() {
+    this.onScheduleOpen.emit(this.data);
   }
 }

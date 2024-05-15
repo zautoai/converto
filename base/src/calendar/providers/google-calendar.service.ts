@@ -235,7 +235,7 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
             });
             const calendar = google.calendar({ version: 'v3', auth: this.googleClient });
             const response = await calendar.calendarList.list();
-            return response.data;
+            return response.data.items;
         }
         catch(err)
         {
