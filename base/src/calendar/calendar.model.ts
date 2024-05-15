@@ -37,6 +37,8 @@ export abstract class BaseCalendar {
 
     abstract revokeAccess(orgId:string): Promise<any>;
 
+    abstract getProfile(orgId:string): Promise<any>;
+
     protected isTokenExpired(expiresIn: number, modifiedAt: Date): boolean {
         const currentTime = Math.floor(Date.now() / 1000);
         const modifiedTime = Math.floor(modifiedAt.getTime() / 1000); 

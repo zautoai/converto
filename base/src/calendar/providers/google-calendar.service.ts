@@ -10,8 +10,7 @@ import { CalendarEvent } from '../interface/event.interface';
 
 @Injectable()
 export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
-
-
+ 
     private googleClient: Auth.OAuth2Client;
     constructor(
         private readonly httpService:HttpService,
@@ -189,6 +188,21 @@ export class GoogleCalendarService extends BaseCalendar implements OnModuleInit{
             this.logger.error(err);
             throw new Error(err);
         }
+    }
+
+    async getProfile(orgId: string): Promise<any> {
+        const accessToken = await this.getAccessToken(orgId);
+        if(!accessToken) return null;
+        this.googleClient = new google.auth.OAuth2();
+        this.googleClient.setCredentials({
+            access_token: accessToken,
+        });
+        const oauth2 = google.oauth2({
+            auth: this.googleClient,
+            version: 'v2'
+          });
+          const profile = await oauth2.userinfo.get();
+          return profile.data;
     }
 
     async handleRovokeAccess(orgId:string,id:string):Promise<void>

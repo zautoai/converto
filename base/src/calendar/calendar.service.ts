@@ -108,6 +108,18 @@ export class CalendarService implements OnModuleInit{
         }
     }
 
+    async getProfile(orgId: string, calendarName:string): Promise<any> {
+        try
+        {
+            const calendar = this.provide.getCalendar(calendarName);
+            return await calendar.getProfile(orgId);
+        }
+        catch(err)
+        {
+            throw new InternalServerErrorException(err.message);
+        }
+    }
+
     async getActiveCalendarName(orgId:string):Promise<string>
     {
         return CalendarName.GOOGLE

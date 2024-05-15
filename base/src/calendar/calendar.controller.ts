@@ -48,6 +48,14 @@ export class CalendarController {
     return await this.calendarService.revokeAccess(orgId, crmAuthDto.name);
   }
 
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getProfile(@Query() crmAuthDto:CalendarAuthDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return await this.calendarService.getProfile(orgId, crmAuthDto.name);
+  }
+
   @Get('/available-dates/:agentId')
   async getAvailableDates(@Param('agentId') agentId: string)
   {
