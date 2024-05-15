@@ -55,7 +55,7 @@ export class CalendarService implements OnModuleInit{
         {
             const calendar = this.provide.getCalendar(calendarName);
             const authUrl = calendar.getAuthUrl(orgId,additionalInfo);
-            return { authUrl}
+            return { url:authUrl} 
         }
         catch(err)
         {

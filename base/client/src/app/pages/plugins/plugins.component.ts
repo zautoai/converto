@@ -3,24 +3,27 @@ import { RestService } from 'src/app/shared/services/rest.service';
 import { API } from '../../config/endpoint.config';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 
-export class CRMPlugin {
+export class Plugin {
   name: string | undefined;
   key: string | undefined;
   iconUrl: string | undefined;
   description: string | undefined;
   authUrl?: string | null;
   profile?:any | null;
+  type?:"CRM" | "CALENDAR";
 
   constructor(
     name?: string,
     key?: string,
     iconUrl?: string,
     description?: string,
+    type?:"CRM" | "CALENDAR"
   ){
     this.name = name;
     this.key = key;
     this.iconUrl = iconUrl;
     this.description = description;
+    this.type = type;
   }
 
   get isConnected(): boolean {
@@ -35,14 +38,23 @@ export class CRMPlugin {
 })
 export class PluginsComponent implements OnInit{
 
-  private _crm: CRMPlugin[] = [
-    new CRMPlugin(
+  private _plugins: Plugin[] = [
+    new Plugin(
       'Hubspot',
       'Hubspot',
       'https://img.icons8.com/external-tal-revivo-color-tal-revivo/48/external-hubspot-a-developer-and-marketer-of-software-products-logo-color-tal-revivo.png',
-      'Connect and streamline your online operations with the HubSpot plugin',
+      'Enhance your online operations with seamless integration using the HubSpot plugin',
+      "CRM"
     ),
-  ];
+    new Plugin(
+      'Google calendar',
+      'Google',
+      'https://img.icons8.com/color/48/google-calendar--v2.png',
+      'Efficiently manage your schedule and tasks with the Google Calendar plugin',
+      "CALENDAR"
+    )
+];
+
 
   @ViewChild('crmMappingOffcanvas',{static:false}) crmMappingOffcanvas: ElementRef | any;
   crmName: string | undefined;
@@ -56,20 +68,38 @@ export class PluginsComponent implements OnInit{
     this.getAuthUrls();
   }
 
-  get crms(): CRMPlugin[] {
-    return this._crm;
+  get plugins(): Plugin[] {
+    return this._plugins;
   }
 
   getAuthUrls() {
-    for (let crm of this.crms) {
-      this.restService.getAll(API.main.external_crm + `/auth-url?name=${crm.name}`)
-        .subscribe((data:any) => {
-          crm.authUrl = data.url || null;
-        },
-          (error) => {
-            console.log(error);
+    for (let crm of this.plugins) {
+      switch (crm.type) {
+        case "CRM":
+          {
+            this.restService.getAll(API.main.external_crm + `/auth-url?name=${crm.key}`)
+              .subscribe((data: any) => {
+                crm.authUrl = data.url || null;
+              },
+                (error) => {
+                  console.log(error);
+                });
+            break;
           }
-        )
+        case "CALENDAR":
+          {
+            this.restService.getAll(API.main.calendar + `/auth-url?name=${crm.key}`)
+            .subscribe((data: any) => {
+              crm.authUrl = data.url || null;
+            },
+            (error) => {
+              console.log(error);
+            });
+            break;
+          }
+        default:
+          break;
+      }
     }
   }
 

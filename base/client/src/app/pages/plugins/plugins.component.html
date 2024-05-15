@@ -1,14 +1,17 @@
 <div class="row mt-3">
     <div class="col-12">
-        <div class="card shadow">
+        <div class="card shadow fixed-vh">
             <div class="card-header">
-                <h4 class="card-title">External CRMs</h4>
+                <h4 class="card-title">Plugins</h4>
             </div>
             <div class="card-body">
                 <div class="row">
-                    @for (item of crms; track $index) {
+                    @for (item of plugins; track $index) {
                         <div class="col-2">
-                            <app-plugin-card [data]="item" (mappingOpen)="openCrmMappingOffcanvas($event)"></app-plugin-card>
+                            <app-plugin-card 
+                            [data]="item" 
+                            (mappingOpen)="openCrmMappingOffcanvas($event)"
+                            ></app-plugin-card>
                         </div>
                     }
                     @empty {
