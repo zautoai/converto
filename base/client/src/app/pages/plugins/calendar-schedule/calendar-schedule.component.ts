@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { availableHours, daysOfWeek, eventDuration } from 'src/app/common/constant';
 import { availableHour } from 'src/app/common/intefaces';
 import { stringToArray } from 'src/app/common/utils';
@@ -25,6 +25,8 @@ export class CalendarScheduleComponent implements OnInit{
   availableDays:string[] = [];
   isLoading:boolean = false;
 
+  @Output() onCancel = new EventEmitter<any>();
+
   constructor(
     private restService: RestService,
     private notifiService: NotificationService,
@@ -33,6 +35,7 @@ export class CalendarScheduleComponent implements OnInit{
 
   ngOnInit(): void {
     this.getSchedule();
+    this.getCalendars();
   }
 
   selectAvailableDays(index: number)
@@ -78,7 +81,6 @@ export class CalendarScheduleComponent implements OnInit{
         this.selectedCalendar = this.schedule.calendarId;
         this.originalSchedule = {...this.schedule};
         this.isLoading = false;
-        this.getCalendars();
       },
       error:(error)=>{
         this.isLoading = false;
@@ -163,5 +165,9 @@ export class CalendarScheduleComponent implements OnInit{
         }
       });
     }
+  }
+
+  cancel() {
+    this.onCancel.emit();
   }
 }

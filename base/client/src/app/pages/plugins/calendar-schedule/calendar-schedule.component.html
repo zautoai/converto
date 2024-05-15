@@ -61,7 +61,7 @@
 
 <div class="p-2 row">
     <div class="col-6">
-        <button class="btn btn-outline-primary w-100"  [disabled]="isLoading">Cancel</button>
+        <button class="btn btn-outline-primary w-100"  (click)="cancel()" [disabled]="isLoading">Cancel</button>
     </div>
     <div class="col-6">
         <button class="btn btn-primary w-100" (click)="onSaveSubmit()" [disabled]="isLoading">Save</button>

@@ -155,10 +155,18 @@ export class ExternalCrmService implements OnModuleInit{
         return company;
     }
     async getCompanyByName(orgId: string, domain: string): Promise<any> {
-        const crmName = await this.getActiveCRM(orgId);
-        const crm = this.crmProvider.getCRM(crmName);
-        const company = await crm.getCompanyByName(orgId, domain);
-        return company;
+        try
+        {
+            const crmName = await this.getActiveCRM(orgId);
+            const crm = this.crmProvider.getCRM(crmName);
+            const company = await crm.getCompanyByName(orgId, domain);
+            return company;
+        }
+        catch(err)
+        {
+            this.logger.error(err);
+            throw new Error(err);
+        }
     }
     async createCompany(orgId:string,data:any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);

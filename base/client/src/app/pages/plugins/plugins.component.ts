@@ -120,7 +120,7 @@ export class PluginsComponent implements OnInit{
     this.offcanvasService.open(this.calendarScheduleOffcanvas,{
       position: 'end',
       backdrop: 'static',
-      panelClass: 'visible crm_mapping',
+      panelClass: 'visible',
       animation: true,
     });
   }

@@ -62,6 +62,6 @@
     </div>
     <hr class="m-0">
     <div class="offcanvas-body">
-        <app-calendar-schedule></app-calendar-schedule>
+        <app-calendar-schedule (onCancel)="offcanvas.dismiss()"></app-calendar-schedule>
     </div>
 </ng-template>
