@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild , ChangeDetectorRef,} from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators,ReactiveFormsModule } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -12,68 +12,6 @@ import { error } from 'console';
 import { PaginationData } from 'src/app/common/intefaces';
 import { ActivatedRoute } from '@angular/router';
 
-export interface Contacts {
-  photoUrl: string;
-  fullName: string;
-  firstName: string;
-  lastName: string;
-  jobTitle: string;
-  organizationName: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  country: string;
-  website: string;
-  socialMedia: any;
-  notes: string;
-  leadSource: string;
-  status: string;
-}
-
-export class Contacts {
-  photoUrl: string;
-  fullName: string;
-  firstName: string;
-  lastName: string;
-  jobTitle: string;
-  organizationName: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  country: string;
-  website: string;
-  socialMedia: any;
-  notes: string;
-  leadSource: string;
-  status: string;
-
-  constructor(data: Partial<Contacts> = {}) {
-    this.photoUrl = data.photoUrl || '';
-    this.fullName = data.fullName || '';
-    this.firstName = data.firstName || '';
-    this.lastName = data.lastName || '';
-    this.jobTitle = data.jobTitle || '';
-    this.organizationName = data.organizationName || '';
-    this.email = data.email || '';
-    this.phone = data.phone || '';
-    this.address = data.address || '';
-    this.city = data.city || '';
-    this.state = data.state || '';
-    this.zip = data.zip || '';
-    this.country = data.country || '';
-    this.website = data.website || '';
-    this.socialMedia = data.socialMedia || {};
-    this.notes = data.notes || '';
-    this.leadSource = data.leadSource || '';
-    this.status = data.status || '';
-  }
-}
 
 
 @Component({
@@ -103,7 +41,7 @@ export class ContactsComponent implements OnInit {
   submittedData: any[] = [];
   selectedData: any = '';
   limit = 2;
-  contacts: Contacts = new Contacts()
+  
 
 
   constructor(
@@ -117,24 +55,24 @@ export class ContactsComponent implements OnInit {
     private sweetAlertService: SweetAlertService,
     private route: ActivatedRoute,
   ) {
-    this.Form = this.formBuilder.group({
-      photoUrl: [''],
-      fullName: [''],
-      firstName: [''],
-      lastName: [''],
-      jobTitle: [''],
-      organizationName: [''],
-      email: ['', [Validators.required, Validators.email,]],
-      phone: [''],
-      address: [''],
-      city: [''],
-      state: [''],
-      zip: [''],
-      country: [''],
-      website: [''],
-      notes: [''],
-      leadSource: [''],
-      status: [''],
+    this.Form = new FormGroup({
+      photoURL:new FormControl(''),
+      fullName: new FormControl(''),
+  firstName: new FormControl(''),
+  lastName: new FormControl(''),
+  jobTitle: new FormControl(''),
+  organizationName: new FormControl(''),
+  email: new FormControl('', [Validators.required, Validators.email]),
+  phone: new FormControl(''),
+  address: new FormControl(''),
+  city: new FormControl(''),
+  state: new FormControl(''),
+  zip: new FormControl(''),
+  country: new FormControl(''),
+  website: new FormControl(''),
+  notes: new FormControl(''),
+  leadSource: new FormControl(''),
+  status: new FormControl(''),
     });
   }
 
@@ -285,43 +223,132 @@ export class ContactsComponent implements OnInit {
   }
 
 
-  onUpdateuserSubmit() {
-    this.resetErrorFeedback(); // Reset error feedback messages
-
-    const formData: { [key: string]: any } = this.Form.value; // Get form data
-
-    if (this.Form.valid) { // Check if the form is valid
-      const data: { [key: string]: any } = {}; // Initialize data object
-
-      // Loop through form data to populate the data object
-      for (const key in formData) {
-        if (formData.hasOwnProperty(key)) {
-          data[key] = formData[key] || ''; // Assign form value to data object or empty string
-        }
-      }
-
-      console.log('Form value:', this.Form.value);
-      console.log('Data to be patched:', data); // Log data before making the API call
-
-      // Make PATCH request to update user data
-      this.restService.patch(API.main.contact, this.user.id, data).subscribe({
-        next: (response: any) => {
-          console.log('Patch response:', response); // Log API response
-          this.offcanvasService.dismiss(); // Dismiss the offcanvas
-          this.notifService.showSuccess('User Updated Successfully.'); // Show success notification
-        },
-        error: (error) => {
-          console.error('Patch error:', error); // Log API error
-          this.notifService.showError(error.error.message); // Show error notification
-        },
+  onUpdateuserSubmit():void {
+    const updateContactFields: any[] = [];
+    if (this.Form.get('photoUrl')?.value) {
+      updateContactFields.push({
+        label: 'Photo Url',
+        value: this.Form.value.photoUrl,
       });
+    }
+    if (this.Form.get('fullName')?.value) {
+      updateContactFields.push({
+        label: 'Full Name',
+        value: this.Form.value.fullname,
+      });
+    }
+  
+    if (this.Form.get('lastName')?.value) {
+      updateContactFields.push({
+        label: 'Last Name',
+        value: this.Form.value.lastname,
+      });
+    }
+    if (this.Form.get('jobTitle')?.value) {
+      updateContactFields.push({
+        label: 'Jobtitle',
+        value: this.Form.value.jobtitle,
+      });
+    }
+    if (this.Form.get('organizationName')?.value) {
+      updateContactFields.push({
+        label: 'Organization Name',
+        value: this.Form.value.website,
+      });
+    }
+    if (this.Form.get('email')?.value) {
+      updateContactFields.push({
+        label: 'Email',
+        value: this.Form.value.address,
+      });
+    }
+    if (this.Form.get('phone')?.value) {
+      updateContactFields.push({
+        label: 'Phone',
+        value: this.Form.value.city,
+      });
+    }
+    if (this.Form.get('address')?.value) {
+      updateContactFields.push({
+        label: 'Address',
+        value: this.Form.value.state,
+      });
+    }
+    if (this.Form.get('zip')?.value) {
+      updateContactFields.push({
+        label: 'Zip',
+        value: this.Form.value.zip,
+      });
+    }
+    if (this.Form.get('country')?.value) {
+      updateContactFields.push({
+        label: 'Country',
+        value: this.Form.value.country,
+      });
+    }
+    if (this.Form.get('city')?.value) {
+      updateContactFields.push({
+        label: 'City',
+        value: this.Form.value.city,
+      });
+    }
+
+    if (this.Form.get('State')?.value) {
+      updateContactFields.push({
+        label: 'State',
+        value: this.Form.value.state,
+      });
+    }
+    if (this.Form.get('notes')?.value) {
+      updateContactFields.push({
+        label: 'Notes',
+        value: this.Form.value.notes,
+      });
+    }
+    if (this.Form.get('source')?.value) {
+      updateContactFields.push({
+        label: 'Source',
+        value: this.Form.value.source,
+      });
+    }
+    if (this.Form.get('website')?.value) {
+      updateContactFields.push({
+        label: 'Website',
+        value: this.Form.value.website,
+      });
+    }
+    if (this.Form.get('status')?.value) {
+      updateContactFields.push({
+        label: 'Status',
+        value: this.Form.value.status,
+      });
+    }
+    if (this.Form.valid) {
+      const updatedContactData = {
+        accountName: this.Form.value.accountName,
+        email: this.Form.value.email,
+        phone: this.Form.value.phone,
+        updateContactFields,
+      };
+      this.restService
+        .patch(API.main.contact, this.user.id, updatedContactData)
+        .subscribe(
+          (response: any) => {
+            this.notifService.showSuccess('Account Updated Successfully.');
+            console.log("lastname",updatedContactData)
+            this.getContacts();
+          },
+          (error) => {
+            console.error(error);
+            this.notifService.showError(
+              'Something Went Wrong! Try Again Later',
+            );
+          },
+        );
+      this.offcanvasService.dismiss();
+      this.Form.reset();
     } else {
-
-      Object.keys(formData).forEach((key) => {
-        if (formData[key].trim().length <= 0) {
-          this.errorFeedback[key] = `${key} is required.`;
-        }
-      });
+      this.Form.markAllAsTouched();
     }
   }
 
@@ -329,8 +356,32 @@ export class ContactsComponent implements OnInit {
   openUpdateUser(user: any) {
     this.user = user; // Store the selected user data
     this.Form.reset();
+    console.log("test",user)
+    this.Form.patchValue(user)
+
+    // this.Form.get('parentAccountId')?.setValue(user?.parentAccountId);
+    // this.Form.get('accountName')?.setValue(user?.accountName);
+    // this.Form.get('industry')?.setValue(user?.industry);
+    // this.Form.get('companySize')?.setValue(user?.companySize);
+    // this.Form.get('annualRevenue')?.setValue(user?.annualRevenue);
+    // this.Form.get('accountType')?.setValue(user?.accountType);
+    // this.Form.get('website')?.setValue(user?.website);
+    // this.Form.get('address')?.setValue(user?.address);
+    // this.Form.get('city')?.setValue(user?.city);
+    // this.Form.get('state')?.setValue(user?.state);
+    // this.Form.get('zip')?.setValue(user?.zip);
+    // this.Form.get('country')?.setValue(user?.country);
+    // this.Form.get('phone')?.setValue(user?.phone);
+    // this.Form.get('email')?.setValue(user?.email);
+    // this.Form.get('socialMedia')?.setValue(user?.socialMedia);
+    // this.Form.get('notes')?.setValue(user?.notes);
+    // this.Form.get('source')?.setValue(user?.source);
+    // this.Form.get('status')?.setValue(user?.status);
+    // this.Form.get('isabm')?.setValue(user?.abm);
+
+
     this.resetErrorFeedback();
-    this.Form.patchValue(user); // Pre-fill the form with the user data
+    // this.Form.patchValue(user); // Pre-fill the form with the user data
     this.offcanvasService.open(this.updateUserOffcanvas, {
       position: 'end',
       backdrop: 'static',

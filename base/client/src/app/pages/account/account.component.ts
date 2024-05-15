@@ -6,7 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { API } from '../../config/endpoint.config';
 import { AvatarService } from '../../shared/services/avatar.service';
@@ -49,27 +49,27 @@ export class AccountsComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
   ) {
-    this.Form = this.formBuilder.group({
-      parentAccountId: [''],
-      photoUrl: [''],
-      accountName: [''],
-      industry: [''],
-      companySize: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      annualRevenue: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      accountType: [''],
-      website: [''],
-      address: [''],
-      city: [''],
-      state: [''],
-      zip: [''],
-      country: [''],
-      phone: [''],
-      email: [''],
-      socialMedia: [''],
-      notes: [''],
-      source: [''],
-      status: [''],
-      isabm:[false]
+    this.Form = new FormGroup({
+      parentAccountId: new FormControl(""),
+      photoUrl: new FormControl(""),
+      accountName: new FormControl(""),
+      industry: new FormControl(""),
+      companySize: new FormControl(""),
+      annualRevenue:new FormControl(""),
+      accountType: new FormControl(""),
+      website: new FormControl(""),
+      address: new FormControl(""),
+      city: new FormControl(""),
+      state: new FormControl(""),
+      zip: new FormControl(""),
+      country: new FormControl(""),
+      phone: new FormControl(""),
+      email: new FormControl(""),
+      socialMedia: new FormControl(""),
+      notes: new FormControl(""),
+      source: new FormControl(""),
+      status: new FormControl(""),
+      isabm:new FormControl(false),
     });
   }
 
@@ -151,27 +151,8 @@ export class AccountsComponent implements OnInit {
   openUpdateUser(data: any) {
     this.user = data; // Store the selected user data
     this.Form.reset();
-
-    this.Form.get('parentAccountId')?.setValue(data?.parentAccountId);
-    this.Form.get('accountName')?.setValue(data?.accountName);
-    this.Form.get('industry')?.setValue(data?.industry);
-    this.Form.get('companySize')?.setValue(data?.companySize);
-    this.Form.get('annualRevenue')?.setValue(data?.annualRevenue);
-    this.Form.get('accountType')?.setValue(data?.accountType);
-    this.Form.get('website')?.setValue(data?.website);
-    this.Form.get('address')?.setValue(data?.address);
-    this.Form.get('city')?.setValue(data?.city);
-    this.Form.get('state')?.setValue(data?.state);
-    this.Form.get('zip')?.setValue(data?.zip);
-    this.Form.get('country')?.setValue(data?.country);
-    this.Form.get('phone')?.setValue(data?.phone);
-    this.Form.get('email')?.setValue(data?.email);
-    this.Form.get('socialMedia')?.setValue(data?.socialMedia);
-    this.Form.get('notes')?.setValue(data?.notes);
-    this.Form.get('source')?.setValue(data?.source);
-    this.Form.get('status')?.setValue(data?.status);
-    this.Form.get('isabm')?.setValue(data?.abm);
-
+    console.log("data",data)
+    this.Form.patchValue(data);
 
     this.resetErrorFeedback();
     this.offcanvasService.open(this.updateUserOffcanvas, {
@@ -295,7 +276,7 @@ export class AccountsComponent implements OnInit {
         updateAccountFields,
       };
       this.restService
-        .patch(API.main.account, this.user.id, updatedAccountData)
+        .patch(API.main.account, this.user.id, this.Form.value)
         .subscribe(
           (response: any) => {
             this.notifService.showSuccess('Account Updated Successfully.');

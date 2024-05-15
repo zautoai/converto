@@ -116,6 +116,8 @@ export class NavService implements OnDestroy {
 		{
 			title: 'Conversations', icon: 'fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/conversations', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
+		
+
 		{
 			title: 'Accounts', icon: 'fa-regular fa-building', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/accounts', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
@@ -126,6 +128,9 @@ export class NavService implements OnDestroy {
 			headTitle: 'MARKETING',
 			show:false,
 			roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+		},
+		{
+			title: 'ABM', icon: 'fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/abm', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
 		{
 			title: 'FormBuilder', icon: 'fa-solid fa-cube', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/form-builder', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]

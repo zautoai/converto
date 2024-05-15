@@ -74,6 +74,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
       isOthers: [false],
       idParam: [''],
       idValue: [''],
+      isAbm:[false]
     });
 
     this.searchSubject.pipe(debounceTime(1000)).subscribe((term) => {
@@ -200,6 +201,8 @@ export class CampaignComponent implements OnInit,AfterViewInit {
       this.campaignForm.get('isOthers')?.setValue(!this.selectedCampaign.isZauto);
       this.campaignForm.get('idParam')?.setValue(this.selectedCampaign.idParam);
       this.campaignForm.get('idValue')?.setValue(this.selectedCampaign.idValue);
+      this.campaignForm.get('isAbm')?.setValue(this.selectedCampaign.isAbm);
+
     }
     this.offcanvasService.open(this.editCampaignModal, {
       position: 'end',
@@ -231,6 +234,8 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     const isZauto: boolean = !this.campaignForm.value.isOthers || false;
     const idParam: string = this.campaignForm.value.idParam || "";
     const idValue: string = this.campaignForm.value.idValue || "";
+    const isAbm: string = this.campaignForm.value.isAbm || "";
+    
 
     if (this.campaignForm.valid) {
       const data = {
@@ -240,7 +245,9 @@ export class CampaignComponent implements OnInit,AfterViewInit {
         url: url,
         isZauto: isZauto,
         idParam: idParam,
-        idValue: idValue
+        idValue: idValue,
+        isAbm:isAbm
+
       };
       this.restService.post(API.main.campaign, data)
         .subscribe((response: any) => {

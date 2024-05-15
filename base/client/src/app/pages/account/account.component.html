@@ -20,8 +20,11 @@
             <th class="text-white">Accountname</th>
             <th class="text-white">Phone</th>
             <th class="text-white">Email</th>
+            <th class="text-white">ABM </th>
             <th class="text-white">Country</th>
             <th class="text-white">Action</th>
+          
+            
           </thead>
           <tbody>
             <ng-container>
@@ -36,8 +39,12 @@
                   {{ data.email }}
                 </td>
                 <td>
+                  {{data.ABM}}
+                </td>
+                <td>
                   {{ data.country }}
                 </td>
+              
                 <td class="icon w-1">
                   <button (click)="openViewUser(data)">
                     <i class="fa fa-eye text-secondary view"></i>
@@ -294,6 +301,11 @@
         <input type="title" class="form-control" formControlName="status" name="Title" placeholder="status" />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
+      <label class="custom-control custom-checkbox mb-2">
+        <input type="checkbox" name="label" class="custom-control-input" formControlName="isabm" />
+        <span class="custom-control-label">Is Account Based Marketing</span>
+      </label>
+    
       <div class="d-flex justify-content-end">
         <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()">
           <i class="fa fa-times"></i> Close
