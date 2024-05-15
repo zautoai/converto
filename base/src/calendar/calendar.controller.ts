@@ -7,6 +7,7 @@ import { DateFilterDto } from 'src/google-calendar/dto/date-filter.dto';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { CalendarAuthDto } from './dto/calendar.dto';
 import { CallBackDto } from './dto/callbac.dto';
+import { BookEventDto } from './dto/book-event.dto';
 
 @ApiTags('Calendar')
 @Controller('api/calendar')
@@ -50,7 +51,7 @@ export class CalendarController {
   @Get('/available-dates/:agentId')
   async getAvailableDates(@Param('agentId') agentId: string)
   {
-      
+      return await this.calendarService.getAvailableDatesByAgent(agentId);
   }
 
   @Get('/available-slots/:agentId')
@@ -62,21 +63,30 @@ export class CalendarController {
       {
           throw new BadRequestException('Date not provided.');
       }
-
+      return await this.calendarService.getAvailableSlotsByAgent(agentId, date);
   }
 
   @Post('book-event/:agentId')
-  async bookEvents(@Param('agentId') agentId: string,@Body() createEventDto: CreateEventDto)
+  async bookEvents(@Param('agentId') agentId: string,@Body() bookEventDto: BookEventDto)
   {
-
+      return await this.calendarService.bookEventByAgent(agentId, bookEventDto);
   }
   
-  @Get('events/')
+  @Get('events/:date')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async getEvents(@Req() request: ZautoRequest)
+  async getEvents(@Param('date') date:string,@Req() request: ZautoRequest)
   {
       const orgId = request.user.org.id;
-      return await this.calendarService.getEvents(orgId,'2024-05-14')
+      return await this.calendarService.getEvents(orgId,date)
+  }
+
+  @Get('slots/:date')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getSlots(@Param('date') date:string,@Req() request: ZautoRequest)
+  {
+      const orgId = request.user.org.id;
+      return await this.calendarService.getSlots(orgId,date)
   }
 }

@@ -5,6 +5,8 @@ import { AvailabilitySchedule } from 'src/google-calendar/entites/slot.model';
 import { CalendarName } from './enum/calendar.enum';
 import { CalendarEvent } from './interface/event.interface';
 import { EventSlot } from './interface/slot.interface';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { BookEventDto } from './dto/book-event.dto';
 
 @Injectable()
 export class CalendarService implements OnModuleInit{
@@ -16,6 +18,7 @@ export class CalendarService implements OnModuleInit{
     private readonly daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     constructor(
+        private readonly prisma: PrismaService,
         private readonly provide: CalendarProvider,
         private readonly availabilityScheduleService: AvailabilityScheduleService
     ){}
@@ -291,7 +294,37 @@ export class CalendarService implements OnModuleInit{
 
     async getAvailableSlotsByAgent(agentId: string, date: string)
     {
-        
+        const agent = await this.prisma.agent.findUnique({ where: { id: agentId } });
+        if (!agent) {
+            throw new NotFoundException('agent not found');
+        }
+        const { orgId } = agent;
+        return await this.getSlots(orgId, date);
+    }
+
+    async getAvailableDatesByAgent(agentId: string)
+    {
+        const agent = await this.prisma.agent.findUnique({ where: { id: agentId } });
+        if (!agent) {
+            throw new NotFoundException('agent not found');
+        }
+        const { orgId } = agent;
+        return await this.getAvailableDates(orgId);
+    }
+
+    async bookEventByAgent(agentId: string, bookEventDto: BookEventDto)
+    {
+        const agent = await this.prisma.agent.findUnique({ where: { id: agentId } });
+        if (!agent) {
+            throw new NotFoundException('agent not found');
+        }
+        const { orgId } = agent;
+        await this.addEvent(orgId, bookEventDto);
+        return {
+            statusCode: 200,
+            status: true,
+            message: 'Event booked successfully'
+        }        
     }
 
     getStartEndTimesForDay(date: Date): { timeMin: string; timeMax: string } {
