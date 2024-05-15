@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateEventDto } from 'src/google-calendar/dto/create-event.dto';
@@ -7,11 +7,20 @@ import { DateFilterDto } from 'src/google-calendar/dto/date-filter.dto';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { CalendarAuthDto } from './dto/calendar.dto';
 import { CallBackDto } from './dto/callbac.dto';
+import { BookEventDto } from './dto/book-event.dto';
 
 @ApiTags('Calendar')
 @Controller('api/calendar')
 export class CalendarController {
   constructor(private readonly calendarService: CalendarService) {}
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getCalendars(@Query() crmAuthDto:CalendarAuthDto,@Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return this.calendarService.getCalendars(orgId);
+  }
 
   @Get('auth-url')
   @UseGuards(JwtAuthGuard)
@@ -38,19 +47,27 @@ export class CalendarController {
     return await this.calendarService.getAccessToken(orgId, crmAuthDto.name);
   }
 
-  @Get('revoke-access')
+  @Delete('revoke/:calendar_name')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async revokeAccess(@Query() crmAuthDto:CalendarAuthDto, @Req() request: ZautoRequest)
+  async revokeAccess(@Param('calendar_name') calendarName: string, @Req() request: ZautoRequest)
   {
     const orgId = request.user.org.id;
-    return await this.calendarService.revokeAccess(orgId, crmAuthDto.name);
+    return await this.calendarService.revokeAccess(orgId, calendarName);
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getProfile(@Query() crmAuthDto:CalendarAuthDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return await this.calendarService.getProfile(orgId, crmAuthDto.name);
   }
 
   @Get('/available-dates/:agentId')
   async getAvailableDates(@Param('agentId') agentId: string)
   {
-      
+      return await this.calendarService.getAvailableDatesByAgent(agentId);
   }
 
   @Get('/available-slots/:agentId')
@@ -62,20 +79,30 @@ export class CalendarController {
       {
           throw new BadRequestException('Date not provided.');
       }
-
+      return await this.calendarService.getAvailableSlotsByAgent(agentId, date);
   }
 
   @Post('book-event/:agentId')
-  async bookEvents(@Param('agentId') agentId: string,@Body() createEventDto: CreateEventDto)
+  async bookEvents(@Param('agentId') agentId: string,@Body() bookEventDto: BookEventDto)
   {
-
+      return await this.calendarService.bookEventByAgent(agentId, bookEventDto);
   }
   
-  @Get('events/')
+  @Get('events/:date')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async getEvents(@Query() dateFilterDto:DateFilterDto,@Req() request: ZautoRequest)
+  async getEvents(@Param('date') date:string,@Req() request: ZautoRequest)
   {
+      const orgId = request.user.org.id;
+      return await this.calendarService.getEvents(orgId,date)
+  }
 
+  @Get('slots/:date')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getSlots(@Param('date') date:string,@Req() request: ZautoRequest)
+  {
+      const orgId = request.user.org.id;
+      return await this.calendarService.getSlots(orgId,date)
   }
 }

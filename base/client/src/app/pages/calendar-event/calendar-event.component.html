@@ -17,11 +17,11 @@
                 <div class="card overflow-hidden">
                   <div class="card-body p-0">
                     <div class="p-2 py-5 bg-primary-transparent border-bottom">
-                      <h4 class="text-center text-primary">{{event.start.dateTime | date:"dd-MMM-yyyy"}}</h4>
-                      <h6 class="text-center text-primary"><i class="fa-regular fa-clock"></i> {{event?.start.dateTime | date:"HH:mm"}} - {{event?.end.dateTime | date:"HH:mm"}}</h6>
+                      <h4 class="text-center text-primary">{{event.start | date:"dd-MMM-yyyy"}}</h4>
+                      <h6 class="text-center text-primary"><i class="fa-regular fa-clock"></i> {{event?.start | date:"HH:mm"}} - {{event?.end | date:"HH:mm"}}</h6>
                     </div>
                     <div class="p-2">
-                      <p class="text-center m-0 text-truncate"><strong>{{event?.summary || '---'}}</strong></p>
+                      <p class="text-center m-0 text-truncate"><strong>{{event?.title || '---'}}</strong></p>
                       <p class="text-center m-0 text-truncate">{{event?.description || '---'}}</p>
                     </div>
                   </div>

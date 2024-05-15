@@ -224,12 +224,12 @@ const routes: Routes = [
     component: IntegrationComponent,
     canActivate:[SetupGuard]
   },
-  {
-    path:'calendar',
-    title: 'Calendar',
-    component: CalenderComponent,
-    canActivate:[SetupGuard]
-  },
+  // {
+  //   path:'calendar',
+  //   title: 'Calendar',
+  //   component: CalenderComponent,
+  //   canActivate:[SetupGuard]
+  // },
   {
     path:'calendar-events',
     title: 'Calendar Events',

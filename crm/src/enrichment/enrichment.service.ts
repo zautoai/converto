@@ -92,7 +92,7 @@ export class EnrichmentService {
       if (!contact.email) {
         throw new BadRequestException('Contact does not have an email');
       }
-      this.enrichmentQueue.add(provider,{orgId,contactId,matchRequest: { email: contact.email },type: 'contact',},{delay: 1000,removeOnComplete: true,attempts: 2,},);
+      this.enrichmentQueue.add(provider,{orgId,id:contactId,matchRequest: { email: contact.email },type: 'contact',},{delay: 1000,removeOnComplete: true,attempts: 2,},);
       this.logger.log(
         `Added enrichment task to queue for contact with email: ${contact.email}`,
       );
@@ -106,49 +106,28 @@ export class EnrichmentService {
     }
   }
 
-  async enrichPeopleByContact(orgId: string,contactId: string,matchRequest: { [key: string]: string },provider: string = EnrichmentProviderName.APOLLO,) {
+  async enrichAccount(orgId: string, accountId: string, provider: string = EnrichmentProviderName.APOLLO,) {
     try {
-      this.logger.log(`Enriching people with contactId: ${contactId}`);
-      const enrichmentService: IEnrichment = this.enrichmentProvider.getProvider(provider);
-      const enrichedData = await enrichmentService.getPeople(matchRequest);
       const prisma = await this.prismaClientManager.getClient(orgId);
-      const existingContact = await prisma.contact.findUnique({
-        where: { id: contactId },
+      const account = await prisma.account.findUnique({
+        where: {
+          id: accountId,
+        },
       });
-      const data = {
-        ...(!existingContact.firstName ? { firstName: enrichedData.firstName }: {}),
-        ...(!existingContact.lastName ? { lastName: enrichedData.lastName } : {}),
-        ...(!existingContact.fullName ? { fullName: enrichedData.fullName } : {}),
-        ...(!existingContact.phone ? { phone: enrichedData.phone } : {}),
-        ...(!existingContact.address ? { address: enrichedData.address } : {}),
-        ...(!existingContact.website ? { website: enrichedData.website } : {}),
-        ...(!existingContact.city ? { city: enrichedData.city } : {}),
-        ...(!existingContact.state ? { state: enrichedData.state } : {}),
-        ...(!existingContact.zip ? { zip: enrichedData.zip } : {}),
-        ...(!existingContact.country ? { country: enrichedData.country } : {}),
-        ...(!existingContact.organizationName ? { organizationName: enrichedData.organizationName } : {}),
-        ...(!existingContact.jobTitle ? { jobTitle: enrichedData.jobTitle } : {}),
-        ...(!existingContact.photoUrl ? { photoUrl: enrichedData.photoUrl } : {}),
-        ...(!existingContact.socialMedia ? {socialMedia: enrichedData.socialMedia}: {}),
-        ...(!existingContact.notes ? { notes: enrichedData.notes } : {}),
+      if (!account) {
+        throw new NotFoundException('Account not found');
+      }
+      this.enrichmentQueue.add(provider, {orgId, id:accountId, matchRequest: { domain: account.domain }, type: 'account', }, {delay: 1000, removeOnComplete: true, attempts: 2, },);
+      this.logger.log(
+        `Added enrichment task to queue for account with domain: ${account.domain}`,
+      );
+      return {
+        statusCode: 200,
+        status: 'success',
+        message: 'Account enrichment successful',
       };
-      const enrichedContact = await prisma.contact.update({
-        where: { id: contactId },
-        data: {...data},
-      });
-      try{
-        const existingCrmContact = await this.externalCrmService.getContactByEmail(orgId,existingContact.email);
-        if(existingCrmContact){
-          await this.externalCrmService.updateContact(orgId, existingCrmContact.id, {...enrichedContact});
-        }
-      }
-      catch(err){
-        this.logger.error(err);
-      }
-      this.logger.log(`Enriched contact with id: ${contactId}`);
-      return enrichedContact;
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      throw new BadRequestException(error);
     }
   }
 }

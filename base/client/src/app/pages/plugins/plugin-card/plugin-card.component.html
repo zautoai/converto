@@ -19,6 +19,13 @@
                 <span class="text-truncate">{{data.profile?.email}}</span> <a role="button" (click)="revoke()"><i class="fa-solid fa-right-from-bracket"></i></a>
             </div>
         }
-        <button class="btn btn-outline-primary btn-block" [disabled]="!data.isConnected" (click)="openMapping()"><i class="fa-solid fa-sitemap"></i> Mappings</button>
+        @switch (data.type) {
+            @case ('CRM') {
+                <button class="btn btn-outline-primary btn-block" [disabled]="!data.isConnected" (click)="openMapping()"><i class="fa-solid fa-sitemap"></i> Mappings</button>
+            }
+            @case ('CALENDAR') {
+                <button class="btn btn-outline-primary btn-block" [disabled]="!data.isConnected"  (click)="openSchedule()"><i class="fa-regular fa-calendar-check"></i> Schedule</button>
+            }
+        }
     </div>
 </div>

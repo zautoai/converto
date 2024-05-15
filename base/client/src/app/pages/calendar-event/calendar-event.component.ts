@@ -26,7 +26,7 @@ export class CalendarEventComponent implements OnInit{
   getAllEvents() {
     this.isLoading = true;
     const date = new Date(this.selectedDate) || new Date();
-    this.restService.getAll(API.main.calendar + `/events?date=${date.toISOString()}`)
+    this.restService.getAll(API.main.calendar + `/events/${date.toISOString()}`)
     .subscribe({
       next:(response:any)=>{
         this.eventsList = response;

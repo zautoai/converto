@@ -186,9 +186,9 @@ export class NavService implements OnDestroy {
 			show:false,
 			roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
-		{
-			title: 'Calendar (Scheduling)', icon: 'fa-solid fa-calendar', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/calendar', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		},
+		// {
+		// 	title: 'Calendar (Scheduling)', icon: 'fa-solid fa-calendar', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/calendar', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+		// },
 		{
 			title: 'Calendar (Events)', icon: 'fa-solid fa-calendar-check', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/calendar-events', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
