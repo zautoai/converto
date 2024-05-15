@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateEventDto } from 'src/google-calendar/dto/create-event.dto';
@@ -39,13 +39,13 @@ export class CalendarController {
     return await this.calendarService.getAccessToken(orgId, crmAuthDto.name);
   }
 
-  @Get('revoke-access')
+  @Delete('revoke/:calendar_name')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async revokeAccess(@Query() crmAuthDto:CalendarAuthDto, @Req() request: ZautoRequest)
+  async revokeAccess(@Param('calendar_name') calendarName: string, @Req() request: ZautoRequest)
   {
     const orgId = request.user.org.id;
-    return await this.calendarService.revokeAccess(orgId, crmAuthDto.name);
+    return await this.calendarService.revokeAccess(orgId, calendarName);
   }
 
   @Get('profile')

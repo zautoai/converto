@@ -108,6 +108,9 @@ export class PluginCardComponent implements OnInit{
         case "CRM":
           this.getCrmProfile();
           break;
+        case "CALENDAR":
+          this.getCalendarProfle();
+          break;
         default:
           break;
       }
@@ -116,13 +119,27 @@ export class PluginCardComponent implements OnInit{
   getCrmProfile()
   {
     this.isLoading = true;
-      this.restService.getAll(API.main.external_crm + `/profile?${this.data.key}`)
+      this.restService.getAll(API.main.external_crm + `/profile?name=${this.data.key}`)
       .subscribe((data: any) => {
         this.isLoading = false;
         this.data.profile = data;
       },
       (error) => {
           this.isLoading = false; 
+          console.log(error);
+      })
+  }
+
+  getCalendarProfle()
+  {
+    this.isLoading = true;
+      this.restService.getAll(API.main.calendar + `/profile?name=${this.data.key}`)
+      .subscribe((data: any) => {
+        this.isLoading = false;
+        this.data.profile = data;
+      },
+      (error) => {
+          this.isLoading = false;
           console.log(error);
       })
   }
@@ -134,14 +151,41 @@ export class PluginCardComponent implements OnInit{
 
   revoke()
   {
+    switch(this.data.type)
+    {
+      case "CRM":
+        this.crmRevoke();
+        break;
+      case "CALENDAR":
+        this.calendarRevoke();
+        break;
+      default:
+        break;
+    }
+  }
+
+  private crmRevoke()
+  {
     this.restService.delete(API.main.external_crm + `/revoke`,this.data.key as string)
-      .subscribe((data: any) => {
-        this.data.profile = null;
-      },
-      (error) => {
-          console.log(error);
-        }
-      )
+    .subscribe((data: any) => {
+      this.data.profile = null;
+    },
+    (error) => {
+        console.log(error);
+      }
+    )
+  }
+
+  private calendarRevoke()
+  {
+    this.restService.delete(API.main.calendar + `/revoke`, this.data.key as string)
+    .subscribe((data: any) => {
+      this.data.profile = null;
+    },
+    (error) => {
+        console.log(error);
+      }
+    )
   }
 
   openMapping() {
