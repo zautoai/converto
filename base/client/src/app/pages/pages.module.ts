@@ -60,6 +60,7 @@ import { CrmContactMappingComponent } from './plugins/crm-mapping/crm-contact-ma
 import { CrmCompanyMappingComponent } from './plugins/crm-mapping/crm-company-mapping/crm-company-mapping.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { CalendarScheduleComponent } from './plugins/calendar-schedule/calendar-schedule.component';
+import { AbmComponent } from './abm/abm.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +70,7 @@ import { CalendarScheduleComponent } from './plugins/calendar-schedule/calendar-
     conversationcomponent,
     ChatContainerComponent,
     SummaryContainerComponent,
+    AbmComponent,
 
     leadscomponent,
 

@@ -331,7 +331,7 @@ export class ContactsComponent implements OnInit {
         updateContactFields,
       };
       this.restService
-        .patch(API.main.contact, this.user.id, updatedContactData)
+        .patch(API.main.contact, this.user.id, this.Form.value)
         .subscribe(
           (response: any) => {
             this.notifService.showSuccess('Account Updated Successfully.');

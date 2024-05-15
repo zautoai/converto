@@ -50,7 +50,6 @@ export class AccountsComponent implements OnInit {
     private route: ActivatedRoute,
   ) {
     this.Form = new FormGroup({
-      parentAccountId: new FormControl(""),
       photoUrl: new FormControl(""),
       accountName: new FormControl(""),
       industry: new FormControl(""),
@@ -269,12 +268,7 @@ export class AccountsComponent implements OnInit {
       });
     }
     if (this.Form.valid) {
-      const updatedAccountData = {
-        accountName: this.Form.value.accountName,
-        email: this.Form.value.email,
-        phone: this.Form.value.phone,
-        updateAccountFields,
-      };
+      
       this.restService
         .patch(API.main.account, this.user.id, this.Form.value)
         .subscribe(
