@@ -158,15 +158,15 @@ export class AccountsService {
       where: { id },
       data: updateAccountDto,
     });
-    try {
-      const existingCrmAccount = await this.externalCRMService.getCompanyByName(orgId, existingAccount.data.accountName);
-      if (existingCrmAccount) {
-        this.externalCRMService.updateContact(orgId, existingCrmAccount.hs_object_id, updateAccountDto);
-      }
-    }
-    catch (err) {
-      this.logger.error(err);
-    }
+    // try {
+    //   const existingCrmAccount = await this.externalCRMService.getCompanyByName(orgId, existingAccount.data.accountName);
+    //   if (existingCrmAccount) {
+    //     this.externalCRMService.updateContact(orgId, existingCrmAccount.hs_object_id, updateAccountDto);
+    //   }
+    // }
+    // catch (err) {
+    //   this.logger.error(err);
+    // }
     return {
       code: 200,
       message: 'Account updated successfully',
