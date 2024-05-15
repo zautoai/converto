@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, AfterViewInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from 'src/app/shared/services/notification.service';
@@ -35,6 +35,8 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   linkList: link[] = [];
   customLinkList: link[] = [];
   isOn: boolean = false;
+  showaccounts: boolean=false
+  
 
   searchTerm: string = '';
   private searchSubject: Subject<string> = new Subject<string>();
@@ -51,6 +53,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
 
+
   constructor(
     private modalService: NgbModal,
     private formBuilder: FormBuilder,
@@ -64,17 +67,18 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     private sweetAlertService: SweetAlertService,
     private scrollService: ScrollUtilService
   ) {
-    this.campaignForm = this.formBuilder.group({
-      title: ['', Validators.required],
-      description: ['', Validators.required],
-      url: [''],
-      startDate: [''],
-      endDate: [''],
-      status: [''],
-      isOthers: [false],
-      idParam: [''],
-      idValue: [''],
-      isAbm:[false]
+    this.campaignForm = new FormGroup({
+      title: new FormControl(""),
+      description: new FormControl(""),
+      url: new FormControl(""),
+      startDate: new FormControl(""),
+      endDate: new FormControl(""),
+      status: new FormControl(""),
+      isOthers: new FormControl(""),
+      idParam: new FormControl(""),
+      idValue: new FormControl(""),
+      isabm:new FormControl(false),
+      myDropdown: new FormControl(null),
     });
 
     this.searchSubject.pipe(debounceTime(1000)).subscribe((term) => {
@@ -89,8 +93,16 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   ngOnInit(): void {
     this.getPlatforms();
     this.getCampaigns();
+    const isabmControl = this.campaignForm.get('isabm');
+    if (isabmControl !== null && isabmControl !== undefined && isabmControl.valueChanges) {
+      isabmControl.valueChanges.subscribe(isabm=>{
+        if(isabm){
 
+        }
+      })
+    }
   }
+   
 
   ngAfterViewInit(): void {
     const containerElement = this.scrollContainer.nativeElement;
@@ -132,6 +144,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
         console.log(error);
       });
   }
+  
 
   getCampaignStats(id: string) {
     this.restService.get(API.main.campaign, id + "/stats")
@@ -489,5 +502,8 @@ export class CampaignComponent implements OnInit,AfterViewInit {
 
     return queryString;
   }
+
+  
+  
 
 }

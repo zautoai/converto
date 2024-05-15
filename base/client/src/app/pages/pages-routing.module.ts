@@ -63,12 +63,12 @@ const routes: Routes = [
     component: AccountsComponent,
     canActivate:[SetupGuard]
   },
-  {
-    path: 'leads',
-    title: "Leads",
-    component: leadscomponent,
-    canActivate:[SetupGuard]
-  },
+  // {
+  //   path: 'leads',
+  //   title: "Leads",
+  //   component: leadscomponent,
+  //   canActivate:[SetupGuard]
+  // },
   {
     path: 'abm',
     title: "abm",
@@ -190,11 +190,11 @@ const routes: Routes = [
     component: CustomiseAvatarComponent,
     canActivate:[SetupGuard] 
   },
-  { 
-    path: 'lead-categories', 
-    title: "Category", 
-    component: LeadCategoryComponent 
-  },
+  // { 
+  //   path: 'lead-categories', 
+  //   title: "Category", 
+  //   component: LeadCategoryComponent 
+  // },
   { 
     path: 'lead-categories/:id', 
     title: "Category", 

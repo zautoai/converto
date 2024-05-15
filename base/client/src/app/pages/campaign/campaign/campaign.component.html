@@ -255,8 +255,8 @@
                 <label for="url">URL</label>
                 <input type="text" id="url" name="url" class="form-control" placeholder="URL e.g: example.com"
                     formControlName="url">
-
             </div>
+
             <div class="form-group mb-3">
                 <label class="custom-control custom-checkbox mb-0">
                     <input type="checkbox" name="lead-only" formControlName="isOthers" class="custom-control-input">
@@ -265,10 +265,19 @@
             </div>
             <div class="form-group mb-3">
                 <label class="custom-control custom-checkbox mb-0">
-                    <input type="checkbox" name="lead-only" formControlName="isAbm" class="custom-control-input">
+                    <input type="checkbox" name="lead-only" formControlName="isabm" class="custom-control-input">
                     <span class="custom-control-label">Is Account Based Marketing</span>
                 </label>
             </div>
+
+            <div *ngIf="campaignForm.get('isabm')?.value">
+                <label>Select an option:</label>
+                <select formControlName="myDropdown">
+                  <option value="option1">Option 1</option>
+                  <option value="option2">Option 2</option>
+                  <option value="option3">Option 3</option>
+                </select>
+              </div>
 
             <div class="form-group mb-3" *ngIf="campaignForm.value.isOthers">
                 <label for="key">Campain Id field</label>
