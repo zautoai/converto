@@ -6,7 +6,7 @@ import { FilterDto } from 'src/common/dto/filter.dto';
 import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class AccountMicroService extends BaseService{
+export class AccountMicroService extends BaseService {
 
   constructor(@Inject('CRM_SERVICE') private readonly CRMClient: ClientProxy) {
     super();
@@ -87,4 +87,31 @@ export class AccountMicroService extends BaseService{
       throw error;
     }
   }
+
+  async getAbmAccounts(orgId: string, filterDto: FilterDto) {
+    try {
+      return this.CRMClient.send(
+        { cmd: 'GET_ABM_ACCOUNTS' },
+        { orgId, filterDto },
+      ).toPromise();
+    }
+    catch (err) {
+      this.logger.error(`Error while fetching accounts: ${err.message}`);
+      throw err;
+    }
+  }
+
+  async getAbmAccount(orgId: string, id: string) {
+    try {
+      return this.CRMClient.send(
+        { cmd: 'GET_ABM_ACCOUNT' },
+        { orgId, id },
+      ).toPromise();
+    }
+    catch (err) {
+      this.logger.error(`Error while fetching account: ${err.message}`);
+      throw err;
+    }
+  }
 }
+

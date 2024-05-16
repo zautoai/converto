@@ -4,9 +4,10 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { FilterDto } from 'src/common/dto/filter.dto';
 import { AccountMicroService } from 'src/microservices/crm_service/account.service';
 import { BaseService } from 'src/common/services/base.service';
+import { Filter } from 'aws-sdk/clients/devicefarm';
 
 @Injectable()
-export class AccountsService extends BaseService{
+export class AccountsService extends BaseService {
   constructor(private readonly accountService: AccountMicroService) {
     super();
   }
@@ -33,5 +34,13 @@ export class AccountsService extends BaseService{
 
   async getFields(orgId: string) {
     return this.handleException(await this.accountService.getAccountField(orgId));
+  }
+
+  async getABM(orgId: string, filterDto: FilterDto) {
+    return this.handleException(await this.accountService.getAbmAccounts(orgId, filterDto));
+  }
+
+  async getABMById(orgId: string, id: string) {
+    return this.handleException(await this.accountService.getAbmAccount(orgId, id));
   }
 }

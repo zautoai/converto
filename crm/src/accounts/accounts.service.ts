@@ -28,7 +28,7 @@ export class AccountsService {
     private readonly externalCRMService: ExternalCrmService,
     private readonly mappingService: MappingService,
     private readonly enrichmentService: EnrichmentService
-  ) {}
+  ) { }
 
   async create(orgId: string, createAccountDto: CreateAccountDto) {
     const prisma = await this.prismaClientManager.getClient(orgId);
@@ -45,7 +45,7 @@ export class AccountsService {
     });
     try {
       // push to external crm
-      await this.externalCRMService.createCompany(orgId,account);
+      await this.externalCRMService.createCompany(orgId, account);
     }
     catch (err) {
       this.logger.error(err);
@@ -65,18 +65,18 @@ export class AccountsService {
       where: {
         ...(searchTerm
           ? {
-              OR: [
-                { accountName: { contains: searchTerm } },
-                { website: { contains: searchTerm } },
-                { phone: { contains: searchTerm } },
-                { email: { contains: searchTerm } },
-                { address: { contains: searchTerm } },
-                { notes: { contains: searchTerm } },
-                { source: { contains: searchTerm } },
-                { status: { contains: searchTerm } },
-                { industry: { contains: searchTerm } },
-              ],
-            }
+            OR: [
+              { accountName: { contains: searchTerm } },
+              { website: { contains: searchTerm } },
+              { phone: { contains: searchTerm } },
+              { email: { contains: searchTerm } },
+              { address: { contains: searchTerm } },
+              { notes: { contains: searchTerm } },
+              { source: { contains: searchTerm } },
+              { status: { contains: searchTerm } },
+              { industry: { contains: searchTerm } },
+            ],
+          }
           : {}),
       },
       take: limit,
@@ -89,22 +89,22 @@ export class AccountsService {
       where: {
         ...(searchTerm
           ? {
-              OR: [
-                { accountName: { contains: searchTerm } },
-                { website: { contains: searchTerm } },
-                { phone: { contains: searchTerm } },
-                { email: { contains: searchTerm } },
-                { address: { contains: searchTerm } },
-                { notes: { contains: searchTerm } },
-                { source: { contains: searchTerm } },
-                { status: { contains: searchTerm } },
-                { industry: { contains: searchTerm } },
-              ],
-            }
+            OR: [
+              { accountName: { contains: searchTerm } },
+              { website: { contains: searchTerm } },
+              { phone: { contains: searchTerm } },
+              { email: { contains: searchTerm } },
+              { address: { contains: searchTerm } },
+              { notes: { contains: searchTerm } },
+              { source: { contains: searchTerm } },
+              { status: { contains: searchTerm } },
+              { industry: { contains: searchTerm } },
+            ],
+          }
           : {}),
       },
     });
-    
+
     return {
       code: 200,
       message: 'Accounts fetched successfully',
@@ -121,7 +121,6 @@ export class AccountsService {
         id,
       },
     });
-    console.log(id);
 
     if (!account) {
       throw new NotFoundException('Account not found');
@@ -145,7 +144,7 @@ export class AccountsService {
     }
     return account;
   }
-  
+
 
   async update(orgId: string, id: string, updateAccountDto: UpdateAccountDto) {
     const prisma = await this.prismaClientManager.getClient(orgId);
@@ -224,20 +223,20 @@ export class AccountsService {
       this.logger.log(`Enriching account with domain: ${domain}`);
       const existingAccount = await this.getAccountByDomain(orgId, domain);
       const enrichedData = await this.enrichmentService.getOrganization(matchRequest, provider);
-      const data = { 
-        ...(!existingAccount.photoUrl ? { photoUrl: enrichedData.logUrl }: {}),
-        ...(!existingAccount.accountName ? { accountName: enrichedData.name }: {}),
-        ...(!existingAccount.industry ? { industry: enrichedData.industry }: {}),
-        ...(!existingAccount.companySize ? { companySize: +enrichedData.size }: {}),
-        ...(!existingAccount.website ? { website: enrichedData.website }: {}),
-        ...(!existingAccount.address ? { address: enrichedData.address }: {}),
-        ...(!existingAccount.city ? { city: enrichedData.city }: {}),
-        ...(!existingAccount.state ? { state: enrichedData.state }: {}),
-        ...(!existingAccount.zip ? { zip: enrichedData.zip }: {}),
-        ...(!existingAccount.country ? { country: enrichedData.country }: {}),
-        ...(!existingAccount.phone ? { phone: enrichedData.phone }: {}),
-       };
-      await this.update(orgId, existingAccount.id,data);
+      const data = {
+        ...(!existingAccount.photoUrl ? { photoUrl: enrichedData.logUrl } : {}),
+        ...(!existingAccount.accountName ? { accountName: enrichedData.name } : {}),
+        ...(!existingAccount.industry ? { industry: enrichedData.industry } : {}),
+        ...(!existingAccount.companySize ? { companySize: +enrichedData.size } : {}),
+        ...(!existingAccount.website ? { website: enrichedData.website } : {}),
+        ...(!existingAccount.address ? { address: enrichedData.address } : {}),
+        ...(!existingAccount.city ? { city: enrichedData.city } : {}),
+        ...(!existingAccount.state ? { state: enrichedData.state } : {}),
+        ...(!existingAccount.zip ? { zip: enrichedData.zip } : {}),
+        ...(!existingAccount.country ? { country: enrichedData.country } : {}),
+        ...(!existingAccount.phone ? { phone: enrichedData.phone } : {}),
+      };
+      await this.update(orgId, existingAccount.id, data);
       return {
         code: 200,
         message: 'Account enriched successfully',
@@ -252,22 +251,19 @@ export class AccountsService {
   }
 
 
-  async hasMapping(orgId:string):Promise<Boolean>
-  {
-    try
-    {
+  async hasMapping(orgId: string): Promise<Boolean> {
+    try {
       const crmName = await this.externalCRMService.getActiveCRM(orgId);
-      const prisma = await this.prismaClientManager.getClient(orgId); 
+      const prisma = await this.prismaClientManager.getClient(orgId);
       const contacts = await prisma.crmMapping.count({
-        where: { 
+        where: {
           crmName,
           objectType: ObjectType.COMPANY
         }
       });
       return contacts > 0;
     }
-    catch(e) 
-    {
+    catch (e) {
       return false;
     }
   }
@@ -276,7 +272,7 @@ export class AccountsService {
     this.logger.debug('Syncing accounts to external CRM');
     try {
       const hasMapping = await this.hasMapping(orgId);
-      if(!hasMapping) return; 
+      if (!hasMapping) return;
       let page = 1;
       let hasNextPage = true;
 
@@ -287,46 +283,38 @@ export class AccountsService {
           searchTerm: '',
           sort: 'asc'
         });
- 
+
         if (accounts.data && accounts.data.length > 0) {
           for (let account of accounts.data) {
             const existingAccount = await this.externalCRMService.getCompanyByName(orgId, account.accountName);
             const hasPriority = await this.externalCRMService.hasPriority(orgId);
-            if(hasPriority)
-            {
-              if(existingAccount) 
-              {
-                try
-                {
+            if (hasPriority) {
+              if (existingAccount) {
+                try {
                   await this.externalCRMService.updateCompany(orgId, existingAccount.hs_object_id, account);
                 }
-                catch(e)
-                {
+                catch (e) {
                   this.logger.error(e);
                 }
               }
-              else
-              {
-                try
-                {
+              else {
+                try {
                   await this.externalCRMService.createCompany(orgId, account);
                 }
-                catch(e)
-                {
+                catch (e) {
                   this.logger.error(e);
                 }
               }
-            } 
-            else
-            {
-              if (existingAccount) continue; 
+            }
+            else {
+              if (existingAccount) continue;
               await this.externalCRMService.createCompany(orgId, account);
             }
             this.logger.log(`Account ${account.accountName} synced to external CRM`);
           }
           page++;
         } else {
-          hasNextPage = false; 
+          hasNextPage = false;
         }
       }
     } catch (err) {
@@ -335,31 +323,28 @@ export class AccountsService {
   }
 
   async syncExternalCrmToAccounts(orgId: string) {
+
     this.logger.debug('Syncing external CRM to contacts');
     try {
-      if(!await this.hasMapping(orgId)) return;
+      if (!await this.hasMapping(orgId)) return;
       const accounts = await this.externalCRMService.getCompanies(orgId);
       if (accounts) {
         for (let account of accounts) {
           const existingAccount = await this.getAccountByDomain(orgId, account.name);
           const hasPriority = await this.externalCRMService.hasPriority(orgId);
           const crmName = await this.externalCRMService.getActiveCRM(orgId);
-          const mappedData = await this.mappingService.handleReverseMapping(orgId,crmName, ObjectType.COMPANY, account);
-          const objects = Object.keys(mappedData); 
-          if(objects.length === 0) continue; 
-          if(!hasPriority)
-          {
-            if(existingAccount)
-            {
+          const mappedData = await this.mappingService.handleReverseMapping(orgId, crmName, ObjectType.COMPANY, account);
+          const objects = Object.keys(mappedData);
+          if (objects.length === 0) continue;
+          if (!hasPriority) {
+            if (existingAccount) {
               await this.update(orgId, existingAccount.id, mappedData);
             }
-            else
-            {
+            else {
               await this.create(orgId, mappedData);
             }
           }
-          else
-          {
+          else {
             if (existingAccount) continue;
             await this.create(orgId, mappedData);
           }
@@ -372,4 +357,85 @@ export class AccountsService {
     }
   }
 
+  async getAbm(orgId: string, filterDto: FilterDto) {
+    const { page, limit, sort, searchTerm } = filterDto;
+    const skip = (page - 1) * limit;
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    try {
+      const abm = await prisma.account.findMany({
+        where: {
+          ...(searchTerm
+            ? {
+              OR: [
+                { accountName: { contains: searchTerm } },
+                { website: { contains: searchTerm } },
+                { phone: { contains: searchTerm } },
+                { email: { contains: searchTerm } },
+                { address: { contains: searchTerm } },
+                { notes: { contains: searchTerm } },
+                { source: { contains: searchTerm } },
+                { status: { contains: searchTerm } },
+                { industry: { contains: searchTerm } },
+              ],
+            }
+            : {}),
+          isabm: true,
+        },
+        take: limit,
+        skip: skip,
+        orderBy: {
+          createdAt: sort,
+        },
+      });
+
+      const total = await prisma.account.count({
+        where: {
+          ...(searchTerm
+            ? {
+              OR: [
+                { accountName: { contains: searchTerm } },
+                { website: { contains: searchTerm } },
+                { phone: { contains: searchTerm } },
+                { email: { contains: searchTerm } },
+                { address: { contains: searchTerm } },
+                { notes: { contains: searchTerm } },
+                { source: { contains: searchTerm } },
+                { status: { contains: searchTerm } },
+                { industry: { contains: searchTerm } },
+              ],
+            }
+            : {}),
+          isabm: true,
+        }
+      })
+
+      return {
+        code: 200,
+        message: 'ABM fetched successfully',
+        data: abm,
+        page: page,
+        total: total,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(
+        'Error while fetching ABM',
+      );
+    }
+  }
+
+  async getAbmById(orgId: string, id: string) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    const abm = await prisma.account.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return {
+      code: 200,
+      message: 'ABM fetched successfully',
+      data: abm,
+    };
+  }
 }

@@ -4,7 +4,7 @@ import { MessagePattern } from '@nestjs/microservices';
 
 @Controller('accounts')
 export class AccountsMicroController {
-  constructor(private readonly accountService: AccountsService) {}
+  constructor(private readonly accountService: AccountsService) { }
 
   @MessagePattern({ cmd: 'CREATE_ACCOUNT' })
   async createAccount(data: any) {
@@ -61,6 +61,24 @@ export class AccountsMicroController {
   async get_contact_fields(data: { orgId: string }) {
     try {
       return await this.accountService.getAccountFields(data.orgId);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'GET_ABM_ACCOUNTS' })
+  async get_abm_accounts(data: any) {
+    try {
+      return await this.accountService.getAbm(data.orgId, data.filterDto);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'GET_ABM_ACCOUNT' })
+  async get_abm_account(data: any) {
+    try {
+      return await this.accountService.getAbmById(data.orgId, data.id);
     } catch (error) {
       return error.response || error;
     }

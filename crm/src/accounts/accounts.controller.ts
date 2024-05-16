@@ -24,7 +24,7 @@ import { FilterDto } from 'src/common/dtos/filter.dto';
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService) {}
+  constructor(private readonly accountsService: AccountsService) { }
 
   @Post()
   @ApiOperation({ description: 'Create Account', summary: 'Create Account' })
@@ -63,6 +63,25 @@ export class AccountsController {
       throw new UnauthorizedException('Unauthorized access');
     }
   }
+
+  @Get('abm')
+  async getAbm(@Req() request: IRequest, @Query() filterDto: FilterDto) {
+    if (request.orgId) {
+      return this.accountsService.getAbm(request.orgId, filterDto);
+    } else {
+      throw new UnauthorizedException('Unauthorized access');
+    }
+  }
+
+  @Get('abm/:id')
+  async getAbmById(@Req() request: IRequest, @Param('id') id: string) {
+    if (request.orgId) {
+      return this.accountsService.getAbmById(request.orgId, id);
+    } else {
+      throw new UnauthorizedException('Unauthorized access');
+    }
+  }
+
   @Get(':id')
   @ApiOperation({
     description: 'Get Account By Id',

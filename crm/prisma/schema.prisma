@@ -137,7 +137,7 @@ enum accountType {
 }
 
 model Account {
-  id              String       @id @default(uuid())
+  id              String      @id @default(uuid())
   parentAccountId String?
   photoUrl        String?
   accountName     String
@@ -158,26 +158,22 @@ model Account {
   notes           String?
   source          String?
   status          String?
-  createdAt       DateTime     @default(now())
-  modifiedAt      DateTime     @updatedAt
-  parentAccount   Account?     @relation("ParentAccount", fields: [parentAccountId], references: [id])
-  subAccounts     Account[]    @relation("ParentAccount")
+  decisionMakers  String[]
+  painPoints      String[]
+  buyingStage     String?
+  campaigns       String[]
+  teamMembers     String[]
+  isabm           Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  modifiedAt      DateTime    @updatedAt
+  parentAccount   Account?    @relation("ParentAccount", fields: [parentAccountId], references: [id])
+  subAccounts     Account[]   @relation("ParentAccount")
 }
 
 model AccountBasedMarketingTarget {
-  id                String   @id @default(uuid())
-  photoUrl          String?
-  targetAccountName String
-  industry          String
-  accountSize       String?
-  revenuePotential  Float?
-  decisionMakers    String[]
-  painPoints        String[]
-  buyingStage       String?
-  campaigns         String[]
-  teamMembers       String[]
-  createdAt         DateTime @default(now())
-  modifiedAt        DateTime @updatedAt
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
 }
 
 model ExternalCrmCredential {
@@ -202,5 +198,5 @@ model CrmMapping {
   createdAt             DateTime @default(now())
   modifiedAt            DateTime @updatedAt
 
-  @@unique([objectType,fieldName,externalCRMObjectType,externalCRMFieldName])
+  @@unique([objectType, fieldName, externalCRMObjectType, externalCRMFieldName])
 }

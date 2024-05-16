@@ -1,23 +1,24 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
-import { accountType } from './account.enum';
-import { IsEmail } from 'class-validator';
+import { ApiProperty } from "@nestjs/swagger";
+import { IsArray, IsBoolean, IsEnum, IsNumber, IsOptional, IsString, IsEmail } from "class-validator";
+import { accountType } from "./account.enum";
+
 
 export class CreateAccountDto {
+
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   parentAccountId?: string;
 
-  @ApiProperty({ required: false, example: 'https://example.com/photo.jpg' })
+  @ApiProperty({ required: false })
   @IsOptional()
-  @IsUrl()
+  @IsString()
   photoUrl?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  accountName?: string;
+  accountName: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -43,6 +44,11 @@ export class CreateAccountDto {
   @IsString()
   @IsOptional()
   website?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  domain?: string;
 
   @ApiProperty({ required: false })
   @IsString()
@@ -74,7 +80,7 @@ export class CreateAccountDto {
   @IsOptional()
   phone?: string;
 
-  @ApiProperty({ required: false, example: 'example@example.com' })
+  @ApiProperty({ required: false })
   @IsEmail()
   @IsOptional()
   email?: string;
@@ -98,4 +104,34 @@ export class CreateAccountDto {
   @IsString()
   @IsOptional()
   status?: string;
+
+  @ApiProperty({ required: false })
+  @IsArray()
+  @IsOptional()
+  decisionMakers: string[]
+
+  @ApiProperty({ required: false })
+  @IsArray()
+  @IsOptional()
+  painPoints: string[]
+
+  @ApiProperty({ required: false })
+  @IsArray()
+  @IsOptional()
+  campaigns: string[]
+
+  @ApiProperty({ required: false })
+  @IsArray()
+  @IsOptional()
+  teamMembers: string[]
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  buyingStage: string
+
+  @ApiProperty({ required: false })
+  @IsBoolean()
+  @IsOptional()
+  isabm: boolean
 }

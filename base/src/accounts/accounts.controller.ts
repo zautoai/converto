@@ -35,7 +35,6 @@ export class AccountsController {
     @Body() createAccountDto: CreateAccountDto,
     @Req() request: ZautoRequest,
   ) {
-    console.log(createAccountDto);
 
     const orgId = request.user.org.id;
     if (!orgId) {
@@ -60,6 +59,24 @@ export class AccountsController {
       throw new UnauthorizedException('Org Id not found');
     }
     return await this.accountsService.getFields(orgId);
+  }
+
+  @Get('abm')
+  async getABM(@Req() request: ZautoRequest, @Query() filterDto: FilterDto) {
+    const orgId = request.user.org.id;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    return await this.accountsService.getABM(orgId, filterDto);
+  }
+
+  @Get('abm/:id')
+  async getABMById(@Req() request: ZautoRequest, @Param('id') id: string) {
+    const orgId = request.user.org.id;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    return await this.accountsService.getABMById(orgId, id);
   }
 
   @Get(':id')
