@@ -28,37 +28,42 @@ export class UsersController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto, @Req() request: ZautoRequest) {
-    return await this.usersService.create(createUserDto);
+    const orgId = request.user.org.id;
+    return await this.usersService.create(orgId,createUserDto);
   }
 
   @Get()
   @ApiQuery({ name: 'page', description: 'Page number.', required: false })
   @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
-  async findAll(@Query() paginationDto: PaginationDto) {
-    return await this.usersService.findAll(paginationDto);
+  async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return await this.usersService.findAll(orgId,paginationDto);
   }
 
   @Get('organization')
   @ApiQuery({ name: 'page', description: 'Page number.', required: false })
   @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
   async findAllByOrg(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
-    const organizationId = request.user.org.id;
-    return await this.usersService.findAllByOrg(paginationDto, organizationId);
+    const orgId = request.user.org.id;
+    return await this.usersService.findAllByOrg(paginationDto,orgId);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.usersService.findOne(id);
+  async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return await this.usersService.findOne(orgId,id);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.usersService.update(id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return await this.usersService.update(orgId, id, updateUserDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.usersService.remove(id);
+  async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return await this.usersService.remove(orgId,id);
   }
 
   @Post('profilePic')
@@ -95,8 +100,9 @@ export class UsersController {
       await this.staticFileService.deleteExistingFile(file.path);
 
       const userId = request.user.id;
+      const orgId = request.user.org.id;
       const imgUrl = `${process.env.HOST_URL}/images/compressed-${file.filename}`
-      this.usersService.updateProfilePicUrl(userId, {
+      this.usersService.updateProfilePicUrl(orgId,userId, {
         imgUrl: imgUrl,
       });
 

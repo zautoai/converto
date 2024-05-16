@@ -8,4 +8,6 @@ export class CreateOrganizationDto {
     @IsNotEmpty()
     @IsString()
     name: string;
+
+    emails?:string[];
 }

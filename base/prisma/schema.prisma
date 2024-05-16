@@ -27,9 +27,7 @@ model User {
   modifiedAt    DateTime       @updatedAt
   orgId         String? // Updated to String
   imgUrl        String?        @db.VarChar(300)
-  org           Organization?  @relation(fields: [orgId], references: [id])
   role          Role?          @relation(fields: [roleId], references: [id])
-  Verifications Verification[]
   ActiveClient  ActiveClient?
   conversations Conversation[]
   ZautoMessages ZautoMessage[]
@@ -46,11 +44,11 @@ enum VerificationType {
 model Verification {
   id         String           @id @default(uuid())
   userId     String // Updated to String
+  email      String
   token      String           @default("default") @db.VarChar(100)
   type       VerificationType
   createdAt  DateTime         @default(now())
   modifiedAt DateTime         @updatedAt
-  user       User             @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "userId_Verification_fkey")
 }
@@ -59,12 +57,12 @@ model Organization {
   id         String      @id @default(uuid())
   name       String      @default("default") @db.VarChar(50)
   siteUrl    String?     @db.Text()
+  emails     String[]
   createdAt  DateTime    @default(now())
   modifiedAt DateTime    @updatedAt
   OrgAccount OrgAccount?
 
   Agents                 Agent[]
-  Users                  User[]
   Campaigns              Campaign[]
   OrgPlatforms           OrgPlatform[]
   LeadConfigs            LeadConfig[]

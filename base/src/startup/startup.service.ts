@@ -48,8 +48,8 @@ export class StartupService extends BaseService implements OnModuleInit {
 
     async executeOnStartup() {
         await this.createSubscriptions();
-        await this.createDefaultRoles();
         await this.createZautoOrg()
+        // await this.createDefaultRoles();
         await this.createPlatforms();
         //await this.resyncHelpers();
         await this.createFolders();
@@ -57,7 +57,7 @@ export class StartupService extends BaseService implements OnModuleInit {
         await this.handleException(await this.startupMicroService.syncOrganizations())
     }
 
-    async createDefaultRoles() {
+    async createDefaultRoles(orgId:string) {
         const defaultRoles = [
             {
                 name: 'admin'
@@ -70,7 +70,7 @@ export class StartupService extends BaseService implements OnModuleInit {
             }
         ];
         try {
-            await this.roleService.createDefaultRoles(defaultRoles);
+            await this.roleService.createDefaultRoles("",defaultRoles);
         } catch (error) {
             console.error('Defailt role not created, mybe it got created already.')
         }
@@ -85,6 +85,7 @@ export class StartupService extends BaseService implements OnModuleInit {
         }
 
         if (zautoAI) {
+            await this.createDefaultRoles(zautoAI.id);
             await this.createSuperUser(zautoAI);
         } else {
             throw 'Zauto AI not created.'
@@ -95,7 +96,7 @@ export class StartupService extends BaseService implements OnModuleInit {
         const userName = process.env.SUPER_USER_NAME;
         const email = process.env.SUPER_USER_EMAIL;
         const password = process.env.SUPER_USER_PASSWORD;
-        const superUserRole = await this.roleService.findOneByName('superadmin');
+        const superUserRole = await this.roleService.findOneByName(zautoAI.id,'superadmin');
         if (superUserRole) {
             const userDeatails = {
                 name: userName,
@@ -114,7 +115,7 @@ export class StartupService extends BaseService implements OnModuleInit {
                     createOrgAccountDto.status = (selectedPlan.price == 0) ? OrgAccountStatus.ACTIVE : OrgAccountStatus.PENDING;
                     const orgAccount = await this.orgAccountService.create(createOrgAccountDto);
                     if (orgAccount) {
-                        const superUser = await this.userService.create(userDeatails, true);
+                        const superUser = await this.userService.create(zautoAI.id,userDeatails, true);
                         if (superUser) {
                             console.log('Superuser Created.')
                         }

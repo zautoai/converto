@@ -2,50 +2,52 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException, 
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/entities/user.entity';
-import { PrismaService } from 'src/prisma/prisma.service';
-
 import { EmailService } from 'src/common/services/email.service';
-import { EMAIL_VERIFICATION_EXPIRES_TIME, SYSTEM_CONST } from 'src/common/constants/system.constants';
-import { ChangePasswordDto } from './dto/change-password.dto';
+import { DEFAULT_SCHEMA_NAME, EMAIL_VERIFICATION_EXPIRES_TIME, SYSTEM_CONST } from 'src/common/constants/system.constants';
 import { RolesService } from 'src/roles/roles.service';
 import { VerificationType } from 'src/common/enums/enums';
 import { OrganizationsService } from 'src/organizations/organizations.service';
 import { CreateOrgAccountDto } from 'src/account/dto/create-account.dto';
 import { OrgAccountStatus } from 'src/common/enums/enums'; 
 import { OrgAccountService } from 'src/account/account.service';
+import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 
 @Injectable()
 export class RegistrationService {
   
   constructor(private readonly userService: UsersService,
-    private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
     private readonly roleService: RolesService,
     private readonly orgService: OrganizationsService,
     private readonly orgAccountService:OrgAccountService,
+    private readonly prismaClientManager: PrismaClientManager
   ) {}
+
+  async findOrgByEmail(email: string) {
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    return await prisma.organization.findFirst({
+      where: {
+        emails:{
+          hasSome:[email]
+        }
+      }
+    })
+  }
 
   async create(createUserDto: CreateUserDto) {
 
-    const _user = await this.userService.findByEmail(createUserDto.email);
+    const _org = await this.findOrgByEmail(createUserDto.email);
     const isValidEmail = await this.emailService.validateEmailDomain(createUserDto.email);
     if(!isValidEmail)
     {
       throw new BadRequestException(`The email address "${createUserDto.email}" is invalid or not allowed.`);
     }
-    if(!_user) {
-      //Step 1: Get Admin Role ID
-      const adminRole = await this.roleService.findOneByName(SYSTEM_CONST.ADMIN_ROLE);
-      if(!adminRole) {
-        throw new NotFoundException('Admin role not found');
-      }
-      //Step 2: Assign admin role to user
-      createUserDto.roleId = adminRole.id;
+    if(!_org) {
 
       //Step 3: Create Organization for the user
       const createOrgDto = {
-        name: `${createUserDto.name}'s Organization`
+        name: `${createUserDto.name}'s Organization`,
+        emails: [createUserDto.email]
       }
       const org = await this.orgService.create(createOrgDto);
       if(org) {
@@ -53,6 +55,15 @@ export class RegistrationService {
       } else {
         throw new NotFoundException('Organization not created');
       }
+
+      //Step 1: Get Admin Role ID
+      const adminRole = await this.roleService.findOneByName(org.id,SYSTEM_CONST.ADMIN_ROLE);
+      if(!adminRole) {
+        throw new NotFoundException('Admin role not found');
+      }
+      //Step 2: Assign admin role to user
+      createUserDto.roleId = adminRole.id;
+
 
       // Setp 5: Select subscription
       const selectedPlan = await this.getSubscription("");
@@ -72,7 +83,7 @@ export class RegistrationService {
       }
 
       //Step 4: Create User Account
-      const user = await this.userService.create(createUserDto);
+      const user = await this.userService.create(org.id,createUserDto);
       if(user) {
         return await this.createVerification(user);
       }
@@ -90,10 +101,13 @@ export class RegistrationService {
   }
 
   async createVerification(user: any) {
-    const verification = await this.prisma.verification.findFirst({where:{id: user.id}})
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const verification = await prisma.verification.findFirst({where:{id: user.id}})
     if(!verification) {
-      const verifyObj = await this.prisma.verification.create({data:{
-        userId: user.id, token: uuidv4(), type: VerificationType.VERIFYEMAIL}
+      const verifyObj = await prisma.verification.create({data:{
+        userId: user.id, token: uuidv4(), 
+        email: user.email,
+        type: VerificationType.VERIFYEMAIL}
       });
       
       try
@@ -118,7 +132,8 @@ export class RegistrationService {
       
       setTimeout(async () => {
         try {
-          await this.prisma.verification.delete({where: {id: verifyObj.id}});
+          const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+          await prisma.verification.delete({where: {id: verifyObj.id}});
         } catch(error) {
           console.log(error)
         }
@@ -129,10 +144,15 @@ export class RegistrationService {
 
   async verifyToken(token: string) {
     try {
-      const verification = await this.prisma.verification.findFirst({where: {token}})
+      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+      const verification = await prisma.verification.findFirst({where: {token}});
+      const org = await this.findOrgByEmail(verification.email);
+      if(!org) {
+        throw new NotFoundException('Organization not found');
+      }
       if(verification) {
-        await this.userService.verifyEmail(verification.userId);
-        await this.prisma.verification.delete({where: {id: verification.id}});
+        await this.userService.verifyEmail(org.id,verification.userId);
+        await prisma.verification.delete({where: {id: verification.id}});
         return {verified: true};
       } else {
         throw new UnauthorizedException('Token Expired or not found.')
@@ -144,10 +164,15 @@ export class RegistrationService {
 
   async sendForgotPassword(email: string) {
     try {
-      const user = await this.userService.findByEmail(email);
+      const org = await this.findOrgByEmail(email);
+      if(!org) {
+        throw new NotFoundException('Organization not found');
+      }
+      const user = await this.userService.findByEmail(org.id,email);
       if(user) {
         const token = uuidv4();
-        const verification  = await this.prisma.verification.create({data: {userId: user.id, token, type: VerificationType.FORGOTPASSWORD}});
+        const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+        const verification  = await prisma.verification.create({data: {userId: user.id, email: user.email,token, type: VerificationType.FORGOTPASSWORD}});
         await this.emailService.sendVerifucationMail({...verification, user});
         return {success: true};
       } else {
@@ -160,10 +185,15 @@ export class RegistrationService {
 
   async changePassword({password, token}) {
     try {
-      const verification = await this.prisma.verification.findFirst({where: {token}})
+      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+      const verification = await prisma.verification.findFirst({where: {token}})
+      const org = await this.findOrgByEmail(verification.email);
+      if(!org) {
+        throw new NotFoundException('Organization not found');
+      }
       if(verification) {
-        await this.userService.changePassword(verification.userId, password);
-        await this.prisma.verification.delete({where: {id: verification.id}});
+        await this.userService.changePassword(org.id,verification.userId, password);
+        await prisma.verification.delete({where: {id: verification.id}});
         return {success: true};
       } else {
         throw new UnauthorizedException('Token expired or not found.')
@@ -175,21 +205,25 @@ export class RegistrationService {
 
   async resendVerification(email: string) {
     
-    const user = await this.userService.findByEmail(email);
-    
-    const verification = await this.prisma.verification.findFirst({where:{id: user.id}})
+    const org = await this.findOrgByEmail(email);
+    if(org) {
+      throw new BadRequestException('Email already registered with another account.');
+    }
+    const user = await this.userService.findByEmail(org.id,email);
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const verification = await prisma.verification.findFirst({where:{id: user.id}})
     if(verification){
-      await this.prisma.verification.delete({where: {id: verification.id}});
+      await prisma.verification.delete({where: {id: verification.id}});
     }
 
-    const verifyObj = await this.prisma.verification.create({data:{
-      userId: user.id, token: uuidv4(), type: VerificationType.VERIFYEMAIL}
+    const verifyObj = await prisma.verification.create({data:{
+      userId: user.id, email: user.email,token: uuidv4(), type: VerificationType.VERIFYEMAIL}
     });
     
     await this.emailService.sendVerifucationMail({...verifyObj, user});
     setTimeout(async () => {
       try {
-        await this.prisma.verification.delete({where: {id: verifyObj.id}});
+        await prisma.verification.delete({where: {id: verifyObj.id}});
       } catch(error) {
         console.log(error)
       }
@@ -199,14 +233,15 @@ export class RegistrationService {
 
   async getSubscription(subId: string)
   {
-    const subsPlan = await this.prisma.subscriptionPlan.findUnique({where:{id:subId}});
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const subsPlan = await prisma.subscriptionPlan.findUnique({where:{id:subId}});
     if(subsPlan)
     {
       return subsPlan;
     }
     else
     {
-      const freePlan = await this.prisma.subscriptionPlan.findFirst({where:{price:0}});
+      const freePlan = await prisma.subscriptionPlan.findFirst({where:{price:0}});
       return freePlan;
     }
   }

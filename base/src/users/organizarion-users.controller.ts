@@ -35,7 +35,8 @@ export class OrgUsersController {
     const remainingUser = userUsage.maxCount - userUsage.count;
     if(remainingUser > 0)
     {
-      return await this.usersService.create({...createUserDto, orgId }, true);
+      const orgId = request.user.org.id;
+      return await this.usersService.create(orgId,{...createUserDto, orgId }, true);
     }
     else
     {
@@ -58,23 +59,26 @@ export class OrgUsersController {
   @Get(':id')
   @UseGuards(JwtAuthGuard, SelfGuard)
   @ApiBearerAuth()
-  async findOne(@Param('id') id: string) {
-    return await this.usersService.findOne(id);
+  async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return await this.usersService.findOne(orgId,id);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, SelfGuard)
   @ApiBearerAuth()
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.usersService.update(id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return await this.usersService.update(orgId, id, updateUserDto);
   }
 
   @Delete(':id')
   @Roles(SYSTEM_CONST.ADMIN_ROLE)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  async remove(@Param('id') id: string) {
-    return await this.usersService.remove(id);
+  async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.org.id;
+    return await this.usersService.remove(orgId,id);
   }
 
   @Post('profilePic')
@@ -113,8 +117,9 @@ export class OrgUsersController {
       await this.staticFileService.deleteExistingFile(file.path);
 
       const userId = request.user.id;
+      const orgId = request.user.org.id;
       const imgUrl = `${process.env.HOST_URL}/images/compressed-${file.filename}`
-      this.usersService.updateProfilePicUrl(userId, {
+      this.usersService.updateProfilePicUrl(orgId,userId, {
         imgUrl: imgUrl,
       });
 

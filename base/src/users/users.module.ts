@@ -7,6 +7,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { CommonModule } from 'src/common/common.module';
 import { OrgUsersController } from './organizarion-users.controller';
 import { AccountModule } from 'src/account/account.module';
+import { OrganizationsModule } from 'src/organizations/organizations.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { AccountModule } from 'src/account/account.module';
     RolesModule,
     CommonModule,
     MulterModule.register(),
-    AccountModule
+    AccountModule,
+    OrganizationsModule
   ],
   controllers: [UsersController, OrgUsersController],
   providers: [UsersService],
