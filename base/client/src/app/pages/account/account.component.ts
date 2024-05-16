@@ -286,6 +286,7 @@ export class AccountsComponent implements OnInit {
         );
       this.offcanvasService.dismiss();
       this.Form.reset();
+      
     } else {
       this.Form.markAllAsTouched();
     }

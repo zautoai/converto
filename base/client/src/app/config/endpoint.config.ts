@@ -55,7 +55,8 @@ export const API = {
     formbuilder: 'api/form-builder',
     account: 'api/crm-accounts',
     external_crm: 'api/external-crm',
-    contact:'api/contacts'
+    contact:'api/contacts',
+    abm:'api/crm-accounts/abm'
   },
   dev: {},
 };

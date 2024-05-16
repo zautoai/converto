@@ -12,6 +12,7 @@ import { Subject, debounceTime } from 'rxjs';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { ScrollUtilService } from 'src/app/shared/services/scroll-util.service';
 import { updateDataList } from 'src/app/common/utils';
+import { ContactsComponent } from '../../contacts/contacts.component';
 
 interface link {
   name: string;
@@ -29,6 +30,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   campaignForm: FormGroup;
   errorFeedback: any = { title: "", desc: "", url: "",key:"",value:"" };
   selectedCampaign: any;
+  Accounts: any;
   selectedCampaignStats: any;
   campaignList: any = [];
   platforms: any = [];
@@ -51,6 +53,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   @ViewChild('filterOffcanvas') filterOffcanvas: ElementRef | any;
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
+  
 
 
 
@@ -78,7 +81,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
       idParam: new FormControl(""),
       idValue: new FormControl(""),
       isabm:new FormControl(false),
-      myDropdown: new FormControl(null),
+      campaignAccount: new FormControl(null),
     });
 
     this.searchSubject.pipe(debounceTime(1000)).subscribe((term) => {
@@ -92,6 +95,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
 
   ngOnInit(): void {
     this.getPlatforms();
+    this.getContacts();
     this.getCampaigns();
     const isabmControl = this.campaignForm.get('isabm');
     if (isabmControl !== null && isabmControl !== undefined && isabmControl.valueChanges) {
@@ -190,6 +194,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
       });
   }
 
+
   openCreateCampaign() {
     this.campaignForm.reset();
     this.resetErrorFeedback();
@@ -247,8 +252,8 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     const isZauto: boolean = !this.campaignForm.value.isOthers || false;
     const idParam: string = this.campaignForm.value.idParam || "";
     const idValue: string = this.campaignForm.value.idValue || "";
-    const isAbm: string = this.campaignForm.value.isAbm || "";
-    
+    const isabm: string = this.campaignForm.value.isabm || "";
+    const campaignAccount:string=this.campaignForm.value.campaignAccount||"";
 
     if (this.campaignForm.valid) {
       const data = {
@@ -259,7 +264,9 @@ export class CampaignComponent implements OnInit,AfterViewInit {
         isZauto: isZauto,
         idParam: idParam,
         idValue: idValue,
-        isAbm:isAbm
+        isabm:isabm,
+        accountId:campaignAccount,
+        
 
       };
       this.restService.post(API.main.campaign, data)
@@ -400,6 +407,9 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   }
 
 
+  
+ 
+
   generateLinks() {
     if (this.platforms.length > 0 && this.selectedCampaign) {
       this.customLinkList.splice(0, this.customLinkList.length);
@@ -503,7 +513,20 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     return queryString;
   }
 
-  
+  getContacts(): void {
+    this.restService
+      .getAll(API.main.abm) // Fetch all contacts from the API
+      .subscribe(
+        (response: any) => {
+          this.Accounts = response.data; // Assign contacts from response to your contacts array
+          console.log(this.Accounts)
+        },
+        (error) => {
+          console.error(error);
+          this.notifService.showError(error.error.message);
+        }
+      );
+  }
   
 
 }

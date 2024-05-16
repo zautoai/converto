@@ -180,7 +180,39 @@
                                             <li class="me-2 mb-1" [ngbNavItem]="3">
                                                 <a ngbNavLink><i class="fe fe-account"></i> Accounts</a>
                                                 <ng-template ngbNavContent>
-                                                    
+                                                    <h3 class="detail-value">{{selectedCampaign?.title}}</h3>
+                                                    <div class="campaign-detail">
+                                                        <dt class="detail-label">Description :</dt>
+                                                        <dd class="detail-value">{{selectedCampaign?.description}}</dd>
+                                                    </div>
+                                                    <div class="campaign-detail">
+                                                        <dt class="detail-label">URL :</dt>
+                                                        <dd class="detail-value">{{selectedCampaign?.url}}</dd>
+                                                    </div>
+                                                    <div class="campaign-detail">
+                                                        <dt class="detail-label">Source :</dt>
+                                                        <dd class="detail-value">{{selectedCampaign?.source}}</dd>
+                                                    </div>
+                                                    <div class="campaign-detail">
+                                                        <dt class="detail-label">Start Date :</dt>
+                                                        <dd class="detail-value">{{selectedCampaign?.startDate | date:'dd/MM/yyyy'}}</dd>
+                                                    </div>
+                                                    <div class="campaign-detail">
+                                                        <dt class="detail-label">End Date :</dt>
+                                                        <dd class="detail-value">{{selectedCampaign?.endDate | date:'dd/MM/yyyy'}}</dd>
+                                                    </div>
+                    
+                                                    <div class="campaign-detail">
+                                                        <dt class="detail-label">Status :</dt>
+                                                        <dd class="detail-value">
+                                                            <div class="badge badge-success" *ngIf="selectedCampaign?.status == 'ACTIVE'">
+                                                                ACTIVE
+                                                            </div>
+                                                            <div class="badge badge-danger" *ngIf="selectedCampaign?.status == 'INACTIVE'">
+                                                                INACTIVE
+                                                            </div>
+                                                        </dd>
+                                                    </div>
                                                 </ng-template>
                                             </li>
                                         </ul>
@@ -271,11 +303,11 @@
             </div>
 
             <div *ngIf="campaignForm.get('isabm')?.value">
-                <label>Select an option:</label>
-                <select formControlName="myDropdown">
-                  <option value="option1">Option 1</option>
-                  <option value="option2">Option 2</option>
-                  <option value="option3">Option 3</option>
+                <label>Select the Account:</label>
+                <select formControlName="campaignAccount">
+                  <option  *ngFor="let Account of Accounts" value="{{Account.id}}">{{Account.
+                    accountName
+                    }}</option>
                 </select>
               </div>
 
