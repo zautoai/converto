@@ -576,6 +576,7 @@ model Campaign {
   status        CampaignStatus @default(ACTIVE)
   startDate     DateTime       @default(now())
   endDate       DateTime?      @db.Timestamp()
+  accountId     String?
   createdAt     DateTime       @default(now())
   modifiedAt    DateTime       @updatedAt
   organization  Organization?  @relation(fields: [orgId], references: [id])
