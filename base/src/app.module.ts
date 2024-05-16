@@ -60,6 +60,7 @@ import { AccountBasedMaretingModule } from './account-based-mareting/account-bas
 import { EnrichmentModule } from './enrichment/enrichment.module';
 import { ExternalCrmModule } from './external-crm/external-crm.module';
 import { CalendarModule } from './calendar/calendar.module';
+import { SchemaManagerModule } from './schema-manager/schema-manager.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { CalendarModule } from './calendar/calendar.module';
           ? undefined
           : ['.env.dev', '.env'],
     }),
+    SchemaManagerModule,
     RolesModule,
     UsersModule,
     AuthModule,
