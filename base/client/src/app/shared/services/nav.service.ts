@@ -212,6 +212,10 @@ export class NavService implements OnDestroy {
 			title: 'File manager', icon: 'fa-solid fa-folder', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/file-manager', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
 		},
 		{
+			title: 'Segment', icon: 'fa-solid fa-object-ungroup', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/segment', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
+		},
+		
+		{
 			headTitle: 'Deployment',
 			show:false,
 			roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
