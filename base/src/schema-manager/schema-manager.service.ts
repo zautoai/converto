@@ -8,15 +8,13 @@ import { getSchemaName } from 'src/common/helpers/cast.helper';
 import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 
 @Injectable()
-export class SchemaManagerService {
+export class SchemaManager {
   private readonly migrationBasePath = './prisma/sql';
-  private readonly logger = new Logger(SchemaManagerService.name);
+  private readonly logger = new Logger(SchemaManager.name);
 
   constructor(private readonly prismaClientManager: PrismaClientManager) {}
 
-  async create(createSchemaManagerDto: CreateSchemaManagerDto,rollback: Function,): Promise<any> {
-    const { name, orgId } = createSchemaManagerDto;
-
+  async create(orgId: string,rollback: Function,): Promise<any> {
     const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
 
     const schemaName = getSchemaName(orgId);

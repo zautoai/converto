@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CrmService } from 'src/crm/crm.service';
 import { SchemaManagerService } from 'src/microservices/crm_service/schema-manager.service';
+import { SchemaManager } from 'src/schema-manager/schema-manager.service';
 
 
 @Injectable()
@@ -13,7 +14,8 @@ export class OrganizationsService {
 
   constructor(
     private prisma: PrismaService,
-    private readonly schemaManagerService: SchemaManagerService
+    private readonly schemaManagerService: SchemaManagerService,
+    private readonly schemaManager: SchemaManager
   ){}
 
   async create(createOrganizationDto: CreateOrganizationDto) {
@@ -21,6 +23,7 @@ export class OrganizationsService {
     if(organization) {
       try
       {
+        await this.schemaManager.create(organization.id,null);
         await this.schemaManagerService.create(organization.id, organization.name);
       }
       catch(e)

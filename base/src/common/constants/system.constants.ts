@@ -1,5 +1,5 @@
 
-export const DEFAULT_SCHEMA_NAME = 'base';
+export const DEFAULT_SCHEMA_NAME = 'public';
 export const SYSTEM_CONST = {
     DEFALT_ROLE :'user',
     ADMIN_ROLE: 'admin',
