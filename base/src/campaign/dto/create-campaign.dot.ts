@@ -48,4 +48,9 @@ export class CreateCampaignDto{
     @IsOptional()
     @IsString()
     idValue: string;
+
+    @ApiProperty({required:false})
+    @IsOptional()
+    @IsString()
+    accountId: string;
 }

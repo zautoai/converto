@@ -46,7 +46,8 @@ export class CampaignService {
                 isZauto: createCampaignDto.isZauto,
                 idParam: createCampaignDto.idParam,
                 idValue: createCampaignDto.idValue,
-                endDate: endDate
+                endDate: endDate,
+                accountId: createCampaignDto.accountId
             }
         });
         await this.updateCampaignCount(1, createCampaignDto.orgId)
@@ -141,6 +142,7 @@ export class CampaignService {
                 isZauto: updateCampaignDto.isZauto,
                 idParam: updateCampaignDto.idParam,
                 idValue: updateCampaignDto.idValue,
+                accountId: updateCampaignDto.accountId
             };
 
             const startDateTimestamp = updateCampaignDto.startDateTimestamp;
@@ -226,7 +228,7 @@ export class CampaignService {
 
     async getLeadCountByDate(id: string) {
         const campaign = await this.prisma.campaign.findFirst({
-            where: { id},
+            where: { id },
             include: {
                 Conversations: {
                     select: {
@@ -277,11 +279,11 @@ export class CampaignService {
             }
         });
         const visitCount = uniqueVisitorCount.length;
-        const convoCount = await this.prisma.conversation.count({ where: { campaignId,isValid:true } });
-        const conversations = await this.prisma.conversation.findMany({ where: { campaignId,isValid:true } });
+        const convoCount = await this.prisma.conversation.count({ where: { campaignId, isValid: true } });
+        const conversations = await this.prisma.conversation.findMany({ where: { campaignId, isValid: true } });
         let totalLeadCount = 0;
         for (const conversation of conversations) {
-            const leadCount = await this.prisma.lead.count({ where: { convId: conversation.id,conversation:{isValid:true} } });
+            const leadCount = await this.prisma.lead.count({ where: { convId: conversation.id, conversation: { isValid: true } } });
             totalLeadCount += leadCount;
         }
 
