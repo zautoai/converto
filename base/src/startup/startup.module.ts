@@ -3,7 +3,6 @@ import { StartupService } from './startup.service';
 import { RolesModule } from 'src/roles/roles.module';
 import { UsersModule } from 'src/users/users.module';
 import { OrganizationsModule } from 'src/organizations/organizations.module';
-import { PlatformModule } from 'src/platform/platform.module';
 import { HelpersModule } from 'src/helpers/helpers.module';
 import { SubscriptionPlanModule } from 'src/subscription-plan/subscription-plan.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
@@ -20,7 +19,6 @@ import { MicroservicesModule } from 'src/microservices/microservices.module';
     RolesModule,
     UsersModule,
     OrganizationsModule,
-    PlatformModule,
     HelpersModule,
     SubscriptionPlanModule,
     CommonModule,

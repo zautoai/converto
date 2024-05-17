@@ -2,7 +2,6 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { DEFALT_ROLES, ZAUTO_ORG } from 'src/common/constants/system.constants';
 import { Organization } from 'src/organizations/entities/organization.entity';
 import { OrganizationsService } from 'src/organizations/organizations.service';
-import { PlatformService } from 'src/platform/platform.service';
 import { RolesService } from 'src/roles/roles.service';
 import { UsersService } from 'src/users/users.service';
 import { ZAUTO_HELPERS } from '../helpers/entities/helpers.model';
@@ -27,7 +26,6 @@ export class StartupService extends BaseService implements OnModuleInit {
         private roleService: RolesService,
         private userService: UsersService,
         private orgService: OrganizationsService,
-        private platformService: PlatformService,
         private helperService: HelpersService,
         private orgAccountService: OrgAccountService,
         private subscriptionPlan: SubscriptionPlanService,
@@ -44,7 +42,6 @@ export class StartupService extends BaseService implements OnModuleInit {
         await this.createSubscriptions();
         await this.createZautoOrg()
         // await this.createDefaultRoles();
-        await this.createPlatforms();
         //await this.resyncHelpers();
         await this.createFolders();
         await this.handleException(await this.startupMicroService.syncOrganizations())
@@ -134,33 +131,6 @@ export class StartupService extends BaseService implements OnModuleInit {
             return freePlan;
         }
     }
-
-    //Default Platforms
-    async createPlatforms() {
-        const defaultPlatforms = [
-            {
-                name: 'facebook'
-            },
-            {
-                name: 'instagram'
-            },
-            {
-                name: 'whatsapp'
-            },
-            {
-                name: 'twitter'
-            },
-            {
-                name: 'linkedin'
-            },
-        ];
-        try {
-            await this.platformService.createDefaultPlatforms(defaultPlatforms);
-        } catch (error) {
-            console.error('Default platform not created, mybe it got created already.')
-        }
-    }
-
 
     async resyncHelpers() {
         try {

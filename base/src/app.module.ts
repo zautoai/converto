@@ -24,8 +24,6 @@ import { RegistrationModule } from './registration/registration.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { LeadConfigModule } from './lead-config/lead-config.module';
-import { PlatformModule } from './platform/platform.module';
-import { OrgPlatformModule } from './org-platform/org-platform.module';
 import { AssistantsModule } from './assistants/assistants.module';
 import { CampaignModule } from './campaign/campaign.module';
 import { DashboardModule } from './dashboard/dashboard.module';
@@ -89,8 +87,6 @@ import { SchemaManagerModule } from './schema-manager/schema-manager.module';
       serveRoot: '/assets',
     }),
     LeadConfigModule,
-    PlatformModule,
-    OrgPlatformModule,
     AssistantsModule,
     CampaignModule,
     DashboardModule,

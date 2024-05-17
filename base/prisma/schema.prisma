@@ -63,7 +63,6 @@ model Organization {
 
   Agents                 Agent[]
   Campaigns              Campaign[]
-  OrgPlatforms           OrgPlatform[]
   LeadConfigs            LeadConfig[]
   Sites                  Site[]
   AgentPrompts           AgentPrompt[]
@@ -509,44 +508,6 @@ model LeadCategoryMap {
   @@index([categoryId], map: "categoryId_LeadCategoryMap_fkey")
 }
 
-enum ToolType {
-  RESTAPI
-  CRM
-  CALENDAR
-  COMMUNICATION
-}
-
-model Tool {
-  id   String   @id @default(uuid())
-  name String   @db.Text
-  type ToolType
-
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-}
-
-model Platform {
-  id          String        @id @default(uuid())
-  name        String        @unique @db.VarChar(100)
-  OrgPlatform OrgPlatform[]
-
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-}
-
-model OrgPlatform {
-  id         String  @id @default(uuid())
-  orgId      String? // Updated to String
-  platformId String? // Updated to String
-
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-
-  platform Platform?     @relation(fields: [platformId], references: [id])
-  org      Organization? @relation(fields: [orgId], references: [id])
-
-  @@unique([orgId, platformId], name: "OrgPlatform_unique_orgId_platformId")
-}
 
 enum CampaignStatus {
   ACTIVE
