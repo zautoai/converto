@@ -39,7 +39,7 @@ export class OrganizationsService {
       {
         await this.schemaManager.create(organization.id,null);
         await this.createDefaultRoles(organization.id);
-        await this.schemaManagerService.create(organization.id, organization.name);
+        // await this.schemaManagerService.create(organization.id, organization.name);
       }
       catch(e)
       {

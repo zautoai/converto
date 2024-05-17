@@ -79,6 +79,7 @@ CREATE TABLE "User" (
 CREATE TABLE "Verification" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
     "token" VARCHAR(100) NOT NULL DEFAULT 'default',
     "type" "VerificationType" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -92,6 +93,7 @@ CREATE TABLE "Organization" (
     "id" TEXT NOT NULL,
     "name" VARCHAR(50) NOT NULL DEFAULT 'default',
     "siteUrl" TEXT,
+    "emails" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
@@ -592,9 +594,6 @@ CREATE UNIQUE INDEX "Role_name_key" ON "Role"("name");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE INDEX "Users_orgId_fkey" ON "User"("orgId");
-
--- CreateIndex
 CREATE INDEX "Users_roleId_fkey" ON "User"("roleId");
 
 -- CreateIndex
@@ -811,13 +810,7 @@ CREATE UNIQUE INDEX "KeyMapping_apiId_fieldName_externalFieldName_key" ON "KeyMa
 CREATE UNIQUE INDEX "AvailabilitySchedule_orgId_key" ON "AvailabilitySchedule"("orgId");
 
 -- AddForeignKey
-ALTER TABLE "User" ADD CONSTRAINT "User_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Verification" ADD CONSTRAINT "Verification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ActiveClient" ADD CONSTRAINT "ActiveClient_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

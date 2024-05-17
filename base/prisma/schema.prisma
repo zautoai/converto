@@ -32,7 +32,6 @@ model User {
   conversations Conversation[]
   ZautoMessages ZautoMessage[]
 
-  @@index([orgId], map: "Users_orgId_fkey")
   @@index([roleId], map: "Users_roleId_fkey")
 }
 

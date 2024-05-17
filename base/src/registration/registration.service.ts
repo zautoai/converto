@@ -37,11 +37,11 @@ export class RegistrationService {
   async create(createUserDto: CreateUserDto) {
 
     const _org = await this.findOrgByEmail(createUserDto.email);
-    const isValidEmail = await this.emailService.validateEmailDomain(createUserDto.email);
-    if(!isValidEmail)
-    {
-      throw new BadRequestException(`The email address "${createUserDto.email}" is invalid or not allowed.`);
-    }
+    // const isValidEmail = await this.emailService.validateEmailDomain(createUserDto.email);
+    // if(!isValidEmail)
+    // {
+    //   throw new BadRequestException(`The email address "${createUserDto.email}" is invalid or not allowed.`);
+    // }
     if(!_org) {
 
       //Step 3: Create Organization for the user
@@ -51,7 +51,7 @@ export class RegistrationService {
       }
       const org = await this.orgService.create(createOrgDto);
       if(org) {
-        createUserDto.orgId = org.id;
+        createUserDto.orgId = org.id; 
       } else {
         throw new NotFoundException('Organization not created');
       }
@@ -66,21 +66,21 @@ export class RegistrationService {
 
 
       // Setp 5: Select subscription
-      const selectedPlan = await this.getSubscription("");
-      if(!selectedPlan)
-      {
-        await this.orgService.remove(org.id);
-        throw new BadRequestException("Unable to select subscription plan");
-      }
-      const createOrgAccountDto = new CreateOrgAccountDto();
-      createOrgAccountDto.orgId = createUserDto.orgId;
-      createOrgAccountDto.subscriptionId = selectedPlan.id;
-      createOrgAccountDto.status = (selectedPlan.price == 0) ? OrgAccountStatus.ACTIVE : OrgAccountStatus.PENDING;
-      const orgAccount = await this.orgAccountService.create(createOrgAccountDto);
-      if(!orgAccount) {
-        await this.orgService.remove(org.id);
-        throw new NotFoundException('Organization account not created');
-      }
+      // const selectedPlan = await this.getSubscription("");
+      // if(!selectedPlan)
+      // {
+      //   await this.orgService.remove(org.id);
+      //   throw new BadRequestException("Unable to select subscription plan");
+      // }
+      // const createOrgAccountDto = new CreateOrgAccountDto();
+      // createOrgAccountDto.orgId = createUserDto.orgId;
+      // createOrgAccountDto.subscriptionId = selectedPlan.id;
+      // createOrgAccountDto.status = (selectedPlan.price == 0) ? OrgAccountStatus.ACTIVE : OrgAccountStatus.PENDING;
+      // const orgAccount = await this.orgAccountService.create(createOrgAccountDto);
+      // if(!orgAccount) {
+      //   await this.orgService.remove(org.id);
+      //   throw new NotFoundException('Organization account not created');
+      // }
 
       //Step 4: Create User Account
       const user = await this.userService.create(org.id,createUserDto);
@@ -90,7 +90,7 @@ export class RegistrationService {
       else {
         //Step 4: Rollback all
         await this.orgService.remove(org.id);
-        await this.orgAccountService.remove(orgAccount.orgId);
+        // await this.orgAccountService.remove(orgAccount.orgId);
         throw new NotFoundException('Registration Failed');
       }
     } else {

@@ -98,6 +98,9 @@ export class StartupService extends BaseService implements OnModuleInit {
             try {
                 const superUser = await this.userService.create(zautoAI.id,userDeatails, true);
                 if (superUser) {
+                    await this.orgService.update(zautoAI.id, {
+                        emails:[superUser.email]
+                    })
                     console.log('Superuser Created.');
                 }
                 // const selectedPlan = await this.getSubscription("");
