@@ -9,8 +9,6 @@ import { SubscriptionPlanModule } from 'src/subscription-plan/subscription-plan.
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { AccountModule } from 'src/account/account.module';
 import { CommonModule } from 'src/common/common.module';
-import { OauthModule } from 'src/oauth/oauth.module';
-import { ExternalToolModule } from 'src/external-tool/external-tool.module';
 import { MicroservicesModule } from 'src/microservices/microservices.module';
 
 
@@ -26,7 +24,6 @@ import { MicroservicesModule } from 'src/microservices/microservices.module';
     HelpersModule,
     SubscriptionPlanModule,
     CommonModule,
-    ExternalToolModule,
     MicroservicesModule
   ],
   providers: [StartupService]

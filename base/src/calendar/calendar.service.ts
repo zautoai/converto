@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CalendarProvider } from './calendar.provider';
 import { AvailabilityScheduleService } from 'src/availability-schedule/availability-schedule.service';
-import { AvailabilitySchedule } from 'src/google-calendar/entites/slot.model';
+import { AvailabilitySchedule } from './slot.model';
 import { CalendarName } from './enum/calendar.enum';
 import { CalendarEvent } from './interface/event.interface';
 import { EventSlot } from './interface/slot.interface';

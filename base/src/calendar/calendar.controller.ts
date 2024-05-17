@@ -1,9 +1,7 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { CreateEventDto } from 'src/google-calendar/dto/create-event.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { DateFilterDto } from 'src/google-calendar/dto/date-filter.dto';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { CalendarAuthDto } from './dto/calendar.dto';
 import { CallBackDto } from './dto/callbac.dto';

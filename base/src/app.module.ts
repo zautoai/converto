@@ -38,19 +38,11 @@ import { SubscriptionPlanModule } from './subscription-plan/subscription-plan.mo
 import { AccountModule } from './account/account.module';
 import { OrgSmtpconfigModule } from './org-smtpconfig/org-smtpconfig.module';
 import { CallToActionModule } from './call-to-action/call-to-action.module';
-import { OauthModule } from './oauth/oauth.module';
-import { CrmKeyMapingModule } from './crm-key-maping/crm-key-maping.module';
-import { ExternalToolModule } from './external-tool/external-tool.module';
-import { OrgToolModule } from './org-tool/org-tool.module';
-import { ExternalApiModule } from './external-api/external-api.module';
-import { ExternalApiKeyMappingModule } from './external-api-key-mapping/external-api-key-mapping.module';
-import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
 import { AvailabilityScheduleModule } from './availability-schedule/availability-schedule.module';
 import { FileManagerModule } from './file-manager/file-manager.module';
 import { LeadCategoryModule } from './lead-category/lead-category.module';
 import { PromptTemplateModule } from './prompt-template/prompt-template.module';
 import { DemandGenModule } from './demand-gen/demand-gen.module';
-import { CrmModule } from './crm/crm.module';
 import { SecureExchangeModule } from './secure-exchange/secure-exchange.module';
 import { MicroservicesModule } from './microservices/microservices.module';
 import { ContactsModule } from './contacts/contacts.module';
@@ -117,19 +109,11 @@ import { SchemaManagerModule } from './schema-manager/schema-manager.module';
     AccountModule,
     OrgSmtpconfigModule,
     CallToActionModule,
-    OauthModule,
-    CrmKeyMapingModule,
-    ExternalToolModule,
-    OrgToolModule,
-    ExternalApiModule,
-    ExternalApiKeyMappingModule,
-    GoogleCalendarModule,
     AvailabilityScheduleModule,
     FileManagerModule,
     LeadCategoryModule,
     PromptTemplateModule,
     DemandGenModule,
-    CrmModule,
     SecureExchangeModule,
     MicroservicesModule,
     ContactsModule,

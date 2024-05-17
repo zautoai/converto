@@ -74,9 +74,6 @@ model Organization {
   Stages                 Stage[]
   Visits                 Visit[]
   CallToAction           CallToAction[]
-  KeyMapping             KeyMapping[]
-  OrgTool                OrgTool[]
-  ExternalApi            ExternalApi[]
   AvailabilitySchedule   AvailabilitySchedule[]
   LeradCategory          LeadCategory[]
   LeadCategoryMap        LeadCategoryMap[]
@@ -652,96 +649,6 @@ model CallToAction {
   @@unique([agentId, name], name: "Unique_Agent_Name")
   @@index([agentId], map: "Cta_agentId_fkey")
   @@index([orgId], map: "Cta_orgId_fkey")
-}
-
-enum ExternalToolLevel {
-  USERLEVEL
-  ORGLEVEL
-}
-
-model ExternalTool {
-  id           String            @id @default(uuid())
-  name         String            @unique
-  type         ToolType
-  authUrl      String            @db.Text
-  tokenUrl     String            @db.Text
-  profileUrl   String            @db.Text
-  propertyUrl  String            @db.Text
-  clientId     String            @db.Text
-  clientSecret String            @db.Text
-  redirectUri  String            @db.Text
-  scope        String            @db.Text
-  level        ExternalToolLevel @default(ORGLEVEL)
-  createdAt    DateTime          @default(now())
-  modifiedAt   DateTime          @updatedAt
-  OrgTool      OrgTool[]
-}
-
-model OrgTool {
-  id           String        @id @default(uuid())
-  orgId        String
-  userId       String?
-  toolId       String
-  accessToken  String        @db.Text
-  refreshToken String?       @db.Text
-  expiresIn    Int
-  org          Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  externalTool ExternalTool  @relation(fields: [toolId], references: [id], onDelete: Cascade)
-  createdAt    DateTime      @default(now())
-  modifiedAt   DateTime      @updatedAt
-  KeyMapping   KeyMapping[]
-
-  @@unique([orgId, toolId, userId], name: "Unique_toolId_userId")
-  @@index([orgId], map: "OAuth_orgId_fkey")
-}
-
-model KeyMapping {
-  id                String        @id @default(uuid())
-  orgId             String
-  orgToolId         String?
-  apiId             String?
-  fieldName         String
-  externalFieldName String
-  createdAt         DateTime      @default(now())
-  modifiedAt        DateTime      @updatedAt
-  org               Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  OrgTool           OrgTool?      @relation(fields: [orgToolId], references: [id], onDelete: Cascade)
-  ExternalApi       ExternalApi?  @relation(fields: [apiId], references: [id], onDelete: Cascade)
-
-  @@unique([orgToolId, fieldName, externalFieldName], name: "Unique_fieldName_externalFieldName")
-  @@unique([apiId, fieldName, externalFieldName], name: "Unique_api_fieldName_externalFieldName")
-}
-
-enum AuthType {
-  NONE
-  BASIC
-  TOKEN
-}
-
-enum HttpMethod {
-  GET
-  POST
-  PUT
-  DELETE
-  PATCH
-}
-
-model ExternalApi {
-  id          String        @id @default(uuid())
-  orgId       String
-  name        String
-  username    String?
-  password    String?
-  header      String?
-  token       String?
-  url         String
-  description String
-  method      HttpMethod
-  authType    AuthType
-  org         Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  createdAt   DateTime      @default(now())
-  modifiedAt  DateTime      @updatedAt
-  KeyMapping  KeyMapping[]
 }
 
 model AvailabilitySchedule {

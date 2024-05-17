@@ -13,12 +13,7 @@ import { SubscriptionPlanService } from 'src/subscription-plan/subscription-plan
 import { CreateSubscriptionPlanDto } from 'src/subscription-plan/dto/create-subscription-plan.dto';
 import { DEFAULT_PLANS } from 'src/subscription-plan/entities/default-subscriptions-plans';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateOrgAccountDto } from 'src/account/dto/create-account.dto';
-import { OrgAccountStatus } from 'src/common/enums/enums';
 import { OrgAccountService } from 'src/account/account.service';
-import { providers } from 'src/common/configs/oauth.config';
-import { ExternalToolService } from 'src/external-tool/external-tool.service';
-import { CreateToolDto } from 'src/external-tool/Dto/create-tool.dto';
 import { BaseService } from 'src/common/services/base.service';
 import { StartupMicroService } from './../microservices/crm_service/startup.service';
 
@@ -36,7 +31,6 @@ export class StartupService extends BaseService implements OnModuleInit {
         private helperService: HelpersService,
         private orgAccountService: OrgAccountService,
         private subscriptionPlan: SubscriptionPlanService,
-        private externalToolService: ExternalToolService,
         private startupMicroService: StartupMicroService
     ) {
         super();
@@ -53,7 +47,6 @@ export class StartupService extends BaseService implements OnModuleInit {
         await this.createPlatforms();
         //await this.resyncHelpers();
         await this.createFolders();
-        await this.createOrUpdateOauthProviders();
         await this.handleException(await this.startupMicroService.syncOrganizations())
     }
 
@@ -232,44 +225,5 @@ export class StartupService extends BaseService implements OnModuleInit {
         }
     }
 
-    async createOrUpdateOauthProviders() {
-        try {
-            console.log('ServerStartup: Creating or updating OAuth providers');
-            for (let name in providers) {
-                let provider = providers[name];
-                const externalToolDto = new CreateToolDto();
-                externalToolDto.name = name;
-                externalToolDto.type = provider.type;
-                externalToolDto.authUrl = provider.authUrl;
-                externalToolDto.profileUrl = provider.profileUrl;
-                externalToolDto.redirectUri = provider.redirectUri;
-                externalToolDto.propertyUrl = provider.propertyUrl;
-                externalToolDto.tokenUrl = provider.tokenUrl;
-                externalToolDto.clientId = provider.clientId;
-                externalToolDto.clientSecret = provider.clientSecret;
-                externalToolDto.scope = provider.scope.join(' ');
-                externalToolDto.level = provider.level;
-
-                try {
-                    // Check if the provider already exists
-                    const existingProvider = await this.externalToolService.getToolByName(name);
-                    if (existingProvider) {
-                        // Update existing provider
-                        await this.externalToolService.update(existingProvider.id, externalToolDto);
-                        console.log(`Updated OAuth provider: ${name}`);
-                    } else {
-                        // Create new provider
-                        await this.externalToolService.create(externalToolDto);
-                        console.log(`Created OAuth provider: ${name}`);
-                    }
-                } catch (error) {
-                    console.error(`Error creating or updating OAuth provider ${name}: ${error.message}`);
-                }
-            }
-            console.log('ServerStartup: OAuth providers created or updated');
-        } catch (error) {
-            console.error('ServerStartup: Error creating or updating OAuth providers:', error.message);
-        }
-    }
 
 } 

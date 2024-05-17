@@ -8,7 +8,6 @@ import { ForgotPasswordController } from './forgot-password.controller';
 import { RolesModule } from 'src/roles/roles.module';
 import { OrganizationsModule } from 'src/organizations/organizations.module';
 import { AccountModule } from 'src/account/account.module';
-import { CrmModule } from 'src/crm/crm.module';
 
 @Module({
   imports: [
@@ -18,7 +17,6 @@ import { CrmModule } from 'src/crm/crm.module';
     RolesModule, 
     OrganizationsModule,
     AccountModule,
-    CrmModule
   ],
   controllers: [RegistrationController, ForgotPasswordController],
   providers: [RegistrationService],

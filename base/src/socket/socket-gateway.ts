@@ -16,7 +16,6 @@ import { ActiveClientService } from 'src/active-client/active-client.service';
 import { MessageMediaType } from 'src/conversation/entities/conversation.enums';
 import { UsageService } from 'src/account/usage.service';
 import { SiteService } from 'src/site/site.service';
-import { CrmConnectorService } from 'src/crm-key-maping/crm-connector.service';
 
 
 
@@ -45,7 +44,7 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     private activeClientService: ActiveClientService,
     private siteService: SiteService,
     private readonly usageService: UsageService,
-    private readonly crmConnectorService: CrmConnectorService) {
+) {
 
       this.redisPublisher = new Redis({
         host: process.env.REDIS_IP,
@@ -299,7 +298,6 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
           this.server.to(client.id).emit('conversationEnded', {convId: message.convId});
           await this.notifyAuthSubscribers('conversationEnded', conversation.orgInfo, {convId: message.convId});
           this.conversationService.endConversation(message.convId);
-          this.crmConnectorService.pushDataToCRM(message.convId,'hubspot');
         } else if(conversation.message && conversation.message.content && conversation.message.content.includes('<END_OF_CHAT>')){
           // Emit the message to the specific client
           this.server.to(client.id).emit('replyMessage', conversation);
@@ -307,7 +305,6 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
           this.server.to(client.id).emit('conversationEnded', {convId: message.convId});
           await this.notifyAuthSubscribers('conversationEnded', conversation.orgInfo, {convId: message.convId});
           this.conversationService.endConversation(message.convId);
-          this.crmConnectorService.pushDataToCRM(message.convId,'hubspot');
         } else {
           // Emit the message to the specific client
           this.server.to(client.id).emit('replyMessage', conversation);

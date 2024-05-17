@@ -9,7 +9,6 @@ import { ActiveClientModule } from 'src/active-client/active-client.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AccountModule } from 'src/account/account.module';
 import { SiteModule } from 'src/site/site.module';
-import { CrmKeyMapingModule } from 'src/crm-key-maping/crm-key-maping.module';
 
 @Module({
     imports: [
@@ -19,7 +18,6 @@ import { CrmKeyMapingModule } from 'src/crm-key-maping/crm-key-maping.module';
         ConversationModule,
         VisitorModule,
         ActiveClientModule,
-        CrmKeyMapingModule,
         JwtModule.register({
             secret: process.env.JWT_SECRET, // Use your secret or private key here
             signOptions: { expiresIn: '60s' },
