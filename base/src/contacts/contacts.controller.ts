@@ -34,7 +34,7 @@ export class ContactsController {
   @ApiBody({ type: CreateContactDto })
   @Post()
   async create(@Body() createContactDto: any, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -43,7 +43,7 @@ export class ContactsController {
 
   @Get()
   async findAll(@Query() filterDto: FilterDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -52,7 +52,7 @@ export class ContactsController {
 
   @Get('fields')
   async getFields(@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -61,7 +61,7 @@ export class ContactsController {
 
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -75,7 +75,7 @@ export class ContactsController {
     @Body() updateContactDto: any,
     @Req() request: ZautoRequest,
   ) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -84,7 +84,7 @@ export class ContactsController {
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -93,7 +93,7 @@ export class ContactsController {
 
   @Post('customfield')
   async createCustomField(@Body() createFieldDto:CreateFieldDto, @Req() request: ZautoRequest){
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }

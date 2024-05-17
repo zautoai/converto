@@ -47,9 +47,9 @@ export class CalendarController {
     // @UseGuards(JwtAuthGuard)
     // async getEvents(@Query() dateFilterDto:DateFilterDto,@Req() request: ZautoRequest)
     // {
-    //     if(request.user && request.user.org)
+    //     if(request.user && request.orgId)
     //     {
-    //         const orgId = request.user.org.id;
+    //         const orgId = request.orgId;
     //         const primaryUser = await this.googleCalendarService.getPrimaryUser(orgId);
     //         const userId = primaryUser.id;
     //         return await this.googleCalendarService.getEvents(orgId,userId,dateFilterDto.date);

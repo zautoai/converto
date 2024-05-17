@@ -29,8 +29,8 @@ export class OrgSmtpconfigController {
     @ApiBearerAuth()
     @ApiOkResponse()
     async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
-        if (request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request.user && request.orgId) {
+            const orgId = request.orgId;
             return await this.orgSmtpconfigService.findAll(orgId,paginationDto);
         }
         else {
@@ -44,8 +44,8 @@ export class OrgSmtpconfigController {
     @ApiBearerAuth()
     @ApiOkResponse()
     async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
-        if (request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request.user && request.orgId) {
+            const orgId = request.orgId;
             const data = await this.orgSmtpconfigService.findOne(id);
             delete data.pass;
             return data;
@@ -62,8 +62,8 @@ export class OrgSmtpconfigController {
     @ApiBearerAuth()
     @ApiCreatedResponse()
     async create(@Body() createOrgSmtpconfigDto: CreateOrgSmtpconfigDto, @Req() request: ZautoRequest) {
-        if (request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request.user && request.orgId) {
+            const orgId = request.orgId;
             createOrgSmtpconfigDto.orgId = orgId;
             return await this.orgSmtpconfigService.create(createOrgSmtpconfigDto);
         }
@@ -78,8 +78,8 @@ export class OrgSmtpconfigController {
     @ApiBearerAuth()
     @ApiOkResponse()
     async update(@Param('id') id: string, @Body() updateOrgSmtpconfigDto: UpdateOrgSmtpconfigDto, @Req() request: ZautoRequest) {
-        if (request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request.user && request.orgId) {
+            const orgId = request.orgId;
             return await this.orgSmtpconfigService.update(id, updateOrgSmtpconfigDto);
         }
         else {
@@ -94,8 +94,8 @@ export class OrgSmtpconfigController {
     @ApiNoContentResponse()
     @HttpCode(204)
     async delete(@Param('id') id: string, @Req() request: ZautoRequest) {
-        if (request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request.user && request.orgId) {
+            const orgId = request.orgId;
             return await this.orgSmtpconfigService.delete(id);
         }
         else {

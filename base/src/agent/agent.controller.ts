@@ -102,8 +102,8 @@ export class AgentController {
   // @ApiBody({ type: CreateAgentDto })
   // @ApiCreatedResponse({type: Agent})
   // async create(@Body() createAgentDto: CreateAgentDto, @Req() zautoRequest: ZautoRequest) {
-  //   if(zautoRequest.user && zautoRequest.user.org) {
-  //     createAgentDto.orgId = zautoRequest.user.org.id;
+  //   if(zautoRequest.user && zautoRequest.orgId) {
+  //     createAgentDto.orgId = zautoRequest.orgId;
   //     return await this.agentsService.create(createAgentDto);
   //   } else throw new UnauthorizedException('Unauthorised access.')
   // }
@@ -117,11 +117,10 @@ export class AgentController {
     type: ResponseDTO<Agent>
   })
   async findAll(@Query() paginationDto: PaginationDto, @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest.user && zautoRequest.user.org && zautoRequest.user.org.name == ZAUTO_ORG) {
-      console.log(zautoRequest.user.org.name)
+    if(zautoRequest.user && zautoRequest.orgId) {
       return await this.agentsService.findAll(paginationDto);
     } else {
-      return await this.agentsService.findAllByOrg(paginationDto, zautoRequest.user.org.id);
+      return await this.agentsService.findAllByOrg(paginationDto, zautoRequest.orgId);
     }
   }
 
@@ -261,18 +260,18 @@ export class AgentController {
   @ApiBody({ type: CreateAvatarDto })
   @ApiCreatedResponse({type: Agent})
   async launchAvatar(@Body() createAvatarDto: CreateAvatarDto, @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest.user && zautoRequest.user.org) {
+    if(zautoRequest.user && zautoRequest.orgId) {
       const avatarName = createAvatarDto.displayName.replaceAll(" ", "_").toLowerCase().trim();
       const avatarExists = await this.agentsService.isNameExists(avatarName);
       if(avatarExists) {
         throw new ConflictException('Avatar Name already taken.');
       } else {
-        const org = await this.orgService.updateOrgWith(zautoRequest.user.org.id, createAvatarDto.companyName, createAvatarDto.companySite);
-        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.user.org.id);
+        const org = await this.orgService.updateOrgWith(zautoRequest.orgId, createAvatarDto.companyName, createAvatarDto.companySite);
+        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.orgId);
         if(orgAvatar) {
           throw new ConflictException('Avatar already launched. Only one avatar can be created per Organization.');
         }
-        const avatar = await this.agentsService.launchAvatarWithAssistant(createAvatarDto, zautoRequest.user.org.id as string);
+        const avatar = await this.agentsService.launchAvatarWithAssistant(createAvatarDto, zautoRequest.orgId as string);
         await this.queueService.addTaskToQueue({
           name: 'launchAvatar',
           id: avatar.id,
@@ -291,10 +290,10 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiCreatedResponse({type: Agent})
   async retryAvatarLaunch(@Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest.user && zautoRequest.user.org) {
-      const org = await this.orgService.findOne(zautoRequest.user.org.id);
+    if(zautoRequest.user && zautoRequest.orgId) {
+      const org = await this.orgService.findOne(zautoRequest.orgId);
       if(org) {
-        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.user.org.id);
+        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.orgId);
         if(orgAvatar) {
           const createAvatarDto  = {
             displayName: orgAvatar.displayName,
@@ -302,12 +301,12 @@ export class AgentController {
             companySite: org.siteUrl
           }
           await this.agentsService.remove(orgAvatar.id);
-          const avatar = await this.agentsService.launchAvatarWithAssistant(createAvatarDto, zautoRequest.user.org.id as string);
+          const avatar = await this.agentsService.launchAvatarWithAssistant(createAvatarDto, zautoRequest.orgId as string);
           await this.queueService.addTaskToQueue({
             name: 'launchAvatar',
             id: avatar.id,
             dto: createAvatarDto,
-            org: zautoRequest.user.org,
+            org: zautoRequest.orgId,
           });
           return avatar;
         }

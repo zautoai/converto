@@ -38,9 +38,9 @@ export class AgentStageController
     @ApiOkResponse({type:Stage})
     async create(@Param('agentId') agentId: string, @Body() createStageDto: CreateStageDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            createStageDto.orgId = zautoRequest.user.org.id;
+            createStageDto.orgId = zautoRequest.orgId;
             createStageDto.agentId = agentId;
             return await this.stageService.create(createStageDto);
         }

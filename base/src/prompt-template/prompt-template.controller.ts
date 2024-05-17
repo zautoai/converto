@@ -28,7 +28,7 @@ export class PromptTemplateController {
   {
     if(request.user)
     {
-      const orgId = request.user.org.id;
+      const orgId = request.orgId;
       return await this.promptTemplateService.selectTemplate(orgId,selectTemplateDto);
     }
     else
@@ -42,7 +42,7 @@ export class PromptTemplateController {
   {
     if(request.user)
     {
-      const orgId = request.user.org.id;
+      const orgId = request.orgId;
       return await this.promptTemplateService.customePrompt(orgId,customeTemplateDto);
     }
     else

@@ -23,8 +23,8 @@ export class LeadController {
 
   @Post()
   async create(@Body() createLeadDto: CreateLeadDto, @Req() request: ZautoRequest) {
-    if (request && request.user && request.user.org) {
-      return await this.leadService.create(createLeadDto, request.user.org.id);
+    if (request && request.user && request.orgId) {
+      return await this.leadService.create(createLeadDto, request.orgId);
     } else {
       throw new UnauthorizedException('Org info not found.')
     }
@@ -37,8 +37,8 @@ export class LeadController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   async findAll(@Query() paginationDto: PaginationDto, @Req() zautoRequest: ZautoRequest) {
-    if (zautoRequest.user && zautoRequest.user.org) {
-      const orgId = zautoRequest.user.org.id;
+    if (zautoRequest.user && zautoRequest.orgId) {
+      const orgId = zautoRequest.orgId;
       return await this.leadService.findAllByOrg(orgId, paginationDto);
     }
     else {
@@ -50,14 +50,14 @@ export class LeadController {
   @Get(':id')
   @ApiOkResponse({ type: Lead })
   async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.leadService.findOne(id,orgId);
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: Lead })
   async update(@Param('id') id: string, @Body() updateLeadDto: UpdateLeadDto,@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.leadService.update(id,orgId, updateLeadDto);
   }
 
@@ -65,7 +65,7 @@ export class LeadController {
   @ApiNoContentResponse()
   @HttpCode(204)
   async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     await this.leadService.remove(id,orgId);
   }
 }

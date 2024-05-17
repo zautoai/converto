@@ -25,7 +25,7 @@ export class CampaignAgentController
     @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
     async findAll(@Param('agentId') agentId: string,@Query() paginationDto: PaginationDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
             return await this.campaignService.findAllByAgent(agentId,paginationDto);
         }

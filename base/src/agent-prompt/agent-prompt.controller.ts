@@ -34,7 +34,7 @@ export class AgentPromptController {
   async find(@Req() request: ZautoRequest) {
     if(request.user)
     {
-      const orgId = request.user.org.id;
+      const orgId = request.orgId;
       return await this.agentpromptService.getPromptByOrg(orgId);
     }
     else

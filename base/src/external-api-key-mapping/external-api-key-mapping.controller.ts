@@ -22,9 +22,9 @@ export class ExternalApiKeyMappingController {
     @Post()
     @ApiOkResponse({type: ExternalApiKeyMapping})
     async create(@Param('externalApiId') externalApiId: string,@Body() createExternalApiKeyMappingDto: CreateExternalApiKeyMappingDto, @Req() request: ZautoRequest) {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            createExternalApiKeyMappingDto.orgId = request.user.org.id;
+            createExternalApiKeyMappingDto.orgId = request.orgId;
             createExternalApiKeyMappingDto.apiId = externalApiId;
             return await this.externalApiKeyMappingService.create(createExternalApiKeyMappingDto);
         }
@@ -37,9 +37,9 @@ export class ExternalApiKeyMappingController {
     @Get()
     @ApiOkResponse({type: ResponseDTO<ExternalApiKeyMapping>})
     async findAll(@Param('externalApiId') externalApiId: string,@Req() request: ZautoRequest){
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             return await this.externalApiKeyMappingService.findAllByApi(externalApiId);
         }
         else

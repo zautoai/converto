@@ -23,9 +23,9 @@ export class ExternalApiController {
     @Post()
     @ApiOkResponse({type: ExternalApi})
     async create(@Body() createExternalApiDto: CreateExternalApiDto, @Req() request: ZautoRequest) {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            createExternalApiDto.orgId = request.user.org.id;
+            createExternalApiDto.orgId = request.orgId;
             return await this.externalApiService.create(createExternalApiDto);
         }
         else
@@ -39,9 +39,9 @@ export class ExternalApiController {
     @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
     @ApiOkResponse({type: ResponseDTO<ExternalApi>})
     async findAll(@Req() request: ZautoRequest, @Query() pagination: PaginationDto){
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             return await this.externalApiService.findAllByOrg(orgId,pagination);
         }
         else

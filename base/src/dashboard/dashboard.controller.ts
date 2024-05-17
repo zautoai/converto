@@ -20,8 +20,8 @@ export class DashboardController {
 
     @Get()
     async mainDashboard(@Query() dashboardDto: DashbaordDto, @Req() zautoRequest: ZautoRequest) {
-        if (zautoRequest.user && zautoRequest.user.org) {
-            const orgId = zautoRequest.user.org.id;
+        if (zautoRequest.user && zautoRequest.orgId) {
+            const orgId = zautoRequest.orgId;
             const widgets = Array.isArray(dashboardDto.widget) ? dashboardDto.widget : [dashboardDto.widget].filter(Boolean);
             let data = {};
             if (widgets.includes('agent')) {
@@ -74,8 +74,8 @@ export class DashboardController {
 
     @Get('counts')
     async getCount(@Query() dashboardDto: DashbaordDto,@Req() zautoRequest: ZautoRequest) {
-        if (zautoRequest.user && zautoRequest.user.org) {
-            const orgId = zautoRequest.user.org.id;
+        if (zautoRequest.user && zautoRequest.orgId) {
+            const orgId = zautoRequest.orgId;
             return await this.dashboardService.getCounts(orgId,dashboardDto);
         }
         else {
@@ -85,8 +85,8 @@ export class DashboardController {
 
     @Get('chart')
     async getChart(@Query() dashboardDto: DashbaordDto, @Req() zautoRequest: ZautoRequest) {
-        if (zautoRequest.user && zautoRequest.user.org) {
-            const orgId = zautoRequest.user.org.id;
+        if (zautoRequest.user && zautoRequest.orgId) {
+            const orgId = zautoRequest.orgId;
             return await this.dashboardService.getChart(orgId, dashboardDto);
         }
         else {
@@ -96,8 +96,8 @@ export class DashboardController {
 
     @Get('top-campaigns')
     async getTopCampaigns(@Query() dashboardDto: DashbaordDto, @Req() zautoRequest: ZautoRequest) {
-        if (zautoRequest.user && zautoRequest.user.org) {
-            const orgId = zautoRequest.user.org.id;
+        if (zautoRequest.user && zautoRequest.orgId) {
+            const orgId = zautoRequest.orgId;
             return await this.dashboardService.getTopCampaigns(orgId, dashboardDto);
         }
         else {

@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { ZAUTO_ORG } from 'src/common/constants/system.constants';
+import { DEFALT_ROLES, ZAUTO_ORG } from 'src/common/constants/system.constants';
 import { Organization } from 'src/organizations/entities/organization.entity';
 import { OrganizationsService } from 'src/organizations/organizations.service';
 import { PlatformService } from 'src/platform/platform.service';
@@ -58,19 +58,9 @@ export class StartupService extends BaseService implements OnModuleInit {
     }
 
     async createDefaultRoles(orgId:string) {
-        const defaultRoles = [
-            {
-                name: 'admin'
-            },
-            {
-                name: 'user'
-            },
-            {
-                name: 'superadmin'
-            }
-        ];
+        const defaultRoles = DEFALT_ROLES;
         try {
-            await this.roleService.createDefaultRoles("",defaultRoles);
+            await this.roleService.createDefaultRoles(orgId,defaultRoles);
         } catch (error) {
             console.error('Defailt role not created, mybe it got created already.')
         }
@@ -102,31 +92,34 @@ export class StartupService extends BaseService implements OnModuleInit {
                 name: userName,
                 email: email,
                 password: password,
-                roleId: superUserRole.id,
                 orgId: zautoAI.id,
                 verified: true,
             };
             try {
-                const selectedPlan = await this.getSubscription("");
-                if (selectedPlan) {
-                    const createOrgAccountDto = new CreateOrgAccountDto();
-                    createOrgAccountDto.orgId = userDeatails.orgId;
-                    createOrgAccountDto.subscriptionId = selectedPlan.id;
-                    createOrgAccountDto.status = (selectedPlan.price == 0) ? OrgAccountStatus.ACTIVE : OrgAccountStatus.PENDING;
-                    const orgAccount = await this.orgAccountService.create(createOrgAccountDto);
-                    if (orgAccount) {
-                        const superUser = await this.userService.create(zautoAI.id,userDeatails, true);
-                        if (superUser) {
-                            console.log('Superuser Created.')
-                        }
-                    }
-                    else {
-                        console.error('Organization account not created');
-                    }
+                const superUser = await this.userService.create(zautoAI.id,userDeatails, true);
+                if (superUser) {
+                    console.log('Superuser Created.');
                 }
-                else {
-                    console.error("Unable to select subscription plan");
-                }
+                // const selectedPlan = await this.getSubscription("");
+                // if (selectedPlan) {
+                //     const createOrgAccountDto = new CreateOrgAccountDto();
+                //     createOrgAccountDto.orgId = userDeatails.orgId;
+                //     createOrgAccountDto.subscriptionId = selectedPlan.id;
+                //     createOrgAccountDto.status = (selectedPlan.price == 0) ? OrgAccountStatus.ACTIVE : OrgAccountStatus.PENDING;
+                //     const orgAccount = await this.orgAccountService.create(createOrgAccountDto);
+                //     const superUser = await this.userService.create(zautoAI.id,userDeatails, true);
+                //     if (superUser) {
+                //         console.log('Superuser Created.')
+                //     }
+                //     if (orgAccount) {
+                //     }
+                //     else {
+                //         console.error('Organization account not created');
+                //     }
+                // }
+                // else {
+                //     console.error("Unable to select subscription plan");
+                // }
             } catch (exception) {
                 console.info('Super Admin not created, mybe it got created already.')
             }

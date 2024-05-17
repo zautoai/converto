@@ -39,9 +39,9 @@ export class LeadCategoryController {
     })
     async findAllLeadCategories(@Query() paginationDto: PaginationDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            const orgId = zautoRequest.user.org.id;
+            const orgId = zautoRequest.orgId;
             return await this.leadCategoryService.findAllByOrg(orgId,paginationDto);
         }
         else

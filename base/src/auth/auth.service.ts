@@ -28,7 +28,7 @@ import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
       }
       const prisma = await this.prismaClientManager.getClient(org.id);
       // Step 1: Fetch a user with the given email
-      const user = await prisma.user.findUnique({ where: { email: email }, include: {org: true} });
+      const user = await prisma.user.findUnique({ where: { email: email }});
   
       // If no user is found, throw an error
       if (!user) {
@@ -50,9 +50,9 @@ import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
       }
       // Step 4: Generate a JWT containing the user's ID and return it
       return {
-        accessToken: this.jwtService.sign({ userId: user.id, orgId: user.org.id , orgName: user.org.name  }),
+        accessToken: this.jwtService.sign({ userId: user.id, orgId: org.id , orgName: org.name  }),
         user: await this.userService.findOne(org.id,user.id),
-        avatar: await prisma.agent.findFirst({where: {orgId: user.org.id}})
+        avatar: await prisma.agent.findFirst({where: {orgId: org.id}})
       };
     }
 

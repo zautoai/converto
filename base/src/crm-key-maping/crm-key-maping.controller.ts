@@ -16,9 +16,9 @@ export class CrmKeyMapingController {
     @Get('properties/:provider')
     async getZautoColumns(@Param('provider') provider: string, @Req() request: ZautoRequest)
     {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             const userId = request.user.id;
             return await this.keyMappingService.getProperties(orgId,provider,userId);
         }
@@ -30,10 +30,10 @@ export class CrmKeyMapingController {
 
     @Post(':toolId')
     async create(@Param('toolId') toolId: string, @Body() createKeyMappingDto: CreateKeyMappingDto, @Req() request: ZautoRequest) {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
             createKeyMappingDto.orgToolId = toolId;
-            createKeyMappingDto.orgId = request.user.org.id;
+            createKeyMappingDto.orgId = request.orgId;
             return await this.keyMappingService.create(createKeyMappingDto);
         }
         else
@@ -45,9 +45,9 @@ export class CrmKeyMapingController {
 
     @Get(':toolId')
     async findAll(@Param('toolId') toolId: string, @Req() request: ZautoRequest) {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             return await this.keyMappingService.findAll(orgId, toolId);
         }
         else

@@ -34,11 +34,11 @@ export class UsersService {
 
   async create(orgId: string,createUserDto: CreateUserDto, verified: boolean = false) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const userUsage = await this.usageService.getUserCount(createUserDto.orgId);
-    const remainingUser = userUsage.maxCount - userUsage.count;
-    if (remainingUser <= 0) {
-      throw new NotAcceptableException(`Remaining user ${remainingUser}`);
-    }
+    // const userUsage = await this.usageService.getUserCount(createUserDto.orgId);
+    // const remainingUser = userUsage.maxCount - userUsage.count;
+    // if (remainingUser <= 0) {
+    //   throw new NotAcceptableException(`Remaining user ${remainingUser}`);
+    // }
 
     const existingUser = await prisma.user.findFirst({
       where: { email: createUserDto.email }
@@ -58,7 +58,7 @@ export class UsersService {
         createUserDto.roleId = defaultRole.id;
       }
       const userData = await prisma.user.create({ data: { ...createUserDto, verified } });
-      delete userData.password;
+      delete userData.password; 
 
       return userData;
     } else {
@@ -140,7 +140,6 @@ export class UsersService {
             modifiedAt: true,
           },
         },
-        org: true
       },
     })
     if (userData) {
@@ -227,7 +226,6 @@ export class UsersService {
             name: true,
           },
         },
-        org: true
       },
     });
     return userData;
@@ -235,7 +233,7 @@ export class UsersService {
 
   async findByEmail(orgId: string,email: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    return await prisma.user.findFirst({ where: { email }, include: { role: true, org: true } });
+    return await prisma.user.findFirst({ where: { email }, include: { role: true } });
   }
 
   async changePassword(orgId: string,id: string, password: string) {

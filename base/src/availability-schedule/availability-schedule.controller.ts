@@ -20,9 +20,9 @@ export class AvailabilityScheduleController {
     @Post()
     async create(@Body() createScheduleDto:CreateScheduleDto,@Req() request: ZautoRequest)
     {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            createScheduleDto.orgId = request.user.org.id;
+            createScheduleDto.orgId = request.orgId;
             return await this.scheduleService.create(createScheduleDto);
         }
         else
@@ -34,9 +34,9 @@ export class AvailabilityScheduleController {
     @Get()
     async findOne(@Req() request: ZautoRequest)
     {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             return await this.scheduleService.findByOrg(orgId);
         }
         else
@@ -48,9 +48,9 @@ export class AvailabilityScheduleController {
     @Patch(':scheduleId')
     async update(@Param('scheduleId') scheduleId: string,@Body() updateScheduleDto: UpdateScheduleDto,@Req() request: ZautoRequest)
     {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             updateScheduleDto.orgId = orgId;
             return await this.scheduleService.update(scheduleId,updateScheduleDto);
         }
@@ -64,9 +64,9 @@ export class AvailabilityScheduleController {
     @Delete(':scheduleId')
     async delete(@Query('scheduleId') scheduleId: string,@Req() request: ZautoRequest)
     {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             return await this.scheduleService.delete(scheduleId);
         }
         else

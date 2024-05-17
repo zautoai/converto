@@ -56,9 +56,9 @@ export class OauthController {
     @Get(':provider/revoke')
     async revokeAuth(@Param('provider') provider: string,@Req() request: ZautoRequest)
     {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             return await this.oauthService.revokeAuth(orgId,provider);
         }
         else
@@ -70,9 +70,9 @@ export class OauthController {
     @Get(':provider/profile')
     async getProfile(@Param('provider') provider: string,@Req() request: ZautoRequest)
     {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             const userId = request.user.id;
             return await this.oauthService.getProfile(orgId,provider,userId);
         }

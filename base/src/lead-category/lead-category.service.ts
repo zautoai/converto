@@ -23,14 +23,14 @@ export class LeadCategoryService {
         else
         {
             let name = this.formateString(createLeadCategory.title);
-            return await this.prisma.leadCategory.create({data: {...createLeadCategory, name, orgId: zautoRequest.user.org.id}}); 
+            return await this.prisma.leadCategory.create({data: {...createLeadCategory, name, orgId: zautoRequest.orgId}}); 
         }
     }
 
     async isCategoryExist(createLeadCategory: CreateLeadCategoryDto, zautoRequest: ZautoRequest)
     {        
         const name = this.formateString(createLeadCategory.title);
-        const existingCategory = await this.prisma.leadCategory.findFirst({where:{name, orgId: zautoRequest.user.org.id}});
+        const existingCategory = await this.prisma.leadCategory.findFirst({where:{name, orgId: zautoRequest.orgId}});
         return existingCategory; 
     }
 

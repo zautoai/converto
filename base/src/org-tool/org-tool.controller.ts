@@ -19,9 +19,9 @@ export class OrgToolController {
 
     @Get()
     async findAll(@Req() request: ZautoRequest) {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             return this.orgToolService.findAllByOrg(orgId);
         }
         else
@@ -32,9 +32,9 @@ export class OrgToolController {
 
     @Get('name/:name')
     async getToolByName(@Param('name') name: string,@Req() request: ZautoRequest) {
-        if(request.user && request.user.org)
+        if(request.user && request.orgId)
         {
-            const orgId = request.user.org.id;
+            const orgId = request.orgId;
             return this.orgToolService.findByToolName(name,orgId);
         }
         else

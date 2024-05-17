@@ -20,8 +20,8 @@ export class VisitorController {
 
   @Post()
   async create(@Body() createVisitorDto: CreateVisitorDto, @Req() request: ZautoRequest) {
-    if(request.user && request.user.org && request.user.org.id) {
-      return await this.visitorService.create(createVisitorDto, request.user.org.id);
+    if(request.user && request.orgId && request.orgId) {
+      return await this.visitorService.create(createVisitorDto, request.orgId);
     } else {
       throw new UnauthorizedException('Org info not found.')
     }
@@ -38,9 +38,9 @@ export class VisitorController {
     })
     async findAll(@Query() paginationDto: PaginationDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            const orgId = zautoRequest.user.org.id;
+            const orgId = zautoRequest.orgId;
             return await this.visitorService.findAllByOrg(orgId,paginationDto);
         }
         else

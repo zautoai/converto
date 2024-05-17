@@ -24,9 +24,9 @@ export class OrgPlatformOtherController {
     @Post()
     async create(@Body() createOrgPlatfoDto:CreateOrgPlatformDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            createOrgPlatfoDto.orgId = zautoRequest.user.org.id;
+            createOrgPlatfoDto.orgId = zautoRequest.orgId;
             return await this.orgPlatformService.createOther(createOrgPlatfoDto);
         }
         else

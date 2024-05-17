@@ -18,8 +18,8 @@ export class UsageController {
 
     @Get('')
     async getUsage(@Query() querys:{ date: string }, @Req() request: ZautoRequest) {
-        if (request && request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request && request.user && request.orgId) {
+            const orgId = request.orgId;
             return this.usageService.getUsage(orgId,querys.date);
         }
         else {
@@ -29,8 +29,8 @@ export class UsageController {
 
     @Get('sites')
     async getSiteCount(@Req() request: ZautoRequest) {
-        if (request && request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request && request.user && request.orgId) {
+            const orgId = request.orgId;
             return this.usageService.getSiteCount(orgId);
         }
         else {
@@ -40,8 +40,8 @@ export class UsageController {
 
     @Get('users')
     async getUserCount(@Req() request: ZautoRequest) {
-        if (request && request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request && request.user && request.orgId) {
+            const orgId = request.orgId;
             return this.usageService.getUserCount(orgId);
         }
         else {
@@ -51,8 +51,8 @@ export class UsageController {
 
     @Get('messages')
     async getMessageCount(@Query() querys:{ date: string }, @Req() request: ZautoRequest) {
-        if (request && request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request && request.user && request.orgId) {
+            const orgId = request.orgId;
             return this.usageService.getMessageCount(orgId,querys.date);
         }
         else {
@@ -62,8 +62,8 @@ export class UsageController {
 
     @Get('conversations')
     async getConversationCount(@Query() querys:{ date: string }, @Req() request: ZautoRequest) {
-        if (request && request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request && request.user && request.orgId) {
+            const orgId = request.orgId;
             return this.usageService.getConversationCount(orgId,querys.date);
         }
         else {
@@ -73,8 +73,8 @@ export class UsageController {
 
     @Get('campaigns')
     async getCampaignCount(@Query() querys:{ date: string }, @Req() request: ZautoRequest) {
-        if (request && request.user && request.user.org) {
-            const orgId = request.user.org.id;
+        if (request && request.user && request.orgId) {
+            const orgId = request.orgId;
             return this.usageService.getCampaginCount(orgId,querys.date);
         }
         else {

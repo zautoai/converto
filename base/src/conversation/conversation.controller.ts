@@ -25,10 +25,10 @@ export class ConversationController {
 
   @Post()
   async create(@Body() createConversationDto: CreateConversationDto, @Req() request: ZautoRequest) {
-    if(request.user && request.user.org && request.user.org.id) {
+    if(request.user && request.orgId && request.orgId) {
 
       const currentDate = new Date().toISOString();
-      const orgId = request.user.org.id;
+      const orgId = request.orgId;
       const conversationUsage = await this.usageService.getConversationCount(orgId,currentDate);
       const remainingConversation = conversationUsage.maxCount - conversationUsage.count;
 
@@ -36,7 +36,7 @@ export class ConversationController {
       {
         throw new NotAcceptableException(`Remaining conversations ${remainingConversation}`);
       }
-      return await this.conversationService.create(createConversationDto, request.user.org.id);
+      return await this.conversationService.create(createConversationDto, request.orgId);
     } else {
       throw new UnauthorizedException('Org info not found.')
     
@@ -55,9 +55,9 @@ export class ConversationController {
     })
     async findAll(@Query() filterDto: ConversationFilterDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            const orgId = zautoRequest.user.org.id;
+            const orgId = zautoRequest.orgId;
             return await this.conversationService.findAllByOrg(orgId,filterDto);
         }
         else

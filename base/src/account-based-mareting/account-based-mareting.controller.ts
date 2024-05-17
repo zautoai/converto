@@ -15,36 +15,36 @@ export class AccountBasedMaretingController {
   constructor(private readonly accountBasedMaretingService: AccountBasedMaretingService) {}
 
   @Post()
-  async create(@Body() createAccountBasedMaretingDto: CreateAccountBasedMaretingDto, @Req() requset: ZautoRequest) {
-    const orgId = requset.user.org.id;
+  async create(@Body() createAccountBasedMaretingDto: CreateAccountBasedMaretingDto, @Req() request: ZautoRequest) {
+    const orgId = request.orgId;
     if(!orgId) throw new UnauthorizedException();
     return await this.accountBasedMaretingService.create(orgId,createAccountBasedMaretingDto);
   }
 
   @Get()
-  async findAll(@Query() filterDto: FilterDto, @Req() requset: ZautoRequest) {
-    const orgId = requset.user.org.id;
+  async findAll(@Query() filterDto: FilterDto, @Req() request: ZautoRequest) {
+    const orgId = request.orgId;
     if(!orgId) throw new UnauthorizedException();
     return await this.accountBasedMaretingService.findAll(orgId,filterDto);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Req() requset: ZautoRequest) {
-    const orgId = requset.user.org.id;
+  async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.orgId;
     if(!orgId) throw new UnauthorizedException();
     return await this.accountBasedMaretingService.findOne(orgId,id);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Req() requset: ZautoRequest, @Body() updateAccountBasedMaretingDto: UpdateAccountBasedMaretingDto) {
-    const orgId = requset.user.org.id;
+  async update(@Param('id') id: string, @Req() request: ZautoRequest, @Body() updateAccountBasedMaretingDto: UpdateAccountBasedMaretingDto) {
+    const orgId = request.orgId;
     if(!orgId) throw new UnauthorizedException();
     return await this.accountBasedMaretingService.update(orgId,id, updateAccountBasedMaretingDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string, @Req() requset: ZautoRequest) {
-    const orgId = requset.user.org.id;
+  async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.orgId;
     if(!orgId) throw new UnauthorizedException();
     return await this.accountBasedMaretingService.remove(orgId,id);
   }

@@ -87,7 +87,7 @@ export class EnrichmentController {
     @Query('provider') provider: string,
     @Req() request: ZautoRequest,
   ) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -125,7 +125,7 @@ export class EnrichmentController {
     @Query('provider') provider: string,
     @Req() request: ZautoRequest,
   ) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -141,7 +141,7 @@ export class EnrichmentController {
     @Body() contactEnrichmentDto: ContactEnrichmentDto,
     @Req() req: ZautoRequest,
   ) {
-    const orgId = req.user.org.id;
+    const orgId = req.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }

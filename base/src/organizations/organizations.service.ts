@@ -1,13 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { CrmService } from 'src/crm/crm.service';
 import { SchemaManagerService } from 'src/microservices/crm_service/schema-manager.service';
 import { SchemaManager } from 'src/schema-manager/schema-manager.service';
-import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
+import { DEFALT_ROLES, DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
 import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
+import { RolesService } from 'src/roles/roles.service';
 
 
 @Injectable()
@@ -17,7 +16,8 @@ export class OrganizationsService {
   constructor(
     private readonly prismaClientManager: PrismaClientManager,
     private readonly schemaManagerService: SchemaManagerService,
-    private readonly schemaManager: SchemaManager
+    private readonly schemaManager: SchemaManager,
+    private readonly roleService: RolesService
   ){}
 
   async findOrgByEmail(email: string) {
@@ -38,6 +38,7 @@ export class OrganizationsService {
       try
       {
         await this.schemaManager.create(organization.id,null);
+        await this.createDefaultRoles(organization.id);
         await this.schemaManagerService.create(organization.id, organization.name);
       }
       catch(e)
@@ -112,4 +113,13 @@ export class OrganizationsService {
     const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     return await prisma.organization.update({data: {name, siteUrl}, where: {id}});
   }
+
+  async createDefaultRoles(orgId:string) {
+    const defaultRoles = DEFALT_ROLES;
+    try {
+        await this.roleService.createDefaultRoles(orgId,defaultRoles);
+    } catch (error) {
+        console.error('Defailt role not created, mybe it got created already.')
+    }
+}
 }

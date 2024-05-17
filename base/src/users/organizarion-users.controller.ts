@@ -30,12 +30,12 @@ export class OrgUsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   async create(@Body() createUserDto: CreateUserDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     const userUsage = await this.usageService.getUserCount(orgId);
     const remainingUser = userUsage.maxCount - userUsage.count;
     if(remainingUser > 0)
     {
-      const orgId = request.user.org.id;
+      const orgId = request.orgId;
       return await this.usersService.create(orgId,{...createUserDto, orgId }, true);
     }
     else
@@ -52,7 +52,7 @@ export class OrgUsersController {
   @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
   @UseGuards(JwtAuthGuard, RolesGuard)
   async findAllByOrg(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
-    const organizationId = request.user.org.id;
+    const organizationId = request.orgId;
     return await this.usersService.findAllByOrg(paginationDto, organizationId);
   }
 
@@ -60,7 +60,7 @@ export class OrgUsersController {
   @UseGuards(JwtAuthGuard, SelfGuard)
   @ApiBearerAuth()
   async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.usersService.findOne(orgId,id);
   }
 
@@ -68,7 +68,7 @@ export class OrgUsersController {
   @UseGuards(JwtAuthGuard, SelfGuard)
   @ApiBearerAuth()
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.usersService.update(orgId, id, updateUserDto);
   }
 
@@ -77,7 +77,7 @@ export class OrgUsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.usersService.remove(orgId,id);
   }
 
@@ -117,7 +117,7 @@ export class OrgUsersController {
       await this.staticFileService.deleteExistingFile(file.path);
 
       const userId = request.user.id;
-      const orgId = request.user.org.id;
+      const orgId = request.orgId;
       const imgUrl = `${process.env.HOST_URL}/images/compressed-${file.filename}`
       this.usersService.updateProfilePicUrl(orgId,userId, {
         imgUrl: imgUrl,

@@ -18,7 +18,7 @@ export class CalendarController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async getCalendars(@Query() crmAuthDto:CalendarAuthDto,@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return this.calendarService.getCalendars(orgId);
   }
 
@@ -26,7 +26,7 @@ export class CalendarController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async getAuthUrl(@Query() crmAuthDto:CalendarAuthDto,@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     const state = crmAuthDto.name;
     return this.calendarService.getAuthUrl(orgId,crmAuthDto.name,{state});
   }
@@ -35,7 +35,7 @@ export class CalendarController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async callback(@Query() callBackDto:CallBackDto,@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.calendarService.exchangeCodeForAccessToken(orgId,callBackDto.state,callBackDto.code);
   }
 
@@ -43,7 +43,7 @@ export class CalendarController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async getAccessToken(@Query() crmAuthDto:CalendarAuthDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.calendarService.getAccessToken(orgId, crmAuthDto.name);
   }
 
@@ -52,7 +52,7 @@ export class CalendarController {
   @ApiBearerAuth()
   async revokeAccess(@Param('calendar_name') calendarName: string, @Req() request: ZautoRequest)
   {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.calendarService.revokeAccess(orgId, calendarName);
   }
 
@@ -60,7 +60,7 @@ export class CalendarController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async getProfile(@Query() crmAuthDto:CalendarAuthDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.calendarService.getProfile(orgId, crmAuthDto.name);
   }
 
@@ -93,7 +93,7 @@ export class CalendarController {
   @UseGuards(JwtAuthGuard)
   async getEvents(@Param('date') date:string,@Req() request: ZautoRequest)
   {
-      const orgId = request.user.org.id;
+      const orgId = request.orgId;
       return await this.calendarService.getEvents(orgId,date)
   }
 
@@ -102,7 +102,7 @@ export class CalendarController {
   @UseGuards(JwtAuthGuard)
   async getSlots(@Param('date') date:string,@Req() request: ZautoRequest)
   {
-      const orgId = request.user.org.id;
+      const orgId = request.orgId;
       return await this.calendarService.getSlots(orgId,date)
   }
 }

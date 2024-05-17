@@ -28,9 +28,9 @@ export class StageController {
     })
     async findAll(@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            const orgId = zautoRequest.user.org.id;
+            const orgId = zautoRequest.orgId;
             return await this.stageService.findAllByOrg(orgId);
         }
         else
@@ -50,9 +50,9 @@ export class StageController {
     @ApiOkResponse({type:Stage})
     async create(@Body() createStageDto: CreateStageDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            createStageDto.orgId = zautoRequest.user.org.id;
+            createStageDto.orgId = zautoRequest.orgId;
             return await this.stageService.create(createStageDto);
         }
         else

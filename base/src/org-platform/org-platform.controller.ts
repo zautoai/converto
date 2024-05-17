@@ -24,9 +24,9 @@ export class OrgPlatformController {
     @Post()
     async create(@Body() createOrgPlatfoDto:CreateOrgPlatformDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            createOrgPlatfoDto.orgId = zautoRequest.user.org.id;
+            createOrgPlatfoDto.orgId = zautoRequest.orgId;
             return await this.orgPlatformService.create(createOrgPlatfoDto);
         }
         else
@@ -38,7 +38,7 @@ export class OrgPlatformController {
     @Get()
     async findAll(@Req() zautoRequest: ZautoRequest)
     {        
-        return await this.orgPlatformService.findAllByOrg(zautoRequest.user.org.id);
+        return await this.orgPlatformService.findAllByOrg(zautoRequest.orgId);
     }
 
     @Get(':id')

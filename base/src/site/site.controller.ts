@@ -56,9 +56,9 @@ export class SiteController {
     })
     async findAll(@Query() paginationDto: PaginationDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            const orgId = zautoRequest.user.org.id;
+            const orgId = zautoRequest.orgId;
             return await this.siteService.findAllByOrg(orgId,paginationDto);
         }
         else
@@ -109,7 +109,7 @@ export class SiteController {
   @ApiBody({ type: ScrapMultipleDto })
   @ApiCreatedResponse()
   async processURLs(@Body() scrapMultipleDto: ScrapMultipleDto,@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     const siteUsage = await this.usageService.getSiteCount(orgId);
     const remainingSite = siteUsage.maxCount - siteUsage.count;
     if(remainingSite <= 0)
@@ -132,9 +132,9 @@ export class SiteController {
   @ApiOkResponse()
   async generatePageGreeting(@Req() req: ZautoRequest)
   {
-    if(req.user && req.user.org)
+    if(req.user && req.orgId)
     {
-        return await this.siteService.generateGreeting(req.user.org.id);
+        return await this.siteService.generateGreeting(req.orgId);
     }
     else
     {
@@ -146,9 +146,9 @@ export class SiteController {
   @ApiOkResponse()
   async selectGeneratedGreetings(@Body() selectGreetingDto: SelectGreetingDto[],@Req() req: ZautoRequest)
   {
-    if(req.user && req.user.org)
+    if(req.user && req.orgId)
     {
-        return await this.siteService.selectGeneratedGreetings(req.user.org.id,selectGreetingDto);
+        return await this.siteService.selectGeneratedGreetings(req.orgId,selectGreetingDto);
     }
     else
     {

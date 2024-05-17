@@ -32,6 +32,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       console.log('Failing here')
       throw new UnauthorizedException();
     }
-    return user;
+    return {
+      user,
+      orgId: payload.orgId
+    };
   }
 }

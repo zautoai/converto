@@ -33,7 +33,7 @@ export class FormBuilderController {
     @Body() createFormBuilderDto: CreateFormBuilderDto,
     @Req() request: ZautoRequest,
   ) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) throw new UnauthorizedException('Organization not found');
     return await this.formBuilderService.create(orgId, createFormBuilderDto);
   }
@@ -42,7 +42,7 @@ export class FormBuilderController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   async findAll(@Req() request: ZautoRequest, @Query() filterDto: FilterDto) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) throw new UnauthorizedException('Organization not found');
     return await this.formBuilderService.findAll(orgId, filterDto);
   }
@@ -51,7 +51,7 @@ export class FormBuilderController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) throw new UnauthorizedException('Organization not found');
     return await this.formBuilderService.findOne(orgId, id);
   }
@@ -64,7 +64,7 @@ export class FormBuilderController {
     @Body() updateFormBuilderDto: UpdateFormBuilderDto,
     @Req() request: ZautoRequest,
   ) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) throw new UnauthorizedException('Organization not found');
     return await this.formBuilderService.update(
       orgId,
@@ -77,7 +77,7 @@ export class FormBuilderController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     if (!orgId) throw new UnauthorizedException('Organization not found');
     return await this.formBuilderService.remove(orgId, id);
   }

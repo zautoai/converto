@@ -24,7 +24,7 @@ export class RolesController {
   @ApiBody({ type: CreateRoleDto })
   @ApiCreatedResponse({type: Role})
   async create(@Body() createRoleDto: CreateRoleDto, @Req() request:ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.rolesService.create(orgId,createRoleDto);
   }
 
@@ -35,21 +35,21 @@ export class RolesController {
     type: ResponseDTO<Role>
   })
   async findAll(@Query() paginationDto: PaginationDto, @Req() request:ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.rolesService.findAll(orgId,paginationDto);
   }
 
   @Get(':id')
   @ApiOkResponse({type: Role})
   async findOne(@Param('id') id: string, @Req() request:ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.rolesService.findOne(orgId,id);
   }
 
   @Patch(':id')
   @ApiOkResponse({type: Role})
   async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto, @Req() request:ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.rolesService.update(orgId,id, updateRoleDto);
   }
 
@@ -57,7 +57,7 @@ export class RolesController {
   @ApiNoContentResponse()
   @HttpCode(204)
   async remove(@Param('id') id: string, @Req() request:ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     await this.rolesService.remove(orgId,id);
   }
 }

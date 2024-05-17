@@ -29,9 +29,9 @@ export class CampaignController
     @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
     async findAll(@Query() campaignFilterDto: CampaignFilterDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            const orgId = zautoRequest.user.org.id;
+            const orgId = zautoRequest.orgId;
             return await this.campaignService.findAllByOrg(orgId,campaignFilterDto);
         }
         else
@@ -51,9 +51,9 @@ export class CampaignController
     @ApiOkResponse({type:Campaign})
     async create(@Body() createCampaignDto:CreateCampaignDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(zautoRequest.user && zautoRequest.orgId)
         {
-            const orgId = zautoRequest.user.org.id;
+            const orgId = zautoRequest.orgId;
             const currentDate = new Date().toISOString();
             const campaignUsage = await this.usageService.getCampaginCount(orgId,currentDate);
             const remainingCampaign = campaignUsage.maxCount - campaignUsage.count;
@@ -62,7 +62,7 @@ export class CampaignController
             {
                 throw new NotAcceptableException(`Remaining campaign ${remainingCampaign}`);
             }
-            createCampaignDto.orgId = zautoRequest.user.org.id;
+            createCampaignDto.orgId = zautoRequest.orgId;
             return await this.campaignService.create(createCampaignDto);
         }
         else

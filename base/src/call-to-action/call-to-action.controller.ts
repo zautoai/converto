@@ -21,9 +21,9 @@ export class CallToActionController {
     @Post('generate')
     async generateCTA(@Req() req: ZautoRequest)
     {
-        if(req.user && req.user.org)
+        if(req.user && req.orgId)
         {
-            return await this.callToActionService.generateCTA(req.user.org.id);
+            return await this.callToActionService.generateCTA(req.orgId);
         }
         else
         {
@@ -34,9 +34,9 @@ export class CallToActionController {
     @Post('select')
     async select(@Body() selectCTADto:any,@Req() req: ZautoRequest)
     {
-        if(req.user && req.user.org)
+        if(req.user && req.orgId)
         {
-            return await this.callToActionService.selectCTA(req.user.org.id,selectCTADto);
+            return await this.callToActionService.selectCTA(req.orgId,selectCTADto);
         }
         else
         {
@@ -48,9 +48,9 @@ export class CallToActionController {
     @ApiOkResponse({type: CallToAction})
     async create(@Body() createCTADto: CreateCTADto, @Req() req: ZautoRequest)
     {
-        if(req.user && req.user.org)
+        if(req.user && req.orgId)
         {
-            createCTADto.orgId = req.user.org.id;
+            createCTADto.orgId = req.orgId;
             return await this.callToActionService.create(createCTADto);
         }
         else
@@ -65,9 +65,9 @@ export class CallToActionController {
     @ApiOkResponse({type: CallToAction})
     async findAll(@Req() req: ZautoRequest,@Query() paginationDto: PaginationDto)
     {
-        if(req.user && req.user.org)
+        if(req.user && req.orgId)
         {
-            return await this.callToActionService.findAll(req.user.org.id,paginationDto);
+            return await this.callToActionService.findAll(req.orgId,paginationDto);
         }
         else
         {
@@ -79,7 +79,7 @@ export class CallToActionController {
     @ApiOkResponse({type: CallToAction})
     async find(@Param('id') id: string,@Req() req: ZautoRequest)
     {
-        if(req.user && req.user.org)
+        if(req.user && req.orgId)
         {
             return await this.callToActionService.find(id);
         }
@@ -93,7 +93,7 @@ export class CallToActionController {
     @ApiOkResponse()
     async update(@Param('id') id: string,@Body() updateCTADto: UpdateCTADto,@Req() req: ZautoRequest)
     {
-        if(req.user && req.user.org)
+        if(req.user && req.orgId)
         {
             return await this.callToActionService.update(id,updateCTADto);
         }
@@ -107,7 +107,7 @@ export class CallToActionController {
     @HttpCode(204)
     async delete(@Param('id') id: string,@Req() req: ZautoRequest)
     {
-        if(req.user && req.user.org)
+        if(req.user && req.orgId)
         {
             return await this.callToActionService.delete(id);
         }

@@ -28,7 +28,7 @@ export class UsersController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.usersService.create(orgId,createUserDto);
   }
 
@@ -36,7 +36,7 @@ export class UsersController {
   @ApiQuery({ name: 'page', description: 'Page number.', required: false })
   @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
   async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.usersService.findAll(orgId,paginationDto);
   }
 
@@ -44,25 +44,25 @@ export class UsersController {
   @ApiQuery({ name: 'page', description: 'Page number.', required: false })
   @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
   async findAllByOrg(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.usersService.findAllByOrg(paginationDto,orgId);
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.usersService.findOne(orgId,id);
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.usersService.update(orgId, id, updateUserDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.orgId;
     return await this.usersService.remove(orgId,id);
   }
 
@@ -100,7 +100,7 @@ export class UsersController {
       await this.staticFileService.deleteExistingFile(file.path);
 
       const userId = request.user.id;
-      const orgId = request.user.org.id;
+      const orgId = request.orgId;
       const imgUrl = `${process.env.HOST_URL}/images/compressed-${file.filename}`
       this.usersService.updateProfilePicUrl(orgId,userId, {
         imgUrl: imgUrl,
