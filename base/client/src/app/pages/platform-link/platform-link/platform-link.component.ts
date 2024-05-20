@@ -19,7 +19,7 @@ export class PlatformLinkComponent implements OnInit
 {
   agentId:any = undefined;
   linkList:link[] =[];
-  platforms:any = [];
+  platforms:any = []
   constructor(
     private restService:RestService,
     private platformService:PlatformService,

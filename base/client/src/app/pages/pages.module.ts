@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { PagesRoutingModule } from './pages-routing.module';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { ZautoDashboardComponent } from './dashboard/dashboard.component';
 import { SharedModule } from '../shared/shared.module';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
@@ -38,7 +36,6 @@ import { IntegrationComponent } from './integrations/integration/integration.com
 import { OAuthButtonComponent } from './integrations/oauth-button/oauth-button.component';
 import { CalenderComponent } from './calender/calender.component';
 import { FileManagerComponent } from './file-manager/file-manager.component';
-
 import { NgxDropzoneModule } from 'ngx-dropzone';
 import { LeadCategoryComponent } from './lead-category/lead-category/lead-category.component';
 import { CalendarEventComponent } from './calendar-event/calendar-event.component';
@@ -61,10 +58,10 @@ import { CrmCompanyMappingComponent } from './plugins/crm-mapping/crm-company-ma
 import { ContactsComponent } from './contacts/contacts.component';
 import { CalendarScheduleComponent } from './plugins/calendar-schedule/calendar-schedule.component';
 import { AbmComponent } from './abm/abm.component';
-import { SegmentComponent } from './segment/segment.component';
 import { AccountviewComponent } from './accountview/accountview.component';
 import { ContactviewComponent } from './contactview/contactview.component';
-
+import { SegmentComponent } from './segment/segment.component';
+import { PlatformLinkModule } from './platform-link/platform-link.module';
 @NgModule({
   declarations: [
     ZautoDashboardComponent,
@@ -74,44 +71,25 @@ import { ContactviewComponent } from './contactview/contactview.component';
     ChatContainerComponent,
     SummaryContainerComponent,
     AbmComponent,
-
     leadscomponent,
-
     CampaignComponent,
     StatsComponent,
-
     VisitorsComponent,
-
     StagesComponent,
-
     CallToActionComponent,
-
     PlatformsComponent,
-
     SMTPConfigComponent,
-
     SitesComponent,
-
     TeamComponent,
-
     LaunchAvatarComponent,
-
     SettingsComponent,
-
     LeadConfigComponent,
-
     CustomiseAvatarComponent,
-
     PlatformLinkComponent,
-
     ExternalApisComponent,
-
     HubspotComponent,
-
     IntegrationComponent,
-
     OAuthButtonComponent,
-
     CalenderComponent,
     FileManagerComponent,
     LeadCategoryComponent,
@@ -122,24 +100,24 @@ import { ContactviewComponent } from './contactview/contactview.component';
     TableCardComponent,
     ChartCardComponent,
     WlcomeCardComponent,
-
     CounterFormatPipe,
     ProgressCardComponent,
     PluginsComponent,
     PluginCardComponent,
     CrmContactMappingComponent,
+    CrmCompanyMappingComponent,
     ContactsComponent,
+    CalendarScheduleComponent,
     AccountviewComponent,
     ContactviewComponent,
-    SegmentComponent,
-    CalendarScheduleComponent
+    SegmentComponent
   ],
   imports: [
+    PlatformLinkModule,
     CommonModule,
     PagesRoutingModule,
     SharedModule,
     NgbModule,
-    ReactiveFormsModule,
     FormsModule,
     NgSelectModule,
     NgScrollbar,
@@ -156,7 +134,7 @@ import { ContactviewComponent } from './contactview/contactview.component';
     NgxColorsModule,
     NgApexchartsModule,
     NgbProgressbarModule,
-    NgbNavModule,
+    NgbNavModule
   ],
 })
 export class PagesModule {}

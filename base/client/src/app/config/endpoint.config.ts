@@ -57,7 +57,8 @@ export const API = {
     external_crm: 'api/external-crm',
     contact:'api/contacts',
     segment:'segment-group',
-    segments:'segments'
+    segments:'segments',
+    abm:'api/crm-accounts/abm'
   },
   dev: {},
 };
