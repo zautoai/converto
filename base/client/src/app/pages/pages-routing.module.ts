@@ -33,6 +33,7 @@ import { ContactsComponent } from './contacts/contacts.component';
 import { AbmComponent } from './abm/abm.component';
 import { AccountviewComponent } from './accountview/accountview.component';
 import { ContactviewComponent } from './contactview/contactview.component';
+import { SegmentComponent } from './segment/segment.component';
 
 const routes: Routes = [
   {
@@ -168,6 +169,12 @@ const routes: Routes = [
     path: 'sites',
     title: "Sites",
     component: SitesComponent,
+    canActivate:[SetupGuard]
+  },
+  {
+    path: 'segment',
+    title: "Segment",
+    component: SegmentComponent,
     canActivate:[SetupGuard]
   },
   {

@@ -60,6 +60,8 @@ import { AccountBasedMaretingModule } from './account-based-mareting/account-bas
 import { EnrichmentModule } from './enrichment/enrichment.module';
 import { ExternalCrmModule } from './external-crm/external-crm.module';
 import { CalendarModule } from './calendar/calendar.module';
+import { SegmentGroupModule } from './segment-group/segment-group.module';
+import { SegmentsModule } from './segments/segments.module';
 
 @Module({
   imports: [
@@ -137,6 +139,8 @@ import { CalendarModule } from './calendar/calendar.module';
     EnrichmentModule,
     ExternalCrmModule,
     CalendarModule,
+    SegmentGroupModule,
+    SegmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

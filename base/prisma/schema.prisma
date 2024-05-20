@@ -84,6 +84,8 @@ model Organization {
   LeradCategory          LeadCategory[]
   LeadCategoryMap        LeadCategoryMap[]
   ExternalToolCredential ExternalToolCredential[]
+  SegmentGroup           SegmentGroup[]
+  Segment                Segment[]
 }
 
 model ActiveClient {
@@ -782,5 +784,31 @@ model ExternalToolCredential {
   toolName     String
   createdAt    DateTime      @default(now())
   modifiedAt   DateTime      @updatedAt
+  org          Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+model SegmentGroup {
+  id          String   @id @default(uuid())
+  orgId       String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @updatedAt
+
+  org     Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  Segment Segment[]
+}
+
+model Segment {
+  id             String   @id @default(uuid())
+  orgId          String
+  segmentGroupId String
+  name           String
+  description    String?
+  color          String
+  createdAt      DateTime @default(now())
+  modifiedAt     DateTime @updatedAt
+
+  segmentGroup SegmentGroup  @relation(fields: [segmentGroupId], references: [id], onDelete: Cascade)
   org          Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
 }
