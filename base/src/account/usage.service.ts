@@ -7,8 +7,8 @@ import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 export class UsageService {
 
     constructor(
-        private readonly prismaClientManager: PrismaClientManager,
-        private accountService: OrgAccountService
+        private prisma: PrismaService,
+        private accountService: OrgAccountService,
     ) { }
 
     async getUsage(orgId: string, date: string) {
@@ -94,7 +94,6 @@ export class UsageService {
         const maxCount = account.subscription.conversationCount;
         const count = await prisma.conversation.count({
             where: {
-                orgId,
                 createdAt: {
                     gte: new Date(startDate),
                     lte: new Date(endDate),
@@ -124,7 +123,6 @@ export class UsageService {
         const maxCount = account.subscription.campaignCount;
         const count = await prisma.campaign.count({
             where: {
-                orgId,
                 status: 'ACTIVE',
                 createdAt: {
                     gte: new Date(startDate),

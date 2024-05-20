@@ -62,7 +62,6 @@ model Organization {
   OrgAccount OrgAccount?
 
   Agents                 Agent[]
-  Campaigns              Campaign[]
   LeadConfigs            LeadConfig[]
   AgentPrompts           AgentPrompt[]
   Visitors               Visitor[]
@@ -247,8 +246,6 @@ model LeadConfig {
   @@index([agentId], map: "AgentId_LeadConfig_fkey")
 }
 
-// ... and so on for the remaining models ...
-
 model Site {
   id         String             @id @default(uuid())
   agentId    String // Updated to String
@@ -263,7 +260,6 @@ model Site {
   @@index([agentId], map: "AgentId_Site_fkey")
 }
 
-// Continue this pattern for all models in your schema.
 model AgentPrompt {
   id         String        @id @default(uuid())
   agentId    String // Updated to String
@@ -511,7 +507,6 @@ enum CampaignStatus {
 
 model Campaign {
   id            String         @id @default(uuid())
-  orgId         String
   agentId       String
   hash          String?
   title         String         @db.VarChar(50)
@@ -528,12 +523,10 @@ model Campaign {
   endDate       DateTime?      @db.Timestamp()
   createdAt     DateTime       @default(now())
   modifiedAt    DateTime       @updatedAt
-  organization  Organization?  @relation(fields: [orgId], references: [id])
   agent         Agent?         @relation(fields: [agentId], references: [id], onDelete: Cascade)
   Conversations Conversation[]
   Visits        Visit[]
 
-  @@index([orgId], map: "orgId_Campaign_fkey")
   @@index([agentId], map: "agentId_Campaign_fkey")
 }
 

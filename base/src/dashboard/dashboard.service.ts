@@ -3,10 +3,17 @@ import { AgentStatus } from 'src/agent/entities/agent.entity';
 import { DateFilter } from 'src/common/enums/enums';
 import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 import { DashbaordDto } from './dto/dashboard.dto';
+import { Sql } from '@prisma/client/runtime/library';
+import { Prisma } from '@prisma/client';
+import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
+import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly prismaClientManager: PrismaClientManager) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly prismaClientManager: PrismaClientManager,
+  ) { }
 
   async getAgentsCount(orgId: string) {
     try {
@@ -98,11 +105,9 @@ export class DashboardService {
   async getCampaignCount(orgId: string, startDate?: Date, endDate?: Date) {
     try {
       const prisma = await this.prismaClientManager.getClient(orgId);
-
       if (startDate && endDate) {
         return await prisma.campaign.count({
           where: {
-            orgId,
             startDate: {
               gte: new Date(startDate), // Greater than or equal to start date
               lte: new Date(endDate), // Less than or equal to end date
@@ -110,7 +115,7 @@ export class DashboardService {
           },
         });
       } else {
-        return await prisma.campaign.count({ where: { orgId } });
+        return await prisma.campaign.count();
       }
     } catch (error) {
       console.log(error);
@@ -158,10 +163,8 @@ export class DashboardService {
   async getCampaignCountAgentWise(orgId: string) {
     try {
       const prisma = await this.prismaClientManager.getClient(orgId);
-
       return await prisma.campaign.groupBy({
         by: ['agentId'],
-        where: { orgId },
         _count: { agentId: true },
       });
     } catch (error) {
@@ -480,7 +483,6 @@ export class DashboardService {
   async getCampaignCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
     try {
       const prisma = await this.prismaClientManager.getClient(orgId);
-
       let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
       const dateWiseConvo = await prisma.campaign.groupBy({
         by: ['createdAt'],
@@ -491,9 +493,6 @@ export class DashboardService {
           _count: {
             createdAt: 'desc',
           },
-        },
-        where: {
-          orgId,
         },
       });
 

@@ -1,13 +1,28 @@
 import { BadRequestException, HttpException, Injectable, Logger } from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
+import { PrismaClientManager } from "src/prisma/prisma-client-manager.service";
+import { DEFAULT_SCHEMA_NAME } from "../constants/system.constants";
 
 @Injectable()
 export class BaseService {
 
     protected readonly logger;
+    private readonly prismaClientManager: PrismaClientManager;
 
     constructor()
     {
         this.logger = new Logger(this.constructor.name);
+        this.prismaClientManager = new PrismaClientManager();
+    }
+
+    protected async getPrismaClient(OrgId:string):Promise<PrismaClient>
+    {
+        return await this.prismaClientManager.getClient(OrgId);
+    }
+
+    protected async getPrismaMasterClient():Promise<PrismaClient>
+    {
+        return await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     }
 
     protected handleException(data: any)

@@ -16,11 +16,13 @@ const { minify } = require('uglify-js');
 import * as fs from 'fs';
 import * as path from 'path';
 import { DemandGenService } from 'src/demand-gen/demand-gen.service';
+import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
+import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
 
 @Injectable() 
 export class AgentService {
  
-  constructor(private prisma: PrismaService, 
+  constructor(
     private readonly promptService: AgentPromptService,
     private readonly chroma: ChromaDBService,
     private readonly staticFileService: StaticFileService,
@@ -28,6 +30,7 @@ export class AgentService {
     private readonly s3Service: S3Service,
     private readonly llmService: LlmService,
     private readonly stageService: StageService,
+    private readonly prismaClientManager: PrismaClientManager
     ) {}
 
 
@@ -43,7 +46,8 @@ export class AgentService {
       instructions: await this.promptService.getAssistantPrompt(agent),
       fileIds: [fileId]
     });
-    await this.prisma.agent.update({data: {
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);//need to replace with actual org id
+    await prisma.agent.update({data: {
       assistantId: assistant.id,
     }, where: {id: agent.id}});
   }
@@ -61,8 +65,9 @@ export class AgentService {
     if(isExist) {
       throw new ConflictException('Agent name alread taken.')
     } else {
+      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
       createAgentDto.welcomeMsg = this.getWelcomeMessage({...createAgentDto});
-      const agent = await this.prisma.agent.create({ data: createAgentDto });
+      const agent = await prisma.agent.create({ data: createAgentDto });
       setImmediate(async () => {
         const instruction = await this.promptService.getAssistantPrompt(agent);
         await this.chroma.createNameSapce(agent.name);
@@ -75,7 +80,7 @@ export class AgentService {
 
         //create file if fileId found
         if(fileId) {
-          await this.prisma.agentFile.create({data:{
+          await prisma.agentFile.create({data:{
             agentId: agent.id,
             fileId: fileId
           }});
@@ -89,11 +94,12 @@ export class AgentService {
   async findAll(paginationDto: PaginationDto) {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
-    const agents = await this.prisma.agent.findMany({
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const agents = await prisma.agent.findMany({
       skip,
       take: limit, where: {status: { not: AgentStatus.DELETED}}
     });
-    const total = await this.prisma.agent.count();
+    const total = await prisma.agent.count();
     return {
       data: agents,
       page: page,
@@ -104,12 +110,13 @@ export class AgentService {
   async findAllByOrg(paginationDto: PaginationDto, orgId: string) {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
-    const agents = await this.prisma.agent.findMany({
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    const agents = await prisma.agent.findMany({
       skip,
       take: limit,
       where: {orgId, status: { not: AgentStatus.DELETED}}
     });
-    const total = await this.prisma.agent.count();
+    const total = await prisma.agent.count();
     return {
       data: agents,
       page: page,
@@ -118,7 +125,8 @@ export class AgentService {
   }
 
   async findOne(id: string) {
-    const agent = await this.prisma.agent.findFirst({
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const agent = await prisma.agent.findFirst({
       where: { id },
     });
     if (agent) {
@@ -129,7 +137,8 @@ export class AgentService {
   }
 
   async findOneByOrg(orgId: string) {
-    const agent = await this.prisma.agent.findFirst({
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const agent = await prisma.agent.findFirst({
       where: { orgId },
     });
     if (agent) {
@@ -142,16 +151,17 @@ export class AgentService {
   async update(id: string, updateAgentDto: UpdateAgentDto) {
     const welcomeMsg = this.getWelcomeMessage({...updateAgentDto});
     updateAgentDto.welcomeMsg = welcomeMsg;
-    const agent = await this.prisma.agent.findFirst({
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const agent = await prisma.agent.findFirst({
       where: { id },
     });
     if (agent) {
-      const updatedAgent = await this.prisma.agent.update({
+      const updatedAgent = await prisma.agent.update({
         data: updateAgentDto,
         where: { id },
       });
       const agentPrompt = await this.promptService.updateByAgent(agent.id, {type: 'system', text: await this.promptService.getAssistantPrompt(updatedAgent)});
-      const agentFile = await this.prisma.agentFile.findFirst({
+      const agentFile = await prisma.agentFile.findFirst({
         where: {
           agentId: agent.id
         }
@@ -171,8 +181,8 @@ export class AgentService {
   }
 
   async updateStyles(id: string, styledata: any) {
-   
-    const agent = await this.prisma.agent.findFirst({
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const agent = await prisma.agent.findFirst({
       where: { id },
     });
     if (agent) {
@@ -181,7 +191,7 @@ export class AgentService {
         ...styledata.wakeupTime ? {wakeupTime : styledata.wakeupTime} : {},
         ...styledata.position ? {position : styledata.position} : {},
       }
-      const updatedAgent = await this.prisma.agent.update({
+      const updatedAgent = await prisma.agent.update({
         data: data,
         where: { id },
       });
@@ -191,18 +201,18 @@ export class AgentService {
   }
 
   async updateLeadInfo(id: string, leadInfo: string) {
-   
-    const agent = await this.prisma.agent.findFirst({
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const agent = await prisma.agent.findFirst({
       where: { id },
     });
     if (agent) {
-      const updatedAgent = await this.prisma.agent.update({
+      const updatedAgent = await prisma.agent.update({
         data: {leadInfo},
         where: { id },
       });
      
       const agentPrompt = await this.promptService.updateByAgent(agent.id, {type: 'system', text: await this.promptService.getAssistantPrompt(updatedAgent)});
-      const agentFile = await this.prisma.agentFile.findFirst({
+      const agentFile = await prisma.agentFile.findFirst({
         where: {
           agentId: agent.id
         }
@@ -216,7 +226,8 @@ export class AgentService {
 
   async updateStatus(id: string, status: AgentStatus) {
     try {
-      this.prisma.agent.update({data: {status}, where: {id}});
+      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+      prisma.agent.update({data: {status}, where: {id}});
     } catch(error) {
       console.log(error)
     }
@@ -224,7 +235,8 @@ export class AgentService {
 
   async updateStarters(id: string, starters: string) {
     try {
-      return await this.prisma.agent.update({data: {starters}, where: {id}});
+      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+      return await prisma.agent.update({data: {starters}, where: {id}});
     } catch(error) {
       console.log(error)
     }
@@ -236,8 +248,9 @@ export class AgentService {
         id: agent.assistantId,
         fileId: agent.AgentFiles[0].fileId
       }
+      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
       await this.llmService.unlinkFileFromAgent(agentConfig);
-      await this.prisma.agentFile.delete({where: {id: agent.AgentFiles[0].id}});
+      await prisma.agentFile.delete({where: {id: agent.AgentFiles[0].id}});
     } catch(error) {
       console.log(error)
     }
@@ -248,14 +261,14 @@ export class AgentService {
         //After extracting the content from sites
         //Upload the content file to S3
         const response = await this.s3Service.uploadTextFile(filePath);
-
-        await this.prisma.agent.update({data: {
+        const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+        await prisma.agent.update({data: {
           siteObjUrl: response.Location,
         }, where:{id: agent.id}});
 
         const file = await this.llmService.uploadFile(filePath);
 
-        await this.prisma.agentFile.create({data:{
+        await prisma.agentFile.create({data:{
           agentId: agent.id,
           fileId: file.id
         }});
@@ -272,25 +285,26 @@ export class AgentService {
 
   async remove(id: string) {
     try {
-      const agent = await this.prisma.agent.findFirst({
+      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+      const agent = await prisma.agent.findFirst({
         where: { id }, include: {org: true}
       });
       if (agent) {
         const fileName = `avatar_${agent.org.name.replaceAll(' ', '_').toLowerCase()}_${agent.name.replaceAll(' ', '_').toLowerCase()}.txt`;
         
-        const agentFile = await this.prisma.agentFile.findFirst({where: {agentId: agent.id}});
+        const agentFile = await prisma.agentFile.findFirst({where: {agentId: agent.id}});
         
         if(agentFile) {
           await this.s3Service.deleteFile(fileName);
         }
         await this.chroma.deleteNameSapce(agent.name);
-        await this.prisma.site.deleteMany({
+        await prisma.site.deleteMany({
           where: {agentId: agent.id}
         })
-        await this.prisma.callToAction.deleteMany({
+        await prisma.callToAction.deleteMany({
           where: {agentId: agent.id}
         })
-        return await this.prisma.agent.delete({
+        return await prisma.agent.delete({
           where: { id },
         });
       } else {
@@ -304,11 +318,12 @@ export class AgentService {
   }
 
   async makeDeleted(id: string) {
-    const agent = await this.prisma.agent.findFirst({
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const agent = await prisma.agent.findFirst({
       where: { id },
     });
     if (agent) {
-      return await this.prisma.agent.update({data: { status: AgentStatus.DELETED },
+      return await prisma.agent.update({data: { status: AgentStatus.DELETED },
         where: { id },
       });
     } else {
@@ -317,19 +332,21 @@ export class AgentService {
   }
 
   async isNameExists(name: string) {
-    const agent = await this.prisma.agent.findFirst({where: {name: name}});
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const agent = await prisma.agent.findFirst({where: {name: name}});
     if(agent) {
       return true;
     } return false;
   }
 
   async updateLogo(id: string, logoUrl: string) {
-    const agent = await this.prisma.agent.findFirst({
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const agent = await prisma.agent.findFirst({
       where: { id },
     });
     if (agent) {
       await this.staticFileService.deleteExistingFile(agent.logoUrl)
-      return await this.prisma.agent.update({
+      return await prisma.agent.update({
         data: {logoUrl},
         where: { id },
       });
@@ -341,16 +358,16 @@ export class AgentService {
   async launchAvatarWithAssistant(createAvatarDto: CreateAvatarDto, orgId: string) {
     try {
       const name = createAvatarDto.displayName.replaceAll(" ", "_").toLowerCase().trim();
-      const avatar = await this.prisma.agent.create({data: {
+      const prisma = await this.prismaClientManager.getClient(orgId);
+      const avatar = await prisma.agent.create({data: {
         displayName: createAvatarDto.displayName, 
         name,companyName: createAvatarDto.companyName,
         status: AgentStatus.TRAINING,
          orgId}});
-        const campaign = await this.prisma.campaign.create({
+        const campaign = await prisma.campaign.create({
           data: {
             title: 'Primary',
             description: 'Default Campaign which is used for all converstation without campaign.',
-            orgId: orgId,
             agentId: avatar.id,
             startDate: new Date(),
             endDate: null,
@@ -359,8 +376,9 @@ export class AgentService {
         })
       return avatar;
     } catch(error) {
-      const _avatar = await this.prisma.agent.findFirst({where: {orgId: orgId}});
-      await this.prisma.agent.delete({where: {id: _avatar.id}});
+      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+      const _avatar = await prisma.agent.findFirst();
+      await prisma.agent.delete({where: {id: _avatar.id}});
       console.log(error)
       throw new InternalServerErrorException('Unable to create avatar');
     }
@@ -376,7 +394,8 @@ export class AgentService {
     createAgentDto.llmModel = process.env.OPENAI_ASSISTANT_DEFAULT_MODEL;
     
     createAgentDto.welcomeMsg = this.getWelcomeMessage({...createAgentDto});
-      const agent = await this.prisma.agent.update({ data: {...createAgentDto, 
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+      const agent = await prisma.agent.update({ data: {...createAgentDto, 
       status: AgentStatus.ACTIVE} , where: {id}});
       //Create Default stages for agent
       if(agent)
@@ -389,8 +408,8 @@ export class AgentService {
 
       //create file if fileId found
       if(createAgentDto.siteObjUrl) {
-        let org = await this.prisma.organization.findUnique({where: {id: agent.orgId}});
-        await this.prisma.agentFile.create({data:{
+        let org = await prisma.organization.findUnique({where: {id: agent.orgId}});
+        await prisma.agentFile.create({data:{
           agentId: agent.id,
           path: createAgentDto.siteObjUrl,
           fileName: `avatar_${org.name.replaceAll(' ', '_').toLowerCase()}_${agent.name.replaceAll(' ', '_').toLowerCase()}.txt`
@@ -407,7 +426,8 @@ export class AgentService {
   async getEmbedding(agentId :string,standalone: boolean = false)
   {
     const host = process.env.HOST_URL;
-    const agent = await this.prisma.agent.findUnique({where:{id:agentId}}); 
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const agent = await prisma.agent.findUnique({where:{id:agentId}}); 
     if(!agent)
     {
       throw new NotFoundException();
@@ -434,19 +454,24 @@ export class AgentService {
   }
 
   async getDefaultCampaign(orgId: string) {
-    return await this.prisma.campaign.findFirst({
-      where: {orgId}
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    return await prisma.campaign.findFirst({
+      where: {
+        isDefault: true
+      }
     })
   }
 
   async getDefaultCampaignByAgent(agentId: string) {
-    return await this.prisma.campaign.findFirst({
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    return await prisma.campaign.findFirst({
       where: {agentId}
     })
   }
 
   async getCampaignByParam(orgId: string, params: string[], paramObj: any){
-    let campigns = await this.prisma.campaign.findMany({ where: {orgId, idParam: {in: params}}});
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    let campigns = await prisma.campaign.findMany({ where: {idParam: {in: params}}});
     for(let campign of campigns) {
       if(campign.idValue === paramObj[campign.idParam]) {
         return campign;
