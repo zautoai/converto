@@ -5,13 +5,15 @@ import { LlmService } from 'src/llm/llm.service';
 import { extractJsonFromMarkdown } from 'src/common/helpers/extractJson.helper';
 import { DEMAND_GENT_CAMPAIGN_FINDR_PROMPT } from 'src/common/templates/demand-gen.template';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 
 @Injectable()
 export class DemandGenService implements OnModuleInit{
 
   constructor(
     private readonly llmService: LlmService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
+    private readonly prismaClientManager: PrismaClientManager
   ) { }
 
   async onModuleInit() {
@@ -106,9 +108,9 @@ export class DemandGenService implements OnModuleInit{
   }
 
   async createCampaign(orgId: string, agentId: string, jsonResponse: any, hash: string) {
-    return await this.prisma.campaign.create({
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    return await prisma.campaign.create({
       data: {
-        orgId: orgId,
         agentId: agentId,
         title: jsonResponse.title,
         description: jsonResponse.description,

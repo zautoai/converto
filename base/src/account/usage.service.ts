@@ -7,7 +7,7 @@ export class UsageService {
 
     constructor(
         private prisma: PrismaService,
-        private accountService: OrgAccountService
+        private accountService: OrgAccountService,
     ) { }
 
     async getUsage(orgId: string, date: string) {
@@ -88,7 +88,6 @@ export class UsageService {
         const maxCount = account.subscription.conversationCount;
         const count = await this.prisma.conversation.count({
             where: {
-                orgId,
                 createdAt: {
                     gte: new Date(startDate),
                     lte: new Date(endDate),
@@ -116,7 +115,6 @@ export class UsageService {
         const maxCount = account.subscription.campaignCount;
         const count = await this.prisma.campaign.count({
             where: {
-                orgId,
                 status:'ACTIVE',
                 createdAt: {
                     gte: new Date(startDate),

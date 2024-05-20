@@ -27,11 +27,11 @@ export class CampaignController
     @Get()
     @ApiQuery({ name: 'page', description: 'Page number.', required: false })
     @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
-    async findAll(@Query() campaignFilterDto: CampaignFilterDto,@Req() zautoRequest: ZautoRequest)
+    async findAll(@Query() campaignFilterDto: CampaignFilterDto,@Req() req: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.orgId)
+        if(req.user && req.orgId)
         {
-            const orgId = zautoRequest.orgId;
+            const orgId = req.orgId;
             return await this.campaignService.findAllByOrg(orgId,campaignFilterDto);
         }
         else
@@ -42,18 +42,19 @@ export class CampaignController
 
     @Get(':id')
     @ApiOkResponse({type:Campaign})
-    async findOne(@Param('id') id: string)
+    async findOne(@Param('id') id: string,@Req() req: ZautoRequest)
     {
-        return await this.campaignService.findOne(id);
+        const orgId = req.orgId;
+        return await this.campaignService.findOne(orgId,id);
     }
 
     @Post()
     @ApiOkResponse({type:Campaign})
-    async create(@Body() createCampaignDto:CreateCampaignDto,@Req() zautoRequest: ZautoRequest)
+    async create(@Body() createCampaignDto:CreateCampaignDto,@Req() req: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.orgId)
+        if(req.user && req.orgId)
         {
-            const orgId = zautoRequest.orgId;
+            const orgId = req.orgId;
             const currentDate = new Date().toISOString();
             const campaignUsage = await this.usageService.getCampaginCount(orgId,currentDate);
             const remainingCampaign = campaignUsage.maxCount - campaignUsage.count;
@@ -62,8 +63,8 @@ export class CampaignController
             {
                 throw new NotAcceptableException(`Remaining campaign ${remainingCampaign}`);
             }
-            createCampaignDto.orgId = zautoRequest.orgId;
-            return await this.campaignService.create(createCampaignDto);
+            createCampaignDto.orgId = req.orgId;
+            return await this.campaignService.create(orgId,createCampaignDto);
         }
         else
         {
@@ -73,21 +74,24 @@ export class CampaignController
 
     @Patch(':id')
     @ApiOkResponse({type:Campaign})
-    async update(@Param('id') id: string,@Body() updateCampaignDto: UpdateCampaignDto) {
-        return await this.campaignService.update(id,updateCampaignDto);
+    async update(@Param('id') id: string,@Body() updateCampaignDto: UpdateCampaignDto,@Req() req: ZautoRequest) {
+        const orgId = req.orgId;
+        return await this.campaignService.update(orgId,id,updateCampaignDto);
     }
 
     @Delete(':id')
-    async delete(@Param('id') id: string)
+    async delete(@Param('id') id: string,@Req() req: ZautoRequest)
     {
-        return await this.campaignService.delete(id);
+        const orgId = req.orgId;
+        return await this.campaignService.delete(orgId,id);
     }
 
     @Get(':id/stats')
-    async getStats(@Param('id') id: string) {
+    async getStats(@Param('id') id: string,@Req() req: ZautoRequest) {
         try {
-            const visitByDate = await this.campaignService.getVisitsCountByDate(id);
-            const leadByDate = await this.campaignService.getLeadCountByDate(id);
+            const orgId = req.orgId;
+            const visitByDate = await this.campaignService.getVisitsCountByDate(orgId,id);
+            const leadByDate = await this.campaignService.getLeadCountByDate(orgId,id);
             return {
                 visitByDate,
                 leadByDate
@@ -98,9 +102,10 @@ export class CampaignController
     }
 
     @Get(':id/counts')
-    async getCounts(@Param('id') id: string)
+    async getCounts(@Param('id') id: string,@Req() req: ZautoRequest)
     {
-        return await this.campaignService.getCounts(id);
+        const orgId = req.orgId;
+        return await this.campaignService.getCounts(orgId,id);
     }
     
 }
