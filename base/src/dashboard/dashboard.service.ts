@@ -160,18 +160,6 @@ export class DashboardService {
     }
   }
 
-  async getCampaignCountAgentWise(orgId: string) {
-    try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
-      return await prisma.campaign.groupBy({
-        by: ['agentId'],
-        _count: { agentId: true },
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   getMessageCount(conversation: string) { }
 
   async getMessagesCount(orgId: string) {
@@ -227,33 +215,6 @@ export class DashboardService {
         where: { agentId },
       });
       return conversations;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async getCampaignWiseVisitCount(orgId: string, agentId: string) {
-    try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
-
-      const campaignWiseData = await prisma.campaign.findMany({
-        where: { agentId },
-        // include: {
-        //     Visitors: {
-        //         select: {
-        //             id: true,
-        //         }
-        //     },
-        // }
-      });
-
-      const visitors = [],
-        labels = [];
-      // for(let campaign of campaignWiseData){
-      //     labels.push(campaign.title)
-      //     visitors.push(campaign.Visitors.length);
-      // }
-      return { visitors, labels };
     } catch (error) {
       console.log(error);
     }

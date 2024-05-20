@@ -203,7 +203,6 @@ model Agent {
   Leads            Lead[]
   LeadConfig       LeadConfig[]
   AgentFiles       AgentFile[]
-  Campaigns        Campaign[]
   Stages           Stage[]
   Messages         ZautoMessage[]
   Visits           Visit[]
@@ -506,8 +505,6 @@ enum CampaignStatus {
 
 model Campaign {
   id            String         @id @default(uuid())
-  orgId         String
-  agentId       String
   hash          String?
   title         String         @db.VarChar(50)
   description   String         @db.Text
@@ -523,13 +520,11 @@ model Campaign {
   endDate       DateTime?      @db.Timestamp()
   createdAt     DateTime       @default(now())
   modifiedAt    DateTime       @updatedAt
-  organization  Organization?  @relation(fields: [orgId], references: [id])
-  agent         Agent?         @relation(fields: [agentId], references: [id], onDelete: Cascade)
   Conversations Conversation[]
   Visits        Visit[]
 
-  @@index([orgId], map: "orgId_Campaign_fkey")
-  @@index([agentId], map: "agentId_Campaign_fkey")
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
 }
 
 model Stage {

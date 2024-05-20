@@ -28,24 +28,15 @@ export class DemandGenService implements OnModuleInit{
   async create(createDemandGenDto: CreateDemandGenDto) {
     try {
       const orgId = createDemandGenDto.orgId;
-      const agent = await this.prisma.agent.findFirst({
-        where:{
-          orgId
-        }
-      });
-      if(!agent)
-      {
-        throw new NotFoundException(`Agent not found with id ${createDemandGenDto.orgId}`);
-      }
       const parsedParams = parseURLParams(createDemandGenDto.url);
-      return await this.processCampaign(orgId,agent.id,parsedParams);
+      return await this.processCampaign(orgId,parsedParams);
     }
     catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async processCampaign(orgId:string,agentId:string,parsedParams:any)
+  async processCampaign(orgId:string,parsedParams:any)
   {
     try {
       parsedParams = this.splitUTMParams(parsedParams);
@@ -62,7 +53,7 @@ export class DemandGenService implements OnModuleInit{
       const content = JSON.stringify(parsedParams);
       const result = await this.findCampaign(content);
       const jsonResponse = await this.processResultContent(result.content, hash);
-      const campaign = await this.createCampaign(orgId, agentId, jsonResponse, hash);
+      const campaign = await this.createCampaign(orgId, jsonResponse, hash);
       return campaign;
     }
     catch(error)
@@ -107,11 +98,10 @@ export class DemandGenService implements OnModuleInit{
     return await this.llmService.chat(promptMessage);
   }
 
-  async createCampaign(orgId: string, agentId: string, jsonResponse: any, hash: string) {
+  async createCampaign(orgId: string, jsonResponse: any, hash: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
     return await prisma.campaign.create({
       data: {
-        agentId: agentId,
         title: jsonResponse.title,
         description: jsonResponse.description,
         source: jsonResponse.source,

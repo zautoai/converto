@@ -135,8 +135,8 @@ export class SiteController {
   @Post('generate')
   @ApiOkResponse()
   async generatePageGreeting(@Req() req: ZautoRequest) {
-    if (req.user && req.orgId) {
-      return await this.siteService.generateGreeting(req.orgId);
+    if (req.user && req.user.orgId) {
+      return await this.siteService.generateGreeting(req.user.orgId);
     }
     else {
       throw new UnauthorizedException("Unauthorised access.");
@@ -146,8 +146,8 @@ export class SiteController {
   @Post('select')
   @ApiOkResponse()
   async selectGeneratedGreetings(@Body() selectGreetingDto: SelectGreetingDto[], @Req() req: ZautoRequest) {
-    if (req.user && req.orgId) {
-      return await this.siteService.selectGeneratedGreetings(req.orgId, selectGreetingDto);
+    if (req.user && req.user.orgId) {
+      return await this.siteService.selectGeneratedGreetings(req.user.orgId, selectGreetingDto);
     }
     else {
       throw new UnauthorizedException("Unauthorised access.");

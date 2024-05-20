@@ -470,14 +470,6 @@ export class AgentService {
       }
     })
   }
-
-  async getDefaultCampaignByAgent(agentId: string) {
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
-    return await prisma.campaign.findFirst({
-      where: { agentId }
-    })
-  }
-
   async getCampaignByParam(orgId: string, params: string[], paramObj: any) {
     const prisma = await this.prismaClientManager.getClient(orgId);
     let campigns = await prisma.campaign.findMany({ where: { idParam: { in: params } } });
