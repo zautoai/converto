@@ -64,7 +64,6 @@ model Organization {
   Agents                 Agent[]
   Campaigns              Campaign[]
   LeadConfigs            LeadConfig[]
-  Sites                  Site[]
   AgentPrompts           AgentPrompt[]
   Visitors               Visitor[]
   Conversations          Conversation[]
@@ -253,7 +252,6 @@ model LeadConfig {
 model Site {
   id         String             @id @default(uuid())
   agentId    String // Updated to String
-  orgId      String? // Updated to String
   url        String             @db.VarChar(500)
   status     SiteProcessStatus? @default(IN_PROGRESS)
   info       String?            @db.Text
@@ -261,9 +259,7 @@ model Site {
   createdAt  DateTime           @default(now())
   modifiedAt DateTime           @updatedAt
   agent      Agent              @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  org        Organization?      @relation(fields: [orgId], references: [id])
 
-  @@index([orgId], map: "OrgId_Site_fkey")
   @@index([agentId], map: "AgentId_Site_fkey")
 }
 
@@ -507,7 +503,6 @@ model LeadCategoryMap {
   @@index([leadId], map: "leadId_LeadCategoryMap_fkey")
   @@index([categoryId], map: "categoryId_LeadCategoryMap_fkey")
 }
-
 
 enum CampaignStatus {
   ACTIVE

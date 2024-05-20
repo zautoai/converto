@@ -1,14 +1,9 @@
-import { Controller, Get, Req,Param, UseGuards, Query } from '@nestjs/common';
-import { UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/auth/roles.decorator';
-import { SYSTEM_CONST } from 'src/common/constants/system.constants';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/roles.guard';
+import { ZautoRequest } from 'src/common/models/request.model';
 import { DashboardService } from './dashboard.service';
 import { DashbaordDto } from './dto/dashboard.dto';
-import { ZautoRequest } from 'src/common/models/request.model';
-import { DateFilter } from 'src/common/enums/enums';
 
 
 @ApiTags('Dashboards')

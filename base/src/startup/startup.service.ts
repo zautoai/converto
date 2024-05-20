@@ -47,10 +47,10 @@ export class StartupService extends BaseService implements OnModuleInit {
         await this.handleException(await this.startupMicroService.syncOrganizations())
     }
 
-    async createDefaultRoles(orgId:string) {
+    async createDefaultRoles(orgId: string) {
         const defaultRoles = DEFALT_ROLES;
         try {
-            await this.roleService.createDefaultRoles(orgId,defaultRoles);
+            await this.roleService.createDefaultRoles(orgId, defaultRoles);
         } catch (error) {
             console.error('Defailt role not created, mybe it got created already.')
         }
@@ -76,20 +76,21 @@ export class StartupService extends BaseService implements OnModuleInit {
         const userName = process.env.SUPER_USER_NAME;
         const email = process.env.SUPER_USER_EMAIL;
         const password = process.env.SUPER_USER_PASSWORD;
-        const superUserRole = await this.roleService.findOneByName(zautoAI.id,'superadmin');
+        const superUserRole = await this.roleService.findOneByName(zautoAI.id, 'superadmin');
         if (superUserRole) {
             const userDeatails = {
                 name: userName,
                 email: email,
                 password: password,
                 orgId: zautoAI.id,
+                roleId: superUserRole.id,
                 verified: true,
             };
             try {
-                const superUser = await this.userService.create(zautoAI.id,userDeatails, true);
+                const superUser = await this.userService.create(zautoAI.id, userDeatails, true);
                 if (superUser) {
                     await this.orgService.update(zautoAI.id, {
-                        emails:[superUser.email]
+                        emails: [superUser.email]
                     })
                     console.log('Superuser Created.');
                 }

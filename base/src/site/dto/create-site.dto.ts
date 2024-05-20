@@ -4,19 +4,14 @@ import { SiteProcessStatus } from "src/common/enums/enums";
 
 export class CreateSiteDto {
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    orgId: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  agentId: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    agentId: string;
-  
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    @MaxLength(500)
-    url: string;
-  }
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(500)
+  url: string;
+}

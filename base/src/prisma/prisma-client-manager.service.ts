@@ -11,35 +11,35 @@ export class PrismaClientManager {
     async getClient(orgId: string): Promise<PrismaClient> {
         const schemaName = orgId != DEFAULT_SCHEMA_NAME ? getSchemaName(orgId) : DEFAULT_SCHEMA_NAME;
         let client = this.clients[orgId];
-        const databaseUrl = process.env.DATABASE_URL.replaceAll(`?schema=${DEFAULT_SCHEMA_NAME}`,`?schema=${schemaName}`);
+        const databaseUrl = process.env.DATABASE_URL.replaceAll(`?schema=${DEFAULT_SCHEMA_NAME}`, `?schema=${schemaName}`);
         if (!client) {
-        client = new PrismaClient({
-            datasources: {
-            db: {
-                url: databaseUrl,
-            },
-            },
-        });
-        try {
-            await client.$connect();
-            this.logger.log(`#Connected to schema '${schemaName}'`);
-        } catch (error) {
-            this.logger.error(`Failed to connect to schema '${schemaName}'`);
-            throw new BadRequestException(
-            `Failed to connect schema '${schemaName}'`,
-            );
-        }
-        const schemaExists = await this.checkSchemaExists(client, schemaName);
-        if (!schemaExists) {
-            throw new BadRequestException(`Schema does not exist`);
-        }
-        this.clients[orgId] = client;
+            client = new PrismaClient({
+                datasources: {
+                    db: {
+                        url: databaseUrl,
+                    },
+                },
+            });
+            try {
+                await client.$connect();
+                this.logger.log(`#Connected to schema '${schemaName}'`);
+            } catch (error) {
+                this.logger.error(`Failed to connect to schema '${schemaName}'`);
+                throw new BadRequestException(
+                    `Failed to connect schema '${schemaName}'`,
+                );
+            }
+            const schemaExists = await this.checkSchemaExists(client, schemaName);
+            if (!schemaExists) {
+                throw new BadRequestException(`Schema does not exist`);
+            }
+            this.clients[orgId] = client;
         }
 
         return client;
     }
 
-    async checkSchemaExists(client: PrismaClient,schemaName: string): Promise<boolean> {
+    async checkSchemaExists(client: PrismaClient, schemaName: string): Promise<boolean> {
         const result = await client.$queryRaw`
                 SELECT EXISTS (
                     SELECT 1
@@ -52,7 +52,7 @@ export class PrismaClientManager {
 
     async onModuleDestroy() {
         await Promise.all(
-        Object.values(this.clients).map((client) => client.$disconnect()),
+            Object.values(this.clients).map((client) => client.$disconnect()),
         );
     }
 }

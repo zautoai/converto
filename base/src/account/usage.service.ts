@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { OrgAccountService } from './account.service';
+import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 
 @Injectable()
 export class UsageService {
 
     constructor(
-        private prisma: PrismaService,
+        private readonly prismaClientManager: PrismaClientManager,
         private accountService: OrgAccountService
     ) { }
 
@@ -27,46 +28,49 @@ export class UsageService {
     }
 
     async getSiteCount(orgId: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
         const account = await this.accountService.findOne(orgId)
         if (!account) {
             throw new NotFoundException("No subscription found.");
         }
         const maxCount = account.subscription.sitesCount;
-        const count = await this.prisma.site.count({ where: { orgId } });
+        const count = await prisma.site.count();
         return { count, maxCount };
     }
 
     async getUserCount(orgId: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
         const account = await this.accountService.findOne(orgId)
         if (!account) {
             throw new NotFoundException("No subscription found.");
         }
         const maxCount = account.subscription.userCount;
-        const count = await this.prisma.user.count({ where: { orgId } });
+        const count = await prisma.user.count({ where: { orgId } });
         return { count, maxCount };
     }
 
     // Messages count
     async getMessageCountBetween(orgId: string, startDate: string, endDate: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
         const account = await this.accountService.findOne(orgId)
         if (!account) {
             throw new NotFoundException("No subscription found.");
         }
         const maxCount = account.subscription.messageCount;
-        let count = await this.prisma.zautoMessage.count({
+        let count = await prisma.zautoMessage.count({
             where: {
                 orgId,
-                type:'TEXT',
-                role:'assistant',
+                type: 'TEXT',
+                role: 'assistant',
                 createdAt: {
                     gte: new Date(startDate),
                     lte: new Date(endDate),
                 }
             }
         });
-        const conversationUsage = await this.getConverstionCountBetween(orgId,startDate,endDate);
+        const conversationUsage = await this.getConverstionCountBetween(orgId, startDate, endDate);
         count = count - conversationUsage.count;
-        return {count,maxCount};
+        return { count, maxCount };
     }
 
     async getMessageCount(orgId: string, date: string) {
@@ -81,12 +85,14 @@ export class UsageService {
 
     // Conversation Count
     async getConverstionCountBetween(orgId: string, startDate: string, endDate: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+
         const account = await this.accountService.findOne(orgId)
         if (!account) {
             throw new NotFoundException("No subscription found.");
         }
         const maxCount = account.subscription.conversationCount;
-        const count = await this.prisma.conversation.count({
+        const count = await prisma.conversation.count({
             where: {
                 orgId,
                 createdAt: {
@@ -95,7 +101,7 @@ export class UsageService {
                 }
             }
         });
-        return {count,maxCount};
+        return { count, maxCount };
     }
 
     async getConversationCount(orgId: string, date: string) {
@@ -109,22 +115,24 @@ export class UsageService {
 
     // Campaign count
     async getCampaginCountBetween(orgId: string, startDate: string, endDate: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+
         const account = await this.accountService.findOne(orgId)
         if (!account) {
             throw new NotFoundException("No subscription found.");
         }
         const maxCount = account.subscription.campaignCount;
-        const count = await this.prisma.campaign.count({
+        const count = await prisma.campaign.count({
             where: {
                 orgId,
-                status:'ACTIVE',
+                status: 'ACTIVE',
                 createdAt: {
                     gte: new Date(startDate),
                     lte: new Date(endDate),
                 }
             }
         });
-        return {count,maxCount};
+        return { count, maxCount };
     }
 
     async getCampaginCount(orgId: string, date: string) {

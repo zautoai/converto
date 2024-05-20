@@ -19,21 +19,19 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   async validate(payload: any) {
     console.log('Payload is: ', payload)
-    if(payload.type  === 'access-token')
-    {
+    if (payload.type === 'access-token') {
       return {};
     }
-    if(!payload.userId)
-    {
+    if (!payload.userId) {
       throw new UnauthorizedException();
     }
-    const user = await this.usersService.getUserById(payload.orgId,payload.userId);
+    const user = await this.usersService.getUserById(payload.orgId, payload.userId);
     if (!user || !user.verified) {
       console.log('Failing here')
       throw new UnauthorizedException();
     }
     return {
-      user,
+      ...user,
       orgId: payload.orgId
     };
   }

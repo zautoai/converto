@@ -7,11 +7,6 @@ export class SelectGreetingDto{
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    orgId: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
     agentId: string;
   
     @ApiProperty()
