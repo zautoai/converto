@@ -93,7 +93,6 @@ export class SiteController {
   @HttpCode(204)
   async remove(@Param('id') id: string, @Req() zautoRequest: ZautoRequest) {
     const orgId = zautoRequest.user.orgId;
-
     return await this.siteService.remove(orgId, id);
   }
 

@@ -8,6 +8,7 @@ export class UsageService {
 
     constructor(
         private prisma: PrismaService,
+        private prismaClientManager: PrismaClientManager,
         private accountService: OrgAccountService,
     ) { }
 

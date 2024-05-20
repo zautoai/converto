@@ -6,7 +6,7 @@ import { DashbaordDto } from './dto/dashboard.dto';
 import { Sql } from '@prisma/client/runtime/library';
 import { Prisma } from '@prisma/client';
 import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
-import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class DashboardService {
