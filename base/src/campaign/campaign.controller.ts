@@ -29,9 +29,9 @@ export class CampaignController
     @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
     async findAll(@Query() campaignFilterDto: CampaignFilterDto,@Req() req: ZautoRequest)
     {
-        if(req.user && req.orgId)
+        if(req.user && req.user.orgId)
         {
-            const orgId = req.orgId;
+            const orgId = req.user.orgId;
             return await this.campaignService.findAllByOrg({orgId,data:campaignFilterDto});
         }
         else
@@ -44,7 +44,7 @@ export class CampaignController
     @ApiOkResponse({type:Campaign})
     async findOne(@Param('id') id: string,@Req() req: ZautoRequest)
     {
-        const orgId = req.orgId;
+        const orgId = req.user.orgId;
         return await this.campaignService.findOne(orgId,id);
     }
 
@@ -52,20 +52,11 @@ export class CampaignController
     @ApiOkResponse({type:Campaign})
     async create(@Body() createCampaignDto:CreateCampaignDto,@Req() req: ZautoRequest)
     {
-        if(req.user && req.orgId)
+        if(req.user && req.user.orgId)
         {
-            const orgId = req.orgId;
-            const currentDate = new Date().toISOString();
-            const campaignUsage = await this.usageService.getCampaginCount(orgId,currentDate);
-            const remainingCampaign = campaignUsage.maxCount - campaignUsage.count;
-
-            if(remainingCampaign <= 0)
-            {
-                throw new NotAcceptableException(`Remaining campaign ${remainingCampaign}`);
-            }
-            createCampaignDto.orgId = req.orgId;
+            const orgId = req.user.orgId;
             return await this.campaignService.create({orgId, data: createCampaignDto});
-        }
+        }   
         else
         {
             throw new UnauthorizedException("Unauthorised access.")
@@ -75,21 +66,21 @@ export class CampaignController
     @Patch(':id')
     @ApiOkResponse({type:Campaign})
     async update(@Param('id') id: string,@Body() updateCampaignDto: UpdateCampaignDto,@Req() req: ZautoRequest) {
-        const orgId = req.orgId;
+        const orgId = req.user.orgId;
         return await this.campaignService.update({orgId,data:updateCampaignDto,id});
     }
 
     @Delete(':id')
     async delete(@Param('id') id: string,@Req() req: ZautoRequest)
     {
-        const orgId = req.orgId;
+        const orgId = req.user.orgId;
         return await this.campaignService.delete(orgId,id);
     }
 
     @Get(':id/stats')
     async getStats(@Param('id') id: string,@Req() req: ZautoRequest) {
         try {
-            const orgId = req.orgId;
+            const orgId = req.user.orgId;
             const visitByDate = await this.campaignService.getVisitsCountByDate(orgId,id);
             const leadByDate = await this.campaignService.getLeadCountByDate(orgId,id);
             return {
@@ -104,7 +95,7 @@ export class CampaignController
     @Get(':id/counts')
     async getCounts(@Param('id') id: string,@Req() req: ZautoRequest)
     {
-        const orgId = req.orgId;
+        const orgId = req.user.orgId;
         return await this.campaignService.getCounts(orgId,id);
     }
     

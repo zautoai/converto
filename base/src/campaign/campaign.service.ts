@@ -45,7 +45,6 @@ export class CampaignService extends BaseService{
         const prisma = await this.getPrismaClient(orgId);
         const campaign = await prisma.campaign.create({
             data: {
-                agentId: data.agentId,
                 title: data.title,
                 description: data.description,
                 url: data.url,
@@ -56,7 +55,7 @@ export class CampaignService extends BaseService{
                 endDate: endDate
             }
         });
-        await this.updateCampaignCount(1, data.orgId)
+        await this.updateCampaignCount(1, orgId)
         return campaign;
     }
 
@@ -110,20 +109,6 @@ export class CampaignService extends BaseService{
             total = await prisma.campaign.count();
         }
 
-        return {
-            data: campaignData,
-            page: page,
-            total: total
-        };
-    }
-
-    async findAllByAgent(serviceParams:ServiceParams<PaginationDto>) {
-        const { orgId, data: paginationDto, agentId } = serviceParams;
-        const { page, limit } = paginationDto;
-        const skip = (page - 1) * limit;
-        const prisma = await this.getPrismaClient(orgId);
-        const campaignData = await prisma.campaign.findMany({ skip, take: limit, where: { agentId } });
-        const total = await prisma.campaign.count({ where: { agentId } });
         return {
             data: campaignData,
             page: page,

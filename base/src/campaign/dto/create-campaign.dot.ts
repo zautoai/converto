@@ -3,14 +3,6 @@ import { IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, IsString } from "class
 import { CampaignStatus } from "src/common/enums/enums";
 
 export class CreateCampaignDto{
-    @ApiProperty({required:false})
-    @IsNumber()
-    @IsOptional()
-    orgId: string;
-
-    @ApiProperty({required:true})
-    @IsString()
-    agentId: string;
 
     @ApiProperty({required:true})
     @IsString()
@@ -25,7 +17,7 @@ export class CreateCampaignDto{
     @IsOptional()
     url?: string;
 
-    @ApiProperty({required:false})
+    @ApiProperty({required:false, default:CampaignStatus.ACTIVE})
     @IsEnum(CampaignStatus)
     @IsOptional()
     status?: CampaignStatus = CampaignStatus.ACTIVE;

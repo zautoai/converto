@@ -47,7 +47,7 @@ export class FileManagerController {
     async uploadFiles(@UploadedFiles() files: Multer.Files,@Req() req: ZautoRequest) {
         if(req.user)
         {
-            const orgId = req.orgId;
+            const orgId = req.user.orgId;
             return await this.fileManagerService.uploadFiles(orgId,files);
         }
         else
@@ -61,7 +61,7 @@ export class FileManagerController {
     {
         if(req.user)
         {
-            const orgId = req.orgId;
+            const orgId = req.user.orgId;
             return await this.fileManagerService.getFiles(orgId,pagination);
         }
         else

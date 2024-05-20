@@ -141,7 +141,7 @@ export class EnrichmentController {
     @Body() contactEnrichmentDto: ContactEnrichmentDto,
     @Req() req: ZautoRequest,
   ) {
-    const orgId = req.orgId;
+    const orgId = req.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }

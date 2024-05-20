@@ -61,7 +61,7 @@ export class AgentController {
           visitor = await this.visitorService.create(visitorObj, orgId);
         } 
         if(!query.utm_campaign && Object.keys(query).length > 1){
-          const thirdPartyCampaign = await this.demandGenService.processCampaign(orgId,agentId,query);
+          const thirdPartyCampaign = await this.demandGenService.processCampaign(orgId,query);
           if(thirdPartyCampaign)
           {
             query.utm_campaign = thirdPartyCampaign.id;
