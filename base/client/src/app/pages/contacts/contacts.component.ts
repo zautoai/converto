@@ -10,7 +10,7 @@ import { DeployScriptType } from '../zautosettings/settings/settings.component';
 import { API } from '../../config/endpoint.config';
 import { error } from 'console';
 import { PaginationData } from 'src/app/common/intefaces';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 
@@ -54,6 +54,7 @@ export class ContactsComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private sweetAlertService: SweetAlertService,
     private route: ActivatedRoute,
+    private router: Router,
   ) {
     this.Form = new FormGroup({
       photoURL:new FormControl(''),
@@ -141,12 +142,7 @@ export class ContactsComponent implements OnInit {
     this.selectedData = data;
     this.Form.reset();
     this.resetErrorFeedback();
-    this.offcanvasService.open(this.viewUserOffcanvas, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
+    this.router.navigate(['/view-contacts', data.id]);
   }
 
   toggleDescription(): void {

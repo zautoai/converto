@@ -61,6 +61,8 @@ import { CrmCompanyMappingComponent } from './plugins/crm-mapping/crm-company-ma
 import { ContactsComponent } from './contacts/contacts.component';
 import { CalendarScheduleComponent } from './plugins/calendar-schedule/calendar-schedule.component';
 import { AbmComponent } from './abm/abm.component';
+import { AccountviewComponent } from './accountview/accountview.component';
+import { ContactviewComponent } from './contactview/contactview.component';
 
 @NgModule({
   declarations: [
@@ -127,7 +129,9 @@ import { AbmComponent } from './abm/abm.component';
     CrmContactMappingComponent,
     CrmCompanyMappingComponent,
     ContactsComponent,
-    CalendarScheduleComponent
+    CalendarScheduleComponent,
+    AccountviewComponent,
+    ContactviewComponent
   ],
   imports: [
     CommonModule,

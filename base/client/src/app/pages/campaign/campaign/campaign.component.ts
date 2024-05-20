@@ -32,6 +32,8 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   selectedCampaign: any;
   Accounts: any;
   selectedCampaignStats: any;
+  selectedCampaignaccounts:any;
+
   campaignList: any = [];
   platforms: any = [];
   linkList: link[] = [];
@@ -160,6 +162,19 @@ export class CampaignComponent implements OnInit,AfterViewInit {
         this.notifService.showError(error.error.message);
       });
   }
+  getCampaignaccount(id: string) {
+    this.restService.get(API.main.abm, id )
+      .subscribe((response: any) => {
+        this.selectedCampaignaccounts = response;
+        console.log("responsegetcampaign",response);
+        console.log("accoundetails",this.selectedCampaignaccounts.data.
+        accountName
+      )              
+      }, (error) => {
+        console.log(error);
+        this.notifService.showError(error.error.message);
+      });
+  }
 
   getPlatforms() {
 
@@ -181,9 +196,11 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     this.router.navigate(['/campaigns', campaign.id], { queryParams: queryParams });
     this.getSelectedCampaign(campaign.id);
     this.getCampaignStats(campaign.id);
+    this.getCampaignaccount(campaign.accountId) 
   }
 
   getSelectedCampaign(id: string) {
+    this.selectedCampaign = null;
     this.restService.get(API.main.campaign, id)
       .subscribe((response: any) => {
         this.selectedCampaign = response;
@@ -254,6 +271,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     const idValue: string = this.campaignForm.value.idValue || "";
     const isabm: string = this.campaignForm.value.isabm || "";
     const campaignAccount:string=this.campaignForm.value.campaignAccount||"";
+    
 
     if (this.campaignForm.valid) {
       const data = {
@@ -266,6 +284,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
         idValue: idValue,
         isabm:isabm,
         accountId:campaignAccount,
+
         
 
       };
@@ -310,6 +329,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     const isZauto: boolean = !this.campaignForm.value.isOthers || false;
     const idParam: string = this.campaignForm.value.idParam || "";
     const idValue: string = this.campaignForm.value.idValue || "";
+    const campaignAccount=this.campaignForm.value.campaignAccount||'';
 
     if (this.campaignForm.valid) {
       const data: any = {
@@ -319,7 +339,8 @@ export class CampaignComponent implements OnInit,AfterViewInit {
         // status: status,
         isZauto: isZauto,
         idParam: idParam,
-        idValue: idValue
+        idValue: idValue,
+        accountId:campaignAccount,
       };
 
       if (startDate) data['startDateTimestamp'] = new Date(startDate).getTime();
@@ -514,6 +535,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   }
 
   getContacts(): void {
+
     this.restService
       .getAll(API.main.abm) // Fetch all contacts from the API
       .subscribe(
