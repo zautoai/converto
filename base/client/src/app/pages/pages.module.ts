@@ -62,6 +62,8 @@ import { ContactsComponent } from './contacts/contacts.component';
 import { CalendarScheduleComponent } from './plugins/calendar-schedule/calendar-schedule.component';
 import { AbmComponent } from './abm/abm.component';
 import { SegmentComponent } from './segment/segment.component';
+import { AccountviewComponent } from './accountview/accountview.component';
+import { ContactviewComponent } from './contactview/contactview.component';
 
 @NgModule({
   declarations: [
@@ -126,8 +128,9 @@ import { SegmentComponent } from './segment/segment.component';
     PluginsComponent,
     PluginCardComponent,
     CrmContactMappingComponent,
-    CrmCompanyMappingComponent,
     ContactsComponent,
+    AccountviewComponent,
+    ContactviewComponent,
     SegmentComponent,
     CalendarScheduleComponent
   ],
@@ -153,7 +156,7 @@ import { SegmentComponent } from './segment/segment.component';
     NgxColorsModule,
     NgApexchartsModule,
     NgbProgressbarModule,
-    NgbNavModule
+    NgbNavModule,
   ],
 })
 export class PagesModule {}

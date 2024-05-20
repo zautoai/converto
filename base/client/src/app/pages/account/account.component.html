@@ -18,10 +18,10 @@
         <table class="table border card-table table-vcenter text-nowrap align-items-center">
           <thead class="bg-primary text-white">
             <th class="text-white">Accountname</th>
-            <th class="text-white">Phone</th>
-            <th class="text-white">Email</th>
-            <th class="text-white">ABM </th>
-            <th class="text-white">Country</th>
+            <th class="text-white">Industry</th>
+            <th class="text-white">Company Size</th>
+            <th class="text-white">Location</th>
+            <th class="text-white">Annual Reveneue</th>
             <th class="text-white">Action</th>
           
             
@@ -33,16 +33,18 @@
                   {{ data.accountName }}
                 </td>
                 <td>
-                  {{ data.phone }}
+                  {{ data.industry }}
                 </td>
                 <td>
-                  {{ data.email }}
+                  {{ data.companySize}}
                 </td>
                 <td>
-                  {{data.ABM}}
+                  {{data.city}}
                 </td>
                 <td>
-                  {{ data.country }}
+                  {{ data.
+                    annualRevenue
+                    }}
                 </td>
               
                 <td class="icon w-1">
@@ -227,12 +229,12 @@
       </div>
       <div class="form-group">
         <label class="form-label">Companysize</label>
-        <input type="title" class="form-control" formControlName="companySize" name="Title" placeholder="companySize" />
+        <input type="number" class="form-control" formControlName="companySize" name="Title" placeholder="companySize" />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Annualreveneue</label>
-        <input type="title" class="form-control" formControlName="annualRevenue" name="Title"
+        <input type="number" class="form-control" formControlName="annualRevenue" name="Title"
           placeholder="annualRevenue" />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
@@ -306,7 +308,6 @@
         <input type="checkbox" name="label" class="custom-control-input" formControlName="isabm" />
         <span class="custom-control-label">Is Account Based Marketing</span>
       </label>
-    
       <div class="d-flex justify-content-end">
         <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()">
           <i class="fa fa-times"></i> Close
@@ -348,7 +349,7 @@
       <p><strong>Notes:</strong> {{ selectedData.notes }}</p>
       <p><strong>Source:</strong> {{ selectedData.source }}</p>
       <p><strong>Status:</strong> {{ selectedData.status }}</p>
-      <p><strong>is Account Based Marketing:{{selectedData.ABM}}</strong></p>
+      <p><strong>is Account Based Marketing: </strong> {{selectedData.isabm}} </p>
     </div>
   </div>
 </ng-template>

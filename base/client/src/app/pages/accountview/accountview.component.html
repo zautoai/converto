@@ -1,0 +1,228 @@
+
+
+<div class="app-container">
+      <header class="app-header">
+        <h1>Common Room</h1>
+        <div class="app-header-actions">
+          <button>Add to segment</button>
+          <button>Send</button>
+          <button>Message</button>
+          <button>Send</button>
+          <button>...</button>
+        </div>
+      </header>
+      <main class="app-main">
+        <div class="user-profile">
+          <img [src]="userImageUrl" [alt]="userName" class="user-image">
+          <div class="user-details">
+            <h3>{{selectedData.accountName}}</h3>
+            <p>Created At  {{ selectedData.
+                modifiedAt  | date:'dd MMMM'}}</p>
+            <p>{{ selectedData.city }}</p>
+            <p>Intent Scoring :</p>
+            
+              
+               
+              
+                  <label for="economicBuyer">SaaS</label>
+                
+            
+              
+            
+          </div>
+        </div>
+        <div class="tab-menu-heading border-bottom-0" style="border: none !important;">
+            <div class="tabs-menu1">
+              <ul ngbNav #nav="ngbNav" [(activeId)]="active">
+                <li class="me-2 mb-1" [ngbNavItem]="1">
+                  <a ngbNavLink><i class="fe fe-eye"></i> Overview</a>
+                  <ng-template ngbNavContent>
+                   <br>
+                        <div class="row">
+                          <div class="col-md-12">
+                         
+                          </div>
+                          <div class="col-md-12">
+                            <div class="card shadow-sm">
+                                
+                              <div class="card-header">
+                                <h5 class="card-title">Basic Information</h5>
+                                
+                              </div>
+                              <div class="card-body">
+                                <ul class="list-group">
+                                  <li class="list-group-item">Account Name : {{selectedData.accountName}}</li>
+                                  <li class="list-group-item">Account Type : {{selectedData.accountType}} </li>
+                                </ul>
+                              </div>
+                            </div  >
+                            <div class="card shadow-sm mt-3">  <div class="card-header">
+                              <h5 class="card-title">Contact Information</h5>  </div>
+                            <div class="card-body">
+                              <ul class="list-group">
+
+
+                                <li class="list-group-item"><strong>Contact Information</strong></li>
+                                <li class="list-group-item">Email: {{selectedData.email}}</li>
+                                <li class="list-group-item">Phone: {{selectedData.phone}}</li>
+                                <li class="list-group-item">Website: {{selectedData.website}}</li>
+                                <li class="list-group-item">Address: {{selectedData.address}}</li>
+                                <li class="list-group-item">City: {{selectedData.city}}</li>
+                                <li class="list-group-item">State: {{selectedData.state}}</li>
+                                <li class="list-group-item">ZIP: {{selectedData.zip}}</li>
+                                <li class="list-group-item">Country: {{selectedData.country}}</li>
+                                <li class="list-group-item">Social Media: {{selectedData.socialMedia}}</li>
+                              </ul>
+
+
+                            </div>
+                          </div>
+                          <div class="card shadow-sm mt-3">  <div class="card-header">
+                            <h5 class="card-title">Business Details </h5>  </div>
+                          <div class="card-body">
+                            <ul class="list-group">
+                              <li class="list-group-item">Industry: {{selectedData.industry}}</li>
+                              <li class="list-group-item">Annual Revenue: {{selectedData.annualRevenue}}</li>
+                              <li class="list-group-item">Company Size: {{selectedData.companySize}}</li>
+                               </ul>
+                          </div>
+                        </div>
+                        <div class="card shadow-sm mt-3">  <div class="card-header">
+                          <h5 class="card-title">Status and Timeline</h5>  </div>
+                        <div class="card-body">
+                          <ul class="list-group">
+                            <li class="list-group-item">Status: {{selectedData.status}}</li>
+                            <li class="list-group-item">Is ABM: {{selectedData.isabm}}</li>
+                            <li class="list-group-item">Created At: {{selectedData.createdAt}}</li>
+                            <li class="list-group-item">Modified At: {{selectedData.modifiedAt}}</li>
+                          </ul>
+                        </div>
+                      </div>
+                      <div class="card shadow-sm mt-3">  <div class="card-header">
+                        <h5 class="card-title">Additional Information</h5>  </div>
+                      <div class="card-body">
+                        <ul class="list-group">
+                          <li class="list-group-item">Notes: {{selectedData.notes}}</li>
+            <li class="list-group-item">Source: {{selectedData.source}}</li>
+                        
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="card shadow-sm mt-3">  <div class="card-header">
+                      <h5 class="card-title">Optional Fields</h5>  </div>
+                    <div class="card-body">
+                      <ul class="list-group">
+                        <li class="list-group-item">Buying Stage: {{selectedData.buyingStage}}</li>
+                        <li class="list-group-item">Campaigns: {{selectedData.campaigns}}</li>
+                        <li class="list-group-item">Decision Makers: {{selectedData.decisionMakers}}</li>
+                        <li class="list-group-item">Domain: {{selectedData.domain}}</li>
+                        <li class="list-group-item">Pain Points: {{selectedData.painPoints}}</li>
+                        <li class="list-group-item">Parent Account ID: {{selectedData.parentAccountId}}</li>
+                        <li class="list-group-item">Photo URL: {{selectedData.photoUrl}}</li>
+                        <li class="list-group-item">Team Members: {{selectedData.teamMembers}}</li>
+                        </ul>
+                    </div>
+                  </div>
+                          </div>
+                        </div>
+                    
+                  </ng-template>
+                </li>
+                <li class="me-2 mb-1" [ngbNavItem]="2">
+                  <a ngbNavLink><i class="fe fe-activity"></i> Activity</a>
+                  <ng-template ngbNavContent>
+                    <!--activity-->
+                    <div class="container">
+                      <div class="roadmap">
+                        <h2>User Journey</h2>
+                        <div class="roadmap-timeline">
+                          <div class="roadmap-line"></div>
+                          <div class="roadmap-milestone">
+                            <div class="milestone-icon">
+                              <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="milestone-content">
+                              <h3> Discovery</h3>
+                              <!-- <p>Discovery</p> -->
+                              <p>The user discovers your brand</p>
+                            </div>
+                          </div>
+                          <div class="roadmap-milestone">
+                            <div class="milestone-icon">
+                              <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="milestone-content">
+                              <h3>Consideration</h3>
+                              
+                              <p>The user discovers your brand through a campaign or other marketing channel.</p>
+                            </div>
+                          </div>
+                          <div class="roadmap-milestone">
+                            <div class="milestone-icon">
+                              <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="milestone-content">
+                              <h3>Engagement</h3>
+                              <p> </p>
+                              <p>Enhance user onboarding</p>
+                            </div>
+                          </div>
+                          <div class="roadmap-milestone">
+                            <div class="milestone-icon">
+                              <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="milestone-content">
+                              <h3>Conversion</h3>
+                              <!-- <p>Conversion </p> -->
+                              <p>Enhance user onboarding</p>
+                            </div>
+                          </div>
+                          <div class="roadmap-milestone">
+                            <div class="milestone-icon">
+                              <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="milestone-content">
+                              <h3>Retention</h3>
+                              
+                              <p>Enhance user onboarding</p>
+                            </div>
+                          </div>
+                          <div class="roadmap-milestone">
+                            <div class="milestone-icon">
+                              <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="milestone-content">
+                              <h3>Advocacy</h3>
+                              <p></p>
+                              <p>Expand to new markets</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                     </div>
+                     
+                    <!--activity-->
+                  </ng-template>
+                </li>
+                <li class="me-2 mb-1" [ngbNavItem]="3">
+                  <a ngbNavLink><i class="fe fe-users"></i> Prospects</a>
+                  <ng-template ngbNavContent>
+                    <div class="card lead-card">
+                      <div class="card-body">
+                        <h5 class="card-title">Sridhar Dhamodharan</h5>
+                        <p class="card-text"><strong>Email:</strong> sridharexample.com</p>
+                        <p class="card-text"><strong>Source:</strong> Campaign</p>
+                        <p class="card-text"><strong>Status:</strong> New</p>
+                      </div>
+                    </div>
+                  </ng-template>
+                </li>
+              </ul>
+              <div [ngbNavOutlet]="nav"></div>
+            </div>
+          </div>
+          
+
+        
+      </main>
+    </div>

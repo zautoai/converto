@@ -31,6 +31,8 @@ import { AccountsComponent } from './account/account.component';
 import { PluginsComponent } from './plugins/plugins.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { AbmComponent } from './abm/abm.component';
+import { AccountviewComponent } from './accountview/accountview.component';
+import { ContactviewComponent } from './contactview/contactview.component';
 import { SegmentComponent } from './segment/segment.component';
 
 const routes: Routes = [
@@ -40,6 +42,9 @@ const routes: Routes = [
     component: LaunchAvatarComponent,
     canActivate:[SetupCompletedGuard]
   },
+   { path: 'view-account/:id', component: AccountviewComponent },
+   { path: 'view-contacts/:id', component: ContactviewComponent },
+
   {
     path: 'dashboard',
     title: "Dashboard",

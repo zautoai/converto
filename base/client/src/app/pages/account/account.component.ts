@@ -14,7 +14,9 @@ import { NotificationService } from '../../shared/services/notification.service'
 import { RestService } from '../../shared/services/rest.service';
 import { SweetAlertService } from '../../shared/services/sweet-alart.service';
 import { ActivatedRoute } from '@angular/router';
-
+import { Router } from '@angular/router';
+import { response } from 'express';
+import { error } from 'console';
 @Component({
   selector: 'app-accounts',
   templateUrl: './account.component.html',
@@ -37,6 +39,7 @@ export class AccountsComponent implements OnInit {
   submittedData: any[] = [];
   selectedData: any = null;
   totalItems: number = 0;
+  accountcontact: Object="";
 
   constructor(
     private avatarService: AvatarService,
@@ -48,6 +51,8 @@ export class AccountsComponent implements OnInit {
     private sweetAlertService: SweetAlertService,
     private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private router: Router
+    
   ) {
     this.Form = new FormGroup({
       photoUrl: new FormControl(""),
@@ -78,6 +83,7 @@ export class AccountsComponent implements OnInit {
       this.currentPage = +params['page'] || 1;
       this.limit = +params['limit'] || this.limit;
       this.getAccounts();
+      this.getaccountcontacts()
       this.onPageChange({ page: this.currentPage })
     });
   }
@@ -89,6 +95,7 @@ export class AccountsComponent implements OnInit {
         (response: any) => {
           this.submittedData = response.data;
           this.totalItems = response.total
+          console.log("accountdata",this.submittedData)
         },
         (error) => {
           console.error(error);
@@ -111,12 +118,19 @@ export class AccountsComponent implements OnInit {
     this.selectedData = data;
     this.Form.reset();
     this.resetErrorFeedback();
-    this.offcanvasService.open(this.viewUserOffcanvas, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
+    console.log("datas",data.id)
+    this.router.navigate(['/view-account', data.id]);
+
+  
+
+
+    
+    // this.offcanvasService.open(this.viewUserOffcanvas, {
+    //   position: 'end',
+    //   backdrop: 'static',
+    //   panelClass: 'visible',
+    //   animation: true,
+    // });
   }
 
   onCreateuserSubmit() {
@@ -131,6 +145,9 @@ export class AccountsComponent implements OnInit {
         }
         return acc;
       }, {} as { [key: string]: string });
+
+
+      
 
 
     this.restService.post(API.main.account, data).subscribe({
@@ -286,6 +303,7 @@ export class AccountsComponent implements OnInit {
         );
       this.offcanvasService.dismiss();
       this.Form.reset();
+      
     } else {
       this.Form.markAllAsTouched();
     }
@@ -343,4 +361,16 @@ export class AccountsComponent implements OnInit {
       event.preventDefault();
     }
   }
+getaccountcontacts(){
+this.restService.getAll(API.main.contact).subscribe(
+  (response)=>{
+    this.accountcontact=response
+    console.log("getaccountcontacts",this.accountcontact)
+  },
+  (error)=>{
+console.log(error)
+  }
+)
+}
+
 }

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { API } from 'src/app/config/endpoint.config';
@@ -42,26 +42,26 @@ export class AbmComponent {
     private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
   ) {
-    this.Form = this.formBuilder.group({
-      parentAccountId: [''],
-      photoUrl: [''],
-      accountName: [''],
-      industry: [''],
-      companySize: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      annualRevenue: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      accountType: [''],
-      website: [''],
-      address: [''],
-      city: [''],
-      state: [''],
-      zip: [''],
-      country: [''],
-      phone: [''],
-      email: [''],
-      socialMedia: [''],
-      notes: [''],
-      source: [''],
-      status: [''],
+    this.Form = new FormGroup({
+      parentAccountId:new FormControl(),
+      photoUrl: new FormControl(),
+      accountName:new FormControl(),
+      industry: new FormControl(),
+      companySize: new FormControl(),
+      annualRevenue: new FormControl(),
+      accountType: new FormControl(),
+      website: new FormControl(),
+      address: new FormControl(),
+      city: new FormControl(),
+      state: new FormControl(),
+      zip: new FormControl(),
+      country: new FormControl(),
+      phone: new FormControl(),
+      email: new FormControl(),
+      socialMedia: new FormControl(),
+      notes: new FormControl(),
+      source: new FormControl(),
+      status: new FormControl(),
     });
   }
 
@@ -76,7 +76,7 @@ export class AbmComponent {
 
   getAccounts(): void {
     this.restService
-      .get(API.main.account, `?limit=${this.limit}&page=${this.currentPage}`)
+      .get(API.main.abm, `?limit=${this.limit}&page=${this.currentPage}`)
       .subscribe(
         (response: any) => {
           this.submittedData = response.data;
@@ -280,7 +280,7 @@ export class AbmComponent {
         updateAccountFields,
       };
       this.restService
-        .patch(API.main.account, this.user.id, updatedAccountData)
+        .patch(API.main.account, this.user.id, this.Form.value)
         .subscribe(
           (response: any) => {
             this.notifService.showSuccess('Account Updated Successfully.');
