@@ -7,6 +7,7 @@ import { CampaignFilterDto } from './dto/campaign-filter.dto';
 import { CampaignStatus } from 'src/common/enums/enums';
 import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 import { BaseService } from 'src/common/services/base.service';
+import { ServiceParams } from 'src/common/models/service-param.model';
 
 @Injectable()
 export class CampaignService extends BaseService{
@@ -36,29 +37,31 @@ export class CampaignService extends BaseService{
 
     }
 
-    async create(orgId: string,createCampaignDto: CreateCampaignDto) {
+    async create(serviceParams:ServiceParams<CreateCampaignDto>) {
+        const { orgId, data } = serviceParams;
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + 30);
-        createCampaignDto.endDate = endDate;
+        data.endDate = endDate;
         const prisma = await this.getPrismaClient(orgId);
         const campaign = await prisma.campaign.create({
             data: {
-                agentId: createCampaignDto.agentId,
-                title: createCampaignDto.title,
-                description: createCampaignDto.description,
-                url: createCampaignDto.url,
-                status: createCampaignDto.status,
-                isZauto: createCampaignDto.isZauto,
-                idParam: createCampaignDto.idParam,
-                idValue: createCampaignDto.idValue,
+                agentId: data.agentId,
+                title: data.title,
+                description: data.description,
+                url: data.url,
+                status: data.status,
+                isZauto: data.isZauto,
+                idParam: data.idParam,
+                idValue: data.idValue,
                 endDate: endDate
             }
         });
-        await this.updateCampaignCount(1, createCampaignDto.orgId)
+        await this.updateCampaignCount(1, data.orgId)
         return campaign;
     }
 
-    async findAll(orgId: string,paginationDto: PaginationDto) {
+    async findAll(serviceParams:ServiceParams<PaginationDto>) {
+        const { orgId, data: paginationDto } = serviceParams;
         const { page, limit } = paginationDto;
         const skip = (page - 1) * limit;
         const prisma = await this.getPrismaClient(orgId);
@@ -71,7 +74,8 @@ export class CampaignService extends BaseService{
         };
     }
 
-    async findAllByOrg(orgId: string, campaignFilterDto: CampaignFilterDto) {
+    async findAllByOrg(serviceParams:ServiceParams<CampaignFilterDto>) {
+        const { orgId, data: campaignFilterDto } = serviceParams;
         const { page, limit } = campaignFilterDto;
         const skip = (page - 1) * limit;
         let campaignData = [], total = 0;
@@ -113,7 +117,8 @@ export class CampaignService extends BaseService{
         };
     }
 
-    async findAllByAgent(orgId: string,agentId: string, paginationDto: PaginationDto) {
+    async findAllByAgent(serviceParams:ServiceParams<PaginationDto>) {
+        const { orgId, data: paginationDto, agentId } = serviceParams;
         const { page, limit } = paginationDto;
         const skip = (page - 1) * limit;
         const prisma = await this.getPrismaClient(orgId);
@@ -137,22 +142,23 @@ export class CampaignService extends BaseService{
         }
     }
 
-    async update(orgId: string,id: string, updateCampaignDto: UpdateCampaignDto) {
+    async update(serviceParams:ServiceParams<UpdateCampaignDto>) {
+        const { orgId, data, id } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
         const existingCampaign = await prisma.campaign.findUnique({ where: { id } });
         if (existingCampaign) {
             let campaignData: any = {
-                title: updateCampaignDto.title,
-                description: updateCampaignDto.description,
-                status: updateCampaignDto.status,
-                url: updateCampaignDto.url,
-                isZauto: updateCampaignDto.isZauto,
-                idParam: updateCampaignDto.idParam,
-                idValue: updateCampaignDto.idValue,
+                title: data.title,
+                description: data.description,
+                status: data.status,
+                url: data.url,
+                isZauto: data.isZauto,
+                idParam: data.idParam,
+                idValue: data.idValue,
             };
 
-            const startDateTimestamp = updateCampaignDto.startDateTimestamp;
-            const endDateTimestamp = updateCampaignDto.endDateTimestamp;
+            const startDateTimestamp = data.startDateTimestamp;
+            const endDateTimestamp = data.endDateTimestamp;
 
             const startDate = this.formatDate(startDateTimestamp);
             const endDate = this.formatDate(endDateTimestamp);

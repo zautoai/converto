@@ -32,7 +32,7 @@ export class CampaignController
         if(req.user && req.orgId)
         {
             const orgId = req.orgId;
-            return await this.campaignService.findAllByOrg(orgId,campaignFilterDto);
+            return await this.campaignService.findAllByOrg({orgId,data:campaignFilterDto});
         }
         else
         {
@@ -64,7 +64,7 @@ export class CampaignController
                 throw new NotAcceptableException(`Remaining campaign ${remainingCampaign}`);
             }
             createCampaignDto.orgId = req.orgId;
-            return await this.campaignService.create(orgId,createCampaignDto);
+            return await this.campaignService.create({orgId, data: createCampaignDto});
         }
         else
         {
@@ -76,7 +76,7 @@ export class CampaignController
     @ApiOkResponse({type:Campaign})
     async update(@Param('id') id: string,@Body() updateCampaignDto: UpdateCampaignDto,@Req() req: ZautoRequest) {
         const orgId = req.orgId;
-        return await this.campaignService.update(orgId,id,updateCampaignDto);
+        return await this.campaignService.update({orgId,data:updateCampaignDto,id});
     }
 
     @Delete(':id')

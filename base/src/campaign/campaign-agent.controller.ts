@@ -28,7 +28,7 @@ export class CampaignAgentController
         if(zautoRequest.user && zautoRequest.orgId)
         {
             const orgId = zautoRequest.orgId;
-            return await this.campaignService.findAllByAgent(orgId,agentId,paginationDto);
+            return await this.campaignService.findAllByAgent({orgId,data: paginationDto, agentId});
         }
         else
         {
