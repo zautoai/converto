@@ -39,6 +39,8 @@ export class StartupService extends BaseService implements OnModuleInit {
     }
 
     async executeOnStartup() {
+        console.log("Startup called");
+
         await this.createSubscriptions();
         await this.createZautoOrg()
         // await this.createDefaultRoles();
@@ -63,7 +65,6 @@ export class StartupService extends BaseService implements OnModuleInit {
                 name: ZAUTO_ORG,
             })
         }
-
         if (zautoAI) {
             await this.createDefaultRoles(zautoAI.id);
             await this.createSuperUser(zautoAI);

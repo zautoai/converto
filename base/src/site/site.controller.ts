@@ -33,7 +33,7 @@ export class SiteController {
   create(@Body() createSiteDto: CreateSiteDto, @Req() request: ZautoRequest) {
     const orgId = request.user.orgId;
 
-    return this.siteService.create(orgId, createSiteDto);
+    return this.siteService.create({ orgId, data: createSiteDto });
   }
 
   // @Get()
@@ -60,7 +60,7 @@ export class SiteController {
 
     if (zautoRequest.user && zautoRequest.user.orgId) {
       const orgId = zautoRequest.user.orgId;
-      return await this.siteService.findAll(orgId, paginationDto);
+      return await this.siteService.findAll({ orgId, data: paginationDto });
     }
     else {
       throw new UnauthorizedException("Unauthorised access.")
@@ -74,7 +74,7 @@ export class SiteController {
   async findOne(@Param('id') id: string, @Req() zautoRequest: ZautoRequest) {
     const orgId = zautoRequest.user.orgId;
 
-    return await this.siteService.findOne(orgId, id);
+    return await this.siteService.findOne({ orgId, data: { id } });
   }
 
   @Patch(':id')
@@ -85,7 +85,7 @@ export class SiteController {
   async update(@Param('id') id: string, @Body() updateSiteDto: UpdateSiteDto, @Req() zautoRequest: ZautoRequest) {
     const orgId = zautoRequest.user.orgId;
 
-    return await this.siteService.update(orgId, id, updateSiteDto);
+    return await this.siteService.update({ orgId, data: updateSiteDto, id });
   }
 
   @Delete(':id')
@@ -93,7 +93,7 @@ export class SiteController {
   @HttpCode(204)
   async remove(@Param('id') id: string, @Req() zautoRequest: ZautoRequest) {
     const orgId = zautoRequest.user.orgId;
-    return await this.siteService.remove(orgId, id);
+    return await this.siteService.remove({ orgId, data: { id } });
   }
 
   @Post("links")
@@ -120,7 +120,7 @@ export class SiteController {
     if (remainingSite <= 0) {
       throw new NotAcceptableException(`Remaining site ${remainingSite}`)
     }
-    return await this.siteService.trainAvatar(orgId, scrapMultipleDto);
+    return await this.siteService.trainAvatar({ orgId, data: scrapMultipleDto });
   }
 
   isValidUrl(url: string) {
@@ -147,7 +147,7 @@ export class SiteController {
   @ApiOkResponse()
   async selectGeneratedGreetings(@Body() selectGreetingDto: SelectGreetingDto[], @Req() req: ZautoRequest) {
     if (req.user && req.user.orgId) {
-      return await this.siteService.selectGeneratedGreetings(req.user.orgId, selectGreetingDto);
+      return await this.siteService.selectGeneratedGreetings({ orgId: req.user.orgId, data: selectGreetingDto });
     }
     else {
       throw new UnauthorizedException("Unauthorised access.");

@@ -414,7 +414,7 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     if (!message) return;
     const orgId = request.orgId;
 
-    let greeting = await this.siteService.getGreetingByUrl(orgId, message.agentId, message.url);
+    let greeting = await this.siteService.getGreetingByUrl({ orgId, data: { pageUrl: message.url } });
     greeting = greeting + "<END_OF_CHAT>";
     const conversation = await this.conversationService.findOne(message.convId);
     const agent = await this.agentsService.findOne(message.agentId);

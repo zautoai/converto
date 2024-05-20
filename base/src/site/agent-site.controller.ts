@@ -23,6 +23,6 @@ export class AgentSiteController {
   })
   async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
     const orgId = request.orgId;
-    return await this.siteService.findAll(orgId, paginationDto);
+    return await this.siteService.findAll({ orgId, data: paginationDto });
   }
 }
