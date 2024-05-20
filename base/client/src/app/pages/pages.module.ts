@@ -61,6 +61,7 @@ import { CrmCompanyMappingComponent } from './plugins/crm-mapping/crm-company-ma
 import { ContactsComponent } from './contacts/contacts.component';
 import { CalendarScheduleComponent } from './plugins/calendar-schedule/calendar-schedule.component';
 import { AbmComponent } from './abm/abm.component';
+import { SegmentComponent } from './segment/segment.component';
 
 @NgModule({
   declarations: [
@@ -127,6 +128,7 @@ import { AbmComponent } from './abm/abm.component';
     CrmContactMappingComponent,
     CrmCompanyMappingComponent,
     ContactsComponent,
+    SegmentComponent,
     CalendarScheduleComponent
   ],
   imports: [
@@ -134,6 +136,7 @@ import { AbmComponent } from './abm/abm.component';
     PagesRoutingModule,
     SharedModule,
     NgbModule,
+    ReactiveFormsModule,
     FormsModule,
     NgSelectModule,
     NgScrollbar,

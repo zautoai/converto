@@ -11,13 +11,12 @@ import { CommonModule } from '@angular/common';
 import {  HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NgHttpLoaderModule } from 'ng-http-loader';
-import { SegmentComponent } from './pages/segment/segment.component';
+
 
 
 @NgModule({
   declarations:[
     AppComponent,
-    SegmentComponent,
   ],
   imports: [
   CommonModule,

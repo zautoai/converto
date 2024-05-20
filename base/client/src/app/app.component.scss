@@ -6,7 +6,9 @@
   #glb-loader.loaderShow {
     display: block;
   }
-
+  .modal-backdrop {
+    display: none !important;
+}
   #glb-loader {
     position: fixed;
     z-index: 50000;
