@@ -60,7 +60,7 @@ export class SiteController {
 
     if (zautoRequest.user && zautoRequest.user.orgId) {
       const orgId = zautoRequest.user.orgId;
-      return await this.siteService.findAllByOrg(orgId, paginationDto);
+      return await this.siteService.findAll(orgId, paginationDto);
     }
     else {
       throw new UnauthorizedException("Unauthorised access.")

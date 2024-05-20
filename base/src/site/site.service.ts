@@ -20,25 +20,28 @@ import { FileUtilService } from 'src/common/services/file-utility.service';
 import { S3Service } from 'src/common/services/s3.service';
 import { WebClientService } from 'src/common/services/web-client.service';
 import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class SiteService {
+export class SiteService extends BaseService {
 
   browsers = {};
   pages = {};
 
-  constructor(private readonly prismaClientManager: PrismaClientManager,
+  constructor(
     private chromaService: ChromaDBService,
     private webClient: WebClientService,
     private fileService: FileUtilService,
     private readonly usageService: UsageService,
     private readonly pageGreeterService: PageGreeterService,
-    private readonly s3Service: S3Service) { }
+    private readonly s3Service: S3Service) {
+    super();
+  }
 
   async create(orgId: string, createSiteDto: CreateSiteDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
 
-    const site = await prisma.site.findFirst({ where: { agentId: createSiteDto.agentId, url: createSiteDto.url } });
+    const site = await prisma.site.findFirst({ where: { url: createSiteDto.url } });
     if (site) {
       return await this.update(orgId, site.id, createSiteDto);
     } else {
@@ -48,7 +51,7 @@ export class SiteService {
 
   //Train Agent on multiple site urls (selected urls)
   async trainAvatar(orgId: string, scrapMultipleDto: ScrapMultipleDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
 
     const siteUsage = await this.usageService.getSiteCount(orgId);
     const remainingSite = siteUsage.maxCount - siteUsage.count;
@@ -56,23 +59,23 @@ export class SiteService {
       throw new NotAcceptableException(`Remaining site ${remainingSite}`)
     }
 
-    const agent = await prisma.agent.findFirst({ where: { id: scrapMultipleDto.agentId }, include: { org: true, AgentFiles: true } });
+    const agent = await prisma.agent.findFirst({ include: { org: true, AgentFiles: true } });
     if (agent) {
       await this.trainZautoRAG(orgId, agent, scrapMultipleDto);
     } else {
-      throw new NotFoundException(`Agent not found with id ${scrapMultipleDto.agentId}`);
+      throw new NotFoundException(`Agent not found`);
     }
   }
 
   async trainZautoRAG(orgId: string, agent: Agent, scrapMultipleDto: ScrapMultipleDto) {
     for (let url of scrapMultipleDto.urls) {
       try {
-        const prisma = await this.prismaClientManager.getClient(orgId);
+        const prisma = await this.getPrismaClient(orgId);
 
-        let site = await prisma.site.findFirst({ where: { agentId: scrapMultipleDto.agentId, url } })
+        let site = await prisma.site.findFirst({ where: { url } })
         if (!site) {
           console.log("SiteService: Creating new site.")
-          site = await this.create(orgId, { url, agentId: scrapMultipleDto.agentId });
+          site = await this.create(orgId, { url });
         }
         if (site) {
           setImmediate(async () => {
@@ -87,7 +90,7 @@ export class SiteService {
 
   async trainOnOpenAI(orgId: string, agent: Agent, scrapMultipleDto: ScrapMultipleDto) {
     try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
+      const prisma = await this.getPrismaClient(orgId);
 
       const filePath = `./${SYSTEM_CONST.TRAINING_CONTENT_PATH}/agent_${agent.id}.txt`;
 
@@ -96,12 +99,12 @@ export class SiteService {
 
       for (let url of scrapMultipleDto.urls) {
 
-        let site = await prisma.site.findFirst({ where: { agentId: scrapMultipleDto.agentId, url } })
+        let site = await prisma.site.findFirst({ where: { url } })
 
         if (!site) {
 
           console.log("SiteService: Creating new site.")
-          site = await this.create(orgId, { url, agentId: scrapMultipleDto.agentId });
+          site = await this.create(orgId, { url });
         }
 
         if (site) {
@@ -135,7 +138,7 @@ export class SiteService {
       //After extracting the content from sites
       //Upload the content file to S3
       const response = await this.s3Service.uploadTextFile(filePath);
-      const prisma = await this.prismaClientManager.getClient(orgId);
+      const prisma = await this.getPrismaClient(orgId);
 
       await prisma.agent.update({
         data: {
@@ -150,7 +153,7 @@ export class SiteService {
   }
 
   async findAll(orgId: string, paginationDto: PaginationDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
 
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
@@ -167,44 +170,8 @@ export class SiteService {
     };
   }
 
-
-  async findAllByAgent(orgId: string, agentId: string, paginationDto: PaginationDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
-
-    const { page, limit } = paginationDto;
-    const skip = (page - 1) * limit;
-    const sites = await prisma.site.findMany({
-      skip,
-      take: limit,
-      where: { agentId }
-    });
-    const total = await prisma.site.count({ where: { agentId } });
-    return {
-      data: sites,
-      page: page,
-      total: total,
-    };
-  }
-
-  async findAllByOrg(orgId: string, paginationDto: PaginationDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
-
-    const { page, limit } = paginationDto;
-    const skip = (page - 1) * limit;
-    const sites = await prisma.site.findMany({
-      skip,
-      take: limit,
-    });
-    const total = await prisma.site.count();
-    return {
-      data: sites,
-      page: page,
-      total: total,
-    };
-  }
-
   async findOne(orgId: string, id: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
 
     const site = await prisma.site.findFirst({ where: { id } });
     if (site) return site;
@@ -213,7 +180,7 @@ export class SiteService {
 
 
   async update(orgId: string, id: string, updateSiteDto: UpdateSiteDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
 
     const site = await prisma.site.findFirst({ where: { id } });
     if (site) {
@@ -224,18 +191,19 @@ export class SiteService {
   }
 
   async remove(orgId: string, id: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
 
-    const site = await prisma.site.findFirst({ where: { id }, include: { agent: true } });
+    const site = await prisma.site.findFirst({ where: { id } });
+    const agent = await prisma.agent.findFirst()
     if (site) {
-      await this.chromaService.removeDocs(site.agent.name, site.url);
+      await this.chromaService.removeDocs(agent.name, site.url);
       return await prisma.site.delete({ where: { id } });
     }
     else throw new NotFoundException(`Site not found with id ${id}`)
   }
 
   async processURL(orgId: string, site: any, agent: any, attempt: number = 0) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
 
     const content = await this.getSimpleContent(site.url, agent);
     if (content) {
@@ -381,11 +349,11 @@ export class SiteService {
       return (pageContent.pageContent && pageContent.pageContent.length > 2) ? pageContent : null;
 
     } catch (error) {
-      const prisma = await this.prismaClientManager.getClient(orgId);
+      const prisma = await this.getPrismaClient(orgId);
 
       console.error('Error during scraping:', error);
       if (agent) {
-        let site = await prisma.site.findFirst({ where: { agentId: agent.id, url } })
+        let site = await prisma.site.findFirst({ where: { url } })
         if (site) {
           try {
             console.log(error)
@@ -416,11 +384,10 @@ export class SiteService {
   }
 
   async getGreetingByUrl(orgId: string, agentId: string, pageUrl: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
 
     const page = await prisma.site.findFirst({
       where: {
-        agentId: agentId,
         url: pageUrl
       }
     });
@@ -432,7 +399,7 @@ export class SiteService {
   }
 
   async generateGreeting(orgId: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
 
     const agent = await prisma.agent.findFirst({ where: { orgId } });
     if (!agent) {
@@ -443,7 +410,7 @@ export class SiteService {
 
   async selectGeneratedGreetings(orgId: string, selectGreetingDto: any) {
     try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
+      const prisma = await this.getPrismaClient(orgId);
 
       const agent = await prisma.agent.findFirst({ where: { orgId: orgId } });
       if (!agent) {

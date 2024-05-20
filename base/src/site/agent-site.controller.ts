@@ -7,9 +7,6 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { Site } from './entities/site.entity';
 import { ZautoRequest } from 'src/common/models/request.model';
 
-
-
-
 @ApiTags('Sites')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -24,8 +21,8 @@ export class AgentSiteController {
   @ApiOkResponse({
     type: ResponseDTO<Site>
   })
-  async findAll(@Param('agentId') agentId: string, @Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
+  async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
     const orgId = request.orgId;
-    return await this.siteService.findAllByAgent(orgId, agentId, paginationDto);
+    return await this.siteService.findAll(orgId, paginationDto);
   }
 }

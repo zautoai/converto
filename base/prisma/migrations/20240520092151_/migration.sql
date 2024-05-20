@@ -32,22 +32,10 @@ CREATE TYPE "Vote" AS ENUM ('UPVOTE', 'DOWNVOTE');
 CREATE TYPE "LeadStatus" AS ENUM ('REPORTING', 'CLOSEDWON', 'CLOSEDLOST');
 
 -- CreateEnum
-CREATE TYPE "ToolType" AS ENUM ('RESTAPI', 'CRM', 'CALENDAR', 'COMMUNICATION');
-
--- CreateEnum
 CREATE TYPE "CampaignStatus" AS ENUM ('ACTIVE', 'INACTIVE');
 
 -- CreateEnum
 CREATE TYPE "CTAType" AS ENUM ('CTA', 'NAVIGATOR', 'CALENDAR');
-
--- CreateEnum
-CREATE TYPE "ExternalToolLevel" AS ENUM ('USERLEVEL', 'ORGLEVEL');
-
--- CreateEnum
-CREATE TYPE "AuthType" AS ENUM ('NONE', 'BASIC', 'TOKEN');
-
--- CreateEnum
-CREATE TYPE "HttpMethod" AS ENUM ('GET', 'POST', 'PUT', 'DELETE', 'PATCH');
 
 -- CreateTable
 CREATE TABLE "Role" (
@@ -214,8 +202,6 @@ CREATE TABLE "LeadConfig" (
 -- CreateTable
 CREATE TABLE "Site" (
     "id" TEXT NOT NULL,
-    "agentId" TEXT NOT NULL,
-    "orgId" TEXT,
     "url" VARCHAR(500) NOT NULL,
     "status" "SiteProcessStatus" DEFAULT 'IN_PROGRESS',
     "info" TEXT,
@@ -364,38 +350,6 @@ CREATE TABLE "LeadCategoryMap" (
 );
 
 -- CreateTable
-CREATE TABLE "Tool" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "type" "ToolType" NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Tool_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Platform" (
-    "id" TEXT NOT NULL,
-    "name" VARCHAR(100) NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Platform_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "OrgPlatform" (
-    "id" TEXT NOT NULL,
-    "orgId" TEXT,
-    "platformId" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "OrgPlatform_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Campaign" (
     "id" TEXT NOT NULL,
     "orgId" TEXT NOT NULL,
@@ -476,74 +430,6 @@ CREATE TABLE "CallToAction" (
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "CallToAction_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "ExternalTool" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "type" "ToolType" NOT NULL,
-    "authUrl" TEXT NOT NULL,
-    "tokenUrl" TEXT NOT NULL,
-    "profileUrl" TEXT NOT NULL,
-    "propertyUrl" TEXT NOT NULL,
-    "clientId" TEXT NOT NULL,
-    "clientSecret" TEXT NOT NULL,
-    "redirectUri" TEXT NOT NULL,
-    "scope" TEXT NOT NULL,
-    "level" "ExternalToolLevel" NOT NULL DEFAULT 'ORGLEVEL',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "ExternalTool_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "OrgTool" (
-    "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
-    "userId" TEXT,
-    "toolId" TEXT NOT NULL,
-    "accessToken" TEXT NOT NULL,
-    "refreshToken" TEXT,
-    "expiresIn" INTEGER NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "OrgTool_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "KeyMapping" (
-    "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
-    "orgToolId" TEXT,
-    "apiId" TEXT,
-    "fieldName" TEXT NOT NULL,
-    "externalFieldName" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "KeyMapping_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "ExternalApi" (
-    "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "username" TEXT,
-    "password" TEXT,
-    "header" TEXT,
-    "token" TEXT,
-    "url" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "method" "HttpMethod" NOT NULL,
-    "authType" "AuthType" NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "ExternalApi_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -654,12 +540,6 @@ CREATE INDEX "OrgId_leadconfig_fkey" ON "LeadConfig"("orgId");
 CREATE INDEX "AgentId_LeadConfig_fkey" ON "LeadConfig"("agentId");
 
 -- CreateIndex
-CREATE INDEX "OrgId_Site_fkey" ON "Site"("orgId");
-
--- CreateIndex
-CREATE INDEX "AgentId_Site_fkey" ON "Site"("agentId");
-
--- CreateIndex
 CREATE INDEX "Agentprompt_orgId_fkey" ON "AgentPrompt"("orgId");
 
 -- CreateIndex
@@ -750,12 +630,6 @@ CREATE INDEX "categoryId_LeadCategoryMap_fkey" ON "LeadCategoryMap"("categoryId"
 CREATE UNIQUE INDEX "LeadCategoryMap_orgId_leadId_categoryId_key" ON "LeadCategoryMap"("orgId", "leadId", "categoryId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Platform_name_key" ON "Platform"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "OrgPlatform_orgId_platformId_key" ON "OrgPlatform"("orgId", "platformId");
-
--- CreateIndex
 CREATE INDEX "orgId_Campaign_fkey" ON "Campaign"("orgId");
 
 -- CreateIndex
@@ -792,21 +666,6 @@ CREATE INDEX "Cta_orgId_fkey" ON "CallToAction"("orgId");
 CREATE UNIQUE INDEX "CallToAction_agentId_name_key" ON "CallToAction"("agentId", "name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ExternalTool_name_key" ON "ExternalTool"("name");
-
--- CreateIndex
-CREATE INDEX "OAuth_orgId_fkey" ON "OrgTool"("orgId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "OrgTool_orgId_toolId_userId_key" ON "OrgTool"("orgId", "toolId", "userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "KeyMapping_orgToolId_fieldName_externalFieldName_key" ON "KeyMapping"("orgToolId", "fieldName", "externalFieldName");
-
--- CreateIndex
-CREATE UNIQUE INDEX "KeyMapping_apiId_fieldName_externalFieldName_key" ON "KeyMapping"("apiId", "fieldName", "externalFieldName");
-
--- CreateIndex
 CREATE UNIQUE INDEX "AvailabilitySchedule_orgId_key" ON "AvailabilitySchedule"("orgId");
 
 -- AddForeignKey
@@ -832,12 +691,6 @@ ALTER TABLE "LeadConfig" ADD CONSTRAINT "LeadConfig_agentId_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "LeadConfig" ADD CONSTRAINT "LeadConfig_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Site" ADD CONSTRAINT "Site_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Site" ADD CONSTRAINT "Site_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AgentPrompt" ADD CONSTRAINT "AgentPrompt_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -915,12 +768,6 @@ ALTER TABLE "LeadCategoryMap" ADD CONSTRAINT "LeadCategoryMap_leadId_fkey" FOREI
 ALTER TABLE "LeadCategoryMap" ADD CONSTRAINT "LeadCategoryMap_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "LeadCategory"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrgPlatform" ADD CONSTRAINT "OrgPlatform_platformId_fkey" FOREIGN KEY ("platformId") REFERENCES "Platform"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "OrgPlatform" ADD CONSTRAINT "OrgPlatform_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Campaign" ADD CONSTRAINT "Campaign_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -937,24 +784,6 @@ ALTER TABLE "CallToAction" ADD CONSTRAINT "CallToAction_agentId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "CallToAction" ADD CONSTRAINT "CallToAction_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "OrgTool" ADD CONSTRAINT "OrgTool_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "OrgTool" ADD CONSTRAINT "OrgTool_toolId_fkey" FOREIGN KEY ("toolId") REFERENCES "ExternalTool"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "KeyMapping" ADD CONSTRAINT "KeyMapping_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "KeyMapping" ADD CONSTRAINT "KeyMapping_orgToolId_fkey" FOREIGN KEY ("orgToolId") REFERENCES "OrgTool"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "KeyMapping" ADD CONSTRAINT "KeyMapping_apiId_fkey" FOREIGN KEY ("apiId") REFERENCES "ExternalApi"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ExternalApi" ADD CONSTRAINT "ExternalApi_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AvailabilitySchedule" ADD CONSTRAINT "AvailabilitySchedule_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
