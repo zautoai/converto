@@ -20,10 +20,10 @@ export class ConversationController {
     ) {}
 
   @Post()
-  async create(@Body() createConversationDto: CreateConversationDto, @Req() request: ZautoRequest) {
-    if(request.user && request.user.orgId) {
-      const orgId = request.user.orgId;
-      return await this.conversationService.create(createConversationDto, orgId);
+  async create(@Body() createConversationDto: CreateConversationDto, @Req() request: Request) {
+    const orgId = request.headers['org-id'];
+    if(orgId) {
+      return await this.conversationService.create({ orgId ,data: createConversationDto});
     } else {
       throw new UnauthorizedException('Org info not found.')
     
@@ -40,12 +40,12 @@ export class ConversationController {
     @ApiOkResponse({
       type: ResponseDTO<Conversation>
     })
-    async findAll(@Query() filterDto: ConversationFilterDto,@Req() zautoRequest: ZautoRequest)
+    async findAll(@Query() filterDto: ConversationFilterDto,@Req() request: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.orgId)
+        if(request.user && request.user.orgId)
         {
-            const orgId = zautoRequest.orgId;
-            return await this.conversationService.findAllByOrg(orgId,filterDto);
+            const orgId = request.user.orgId;
+            return await this.conversationService.findAll({orgId,data:filterDto});
         }
         else
         {
@@ -58,8 +58,16 @@ export class ConversationController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOkResponse({type: Conversation})
-  async findOne(@Param('id') id: string) {
-    return await this.conversationService.findOne(id);
+  async findOne(@Param('id') id: string,@Req() request: ZautoRequest) {
+    if(request.user && request.user.orgId)
+    {
+      const orgId = request.user.orgId;
+      return await this.conversationService.findOne(orgId,id);
+    }
+    else
+    {
+      throw new UnauthorizedException('You are not authorized to access this resource')
+    }
   }
 
   @Get(':id/summary')
@@ -67,8 +75,16 @@ export class ConversationController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOkResponse({type: Conversation})
-  async getSummary(@Param('id') id: string) {
-    return await this.conversationService.findOneWithSummary(id);
+  async getSummary(@Param('id') id: string,@Req() request: ZautoRequest) {
+    if(request.user && request.user.orgId)
+    {
+      const orgId = request.user.orgId;
+      return await this.conversationService.findOneWithSummary(orgId,id);
+    }
+    else
+    {
+      throw new UnauthorizedException('You are not authorized to access this resource')
+    }
   }
 
   @Patch(':id')
@@ -86,14 +102,31 @@ export class ConversationController {
   @ApiBearerAuth()
   @ApiNoContentResponse()
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
-    await this.conversationService.remove(id);
+  async remove(@Param('id') id: string,@Req() request: ZautoRequest) {
+
+    if(request.user && request.user.orgId)
+    {
+      const orgId = request.user.orgId;
+      return await this.conversationService.findOne(orgId, id);
+    }
+    else
+    {
+      throw new UnauthorizedException('You are not authorized to access this resource')
+    }
   }
 
   //update message
   @Patch('/message/:id')
   @ApiOkResponse({type: Conversation})
-  async updateMessage(@Param('id') id: string, @Body() updateMessageDto: any) {
-    return await this.conversationService.updateMessage(id,updateMessageDto);
+  async updateMessage(@Param('id') id: string, @Body() updateMessageDto: any,@Req() request: ZautoRequest) {
+    if(request.user && request.user.orgId)
+    {
+      const orgId = request.user.orgId;
+      return await this.conversationService.updateMessage({orgId,data:{id,updateMessageDto}});
+    }
+    else
+    {
+      throw new UnauthorizedException('You are not authorized to access this resource')
+    }
   }
 }

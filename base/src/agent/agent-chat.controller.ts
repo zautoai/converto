@@ -74,12 +74,13 @@ export class AgentChatController {
 
   @Get(':convId')
   @ApiCreatedResponse({type: Agent})
-  async fetchMessages(@Param('convId') conversationId: string, @Param('agentId') agentId: string) {
-    const conversation = await this.conversationService.findOneNoSummay(conversationId);
-    if(conversation && conversation.agentId != agentId) {
+  async fetchMessages(@Param('convId') conversationId: string, @Param('agentId') agentId: string, @Req() request: Request) {
+    const orgId = request.headers['org-id'];
+    const conversation = await this.conversationService.findOneNoSummay(orgId,conversationId);
+    if(conversation ) {
       throw new UnauthorizedException('You are not authorized to access this conversation.')
     }
-    let history = await this.conversationService.getMessages(conversationId);
+    let history = await this.conversationService.getMessages(orgId,conversationId);
     return history;
   }
 

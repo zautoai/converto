@@ -25,12 +25,7 @@ export class FileManagerService {
     async getFiles(orgId: string, paginationDto: PaginationDto) {
         const { page, limit } = paginationDto;
         const skip = (page - 1) * limit;
-        const agent = await this.prisma.agent.findFirst({
-            where: {
-                orgId: orgId
-            },
-
-        });
+        const agent = await this.prisma.agent.findFirst();
         if (!agent) {
             throw new NotFoundException(`Agnet not found`);
         }
@@ -73,11 +68,7 @@ export class FileManagerService {
         const uploadedFiles = [];
         const failedFiles = [];
         try {
-            const agent = await this.prisma.agent.findFirst({
-                where: {
-                    orgId: orgId
-                }
-            });
+            const agent = await this.prisma.agent.findFirst();
             if (!agent) {
                 throw new NotFoundException(`Agnet not found`);
             }

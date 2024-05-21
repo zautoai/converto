@@ -36,7 +36,7 @@ export class SummarizerService {
             const payload = JSON.parse(message);
             const id = payload.id;
             const conversation = await this.prisma.conversation.findUnique({
-                include: { Lead: true, agent: true, messages: {
+                include: { Lead: true, messages: {
                     where: { type : 'TEXT'},
                     orderBy: { createdAt: 'asc' },
                 }}, where: {id}

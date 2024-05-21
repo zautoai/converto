@@ -24,16 +24,12 @@ export class LeadConfigController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   async create(@Param('agentId') agentId: string, @Body() createLeadConfigDto: CreateLeadConfigDto, @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest && zautoRequest.user) {
-      const agent = await this.agentService.findOne(agentId);
-      if(agent && agent.orgId == zautoRequest.orgId) {
-        createLeadConfigDto.agentId = agentId;
-        return await this.leadConfigService.create(createLeadConfigDto);
-      } else {
-        throw new UnauthorizedException('You are unauthorized to perform this action.')
-      }
+    if (zautoRequest.user && zautoRequest.user.orgId) {
+      const orgId = zautoRequest.user.orgId;
+      return await this.leadConfigService.create(createLeadConfigDto);
+    } else {
+      throw new UnauthorizedException('You are unauthorized to perform this action')
     }
-    throw new UnauthorizedException('You are unauthorized to perform this action.')
   }
 
   // @Get()
@@ -64,13 +60,8 @@ export class LeadConfigController {
     type: ResponseDTO<LeadConfig>
   })
   async findOneByAgent(@Param('agentId') agentId: string, @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest && zautoRequest.user) {
-      const agent = await this.agentService.findOne(agentId);
-      if(agent && agent.orgId == zautoRequest.orgId) {
-        return await  this.leadConfigService.findByAgent(agentId);
-      } else {
-        throw new UnauthorizedException('You are unauthorized to perform this action.')
-      }
+    if(zautoRequest.user && zautoRequest.user.orgId) {
+      return await  this.leadConfigService.findByAgent(agentId);
     }
     throw new UnauthorizedException('You are unauthorized to perform this action.')
   }
@@ -79,13 +70,8 @@ export class LeadConfigController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async findOne(@Param('agentId') agentId: string, @Param('id') id: string, @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest && zautoRequest.user) {
-      const agent = await this.agentService.findOne(agentId);
-      if(agent && agent.orgId == zautoRequest.orgId) {
-        return await  this.leadConfigService.findOne(id);
-      } else {
-        throw new UnauthorizedException('You are unauthorized to perform this action.')
-      }
+    if(zautoRequest.user && zautoRequest.user.orgId) {
+      return await  this.leadConfigService.findOne(id);
     }
     throw new UnauthorizedException('You are unauthorized to perform this action.')
   }
@@ -95,13 +81,8 @@ export class LeadConfigController {
   @ApiBearerAuth()
   async update(@Param('agentId') agentId: string, @Param('id') id: string,
    @Body() updateLeadConfigDto: UpdateLeadConfigDto, @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest && zautoRequest.user) {
-      const agent = await this.agentService.findOne(agentId);
-      if(agent && agent.orgId == zautoRequest.orgId) {
-        return await  this.leadConfigService.update(id, updateLeadConfigDto)
-      } else {
-        throw new UnauthorizedException('You are unauthorized to perform this action.')
-      }
+    if(zautoRequest.user && zautoRequest.user.orgId) {
+      return await  this.leadConfigService.update(id, updateLeadConfigDto)
     }
     throw new UnauthorizedException('You are unauthorized to perform this action.')
   }
@@ -110,13 +91,8 @@ export class LeadConfigController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async remove(@Param('agentId') agentId: string, @Param('id') id: string,  @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest && zautoRequest.user) {
-      const agent = await this.agentService.findOne(agentId);
-      if(agent && agent.orgId == zautoRequest.orgId) {
-        return await  this.leadConfigService.remove(id)
-      } else {
-        throw new UnauthorizedException('You are unauthorized to perform this action.')
-      }
+    if(zautoRequest.user && zautoRequest.user.orgId) {
+      return await  this.leadConfigService.remove(id)
     }
     throw new UnauthorizedException('You are unauthorized to perform this action.')
   }

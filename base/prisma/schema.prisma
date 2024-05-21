@@ -60,24 +60,9 @@ model Organization {
   createdAt  DateTime    @default(now())
   modifiedAt DateTime    @updatedAt
 
-<<<<<<< HEAD
   Leads                  Lead[]
   LeradCategory          LeadCategory[]
   LeadCategoryMap        LeadCategoryMap[]
-=======
-  Agents          Agent[]
-  Campaigns       Campaign[]
-  LeadConfigs     LeadConfig[]
-  AgentPrompts    AgentPrompt[]
-  Visitors        Visitor[]
-  Conversations   Conversation[]
-  Leads           Lead[]
-  ZautoMessages   ZautoMessage[]
-  Stages          Stage[]
-  Visits          Visit[]
-  LeradCategory   LeadCategory[]
-  LeadCategoryMap LeadCategoryMap[]
->>>>>>> 1a71724e3a955542e7214183d865cca120cebcd2
 }
 
 model ActiveClient {
@@ -149,12 +134,7 @@ model Agent {
   LeadConfig       LeadConfig[]
   AgentFiles       AgentFile[]
   Stages           Stage[]
-  Messages         ZautoMessage[]
-<<<<<<< HEAD
   CallToAction     CallToAction[]
-=======
-  Visits           Visit[]
->>>>>>> 1a71724e3a955542e7214183d865cca120cebcd2
   starters         String?          @db.Text
 }
 
@@ -315,8 +295,6 @@ enum Vote {
 
 model ZautoMessage {
   id           String           @id @default(uuid())
-  agentId      String
-  agent        Agent            @relation(fields: [agentId], references: [id], onDelete: Cascade)
   conv         Conversation     @relation(fields: [convId], references: [id], onDelete: Cascade)
   convId       String
   role         String           @db.VarChar(20)
@@ -487,25 +465,18 @@ enum CTAType {
 
 model CallToAction {
   id          String   @id @default(uuid())
-<<<<<<< HEAD
   agentId     String?
   name        String   @db.VarChar(100)
-=======
-  name        String   @unique @db.VarChar(100)
->>>>>>> 1a71724e3a955542e7214183d865cca120cebcd2
   description String   @db.VarChar(256)
   link        String?  @db.Text
   type        CTAType? @default(NAVIGATOR)
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @updatedAt
-<<<<<<< HEAD
 
   agent Agent?        @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@unique([agentId, name], name: "Unique_Agent_Name")
   @@index([agentId], map: "Cta_agentId_fkey")
-=======
->>>>>>> 1a71724e3a955542e7214183d865cca120cebcd2
 }
 
 model AvailabilitySchedule {

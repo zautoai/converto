@@ -38,7 +38,6 @@ export class StarterGeneratorService {
             const conversation = await this.prisma.conversation.findUnique({
                     include: { 
                         Lead: true, 
-                        agent: true, 
                         messages: {
                             where: { type : 'TEXT'},
                             orderBy: { createdAt: 'asc' }, 

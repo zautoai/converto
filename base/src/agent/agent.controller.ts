@@ -338,11 +338,11 @@ export class AgentController {
   @Header('Content-Type', 'application/javascript')
   async standaloneEmbedding(@Param('agentId') agentId: string, @Req() request: Request)
   {
-    const org = request.headers['org-id'];
+    const orgId = request.headers['org-id'];
     if(agentId.includes('.js'))
     {
       agentId = agentId.replace('.js','');
-      return await this.agentsService.getEmbedding(org,agentId,true);
+      return await this.agentsService.getEmbedding(orgId,agentId,true);
     }
     else
     {
@@ -351,8 +351,9 @@ export class AgentController {
   }
 
   @Post(':agentId/track/:convId')
-  async websiteTracking(@Param('agentId') agentId: string,@Param('convId') convId: string,@Body() trackingDto:TrackingDto)
+  async websiteTracking(@Param('agentId') agentId: string,@Param('convId') convId: string,@Body() trackingDto:TrackingDto, @Req() request: Request)
   {
-    return await this.trackingService.addTracking(agentId, convId, trackingDto);
+    const orgId = request.headers['org-id']; 
+    return await this.trackingService.addTracking({ orgId ,data:{convId, trackingDto}});
   }
 }

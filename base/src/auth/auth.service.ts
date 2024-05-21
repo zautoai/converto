@@ -10,23 +10,24 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 import { OrganizationsService } from 'src/organizations/organizations.service';
-import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
+import { BaseService } from 'src/common/services/base.service';
 
   
   @Injectable()
-  export class AuthService {
+  export class AuthService extends BaseService{
     constructor(
       private jwtService: JwtService,
       private userService: UsersService,
-      private readonly organizationService: OrganizationsService,
-      private readonly prismaClientManager: PrismaClientManager) {}
+      private readonly organizationService: OrganizationsService) {
+        super();
+      }
   
     async login(email: string, password: string): Promise<AuthEntity> {
       const org = await this.organizationService.findOrgByEmail(email)
       if(!org) {
         throw new NotFoundException(`No organization found for email: ${email}`);
       }
-      const prisma = await this.prismaClientManager.getClient(org.id);
+      const prisma = await this.getPrismaClient(org.id);
       // Step 1: Fetch a user with the given email
       const user = await prisma.user.findUnique({ where: { email: email }});
   
@@ -52,22 +53,22 @@ import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
       return {
         accessToken: this.jwtService.sign({ userId: user.id, orgId: org.id , orgName: org.name  }),
         user: await this.userService.findOne(org.id,user.id),
-        avatar: await prisma.agent.findFirst({where: {orgId: org.id}})
+        avatar: await prisma.agent.findFirst()
       };
     }
 
     async getUserInfo(user: any) {
-      const prisma = await this.prismaClientManager.getClient(user.org.id);
+      const prisma = await this.getPrismaClient(user.org.id);
       return {
         user: await this.userService.findOne(user.org.id,user.id),
-        avatar: await prisma.agent.findFirst({where: {orgId: user.org.id}})
+        avatar: await prisma.agent.findFirst()
       };
     }
 
     async verifyToken(token:string)
     {
       const decoded = await this.jwtService.verify(token,{secret:process.env.JWT_SECRET});
-      const prisma = await this.prismaClientManager.getClient(decoded.orgId);
+      const prisma = await this.getPrismaClient(decoded.orgId);
       const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
       if (!user) {
         throw new NotFoundException(`No user found for id: ${decoded.userId}`);

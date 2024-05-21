@@ -41,7 +41,6 @@ export class EndOfConversationService {
                         Lead: true,
                         visit: true,
                         visitor: true,
-                        agent: true,
                         messages: {
                             where: { type : 'TEXT'},
                             orderBy: { createdAt: 'asc' }, 
