@@ -1,19 +1,16 @@
-import { InjectQueue } from '@nestjs/bull';
 import {
   BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Queue } from 'bull';
 import { FilterDto } from 'src/common/dtos/filter.dto';
 import { CustomFieldParent } from 'src/common/enum/enums';
 import { MappingService } from 'src/common/services/mapping.service';
 import { CustomFieldsService } from 'src/custom-fields/custom-fields.service';
 import { EnrichmentProviderName } from 'src/enrichment/enrichment-provider.enum';
 import { EnrichmentService } from 'src/enrichment/enrichment.service';
-import { IEnrichment } from 'src/enrichment/interfaces/enrichment.interface';
-import { CrmNames, ObjectType } from 'src/external-crm/enum/external-crm.enum';
+import { ObjectType } from 'src/external-crm/enum/external-crm.enum';
 import { ExternalCrmService } from 'src/external-crm/external-crm.service';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 
@@ -89,7 +86,7 @@ export class ContactsService {
             ],
           }
           : {}),
-      } 
+      }
     });
     return {
       code: 200,
@@ -405,7 +402,7 @@ export class ContactsService {
     return name.toLowerCase().replaceAll(' ', '_');
   }
 
-  async enrichPeopleByContact(orgId: string,contactId: string,matchRequest: { [key: string]: string },provider: string = EnrichmentProviderName.APOLLO,) {
+  async enrichPeopleByContact(orgId: string, contactId: string, matchRequest: { [key: string]: string }, provider: string = EnrichmentProviderName.APOLLO,) {
     try {
       this.logger.log(`Enriching people with contactId: ${contactId}`);
       const enrichedData = await this.enrichmentService.getPeople(matchRequest);
@@ -414,7 +411,7 @@ export class ContactsService {
         where: { id: contactId },
       });
       const data = {
-        ...(!existingContact.firstName ? { firstName: enrichedData.firstName }: {}),
+        ...(!existingContact.firstName ? { firstName: enrichedData.firstName } : {}),
         ...(!existingContact.lastName ? { lastName: enrichedData.lastName } : {}),
         ...(!existingContact.fullName ? { fullName: enrichedData.fullName } : {}),
         ...(!existingContact.phone ? { phone: enrichedData.phone } : {}),
@@ -427,7 +424,7 @@ export class ContactsService {
         ...(!existingContact.organizationName ? { organizationName: enrichedData.organizationName } : {}),
         ...(!existingContact.jobTitle ? { jobTitle: enrichedData.jobTitle } : {}),
         ...(!existingContact.photoUrl ? { photoUrl: enrichedData.photoUrl } : {}),
-        ...(!existingContact.socialMedia ? {socialMedia: enrichedData.socialMedia}: {}),
+        ...(!existingContact.socialMedia ? { socialMedia: enrichedData.socialMedia } : {}),
         ...(!existingContact.notes ? { notes: enrichedData.notes } : {}),
       };
       // const enrichedContact = await prisma.contact.update({
@@ -443,12 +440,10 @@ export class ContactsService {
     }
   }
 
-  async hasMapping(orgId:string):Promise<Boolean>
-  {
-    try
-    {
+  async hasMapping(orgId: string): Promise<Boolean> {
+    try {
       const crmName = await this.externalCRMService.getActiveCRM(orgId);
-      const prisma = await this.prismaClientManager.getClient(orgId); 
+      const prisma = await this.prismaClientManager.getClient(orgId);
       const contacts = await prisma.crmMapping.count({
         where: {
           crmName,
@@ -457,8 +452,7 @@ export class ContactsService {
       });
       return contacts > 0;
     }
-    catch(e)
-    {
+    catch (e) {
       return false;
     }
   }
@@ -466,7 +460,7 @@ export class ContactsService {
   async syncContactsToExternalCrm(orgId: string) {
     this.logger.debug('Syncing contacts to external CRM');
     try {
-      if(!await this.hasMapping(orgId)) return; 
+      if (!await this.hasMapping(orgId)) return;
       let page = 1;
       let hasNextPage = true;
 
@@ -477,46 +471,38 @@ export class ContactsService {
           searchTerm: '',
           sort: 'asc'
         });
- 
+
         if (contacts.data && contacts.data.length > 0) {
           for (let contact of contacts.data) {
             const existingContact = await this.externalCRMService.getContactByEmail(orgId, contact.email);
             const hasPriority = await this.externalCRMService.hasPriority(orgId);
-            if(hasPriority)
-            {
-              if(existingContact) 
-              {
-                try
-                {
+            if (hasPriority) {
+              if (existingContact) {
+                try {
                   await this.externalCRMService.updateContact(orgId, existingContact.hs_object_id, contact);
                 }
-                catch(e)
-                {
+                catch (e) {
                   this.logger.error(e);
                 }
               }
-              else
-              {
-                try
-                {
+              else {
+                try {
                   await this.externalCRMService.createContact(orgId, contact);
                 }
-                catch(e)
-                {
+                catch (e) {
                   this.logger.error(e);
                 }
               }
-            } 
-            else
-            {
-              if (existingContact) continue; 
+            }
+            else {
+              if (existingContact) continue;
               await this.externalCRMService.createContact(orgId, contact);
             }
             this.logger.log(`Contact ${contact.email} synced to external CRM`);
           }
           page++;
         } else {
-          hasNextPage = false; 
+          hasNextPage = false;
         }
       }
     } catch (err) {
@@ -527,29 +513,25 @@ export class ContactsService {
   async syncExternalCrmToContacts(orgId: string) {
     this.logger.debug('Syncing external CRM to contacts');
     try {
-      if(!await this.hasMapping(orgId)) return;
+      if (!await this.hasMapping(orgId)) return;
       const contacts = await this.externalCRMService.getContacts(orgId);
       if (contacts) {
         for (let contact of contacts) {
           const existingContact = await this.getContactByEmail(orgId, contact.email);
           const hasPriority = await this.externalCRMService.hasPriority(orgId);
           const crmName = await this.externalCRMService.getActiveCRM(orgId);
-          const mappedData = await this.mappingService.handleReverseMapping(orgId,crmName, ObjectType.CONTACT, contact);
-          const objects = Object.keys(mappedData); 
-          if(objects.length === 0) continue; 
-          if(!hasPriority)
-          {
-            if(existingContact)
-            {
+          const mappedData = await this.mappingService.handleReverseMapping(orgId, crmName, ObjectType.CONTACT, contact);
+          const objects = Object.keys(mappedData);
+          if (objects.length === 0) continue;
+          if (!hasPriority) {
+            if (existingContact) {
               await this.updateContact(orgId, existingContact.id, mappedData);
             }
-            else
-            {
+            else {
               await this.createContact(orgId, mappedData);
             }
           }
-          else
-          {
+          else {
             if (existingContact) continue;
             await this.createContact(orgId, mappedData);
           }
@@ -560,5 +542,28 @@ export class ContactsService {
     catch (err) {
       this.logger.error(err);
     }
+  }
+
+  async getContactsByConversation(orgId: string, id: string) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    const contact = await prisma.contact.findFirst({
+      where: {
+        conversationId: id
+      }
+    });
+    return contact;
+  }
+
+  async getContactsByDate(orgId: string, startDate: Date, endDate: Date) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    const contacts = await prisma.contact.findMany({
+      where: {
+        createdAt: {
+          gte: startDate.toISOString(),
+          lte: endDate.toISOString()
+        }
+      }
+    });
+    return contacts;
   }
 }

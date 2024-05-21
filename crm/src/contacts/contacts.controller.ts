@@ -24,7 +24,7 @@ import { UpdateContactDto } from './dto/update-contact.dto';
 @ApiTags('Contacts')
 @Controller('contacts')
 export class ContactsController {
-  constructor(private contactsService: ContactsService) {}
+  constructor(private contactsService: ContactsService) { }
 
   @ApiOperation({
     summary: 'Get all contacts for an organization',
@@ -51,6 +51,37 @@ export class ContactsController {
       throw new UnauthorizedException('Unauthorized access');
     }
   }
+
+  @ApiOperation({
+    summary: 'Get all contacts for a conversation',
+    description: 'Endpoint to get all contacts for a conversation.',
+  })
+  @Get('conversation/:id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  async getContactsByConversation(@Req() request: IRequest, @Param('id') id: string) {
+    if (request.orgId) {
+      return this.contactsService.getContactsByConversation(request.orgId, id);
+    } else {
+      throw new UnauthorizedException('Unauthorized access');
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Get all contacts for a date range',
+    description: 'Endpoint to get all contacts for a date range.',
+  })
+  @Get('date-range')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  async getContactsByDateRange(@Req() request: IRequest, @Query('startDate') startDate: Date, @Query('endDate') endDate: Date) {
+    if (request.orgId) {
+      return this.contactsService.getContactsByDate(request.orgId, startDate, endDate);
+    } else {
+      throw new UnauthorizedException('Unauthorized access');
+    }
+  }
+
 
   @ApiOperation({
     summary: 'Get a single contact for an organization',
@@ -153,4 +184,6 @@ export class ContactsController {
       createFieldDto,
     );
   }
+
+
 }
