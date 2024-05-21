@@ -334,9 +334,7 @@ export class AgentService extends BaseService{
         }
         await this.chroma.deleteNameSapce(agent.name);
         await prisma.site.deleteMany()
-        await prisma.callToAction.deleteMany({
-          where: { agentId: agent.id }
-        })
+        await prisma.callToAction.deleteMany()
         return await prisma.agent.delete({
           where: { id },
         });
