@@ -1,11 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCampaignDto } from './dto/create-campaign.dot';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { UpdateCampaignDto } from './dto/update.campaign.dto';
 import { CampaignFilterDto } from './dto/campaign-filter.dto';
 import { CampaignStatus } from 'src/common/enums/enums';
-import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 import { BaseService } from 'src/common/services/base.service';
 import { ServiceParams } from 'src/common/models/service-param.model';
 
@@ -14,27 +12,6 @@ export class CampaignService extends BaseService{
     constructor(
     ) { 
         super();
-    }
-
-    async canCreateCampaign(orgId: string) {
-        const prisma = await this.getPrismaClient(orgId);
-        const account = await prisma.orgAccount.findFirst({
-            where: { orgId }
-        })
-        const subscription = await prisma.subscriptionPlan.findUnique({
-            where: {
-                id: account.subscriptionId
-            }
-        })
-        return subscription.campaignCount;
-    }
-
-    async updateCampaignCount(count: number, orgId: string) {
-        const prisma = await this.getPrismaClient(orgId);
-        const account = await prisma.orgAccount.findFirst({
-            where: { orgId }
-        })
-
     }
 
     async create(serviceParams:ServiceParams<CreateCampaignDto>) {
@@ -55,7 +32,6 @@ export class CampaignService extends BaseService{
                 endDate: endDate
             }
         });
-        await this.updateCampaignCount(1, orgId)
         return campaign;
     }
 

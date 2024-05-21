@@ -26,11 +26,11 @@ export class StageController {
     @ApiOkResponse({
       type: ResponseDTO<Stage>
     })
-    async findAll(@Req() zautoRequest: ZautoRequest)
+    async findAll(@Req() request: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.orgId)
+        if(request.user && request.orgId)
         {
-            const orgId = zautoRequest.orgId;
+            const orgId = request.orgId;
             return await this.stageService.findAllByOrg(orgId);
         }
         else
@@ -41,19 +41,27 @@ export class StageController {
 
     @Get(':id')
     @ApiOkResponse({type:Stage})
-    async findOne(@Param('id') id: string,)
+    async findOne(@Param('id') id: string,@Req() request: ZautoRequest)
     {
-        return await this.stageService.findOne(id);
+        if(request.user && request.user.orgId)
+        {
+            const orgId = request.user.orgId;
+            return await this.stageService.findOne(orgId, id);
+        }
+        else
+        {
+            throw new UnauthorizedException("Unauthorised access.")
+        }
     }
     
     @Post()
     @ApiOkResponse({type:Stage})
     async create(@Body() createStageDto: CreateStageDto,@Req() zautoRequest: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.orgId)
+        if(zautoRequest.user && zautoRequest.user.orgId)
         {
-            createStageDto.orgId = zautoRequest.orgId;
-            return await this.stageService.create(createStageDto);
+            const orgId = zautoRequest.user.orgId;
+            return await this.stageService.create({orgId,data:createStageDto});
         }
         else
         {
@@ -63,17 +71,34 @@ export class StageController {
     
     @Patch(':id')
     @ApiOkResponse({type:Stage})
-    async update(@Param('id') id: string, @Body() updateStageDto:UpdateStageDto)
+    async update(@Param('id') id: string, @Body() updateStageDto:UpdateStageDto,@Req() zautoRequest: ZautoRequest)
     {
-        return await this.stageService.update(id,updateStageDto);
+        if(zautoRequest.user && zautoRequest.user.orgId)
+        {
+            const orgId = zautoRequest.user.orgId;
+            return await this.stageService.update({orgId,id, data:updateStageDto});
+        }
+        else
+        {
+            throw new UnauthorizedException("Unauthorised access.")
+        }
     }
+    
 
     @Delete(':id')
     @HttpCode(204)
-    async delete(@Param('id') id: string)
+    async delete(@Param('id') id: string,@Req() zautoRequest: ZautoRequest)
     {
-        return await this.stageService.delete(id);
+        if(zautoRequest.user && zautoRequest.user.orgId)
+        {
+            const orgId = zautoRequest.user.orgId;
+            return await this.stageService.delete(orgId, id);
+        }
+        else
+        {
+            throw new UnauthorizedException("Unauthorised access.")
+        }
     }
-
+       
    
 }

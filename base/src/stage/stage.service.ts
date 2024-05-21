@@ -6,17 +6,23 @@ import { UpdateStageDto } from './dto/update-stage.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AGENT_STAGES } from 'src/common/templates/agent-prompt.template';
 import { AgentPromptService } from 'src/agent-prompt/agent-prompt.service';
+import { ServiceParams } from 'src/common/models/service-param.model';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class StageService {
-    constructor(private readonly prisma: PrismaService,
-        private readonly promptService: AgentPromptService,) { }
+export class StageService extends BaseService{
+    constructor(
+        private readonly promptService: AgentPromptService,) {
+            super();
+         }
 
-    async findAll(paginationDto: PaginationDto) {
+    async findAll(serviceParams: ServiceParams<PaginationDto>) {
+        const { orgId, data: paginationDto } = serviceParams;
         const { page, limit } = paginationDto;
         const skip = (page - 1) * limit;
-        const stageData = await this.prisma.stage.findMany({ skip, take: limit });
-        const total = await this.prisma.stage.count();
+        const prisma = await this.getPrismaClient(orgId);
+        const stageData = await prisma.stage.findMany({ skip, take: limit });
+        const total = await prisma.stage.count();
         return {
             data: stageData,
             page: page,
@@ -24,25 +30,9 @@ export class StageService {
         };
     }
 
-    async findAllByAgent(agentId: string, paginationDto: PaginationDto) {
-        const { page, limit } = paginationDto;
-        const skip = (page - 1) * limit;
-        const stageData = await this.prisma.stage.findMany({
-            skip,
-            take: limit,
-            where: { agentId },
-            orderBy: { sequence: 'asc' }
-        });
-        const total = await this.prisma.stage.count({ where: { agentId } });
-        return {
-            data: stageData,
-            page: page,
-            total: total
-        };
-    }
-
-    async findOne(id: string) {
-        const existingStage = await this.prisma.stage.findUnique({ where: { id } });
+    async findOne(orgId:string,id: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        const existingStage = await prisma.stage.findUnique({ where: { id } });
         if (existingStage) {
             return existingStage;
         }
@@ -52,7 +42,8 @@ export class StageService {
     }
 
     async findAllByOrg(orgId: string) {
-        const existingStage = await this.prisma.stage.findMany({ where: { orgId }, orderBy: { sequence: 'asc' } });
+        const prisma = await this.getPrismaClient(orgId);
+        const existingStage = await prisma.stage.findMany({ orderBy: { sequence: 'asc' } });
         if (existingStage) {
             return existingStage;
         }
@@ -61,14 +52,17 @@ export class StageService {
         }
     }
 
-    async create(createStageDto: CreateStageDto) {
+    async create(serviceParams:ServiceParams<CreateStageDto>) {
+        const { orgId, data: createStageDto } = serviceParams;
         try {
-            const stageData = await this.prisma.stage.create({ data: createStageDto });
+            const prisma = await this.getPrismaClient(orgId);
+            const stageData = await prisma.stage.create({ data: createStageDto });
 
-            const agent = await this.prisma.agent.findUnique({ where: { id: createStageDto.agentId } });
+            const agent = await prisma.agent.findUnique({ where: { id: createStageDto.agentId } });
             if (agent) {
-                const agentPrompt = await this.promptService.findByAgent(agent.id);
-                await this.promptService.update(agentPrompt.id, { type: 'system', text: await this.promptService.getAssistantPrompt(agent) });
+                const agentPrompt = await this.promptService.findByAgent(orgId,agent.id);
+                const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
+                await this.promptService.update({ orgId, agentId: agentPrompt.id, data:{ type: 'system', text: prompt }});
             }
             return stageData;
         }
@@ -82,15 +76,18 @@ export class StageService {
         }
     }
 
-    async update(id: string, updateStageDto: UpdateStageDto) {
-        const existingStage = await this.prisma.stage.findUnique({ where: { id } });
+    async update(serviceParams: ServiceParams<UpdateStageDto>) {
+        const { orgId, data: updateStageDto, id } = serviceParams;
+        const prisma = await this.getPrismaClient(orgId);
+        const existingStage = await prisma.stage.findUnique({ where: { id } });
         if (existingStage && existingStage.canEdit) {
-            const satgeData = await this.prisma.stage.update({ data: updateStageDto, where: { id } });
-            const agent = await this.prisma.agent.findUnique({ where: { id: existingStage.agentId } });
+            const satgeData = await prisma.stage.update({ data: updateStageDto, where: { id } });
+            const agent = await prisma.agent.findUnique({ where: { id: existingStage.agentId } });
             if (agent) {
-                const agentPrompt = await this.promptService.findByAgent(agent.id);
-                const updatedPrompt = await this.promptService.update(agentPrompt.id, { type: 'system', text: await this.promptService.getAssistantPrompt(agent) });
-                const agentFile = await this.prisma.agentFile.findFirst({
+                const agentPrompt = await this.promptService.findByAgent(orgId,agent.id);
+                const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
+                const updatedPrompt = await this.promptService.update({orgId,agentId: agentPrompt.id, data:{ type: 'system', text: prompt }});
+                const agentFile = await prisma.agentFile.findFirst({
                     where: {
                         agentId: agent.id
                     }
@@ -106,15 +103,17 @@ export class StageService {
         }
     }
 
-    async delete(id: string) {
-        const existingStage = await this.prisma.stage.findUnique({ where: { id } });
+    async delete(orgId: string,id: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        const existingStage = await prisma.stage.findUnique({ where: { id } });
         if (existingStage && existingStage.canEdit) {
-            const stageData = await this.prisma.stage.delete({ where: { id } });
+            const stageData = await prisma.stage.delete({ where: { id } });
 
-            const agent = await this.prisma.agent.findUnique({ where: { id: existingStage.agentId } });
+            const agent = await prisma.agent.findUnique({ where: { id: existingStage.agentId } });
             if (agent) {
-                const agentPrompt = await this.promptService.findByAgent(agent.id);
-                await this.promptService.update(agentPrompt.id, { type: 'system', text: await this.promptService.getAssistantPrompt(agent) });
+                const agentPrompt = await this.promptService.findByAgent(orgId,agent.id);
+                const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
+                await this.promptService.update({orgId, id: agentPrompt.id, data: { type: 'system', text: prompt }});
             }
             return stageData;
         } else if(!existingStage.canEdit) {
@@ -125,23 +124,28 @@ export class StageService {
         }
     }
 
-    async updateSquence(agentId: string, updateSquence: any) {
+    async updateSquence(serviceParams: ServiceParams<{agentId: string, updateSquence: any}>) {
+        const { orgId, data } = serviceParams;
+        const { agentId, updateSquence } = data;
+        const prisma = await this.getPrismaClient(orgId);
         const stages: any = [...updateSquence.stages];
+
         if (stages) {
             //delete stages
-            const deletedStages = await this.prisma.stage.deleteMany({ where: { agentId: agentId } });
+            const deletedStages = await prisma.stage.deleteMany({ where: { agentId: agentId } });
 
             // const _stages = await this.prisma.stage.createMany({data: []})
 
             //create stages
-            const newStages = await this.prisma.stage.createMany({ data: stages });
+            const newStages = await prisma.stage.createMany({ data: stages });
 
 
-            const agent = await this.prisma.agent.findUnique({ where: { id: agentId } });
+            const agent = await prisma.agent.findUnique({ where: { id: agentId } });
             if (agent) {
-                let agentPrompt = await this.promptService.findByAgent(agent.id);
-                let updatedPrompt = await this.promptService.update(agentPrompt.id, { type: 'system', text: await this.promptService.getAssistantPrompt(agent) });
-                const agentFile = await this.prisma.agentFile.findFirst({
+                let agentPrompt = await this.promptService.findByAgent(orgId,agent.id);
+                const prompt = await this.promptService.getAssistantPrompt(orgId,agent);
+                let updatedPrompt = await this.promptService.update({orgId,id:agentPrompt.id, data: { type: 'system', text: prompt }});
+                const agentFile = await prisma.agentFile.findFirst({
                     where: {
                         agentId: agent.id
                     }
@@ -162,7 +166,8 @@ export class StageService {
         }
     }
 
-    async setDefaultStages(agent: any) {
+    async setDefaultStages(orgId:string,agent: any) {
+        const prisma = await this.getPrismaClient(orgId);
         try {
             for (let i = 0; i < AGENT_STAGES.length; i++) {
                 const stage = AGENT_STAGES[i];
@@ -174,7 +179,7 @@ export class StageService {
                     sequence: stage.sequence,
                     canEdit: stage.canEdit || false
                 };
-                await this.prisma.stage.create({ data: data });
+                await prisma.stage.create({ data: data });
             }
         } catch (error) {
             console.error(`Error creating stage: `, error);
@@ -182,9 +187,10 @@ export class StageService {
         }
     }
 
-    async getStagesText(agentId: string) {
+    async getStagesText(orgId:string,agentId: string) {
         let stagestext = "";
-        const stages = await this.prisma.stage.findMany({ where: { agentId }, orderBy: { sequence: 'asc' } });
+        const prisma = await this.getPrismaClient(orgId);
+        const stages = await prisma.stage.findMany({ where: { agentId }, orderBy: { sequence: 'asc' } });
         for (let [index, stage] of stages.entries()) {
             stagestext += `${index + 1}.${stage.name}: ${stage.instruction}\n`;
         }

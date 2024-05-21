@@ -8,11 +8,7 @@ import { ZAUTO_HELPERS } from '../helpers/entities/helpers.model';
 import { HelpersService } from 'src/helpers/helpers.service';
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { SubscriptionPlanService } from 'src/subscription-plan/subscription-plan.service';
-import { CreateSubscriptionPlanDto } from 'src/subscription-plan/dto/create-subscription-plan.dto';
-import { DEFAULT_PLANS } from 'src/subscription-plan/entities/default-subscriptions-plans';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { OrgAccountService } from 'src/account/account.service';
 import { BaseService } from 'src/common/services/base.service';
 import { StartupMicroService } from './../microservices/crm_service/startup.service';
 
@@ -27,8 +23,6 @@ export class StartupService extends BaseService implements OnModuleInit {
         private userService: UsersService,
         private orgService: OrganizationsService,
         private helperService: HelpersService,
-        private orgAccountService: OrgAccountService,
-        private subscriptionPlan: SubscriptionPlanService,
         private startupMicroService: StartupMicroService
     ) {
         super();
@@ -39,7 +33,6 @@ export class StartupService extends BaseService implements OnModuleInit {
     }
 
     async executeOnStartup() {
-        await this.createSubscriptions();
         await this.createZautoOrg()
         // await this.createDefaultRoles();
         //await this.resyncHelpers();
@@ -122,17 +115,6 @@ export class StartupService extends BaseService implements OnModuleInit {
         }
     }
 
-    async getSubscription(subId: string) {
-        const subsPlan = await this.prisma.subscriptionPlan.findUnique({ where: { id: subId } });
-        if (subsPlan) {
-            return subsPlan;
-        }
-        else {
-            const freePlan = await this.prisma.subscriptionPlan.findFirst({ where: { price: 0 } });
-            return freePlan;
-        }
-    }
-
     async resyncHelpers() {
         try {
             this.helperService.reSyncHelpers();
@@ -174,27 +156,4 @@ export class StartupService extends BaseService implements OnModuleInit {
             }
         });
     }
-
-    async createSubscriptions() {
-        const defaultPlans = DEFAULT_PLANS;
-
-        try {
-            for (let plan of defaultPlans) {
-                const createSubscriptionPlanDto = new CreateSubscriptionPlanDto();
-                createSubscriptionPlanDto.name = plan.name;
-                createSubscriptionPlanDto.description = plan.description;
-                createSubscriptionPlanDto.agentsCount = plan.agentsCount;
-                createSubscriptionPlanDto.messageCount = plan.messageCount;
-                createSubscriptionPlanDto.sitesCount = plan.sitesCount;
-                createSubscriptionPlanDto.campaignCount = plan.campaignCount;
-                createSubscriptionPlanDto.userCount = plan.userCount;
-                createSubscriptionPlanDto.price = plan.price;
-                await this.subscriptionPlan.create(createSubscriptionPlanDto)
-            }
-        } catch (error) {
-            console.error('Default subscription plan not created, mybe it got created already.')
-        }
-    }
-
-
 } 

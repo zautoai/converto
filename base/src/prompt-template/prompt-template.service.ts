@@ -29,27 +29,27 @@ export class PromptTemplateService {
   }
 
   async selectTemplate(orgId: string, selectTemplateDto: SelectTemplateDto) {
-    const agent = await this.prisma.agent.findFirst({ where: { orgId } });
+    const agent = await this.prisma.agent.findFirst();
     if (!agent) {
       throw new NotFoundException(`Agent not found`);
     }
     const template = this.findOne(+selectTemplateDto.templateId);
     template.prompt = this.replaceVariablesInTemplate(template.prompt, selectTemplateDto.variables);
     template.prompt = await this.getAgentPrompt(agent, template.prompt);
-    const agentPrompt = await this.agentPromptService.updateByAgent(agent.id,{text:template.prompt,type:'template',templateId:template.id.toString()});
+    const agentPrompt = await this.agentPromptService.updateByAgent({orgId,agentId:agent.id,data:{text:template.prompt,type:'template',templateId:template.id.toString()}});
     return agentPrompt;
   }
 
   async customePrompt(orgId: string, customeTemplateDto: CustomeTemplateDto)
   {
-    const agent = await this.prisma.agent.findFirst({ where: { orgId } });
+    const agent = await this.prisma.agent.findFirst();
     if (!agent) {
       throw new NotFoundException(`Agent not found`);
     }
     let prompt = customeTemplateDto.prompt;
     prompt = this.replaceVariablesInTemplate(prompt, customeTemplateDto.variables);
     prompt = await this.getAgentPrompt(agent, prompt);
-    const agentPrompt = await this.agentPromptService.updateByAgent(agent.id,{text:prompt,type:'custom'});
+    const agentPrompt = await this.agentPromptService.updateByAgent({orgId,agentId: agent.id,data: {text:prompt,type:'custom'}});
     return agentPrompt;
   }
 

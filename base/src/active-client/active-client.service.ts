@@ -1,43 +1,53 @@
 import { Injectable } from "@nestjs/common";
 import { CreateActiveClientDto } from "./dto/create-client.dto";
-import { PrismaService } from "src/prisma/prisma.service";
+import { BaseService } from "src/common/services/base.service";
+import { ServiceParams } from "src/common/models/service-param.model";
 
 @Injectable()
-export class ActiveClientService {
+export class ActiveClientService extends BaseService{
 
 
-    constructor(private readonly prisma: PrismaService) {}
+    constructor() {
+        super();
+    }
 
-    async create(activeClient: CreateActiveClientDto) {
-        const client = await this.prisma.activeClient.findUnique({where: {userId: activeClient.userId}})
+    async create(serviceParams: ServiceParams<CreateActiveClientDto>) {
+        const { orgId ,data: activeClient } = serviceParams;
+        const prisma = await this.getPrismaClient(orgId);
+        const client = await prisma.activeClient.findUnique({where: {userId: activeClient.userId}})
         if(client) {
-            return await this.prisma.activeClient.update({data: activeClient, where:{userId: activeClient.userId}});
+            return await prisma.activeClient.update({data: activeClient, where:{userId: activeClient.userId}});
         } else {
-            return await this.prisma.activeClient.create({data: activeClient});
+            return await prisma.activeClient.create({data: activeClient});
         }
     }
 
-    async findOne(userId: string) {
-        return await this.prisma.activeClient.findUnique({where: {userId}});
+    async findOne(orgId: string,userId: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        return await prisma.activeClient.findUnique({where: {userId}});
     }
 
-    async findByOrg(orgId: string) {
-        return await this.prisma.activeClient.findMany({where: {orgId}});
+    async findAll(orgId: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        return await prisma.activeClient.findMany({where: {orgId}});
     }
 
-    async findByUser(userId: string) {
-        return await this.prisma.activeClient.findUnique({where: {userId}});
+    async findByUser(orgId: string,userId: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        return await prisma.activeClient.findUnique({where: {userId}});
     }
 
-    async findByClient(clientId: string) {
-        return await this.prisma.activeClient.findUnique({where: {clientId}, include: {user: {
+    async findByClient(orgId: string,clientId: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        return await prisma.activeClient.findUnique({where: {clientId}, include: {user: {
             select: {id: true, name:true, imgUrl: true}
         }}});
     }
 
-    async deleteByClient(clientId: string) {
+    async deleteByClient(orgId: string,clientId: string) {
+        const prisma = await this.getPrismaClient(orgId);
         try {
-            return await this.prisma.activeClient.delete({where: {clientId}});
+            return await prisma.activeClient.delete({where: {clientId}});
         }
         catch(error) {
             console.log(error)

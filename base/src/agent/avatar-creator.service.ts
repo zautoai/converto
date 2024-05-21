@@ -62,7 +62,7 @@ export class AvatarCreatorService {
         let fileRollBack : Function  = null
         
         try {
-            const _avatar = await this.agentService.findOne(avatarId);
+            const _avatar = await this.agentService.findOne(org.id,avatarId);
             if(_avatar && _avatar.status !== AgentStatus.ACTIVE) {
                 console.log('AvatarCreator: Start Creating Avatar for ' + JSON.stringify(createAvatarDto));
                 const avatarUniqueName = `${org.name.replaceAll(' ', '_').toLowerCase()}_${createAvatarDto.displayName.replaceAll(' ', '_').toLowerCase()}`;
@@ -84,7 +84,7 @@ export class AvatarCreatorService {
                 if(sites.length < 1) {
                     throw 'Unable to Read the Site'
                 }
-                await this.siteService.trainAvatar(_avatar.orgId, {urls:links, agentId: _avatar.id});
+                await this.siteService.trainAvatar(org.id, {urls:links, agentId: _avatar.id});
                 this.emitEvent(avatarId, {
                     avatarId: avatarId,
                     status: AgentStatus.TRAINING,
@@ -114,7 +114,7 @@ export class AvatarCreatorService {
                 const createAgentObj = await this.getCreateAgentObj(createAvatarDto, org, file, instructions);
                 console.log('AvatarCreator: Got createAgentObj for ' + avatarUniqueName, createAgentObj);
                 
-                const agent = await this.agentService.updateAvatar(avatarId, createAgentObj);
+                const agent = await this.agentService.updateAvatar({orgId: org.id,data:createAgentObj,avatarId});
                 if(!agent) return null;
                 console.log('AvatarCreator: Agent Created for ' + avatarUniqueName, agent.id);
                 this.emitEvent(avatarId, {
@@ -139,7 +139,7 @@ export class AvatarCreatorService {
             }
         } catch(error) {
             if(fileRollBack) fileRollBack();
-            this.agentService.updateStatus(avatarId,AgentStatus.TRAININGFAILED)
+            this.agentService.updateStatus({orgId: org.id, data: {id: avatarId,status: AgentStatus.TRAININGFAILED}});
             this.emitEvent(avatarId, {
                 avatarId: avatarId,
                 status: AgentStatus.TRAININGFAILED,
@@ -306,7 +306,6 @@ export class AvatarCreatorService {
             for(let site of sites) {
                 siteDtos.push({
                     url: site.url,
-                    orgId: avatar.orgId,
                     agentId: avatar.id,
                     status: SiteProcessStatus.COMPLETED,
                 })

@@ -6,14 +6,6 @@ export class CreateVisitDto {
 
     @ApiProperty()
     @IsString()
-    orgId: string;
-
-    @ApiProperty()
-    @IsString()
-    agentId: string;
-
-    @ApiProperty()
-    @IsString()
     visitorId: string;
 
 

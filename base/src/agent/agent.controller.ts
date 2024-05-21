@@ -42,7 +42,7 @@ export class AgentController {
 
     async addVisitor(agentId: string, query: any, request: Request, orgId?: string) {
       try {
-        let visitor = await this.visitorService.findById(query.visitor)
+        let visitor = await this.visitorService.findOne(orgId,query.visitor)
         if(!visitor) {
           const ipaddress = request.headers['x-forwarded-for'];
           console.log(ipaddress)
@@ -51,14 +51,12 @@ export class AgentController {
           delete headers['Authorization']
           delete headers['Proxy-Authorization']
           const visitorObj = {
-            agentId: agentId,
             infoJson: JSON.stringify(headers),
             userAgent: headers['user-agent'],
-            orgId: orgId,
             ipAddress: ipaddress,
             trackingInfo: JSON.stringify(ipData)
           };
-          visitor = await this.visitorService.create(visitorObj, orgId);
+          visitor = await this.visitorService.create({orgId,data:visitorObj});
         } 
         if(!query.utm_campaign && Object.keys(query).length > 1){
           const thirdPartyCampaign = await this.demandGenService.processCampaign(orgId,query);
@@ -78,13 +76,11 @@ export class AgentController {
           const defaultCampign = await this.agentsService.getDefaultCampaign(orgId);
           query.utm_campaign = defaultCampign.id
         }
-        const visit = await this.visitorService.createOrUpdateVisit({
-          orgId: orgId,
-          agentId: agentId,
+        const visit = await this.visitorService.createOrUpdateVisit({orgId,data:{
           campaignId: query.utm_campaign,
           source: query.source,
           visitorId: visitor.id
-        });
+        }});
         return {
           visit,
           visitor
@@ -116,12 +112,9 @@ export class AgentController {
   @ApiOkResponse({
     type: ResponseDTO<Agent>
   })
-  async findAll(@Query() paginationDto: PaginationDto, @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest.user && zautoRequest.orgId) {
-      return await this.agentsService.findAll(paginationDto);
-    } else {
-      return await this.agentsService.findAllByOrg(paginationDto, zautoRequest.orgId);
-    }
+  async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.findAll({orgId,data:paginationDto});
   }
 
   @Get(':id')
@@ -131,9 +124,11 @@ export class AgentController {
     type: Agent
   })
   async findOne(@Query() sourceQuery: any, @Param('id') id: string, @Req() request: Request) {
-    const agent = await this.agentsService.findOne(id);
+    const orgId = request.headers['org-id'];
+    const agent = await this.agentsService.findOne(orgId,id);
     if(sourceQuery.source) {
-      const visitorData = await this.addVisitor(id, sourceQuery, request, agent.orgId);
+
+      const visitorData = await this.addVisitor(id, sourceQuery, request,orgId);
       return {
         ...agent, visitor: visitorData.visitor, visit: visitorData.visit, 
       }
@@ -145,8 +140,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiBody({ type: UpdateAgentDto })
   @ApiOkResponse({type: Agent})
-  async update(@Param('id') id: string, @Body() updateAgentDto: UpdateAgentDto) {
-    return await this.agentsService.update(id, updateAgentDto);
+  async update(@Param('id') id: string, @Body() updateAgentDto: UpdateAgentDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.update({orgId, id, data:updateAgentDto});
   }
 
   @Patch(':id/styles')
@@ -155,8 +151,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiBody({ type: UpdateAgentDto })
   @ApiOkResponse({type: Agent})
-  async updateStyle(@Param('id') id: string, @Body() stylesObj: any) {
-    return await this.agentsService.updateStyles(id, stylesObj);
+  async updateStyle(@Param('id') id: string, @Body() styledata: any, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.updateStyles({orgId,data:{id, styledata}});
   }
 
   @Patch(':id/leadInfo')
@@ -165,8 +162,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiBody({ type: UpdateAgentDto })
   @ApiOkResponse({type: Agent})
-  async updateLeadInfo(@Param('id') id: string, @Body() leadInfoObj: any) {
-    return await this.agentsService.updateLeadInfo(id, leadInfoObj.leadInfo);
+  async updateLeadInfo(@Param('id') id: string, @Body() leadInfoObj: any, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.updateLeadInfo({orgId,data:{id, leadInfo: leadInfoObj.leadInfo}});
   }
 
   @Patch(':id/starters')
@@ -175,8 +173,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiBody({ type: UpdateAgentDto })
   @ApiOkResponse({type: Agent})
-  async updateStarters(@Param('id') id: string, @Body() startersObj: any) {
-    return await this.agentsService.updateStarters(id, startersObj.starters);
+  async updateStarters(@Param('id') id: string, @Body() startersObj: any, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.updateStarters({orgId , data: {id, starters: startersObj.starters}});
   }
 
   @Delete(':id')
@@ -185,8 +184,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiNoContentResponse()
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
-    return await this.agentsService.remove(id);
+  async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.remove(orgId,id);
   }
 
   @Post('availability')
@@ -194,8 +194,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiBody({ type: NameCheckDto })
   @ApiOkResponse({type: NameAvailability})
-  async isNameAvailable(@Body() nameCheckDto: NameCheckDto) {
-    const isExist = await this.agentsService.isNameExists(nameCheckDto.name);
+  async isNameAvailable(@Body() nameCheckDto: NameCheckDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    const isExist = await this.agentsService.isNameExists(orgId,nameCheckDto.name);
     return new NameAvailability(nameCheckDto.name, !isExist);
   }
 
@@ -222,7 +223,7 @@ export class AgentController {
       fileSize: 5 * 1024 * 1024, // 5MB
     },
   }))
-  async uploadProfilePic(@UploadedFile() file: Multer.File, @Param('id') id: string) { 
+  async uploadProfilePic(@UploadedFile() file: Multer.File, @Param('id') id: string, @Req() request: ZautoRequest) { 
     try {
       // Use sharp to compress and optionally resize the image
       const outputPath = `./public/images/compressed-${file.filename}`;
@@ -231,10 +232,10 @@ export class AgentController {
         .toFormat('jpeg') // Convert to JPEG for compression
         .jpeg({ quality: 50 }) // Set the quality of the image
         .toFile(outputPath);
-
+      const orgId = request.user.orgId;
       await this.staticService.deleteExistingFile(file.path);
-      const imgUrl = `${process.env.HOST_URL}/images/compressed-${file.filename}`
-      await this.agentsService.updateLogo(id, imgUrl);
+      const logoUrl = `${process.env.HOST_URL}/images/compressed-${file.filename}`
+      await this.agentsService.updateLogo({orgId, data: {id, logoUrl}});
 
       return {
         message: 'File uploaded and compressed successfully.',
@@ -243,7 +244,7 @@ export class AgentController {
           filename: file.filename,
           size: file.size,
           mimeType: file.mimetype,
-          path: imgUrl,
+          path: logoUrl,
         },
       };
     } catch (error) {
@@ -261,8 +262,9 @@ export class AgentController {
   @ApiCreatedResponse({type: Agent})
   async launchAvatar(@Body() createAvatarDto: CreateAvatarDto, @Req() zautoRequest: ZautoRequest) {
     if(zautoRequest.user && zautoRequest.orgId) {
+      const orgId = zautoRequest.user.orgId;
       const avatarName = createAvatarDto.displayName.replaceAll(" ", "_").toLowerCase().trim();
-      const avatarExists = await this.agentsService.isNameExists(avatarName);
+      const avatarExists = await this.agentsService.isNameExists(orgId,avatarName);
       if(avatarExists) {
         throw new ConflictException('Avatar Name already taken.');
       } else {
@@ -271,7 +273,7 @@ export class AgentController {
         if(orgAvatar) {
           throw new ConflictException('Avatar already launched. Only one avatar can be created per Organization.');
         }
-        const avatar = await this.agentsService.launchAvatarWithAssistant(createAvatarDto, zautoRequest.orgId as string);
+        const avatar = await this.agentsService.launchAvatarWithAssistant({orgId,data:createAvatarDto})
         await this.queueService.addTaskToQueue({
           name: 'launchAvatar',
           id: avatar.id,
@@ -291,7 +293,8 @@ export class AgentController {
   @ApiCreatedResponse({type: Agent})
   async retryAvatarLaunch(@Req() zautoRequest: ZautoRequest) {
     if(zautoRequest.user && zautoRequest.orgId) {
-      const org = await this.orgService.findOne(zautoRequest.orgId);
+      const orgId = zautoRequest.user.orgId;
+      const org = await this.orgService.findOne(orgId)
       if(org) {
         const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.orgId);
         if(orgAvatar) {
@@ -300,8 +303,8 @@ export class AgentController {
             companyName: org.name,
             companySite: org.siteUrl
           }
-          await this.agentsService.remove(orgAvatar.id);
-          const avatar = await this.agentsService.launchAvatarWithAssistant(createAvatarDto, zautoRequest.orgId as string);
+          await this.agentsService.remove(orgId,orgAvatar.id);
+          const avatar = await this.agentsService.launchAvatarWithAssistant({orgId,data:createAvatarDto});
           await this.queueService.addTaskToQueue({
             name: 'launchAvatar',
             id: avatar.id,
@@ -317,12 +320,13 @@ export class AgentController {
 
   @Get('widget/:agentId')
   @Header('Content-Type', 'application/javascript')
-  async embedding(@Param('agentId') agentId: string)
+  async embedding(@Param('agentId') agentId: string, @Req() request: Request)
   {
+    const org = request.headers['org-id'];
     if(agentId.includes('.js'))
     {
       agentId = agentId.replace('.js','');
-      return await this.agentsService.getEmbedding(agentId);
+      return await this.agentsService.getEmbedding(org,agentId);
     }
     else
     {
@@ -332,12 +336,13 @@ export class AgentController {
 
   @Get('widget/standalone/:agentId')
   @Header('Content-Type', 'application/javascript')
-  async standaloneEmbedding(@Param('agentId') agentId: string)
+  async standaloneEmbedding(@Param('agentId') agentId: string, @Req() request: Request)
   {
+    const org = request.headers['org-id'];
     if(agentId.includes('.js'))
     {
       agentId = agentId.replace('.js','');
-      return await this.agentsService.getEmbedding(agentId,true);
+      return await this.agentsService.getEmbedding(org,agentId,true);
     }
     else
     {

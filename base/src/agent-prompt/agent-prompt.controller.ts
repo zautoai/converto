@@ -23,19 +23,20 @@ export class AgentPromptController {
   @Post()
   @ApiBody({ type: AgentPrompt })
   @ApiCreatedResponse({type: AgentPrompt})
-  async create(@Body() createAgentPromptDto: CreateAgentPromptDto) {
-    return await this.agentpromptService.create(createAgentPromptDto);
+  async create(@Body() createAgentPromptDto: CreateAgentPromptDto,@Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentpromptService.create({orgId,data:createAgentPromptDto});
   }
 
   @Get()
   @ApiResponse({
     type: ResponseDTO<AgentPrompt>
   })
-  async find(@Req() request: ZautoRequest) {
+  async findAll(@Body() paginationDto:PaginationDto,@Req() request: ZautoRequest) {
     if(request.user)
     {
-      const orgId = request.orgId;
-      return await this.agentpromptService.getPromptByOrg(orgId);
+      const orgId = request.user.orgId;
+      return await this.agentpromptService.findAll({orgId,data:paginationDto})
     }
     else
     {
@@ -45,20 +46,23 @@ export class AgentPromptController {
 
   @Get(':id')
   @ApiOkResponse({type: AgentPrompt})
-  async findOne(@Param('id') id: string) {
-    return await this.agentpromptService.findOne(id);
+  async findOne(@Param('id') id: string,@Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentpromptService.findOne(orgId,id);
   }
 
   @Patch(':id')
   @ApiOkResponse({type: AgentPrompt})
-  async update(@Param('id') id: string, @Body() updateAgentPromptDto: UpdateAgentPromptDto) {
-    return await this.agentpromptService.update(id, updateAgentPromptDto);
+  async update(@Param('id') id: string, @Body() updateAgentPromptDto: UpdateAgentPromptDto,@Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentpromptService.update({ orgId,id, data:updateAgentPromptDto});
   }
 
   @Delete(':id')
   @ApiNoContentResponse()
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
-    await this.agentpromptService.remove(id);
+  async remove(@Param('id') id: string,@Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    await this.agentpromptService.remove(orgId, id)
   }
 }

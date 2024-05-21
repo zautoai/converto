@@ -59,18 +59,8 @@ model Organization {
   emails     String[]
   createdAt  DateTime    @default(now())
   modifiedAt DateTime    @updatedAt
-  OrgAccount OrgAccount?
 
-  Agents                 Agent[]
-  LeadConfigs            LeadConfig[]
-  AgentPrompts           AgentPrompt[]
-  Visitors               Visitor[]
-  Conversations          Conversation[]
   Leads                  Lead[]
-  ZautoMessages          ZautoMessage[]
-  Stages                 Stage[]
-  Visits                 Visit[]
-  CallToAction           CallToAction[]
   AvailabilitySchedule   AvailabilitySchedule[]
   LeradCategory          LeadCategory[]
   LeadCategoryMap        LeadCategoryMap[]
@@ -89,57 +79,6 @@ model ActiveClient {
 
   @@unique([userId, clientId], name: "Unique_userId_clientId")
   @@index([userId], map: "UserId_ActiveClient_fkey")
-}
-
-model SubscriptionPlan {
-  id                String       @id @default(uuid())
-  name              String       @unique @db.VarChar(100)
-  type              String       @default("monthly") @db.VarChar(10)
-  description       String       @db.Text()
-  agentsCount       Int          @default(1) @db.Integer()
-  messageCount      Int          @default(0) @db.Integer()
-  conversationCount Int          @default(0) @db.Integer()
-  sitesCount        Int          @default(0) @db.Integer()
-  campaignCount     Int          @default(0) @db.Integer()
-  userCount         Int          @default(0) @db.Integer()
-  price             Float        @default(0)
-  createdAt         DateTime     @default(now())
-  modifiedAt        DateTime     @updatedAt
-  orgAccounts       OrgAccount[]
-}
-
-enum OrgAccountStatus {
-  ACTIVE
-  EXPAIRED
-  PENDING
-}
-
-model OrgAccount {
-  orgId          String           @unique
-  org            Organization     @relation(fields: [orgId], references: [id])
-  subscriptionId String
-  subscription   SubscriptionPlan @relation(fields: [subscriptionId], references: [id])
-  status         OrgAccountStatus
-  createdAt      DateTime         @default(now())
-  modifiedAt     DateTime         @updatedAt
-
-  @@unique([orgId, subscriptionId], name: "Unique_Org_Subscription")
-  @@index([orgId], map: "OrgId_OrgAccount_fkey")
-  @@index([subscriptionId], map: "subscriptionId_OrgAccount_fkey")
-}
-
-model Usage {
-  orgId        String   @unique
-  month        String   @db.VarChar(20)
-  year         String   @db.VarChar(10)
-  inputToken   Int      @default(0) @db.Integer()
-  ountputToken Int      @default(0) @db.Integer()
-  message      Int      @db.Integer()
-  createdAt    DateTime @default(now())
-  modifiedAt   DateTime @updatedAt
-
-  @@unique([orgId, month, year], name: "Unique_Org_Month_Year")
-  @@index([orgId], map: "OrgAccount_orgId_fkey")
 }
 
 enum ConversationType {
@@ -169,10 +108,6 @@ enum BotPosition {
 
 model Agent {
   id String @id @default(uuid())
-
-  orgId String // Updated to String
-  org   Organization? @relation(fields: [orgId], references: [id])
-
   name             String?          @unique @db.VarChar(100)
   displayName      String           @db.VarChar(50)
   usetools         Boolean          @default(true)
@@ -198,19 +133,13 @@ model Agent {
   position         BotPosition?     @default(BOTTOM_RIGHT)
   sites            Site[]
   AgentPrompt      AgentPrompt[]
-  Visitors         Visitor[]
-  Conversations    Conversation[]
   Leads            Lead[]
   LeadConfig       LeadConfig[]
   AgentFiles       AgentFile[]
   Stages           Stage[]
   Messages         ZautoMessage[]
-  Visits           Visit[]
   CallToAction     CallToAction[]
   starters         String?          @db.Text
-
-  @@unique([name, orgId], name: "Unique_Agent_Name_OrgId")
-  @@index([orgId], map: "OrgId_agent_fkey")
 }
 
 model AgentFile {
@@ -231,7 +160,6 @@ model AgentFile {
 model LeadConfig {
   id         String        @id @default(uuid())
   agentId    String // Updated to String
-  orgId      String? // Updated to String
   name       Boolean       @default(false)
   email      Boolean       @default(false)
   mobile     Boolean       @default(false)
@@ -239,9 +167,7 @@ model LeadConfig {
   createdAt  DateTime      @default(now())
   modifiedAt DateTime      @updatedAt
   agent      Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  org        Organization? @relation(fields: [orgId], references: [id])
 
-  @@index([orgId], map: "OrgId_leadconfig_fkey")
   @@index([agentId], map: "AgentId_LeadConfig_fkey")
 }
 
@@ -262,26 +188,16 @@ model Site {
 model AgentPrompt {
   id         String        @id @default(uuid())
   agentId    String // Updated to String
-  orgId      String? // Updated to String
   templateId String?
   type       String        @db.VarChar(50)
   text       String        @db.Text
   createdAt  DateTime      @default(now())
   modifiedAt DateTime      @updatedAt
   agent      Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  org        Organization? @relation(fields: [orgId], references: [id])
-
-  @@index([orgId], map: "Agentprompt_orgId_fkey")
 }
 
 model Visitor {
   id String @id @default(uuid())
-
-  agentId String // Updated to String
-  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
-
-  orgId String? // Updated to String
-  org   Organization? @relation(fields: [orgId], references: [id])
 
   userAgent    String  @db.Text
   infoJson     String  @db.Text
@@ -295,18 +211,10 @@ model Visitor {
   conversations Conversation[]
   visits        Visit[]
 
-  @@index([orgId], map: "OrgId_visitor_fkey")
-  @@index([agentId], map: "AgentId_visitor_fkey")
 }
 
 model Visit {
   id String @id @default(uuid())
-
-  agentId String // Updated to String
-  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
-
-  orgId String // Updated to String
-  org   Organization @relation(fields: [orgId], references: [id])
 
   visitorId String
   visitor   Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
@@ -322,8 +230,6 @@ model Visit {
 
   conversation Conversation?
 
-  @@index([orgId], map: "Visitor_orgId_fkey")
-  @@index([agentId], map: "Visitor_agentId_fkey")
   @@index([visitorId], map: "Visitor_visitorId_fkey")
   @@index([campaignId], map: "Visitor_campaignId_fkey")
   @@index([source], map: "Visitor_source_key")
@@ -336,12 +242,6 @@ enum ConversationStatus {
 
 model Conversation {
   id String @id @default(uuid())
-
-  orgId String
-  org   Organization? @relation(fields: [orgId], references: [id])
-
-  agentId String
-  agent   Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   visitorId String
   visitor   Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
@@ -373,8 +273,6 @@ model Conversation {
   isValid          Boolean            @default(false)
 
   @@index([assigneeId], map: "assignee_Conversation_fkey")
-  @@index([orgId], map: "orgId_Conversation_fkey")
-  @@index([agentId], map: "agentId_Conversation_fkey")
   @@index([campaignId], map: "campaignId_Conversation_fkey")
   @@index([visitorId], map: "visitorId_Conversation_fkey")
   @@index([visitId], map: "visitId_Conversation_fkey")
@@ -402,8 +300,6 @@ enum Vote {
 
 model ZautoMessage {
   id           String           @id @default(uuid())
-  org          Organization     @relation(fields: [orgId], references: [id])
-  orgId        String
   agentId      String
   agent        Agent            @relation(fields: [agentId], references: [id], onDelete: Cascade)
   conv         Conversation     @relation(fields: [convId], references: [id], onDelete: Cascade)
@@ -423,7 +319,6 @@ model ZautoMessage {
   createdAt  DateTime @default(now())
   modifiedAt DateTime @updatedAt
 
-  @@index([orgId], map: "orgId_ZautoMessage_fkey")
   @@index([convId], map: "convId_ZautoMessage_fkey")
   @@index([sentById], map: "sentById_ZautoMessage_fkey")
 }
@@ -529,7 +424,6 @@ model Campaign {
 model Stage {
   id          String   @id @default(uuid())
   agentId     String?
-  orgId       String?
   name        String   @db.VarChar(100)
   instruction String   @db.Text
   sequence    Int      @db.Integer()
@@ -538,12 +432,10 @@ model Stage {
   modifiedAt  DateTime @updatedAt
 
   agent Agent?        @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  org   Organization? @relation(fields: [orgId], references: [id])
 
   @@unique([agentId, name], name: "Unique_Agent_Name")
   @@unique([agentId, sequence], name: "Unique_Agent_Sequence")
   @@index([agentId], map: "agentId_Stage_fkey")
-  @@index([orgId], map: "orgId_Stage_fkey")
 }
 
 model OpenAIAssistant {
@@ -580,7 +472,6 @@ enum CTAType {
 model CallToAction {
   id          String   @id @default(uuid())
   agentId     String?
-  orgId       String?
   name        String   @db.VarChar(100)
   description String   @db.VarChar(256)
   link        String?  @db.Text
@@ -589,11 +480,9 @@ model CallToAction {
   modifiedAt  DateTime @updatedAt
 
   agent Agent?        @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  org   Organization? @relation(fields: [orgId], references: [id])
 
   @@unique([agentId, name], name: "Unique_Agent_Name")
   @@index([agentId], map: "Cta_agentId_fkey")
-  @@index([orgId], map: "Cta_orgId_fkey")
 }
 
 model AvailabilitySchedule {
