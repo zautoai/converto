@@ -1,7 +1,6 @@
 import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { CreateAgentDto } from './dto/create-agent.dto';
 import { UpdateAgentDto } from './dto/update-agent.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { AgentPromptService } from 'src/agent-prompt/agent-prompt.service';
 import { ChromaDBService } from 'src/chroma/chroma-dbservice/chroma-db.service';
@@ -15,29 +14,11 @@ import { CreateAvatarDto } from './dto/create-avatar.dto';
 const { minify } = require('uglify-js');
 import * as fs from 'fs';
 import * as path from 'path';
-import { DemandGenService } from 'src/demand-gen/demand-gen.service';
-import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
-import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
 import { ServiceParams } from 'src/common/models/service-param.model';
 import { BaseService } from 'src/common/services/base.service';
 
 @Injectable() 
 export class AgentService extends BaseService{
-    updateAvatar(arg0: {
-        orgId: string; data: {
-            orgId: string; name: string; companyName: string; displayName: string; role: string; purpouse: any; leadInfo: any; companyBusiness: any; companyValue: any; usetools: boolean; conversationType: import("../common/enums/enums").ConversationType;
-            //   id: agent.assistantId,
-            //   instructions: agentPrompt.text,
-            //   model: agent.llmModel,
-            //   fileIds: [agentFile.id], 
-            //   name: agent.displayName
-            // });
-            siteObjUrl: any; //   instructions: agentPrompt.text,
-            useAssistant: boolean;
-        }; avatarId: string;
-    }) {
-        throw new Error("Method not implemented.");
-    }
  
   constructor(
     private readonly promptService: AgentPromptService,
@@ -94,7 +75,7 @@ export class AgentService extends BaseService{
         await this.promptService.create({orgId, data: {agentId: agent.id, type: 'system', text: instruction}})
         //Create Default stages for agent
         if (agent) {
-          await this.stageService.setDefaultStages(agent);
+          await this.stageService.setDefaultStages(orgId,agent);
         }
 
         //create file if fileId found
@@ -311,7 +292,7 @@ export class AgentService extends BaseService{
       await this.fileService.deleteFile(filePath);
 
       if (agent.AgentFiles && agent.AgentFiles[0]) {
-        this.removeOldFile(agent);
+        this.removeOldFile({orgId,data:agent});
       }
     } catch (error) {
       console.log(error)
@@ -434,7 +415,7 @@ export class AgentService extends BaseService{
       status: AgentStatus.ACTIVE} , where: {id}});
       //Create Default stages for agent
       if (agent) {
-        await this.stageService.setDefaultStages(agent);
+        await this.stageService.setDefaultStages(orgId,agent);
       }
       const instruction = await this.promptService.getAssistantPrompt(orgId,agent);
   

@@ -84,7 +84,7 @@ export class AvatarCreatorService {
                 if (sites.length < 1) {
                     throw 'Unable to Read the Site'
                 }
-                await this.siteService.trainAvatar({ orgId: _avatar.orgId, data: { urls: links } });
+                await this.siteService.trainAvatar({ orgId: org.id, data: { urls: links } });
                 this.emitEvent(avatarId, {
                     avatarId: avatarId,
                     status: AgentStatus.TRAINING,
