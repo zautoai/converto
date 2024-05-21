@@ -18,7 +18,6 @@ import { LlmModule } from './llm/llm.module';
 import { AgentPromptModule } from './agent-prompt/agent-prompt.module';
 import { VisitorModule } from './visitor/visitor.module';
 import { ConversationModule } from './conversation/conversation.module';
-import { LeadModule } from './lead/lead.module';
 import { RegistrationModule } from './registration/registration.module';
 
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -38,7 +37,6 @@ import { OrgSmtpconfigModule } from './org-smtpconfig/org-smtpconfig.module';
 import { CallToActionModule } from './call-to-action/call-to-action.module';
 import { AvailabilityScheduleModule } from './availability-schedule/availability-schedule.module';
 import { FileManagerModule } from './file-manager/file-manager.module';
-import { LeadCategoryModule } from './lead-category/lead-category.module';
 import { PromptTemplateModule } from './prompt-template/prompt-template.module';
 import { DemandGenModule } from './demand-gen/demand-gen.module';
 import { SecureExchangeModule } from './secure-exchange/secure-exchange.module';
@@ -77,7 +75,6 @@ import { SchemaManagerModule } from './schema-manager/schema-manager.module';
     AgentPromptModule,
     VisitorModule,
     ConversationModule,
-    LeadModule,
     RegistrationModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
@@ -107,7 +104,6 @@ import { SchemaManagerModule } from './schema-manager/schema-manager.module';
     CallToActionModule,
     AvailabilityScheduleModule,
     FileManagerModule,
-    LeadCategoryModule,
     PromptTemplateModule,
     DemandGenModule,
     SecureExchangeModule,

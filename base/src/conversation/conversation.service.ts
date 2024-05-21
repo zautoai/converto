@@ -10,15 +10,16 @@ import { User } from 'src/users/entities/user.entity';
 import { MessageMediaType } from './entities/conversation.enums';
 import { SummarizerService } from 'src/assistants/services/summarizer.service';
 import { ZautoChatCompletionMessage } from 'src/llm/llms/llm.models';
-import { LeadService } from 'src/lead/lead.service';
 import { UsageService } from 'src/account/usage.service';
+import { ContactsService } from 'src/contacts/contacts.service';
 
 @Injectable()
 export class ConversationService {
 
   constructor(private prisma: PrismaService,
     private summarizer: SummarizerService,
-    private readonly usageService: UsageService) { }
+    private readonly usageService: UsageService,
+    private contactsService: ContactsService) { }
 
   async create(createConversationDto: CreateConversationDto, orgId: string) {
     const currentDate = new Date().toISOString();
@@ -71,7 +72,7 @@ export class ConversationService {
   async findAllByagentId(agentId: string, paginationDto: PaginationDto) {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
-    const roleData = await this.prisma.conversation.findMany({ skip, take: limit, where: { agentId }, include: { Lead: true } });
+    const roleData = await this.prisma.conversation.findMany({ skip, take: limit, where: { agentId } });
     const total = await this.prisma.conversation.count({ where: { agentId } });
     return {
       data: roleData,
@@ -96,7 +97,6 @@ export class ConversationService {
         isValid: true
       },
       include: {
-        Lead: true,
         visitor: true,
         campaign: true,
         visit: true,
@@ -118,7 +118,6 @@ export class ConversationService {
         ...filterDto.campaign ? { campaignId: { equals: filterDto.campaign } } : {},
         ...filterDto.fromDate ? { modifiedAt: { gte: filterDto.fromDate, lte: filterDto.toDate } } : {},
         ...filterDto.status ? { status: { equals: ConversationStatus[filterDto.status] } } : {},
-        ...filterDto.lead ? { Lead: { isNot: null } } : {},
         isValid: true
       },
     });
@@ -157,7 +156,6 @@ export class ConversationService {
           }
         },
         campaign: true,
-        Lead: true,
         visitor: true,
         visit: true
       }
@@ -182,8 +180,7 @@ export class ConversationService {
               }
             }
           }
-        },
-        Lead: { include: {LeadCategoryMap: { include: {category: true}}}},
+        }
       }
     });
     if (existingConversation) {
@@ -211,7 +208,6 @@ export class ConversationService {
           }
         },
         campaign: true,
-        Lead: true,
         visitor: true,
         visit: true
       }
@@ -377,6 +373,7 @@ export class ConversationService {
 
   async requestForHumanSupport(id: string, lead?: any) {
     try {
+      const orgId = "From Subdomain"
       const conversation = await this.findOneNoSummay(id)
       if (conversation) {
         await this.createMessage({
@@ -389,7 +386,8 @@ export class ConversationService {
         })
       }
       if (lead) {
-        await this.addLead(conversation, lead);
+        lead.conversationId = id;
+        await this.contactsService.create(orgId, lead)
       }
       return conversation;
     } catch (error) {
@@ -397,27 +395,13 @@ export class ConversationService {
     }
   }
 
-  async addLead(conversation: any, lead: any) {
-    try {
-      const _lead = await this.prisma.lead.findFirst({ where: { convId: conversation.id } });
-      if (_lead) {
-        return await this.prisma.lead.update({ data: { ..._lead, orgId: conversation.orgId }, where: { id: _lead.id } })
-      } else {
-        return await this.prisma.lead.create({
-          data:
-            { ...lead, orgId: conversation.orgId, convId: conversation.id, agentId: conversation.agentId }
-        });
-      }
-    } catch (error) {
-      throw new InternalServerErrorException(error)
-    }
-  }
+
 
   async createMessage(createMessageDto: CreateMessageDto) {
     try {
       const message = await this.prisma.zautoMessage.create({ data: createMessageDto });
-      const count = await this.prisma.zautoMessage.count({ where: { convId: createMessageDto.convId, type:'TEXT' } });
-      if(count > 3) {
+      const count = await this.prisma.zautoMessage.count({ where: { convId: createMessageDto.convId, type: 'TEXT' } });
+      if (count > 3) {
         await this.prisma.conversation.update({ data: { isValid: true }, where: { id: createMessageDto.convId } })
       }
       return message;
@@ -463,7 +447,7 @@ export class ConversationService {
   async getLastMessage(convId: string) {
     try {
       const lastMessage = await this.prisma.zautoMessage.findFirst({
-        where: { convId , type: "TEXT"},
+        where: { convId, type: "TEXT" },
         orderBy: { createdAt: 'desc' },
         include: {
           sentBy: {
@@ -475,14 +459,13 @@ export class ConversationService {
           }
         }
       });
-    return lastMessage;
+      return lastMessage;
     } catch (error) {
       throw new InternalServerErrorException('Unable to fetch last message');
     }
   }
 
-  async createNavigationActivity(convId: string,url: string)
-  {
+  async createNavigationActivity(convId: string, url: string) {
     try {
       const conversation = await this.findOne(convId);
       if (conversation) {
@@ -506,14 +489,15 @@ export class ConversationService {
     }
   }
 
-  async updateNavigationActivity(messageId: string, url: string)
-  {
+  async updateNavigationActivity(messageId: string, url: string) {
     try {
-      const message = await this.prisma.zautoMessage.update({ data: {
-        role: 'user',
-        content: `Left from ${url}`,
-        type: MessageMediaType.ACTIVITY,
-      }, where: {id: messageId}})
+      const message = await this.prisma.zautoMessage.update({
+        data: {
+          role: 'user',
+          content: `Left from ${url}`,
+          type: MessageMediaType.ACTIVITY,
+        }, where: { id: messageId }
+      })
       return {
         message,
       }

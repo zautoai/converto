@@ -61,18 +61,15 @@ model Organization {
   modifiedAt DateTime    @updatedAt
   OrgAccount OrgAccount?
 
-  Agents          Agent[]
-  Campaigns       Campaign[]
-  LeadConfigs     LeadConfig[]
-  AgentPrompts    AgentPrompt[]
-  Visitors        Visitor[]
-  Conversations   Conversation[]
-  Leads           Lead[]
-  ZautoMessages   ZautoMessage[]
-  Stages          Stage[]
-  Visits          Visit[]
-  LeradCategory   LeadCategory[]
-  LeadCategoryMap LeadCategoryMap[]
+  Agents        Agent[]
+  Campaigns     Campaign[]
+  LeadConfigs   LeadConfig[]
+  AgentPrompts  AgentPrompt[]
+  Visitors      Visitor[]
+  Conversations Conversation[]
+  ZautoMessages ZautoMessage[]
+  Stages        Stage[]
+  Visits        Visit[]
 }
 
 model ActiveClient {
@@ -197,7 +194,6 @@ model Agent {
   AgentPrompt      AgentPrompt[]
   Visitors         Visitor[]
   Conversations    Conversation[]
-  Leads            Lead[]
   LeadConfig       LeadConfig[]
   AgentFiles       AgentFile[]
   Stages           Stage[]
@@ -349,7 +345,6 @@ model Conversation {
 
   type             ConversationType
   threadId         String?            @db.VarChar(150)
-  Lead             Lead?
   messages         ZautoMessage[]
   createdAt        DateTime           @default(now())
   modifiedAt       DateTime           @updatedAt
@@ -421,77 +416,6 @@ model ZautoMessage {
   @@index([orgId], map: "orgId_ZautoMessage_fkey")
   @@index([convId], map: "convId_ZautoMessage_fkey")
   @@index([sentById], map: "sentById_ZautoMessage_fkey")
-}
-
-enum LeadStatus {
-  REPORTING
-  CLOSEDWON
-  CLOSEDLOST
-}
-
-model Lead {
-  id           String     @id @default(uuid())
-  convId       String?    @unique
-  agentId      String? // Updated to String
-  orgId        String? // Updated to String
-  name         String?    @db.VarChar(50)
-  email        String?    @db.VarChar(50)
-  mobile       String?    @db.VarChar(15)
-  whatsapp     String?    @db.VarChar(15)
-  info         String?    @db.Text
-  crm_id       String?    @db.VarChar(100)
-  crmContactid String?    @unique
-  status       LeadStatus @default(REPORTING)
-
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-
-  conversation Conversation? @relation(fields: [convId], references: [id], onDelete: SetNull)
-  Agent        Agent?        @relation(fields: [agentId], references: [id], onDelete: SetNull)
-  org          Organization? @relation(fields: [orgId], references: [id])
-
-  LeadCategoryMap LeadCategoryMap[]
-
-  @@index([orgId], map: "orgId_Lead_fkey")
-  @@index([convId], map: "convId_Lead_fkey")
-  @@index([agentId], map: "agentId_Lead_fkey")
-}
-
-model LeadCategory {
-  id          String @id @default(uuid())
-  orgId       String
-  name        String
-  title       String
-  description String
-  color       String
-
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-
-  LeadCategoryMap LeadCategoryMap[]
-
-  org Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
-
-  @@unique([orgId, name], name: "LeadCategory_unique_orgId_name")
-  @@index([orgId], map: "orgId_LeadCategory_fkey")
-}
-
-model LeadCategoryMap {
-  orgId      String
-  leadId     String
-  categoryId String
-
-  org      Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  lead     Lead?         @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  category LeadCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-
-  @@unique([orgId, leadId, categoryId], name: "LeadCategory_unique_orgId_name")
-  @@index([orgId], map: "orgId_LeadCategoryMap_fkey")
-  @@index([leadId], map: "leadId_LeadCategoryMap_fkey")
-  @@index([categoryId], map: "categoryId_LeadCategoryMap_fkey")
 }
 
 enum CampaignStatus {

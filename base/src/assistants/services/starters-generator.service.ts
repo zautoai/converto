@@ -11,9 +11,9 @@ export class StarterGeneratorService {
 
     private redisSubscriber: RedisClient;
 
-    constructor(private readonly llmService: LlmService, 
+    constructor(private readonly llmService: LlmService,
         private readonly prisma: PrismaService) {
-        
+
         this.redisSubscriber = new Redis({
             host: process.env.REDIS_IP,
             port: parseInt(process.env.REDIS_PORT, 10) || 6379,
@@ -25,30 +25,29 @@ export class StarterGeneratorService {
     onModuleInit() {
         this.redisSubscriber.subscribe('generateStarters', (err, count) => {
             if (err) {
-              console.error('Failed to subscribe: %s', err.message);
+                console.error('Failed to subscribe: %s', err.message);
             } else {
-              console.log(`Subscribed successfully! This client is currently subscribed to ${count} channels.`);
+                console.log(`Subscribed successfully! This client is currently subscribed to ${count} channels.`);
             }
-          });
-        
+        });
+
         // Handle incoming messages
         this.redisSubscriber.on('message', async (channel, message) => {
             const payload = JSON.parse(message);
             const id = payload.convId;
             const conversation = await this.prisma.conversation.findUnique({
-                    include: { 
-                        Lead: true, 
-                        agent: true, 
-                        messages: {
-                            where: { type : 'TEXT'},
-                            orderBy: { createdAt: 'asc' }, 
-                            select:{
-                                content: true,
-                                role: true
-                            },
-                        }
-                    },
-                    where: {id}
+                include: {
+                    agent: true,
+                    messages: {
+                        where: { type: 'TEXT' },
+                        orderBy: { createdAt: 'asc' },
+                        select: {
+                            content: true,
+                            role: true
+                        },
+                    }
+                },
+                where: { id }
             });
             if (conversation) {
                 // const content = JSON.stringify(conversation.messages);
@@ -61,16 +60,16 @@ export class StarterGeneratorService {
                 // }
                 // console.log(jsonLead);
             }
-          });
+        });
     }
 
     extractJsonFromMarkdown(mdContent: string) {
         // Regular expression to match a JSON block within Markdown
         const jsonRegex = /```json([\s\S]*?)```/;
-    
+
         // Extract JSON string
         const match = mdContent.match(jsonRegex);
-        
+
         if (match && match[1]) {
             // Clean up whitespace and parse JSON
             try {
@@ -84,14 +83,14 @@ export class StarterGeneratorService {
             console.error('No JSON content found');
             return null;
         }
-      }
+    }
 
     async generateStarters(content: string) {
-        let prompt = STARTER_GENERATOR_PROMPT.replace('{{conversation}}', content);   
+        let prompt = STARTER_GENERATOR_PROMPT.replace('{{conversation}}', content);
         const promptMesssage = [
-            {role: 'system', content: prompt}
+            { role: 'system', content: prompt }
         ];
         return await this.llmService.sendDirect(promptMesssage, LLMNames.COHERE, LLMModels.COHER_COMMAND_R);
     }
-    
+
 }

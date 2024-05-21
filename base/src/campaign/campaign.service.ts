@@ -8,11 +8,13 @@ import { CampaignStatus } from 'src/common/enums/enums';
 import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 import { BaseService } from 'src/common/services/base.service';
 import { ServiceParams } from 'src/common/models/service-param.model';
+import { ContactsService } from 'src/contacts/contacts.service';
 
 @Injectable()
-export class CampaignService extends BaseService{
+export class CampaignService extends BaseService {
     constructor(
-    ) { 
+        private contactsService: ContactsService
+    ) {
         super();
     }
 
@@ -37,7 +39,7 @@ export class CampaignService extends BaseService{
 
     }
 
-    async create(serviceParams:ServiceParams<CreateCampaignDto>) {
+    async create(serviceParams: ServiceParams<CreateCampaignDto>) {
         const { orgId, data } = serviceParams;
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + 30);
@@ -59,7 +61,7 @@ export class CampaignService extends BaseService{
         return campaign;
     }
 
-    async findAll(serviceParams:ServiceParams<PaginationDto>) {
+    async findAll(serviceParams: ServiceParams<PaginationDto>) {
         const { orgId, data: paginationDto } = serviceParams;
         const { page, limit } = paginationDto;
         const skip = (page - 1) * limit;
@@ -73,7 +75,7 @@ export class CampaignService extends BaseService{
         };
     }
 
-    async findAllByOrg(serviceParams:ServiceParams<CampaignFilterDto>) {
+    async findAllByOrg(serviceParams: ServiceParams<CampaignFilterDto>) {
         const { orgId, data: campaignFilterDto } = serviceParams;
         const { page, limit } = campaignFilterDto;
         const skip = (page - 1) * limit;
@@ -116,7 +118,7 @@ export class CampaignService extends BaseService{
         };
     }
 
-    async findOne(orgId: string,id: string) {
+    async findOne(orgId: string, id: string) {
         const prisma = await this.getPrismaClient(orgId);
         const existingCampaign = await prisma.campaign.findUnique({ where: { id } });
         if (existingCampaign) {
@@ -127,7 +129,7 @@ export class CampaignService extends BaseService{
         }
     }
 
-    async update(serviceParams:ServiceParams<UpdateCampaignDto>) {
+    async update(serviceParams: ServiceParams<UpdateCampaignDto>) {
         const { orgId, data, id } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
         const existingCampaign = await prisma.campaign.findUnique({ where: { id } });
@@ -163,7 +165,7 @@ export class CampaignService extends BaseService{
     }
 
 
-    async delete(orgId: string,id: string) {
+    async delete(orgId: string, id: string) {
         const prisma = await this.getPrismaClient(orgId);
         const existingCampaign = await prisma.campaign.findUnique({ where: { id } });
         if (existingCampaign) {
@@ -187,7 +189,7 @@ export class CampaignService extends BaseService{
         return date.toISOString().split('T')[0];
     };
 
-    async getVisitsCountByDate(orgId: string,id: string) {
+    async getVisitsCountByDate(orgId: string, id: string) {
         try {
             const prisma = await this.getPrismaClient(orgId);
             const dateWiseVisit = await prisma.visit.groupBy({
@@ -225,27 +227,19 @@ export class CampaignService extends BaseService{
         }
     }
 
-    async getLeadCountByDate(orgId: string,id: string) {
+    async getLeadCountByDate(orgId: string, id: string) {
         const prisma = await this.getPrismaClient(orgId);
         const campaign = await prisma.campaign.findFirst({
-            where: { id},
+            where: { id },
             include: {
-                Conversations: {
-                    select: {
-                        Lead: {
-                            select: {
-                                createdAt: true
-                            }
-                        },
-                    }
-                }
+                Conversations: true
             }
         });
-
         const leadByDate = {};
 
         for (let conversation of campaign.Conversations) {
-            const createdAt = conversation?.Lead?.createdAt;
+            const lead = await this.contactsService.getContactsByConversation(orgId, conversation.id);
+            const createdAt = lead.createdAt;
             if (createdAt) {
                 const date = this.toDateString(createdAt);
 
@@ -268,7 +262,7 @@ export class CampaignService extends BaseService{
 
     }
 
-    async getCounts(orgId: string,campaignId: string) {
+    async getCounts(orgId: string, campaignId: string) {
         const prisma = await this.getPrismaClient(orgId);
         const uniqueVisitorCount = await prisma.visit.groupBy({
             by: ['visitorId'],
@@ -280,12 +274,14 @@ export class CampaignService extends BaseService{
             }
         });
         const visitCount = uniqueVisitorCount.length;
-        const convoCount = await prisma.conversation.count({ where: { campaignId,isValid:true } });
-        const conversations = await prisma.conversation.findMany({ where: { campaignId,isValid:true } });
+        const convoCount = await prisma.conversation.count({ where: { campaignId, isValid: true } });
+        const conversations = await prisma.conversation.findMany({ where: { campaignId, isValid: true } });
         let totalLeadCount = 0;
         for (const conversation of conversations) {
-            const leadCount = await prisma.lead.count({ where: { convId: conversation.id,conversation:{isValid:true} } });
-            totalLeadCount += leadCount;
+            const lead = await this.contactsService.getContactsByConversation(orgId, conversation.id);
+            if (lead) {
+                totalLeadCount += 1;
+            }
         }
 
         return {
