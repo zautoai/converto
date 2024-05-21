@@ -1,59 +1,30 @@
-
-
-
-
-<main class="app-main">
-  <div class="row">
-    <div class="col-md-12 mb-3">
-      <div class="card">
-        <div class="card-body">
-          <div class="row">
-
-            <div class="col-md-6 text-center mb-3">
-              <img src="{{userImageUrl}}" class="img-fluid rounded-circle mb-3" alt="Profile" style="width: 80px; height: 80px; ">
-              <a href="{{ selectedData.website }}" >
-              <h5 class="mb-1 fs-3 no-underline">{{selectedData.accountName}}</h5>
-            </a> 
-               <p class="text-muted fs-6 mb-2">{{ selectedData.industry }}</p> 
-                
-              
-              <div class="social-icons mt-3 mb-3">
-                <a href="https://twitter.com/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-twitter"></i></a>
-                <a href="https://facebook.com/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-facebook"></i></a>
-                <a href="https://linkedin.com/in/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-linkedin"></i></a>
-                <a href="https://instagram.com/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-instagram"></i></a>
-                <div style="text-align: start;">
-                <p class="text-muted fs-6 mb-2"> AnnualRevenue: {{ selectedData.annualRevenue }}</p> 
-                 <p class="text-muted fs-6 mb-2"> Company Size: {{ selectedData.companySize }}</p>
-                </div>
-            </div>
-
-            </div>
-
-            <div class="col-md-6">
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="top section text-center">
-                    <h6 class="mb-1 mt-3 text-center fw-bold" style="color: rgb(12, 219, 56); font-size: large;">100&nbsp;</h6>
-                    <p class="fw-normal text-muted lead-score" style="margin-top: 20px;">Predictive Lead Score</p>
-                  </div>
-                </div>
-                <div class="col-md-12 text-end" style="margin-top:20px;">
-                 <div class="d-flex gap-2 align-item-center justify-content-center text-end">
-                  <label for="segment" class="mb-2"><span class="fw-bold text-primary ">Mid Market</span></label>
-                  <label for="segment" class="mb-2"><span class="fw-bold text-primary">High Potential</span></label>
-                 </div>
-                 <div  class="d-flex gap-2 align-item-center justify-content-center text-end"> <label for="segment" class="mb-2"><span class="fw-bold text-primary">ICP Match</span></label>
-                  <label for="segment" class="mb-2"><span class="fw-bold text-primary">ICP Match</span></label></div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="profile-card">
+  <img src="https://via.placeholder.com/80" alt="Profile">
+  <h5>Merri Diamond <span class="rating"><i class="fas fa-star"></i> 3.6</span></h5>
+  <p class="text-muted">{{selectedData.fullname}}</p>
+  
+  <div class="info-item">
+      <i class="fas fa-calendar-alt"></i>
+      <span>Date: 15 Jan 2023</span>
   </div>
+  <div class="info-item">
+      <i class="fas fa-phone"></i>
+      <span>Phone: +1 23456 78910</span>
+  </div>
+  <div class="info-item">
+      <i class="fas fa-envelope"></i>
+      <span>Email: supportmannatthemes.com</span>
+  </div>
+  <div class="info-item">
+      <p class="text-muted mb-0"><strong>Last Message:</strong> popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature.</p>
+  </div>
+  
+  <div class="buttons">
+      <button class="btn btn-outline-primary">Send SMS</button>
+      <button class="btn btn-outline-success">Send Email</button>
+  </div>
+</div>
+
   <!--below tab-->
         <div class="tab-menu-heading border-bottom-0" style="border: none !important;">
             <div class="tabs-menu1">
@@ -244,5 +215,4 @@
           
 
         
-      </main>
-    
+     

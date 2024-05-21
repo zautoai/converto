@@ -214,3 +214,37 @@ body {
     color:black; /* Inherit color from parent element */
     
   }
+  .profile-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 1150px;
+    margin: auto;
+    text-align: center;
+    background-color: #fff;
+}
+.profile-card img {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+}
+.profile-card h5 {
+    margin-top: 15px;
+    font-size: 1.25rem;
+}
+.profile-card .rating {
+    font-size: 0.9rem;
+    color: #ffc107;
+}
+.profile-card .info-item {
+    margin-bottom: 10px;
+}
+.profile-card .info-item i {
+    margin-right: 10px;
+}
+.profile-card .buttons {
+    margin-top: 20px;
+}
+.profile-card .buttons .btn {
+    margin-right: 10px;
+}
