@@ -40,7 +40,7 @@ export class ContactsComponent implements OnInit {
   itemPerPage: number = 10;
   submittedData: any[] = [];
   selectedData: any = '';
-  limit = 2;
+  limit = 5;
   
 
 

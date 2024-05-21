@@ -10,7 +10,7 @@ import { RestService } from 'src/app/shared/services/rest.service';
   styleUrl: './contactview.component.scss'
 })
 export class ContactviewComponent {
-  userImageUrl = 'assets/user-image.jpg';
+  userImageUrl = 'https://th.bing.com/th/id/OIP.EVCGXvrjsvMrhfOX3su_FgHaHa?w=218&h=218&c=7&r=0&o=5&dpr=1.5&pid=1.7';
   userName = 'Unknown image'; 
   
   userLinkedIn = 'https://www.linkedin.com/in/e.gooding';

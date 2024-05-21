@@ -21,7 +21,12 @@
             <th class="text-white">Industry</th>
             <th class="text-white">Company Size</th>
             <th class="text-white">Location</th>
+          
             <th class="text-white">Annual Reveneue</th>
+            <th class="text-white">Status</th>
+            <th class="text-white">Score</th>
+             <th class="text-white">Engagement</th>
+
             <th class="text-white">Action</th>
           
             
@@ -41,12 +46,21 @@
                 <td>
                   {{data.city}}
                 </td>
+               
                 <td>
                   {{ data.
                     annualRevenue
                     }}
                 </td>
-              
+                <td>
+                  {{data.status}}
+                </td>
+                <td>
+                  {{data.Score}}||"N/A"
+                </td>
+                <td>
+                  {{data.Engagement}}
+                </td>
                 <td class="icon w-1">
                   <button (click)="openViewUser(data)">
                     <i class="fa fa-eye text-secondary view"></i>

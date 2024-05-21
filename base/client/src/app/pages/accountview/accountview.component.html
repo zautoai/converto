@@ -1,36 +1,60 @@
 
 
-<div class="app-container">
-      <header class="app-header">
-        <h1>Common Room</h1>
-        <div class="app-header-actions">
-          <button>Add to segment</button>
-          <button>Send</button>
-          <button>Message</button>
-          <button>Send</button>
-          <button>...</button>
-        </div>
-      </header>
-      <main class="app-main">
-        <div class="user-profile">
-          <img [src]="userImageUrl" [alt]="userName" class="user-image">
-          <div class="user-details">
-            <h3>{{selectedData.accountName}}</h3>
-            <p>Created At  {{ selectedData.
-                modifiedAt  | date:'dd MMMM'}}</p>
-            <p>{{ selectedData.city }}</p>
-            <p>Intent Scoring :</p>
-            
-              
-               
-              
-                  <label for="economicBuyer">SaaS</label>
+
+
+<main class="app-main">
+  <div class="row">
+    <div class="col-md-12 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+
+            <div class="col-md-6 text-center mb-3">
+              <img src="{{userImageUrl}}" class="img-fluid rounded-circle mb-3" alt="Profile" style="width: 80px; height: 80px; ">
+              <a href="{{ selectedData.website }}" >
+              <h5 class="mb-1 fs-3 no-underline">{{selectedData.accountName}}</h5>
+            </a> 
+               <p class="text-muted fs-6 mb-2">{{ selectedData.industry }}</p> 
                 
-            
               
-            
+              <div class="social-icons mt-3 mb-3">
+                <a href="https://twitter.com/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="https://facebook.com/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-facebook"></i></a>
+                <a href="https://linkedin.com/in/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-linkedin"></i></a>
+                <a href="https://instagram.com/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-instagram"></i></a>
+                <div style="text-align: start;">
+                <p class="text-muted fs-6 mb-2"> AnnualRevenue: {{ selectedData.annualRevenue }}</p> 
+                 <p class="text-muted fs-6 mb-2"> Company Size: {{ selectedData.companySize }}</p>
+                </div>
+            </div>
+
+            </div>
+
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="top section text-center">
+                    <h6 class="mb-1 mt-3 text-center fw-bold" style="color: rgb(12, 219, 56); font-size: large;">100&nbsp;</h6>
+                    <p class="fw-normal text-muted lead-score" style="margin-top: 20px;">Predictive Lead Score</p>
+                  </div>
+                </div>
+                <div class="col-md-12 text-end" style="margin-top:20px;">
+                 <div class="d-flex gap-2 align-item-center justify-content-center text-end">
+                  <label for="segment" class="mb-2"><span class="fw-bold text-primary ">Mid Market</span></label>
+                  <label for="segment" class="mb-2"><span class="fw-bold text-primary">High Potential</span></label>
+                 </div>
+                 <div  class="d-flex gap-2 align-item-center justify-content-center text-end"> <label for="segment" class="mb-2"><span class="fw-bold text-primary">ICP Match</span></label>
+                  <label for="segment" class="mb-2"><span class="fw-bold text-primary">ICP Match</span></label></div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+  <!--below tab-->
         <div class="tab-menu-heading border-bottom-0" style="border: none !important;">
             <div class="tabs-menu1">
               <ul ngbNav #nav="ngbNav" [(activeId)]="active">
@@ -56,12 +80,10 @@
                                 </ul>
                               </div>
                             </div  >
-                            <div class="card shadow-sm mt-3">  <div class="card-header">
+                            <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                               <h5 class="card-title">Contact Information</h5>  </div>
                             <div class="card-body">
                               <ul class="list-group">
-
-
                                 <li class="list-group-item"><strong>Contact Information</strong></li>
                                 <li class="list-group-item">Email: {{selectedData.email}}</li>
                                 <li class="list-group-item">Phone: {{selectedData.phone}}</li>
@@ -73,11 +95,9 @@
                                 <li class="list-group-item">Country: {{selectedData.country}}</li>
                                 <li class="list-group-item">Social Media: {{selectedData.socialMedia}}</li>
                               </ul>
-
-
                             </div>
-                          </div>
-                          <div class="card shadow-sm mt-3">  <div class="card-header">
+                          </div> -->
+                          <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                             <h5 class="card-title">Business Details </h5>  </div>
                           <div class="card-body">
                             <ul class="list-group">
@@ -86,8 +106,8 @@
                               <li class="list-group-item">Company Size: {{selectedData.companySize}}</li>
                                </ul>
                           </div>
-                        </div>
-                        <div class="card shadow-sm mt-3">  <div class="card-header">
+                        </div> -->
+                        <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                           <h5 class="card-title">Status and Timeline</h5>  </div>
                         <div class="card-body">
                           <ul class="list-group">
@@ -97,8 +117,8 @@
                             <li class="list-group-item">Modified At: {{selectedData.modifiedAt}}</li>
                           </ul>
                         </div>
-                      </div>
-                      <div class="card shadow-sm mt-3">  <div class="card-header">
+                      </div> -->
+                      <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                         <h5 class="card-title">Additional Information</h5>  </div>
                       <div class="card-body">
                         <ul class="list-group">
@@ -107,8 +127,8 @@
                         
                         </ul>
                       </div>
-                    </div>
-                    <div class="card shadow-sm mt-3">  <div class="card-header">
+                    </div> -->
+                    <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                       <h5 class="card-title">Optional Fields</h5>  </div>
                     <div class="card-body">
                       <ul class="list-group">
@@ -122,7 +142,7 @@
                         <li class="list-group-item">Team Members: {{selectedData.teamMembers}}</li>
                         </ul>
                     </div>
-                  </div>
+                  </div> -->
                           </div>
                         </div>
                     
@@ -225,4 +245,4 @@
 
         
       </main>
-    </div>
+    

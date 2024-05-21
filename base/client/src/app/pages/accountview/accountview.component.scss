@@ -89,14 +89,14 @@ body {
   }
   
   /* Link Styles */
-  a {
-    color: #007bff;
-    text-decoration: none;
-  }
+   a {
+     color: #007bff;
+     text-decoration: none;
+   }
   
-  a:hover {
-    text-decoration: underline;
-  }
+  // a:hover {
+  //   text-decoration: underline;
+  // }
   label {
     background-color: #6cd284; 
     padding: 5px 10px;         
@@ -208,4 +208,9 @@ body {
   .lead-card a {
     display: block;
     margin-top: 10px;
+  }
+  .no-underline {
+    text-decoration: none;
+    color:black; /* Inherit color from parent element */
+    
   }

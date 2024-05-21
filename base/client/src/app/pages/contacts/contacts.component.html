@@ -23,17 +23,24 @@
             <th class="text-white">Last Name</th> -->
             <th class="text-white">Job Title</th>
             <th class="text-white">Organization Name</th>
-            <th class="text-white">Email</th>
-            <!-- <th class="text-white">Phone</th>
-            <th class="text-white">Address</th>
+           
+             <!-- <th class="text-white">Phone</th> -->
+            <!-- <th class="text-white">Address</th>
             <th class="text-white">City</th>
             <th class="text-white">State</th>
             <th class="text-white">Zip</th>
             <th class="text-white">Country</th>
             <th class="text-white">Website</th>
-            <th class="text-white">Notes</th> -->
-            <th class="text-white">Lead Source</th>
-            <!-- <th class="text-white">Status</th>
+            <th class="text-white">Notes</th>  -->
+            <th class="text-white">Email</th>
+            <th class="text-white">Lead Source</th> 
+            <th class="text-white"> Lead Status</th>
+            <th class="text-white">Lead Score</th>
+            <th class="text-white">Engagement</th>
+            <th class="text-white">Priority</th>
+           
+           
+             <!--
             <th class="text-white">createdAt</th>
             <th class="text-white">modifiedAt</th>-->
             <th class="text-white">Actions</th> 
@@ -62,9 +69,21 @@
                 <td>
                   {{ data.email }}
                 </td>
-                <!-- <td>
-                  {{ data.phone }}
+               
+                <td>
+                  {{ data.leadSource }}
                 </td>
+                <td>
+                  {{ data.status }}
+                </td>
+                <td>
+                  N/A
+                </td>
+                <td>N/A</td>
+             <td>N/A</td>
+                <!-- <td>  {{ data.phone }}</td> -->
+                
+                <!--
                 <td>
                   {{ data.address }}
                 </td>
@@ -86,12 +105,9 @@
                 <td>
                   {{ data.notes }}
                 </td> -->
-                <td>
-                  {{ data.leadSource }}
-                </td>
-                <!-- <td>
-                  {{ data.status }}
-                </td>
+               
+           
+                <!--
                 <td>
                   {{ data.createdAt }}
                 </td>

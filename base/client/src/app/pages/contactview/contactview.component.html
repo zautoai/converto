@@ -1,31 +1,47 @@
 
 
-<div class="app-container">
+
 
     <main class="app-main">
-        <div class="user-profile card">
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <div class="card">
             <div class="card-body">
-              <div class="d-flex align-items-center">
-                <img src="https://media.licdn.com/dms/image/D5603AQHU3Iyn3BPz2w/profile-displayphoto-shrink_200_200/0/1714300959571?e=2147483647&v=beta&t=ALf1CZOLHKztxdmlYVmepoupFWz7Yabv9lviRLWalIU" alt="{{ userName }}" class="user-image rounded-circle me-3">
-                <div>
-                  <h5 class="mb-1">{{ selectedData.firstName }}</h5>
-                  <p class="text-muted mb-0">Created At {{ selectedData.modifiedAt | date:'dd MMMM' }}</p>
-                  <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>{{ selectedData.city }}</p>
+              <div class="row">
+  
+                <div class="col-md-6 text-center mb-3">
+                  <img src="{{userImageUrl}}" class="img-fluid rounded-circle mb-3" alt="Profile" style="width: 80px; height: 80px;">
+                  <h5 class="mb-1 fs-4">{{ selectedData.firstName }} {{ selectedData.lastName }}</h5>
+                  <p class=" fs-5 text-primary p-2 rounded">{{ selectedData.jobTitle }} <span>{{selectedData.organizationName}}</span></p>
+                  <p class="text-muted fs-6 mb-0">Created At {{ selectedData.createdAt | date:'dd MMMM' }}</p>
+
                 </div>
-              </div>
-              <hr>
-              <div class=" justify-content-between">
-                <div>
-               
+  
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="top section text-center">
+                        <h6 class="mb-1 mt-3 text-center fw-bold" style="color: rgb(12, 219, 56); font-size: large;">100&nbsp;</h6>
+                        <p class="fw-normal text-muted lead-score" style="margin-top: 20px;">Predictive Lead Score</p>
+                      </div>
+                    </div>
+                    <div class="col-md-12 text-end" style="margin-top:20px;">
+                     <div class="d-flex gap-2 align-item-center justify-content-center text-end">
+                      <label for="segment" class="mb-2"><span class="fw-bold text-primary ">Mid Market</span></label>
+                      <label for="segment" class="mb-2"><span class="fw-bold text-primary">High Potential</span></label>
+                     </div>
+                     <div  class="d-flex gap-2 align-item-center justify-content-center text-end"> <label for="segment" class="mb-2"><span class="fw-bold text-primary">ICP Match</span></label>
+                      <label for="segment" class="mb-2"><span class="fw-bold text-primary">ICP Match</span></label></div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p class="mb-1"> Intent Scoring: 80 <span class="badge bg-success">{{ selectedData.saasScore }}</span></p>
-                  <hr>
-                  <label for="economicBuyer">SaaS</label>
-                </div>
+  
               </div>
             </div>
           </div>
+        </div>
+      </div>
+          <!--down section-->
       <div class="tab-menu-heading border-bottom-0" style="border: none !important;">
           <div class="tabs-menu1">
             <ul ngbNav #nav="ngbNav" [(activeId)]="active">
@@ -211,4 +227,4 @@
 
       
     </main>
-  </div>
+ 
