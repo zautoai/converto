@@ -71,7 +71,6 @@ model Organization {
   ZautoMessages   ZautoMessage[]
   Stages          Stage[]
   Visits          Visit[]
-  CallToAction    CallToAction[]
   LeradCategory   LeadCategory[]
   LeadCategoryMap LeadCategoryMap[]
 }
@@ -204,7 +203,6 @@ model Agent {
   Stages           Stage[]
   Messages         ZautoMessage[]
   Visits           Visit[]
-  CallToAction     CallToAction[]
   starters         String?          @db.Text
 
   @@unique([name, orgId], name: "Unique_Agent_Name_OrgId")
@@ -578,21 +576,12 @@ enum CTAType {
 
 model CallToAction {
   id          String   @id @default(uuid())
-  agentId     String?
-  orgId       String?
-  name        String   @db.VarChar(100)
+  name        String   @unique @db.VarChar(100)
   description String   @db.VarChar(256)
   link        String?  @db.Text
   type        CTAType? @default(NAVIGATOR)
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @updatedAt
-
-  agent Agent?        @relation(fields: [agentId], references: [id], onDelete: Cascade)
-  org   Organization? @relation(fields: [orgId], references: [id])
-
-  @@unique([agentId, name], name: "Unique_Agent_Name")
-  @@index([agentId], map: "Cta_agentId_fkey")
-  @@index([orgId], map: "Cta_orgId_fkey")
 }
 
 model AvailabilitySchedule {

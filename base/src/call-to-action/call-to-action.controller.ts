@@ -14,47 +14,38 @@ import { CallToAction } from './entities/cta.entity';
 @ApiBearerAuth()
 export class CallToActionController {
 
-    constructor (
+    constructor(
         private readonly callToActionService: CallToActionService,
-    ){}
+    ) { }
 
     @Post('generate')
-    async generateCTA(@Req() req: ZautoRequest)
-    {
-        if(req.user && req.user.orgId)
-        {
+    async generateCTA(@Req() req: ZautoRequest) {
+        if (req.user && req.user.orgId) {
             return await this.callToActionService.generateCTA(req.user.orgId);
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.");
         }
     }
 
     @Post('select')
-    async select(@Body() selectCTADto:any,@Req() req: ZautoRequest)
-    {
-        if(req.user && req.user.orgId)
-        {
-            return await this.callToActionService.selectCTA(req.user.orgId,selectCTADto);
+    async select(@Body() selectCTADto: any, @Req() req: ZautoRequest) {
+        if (req.user && req.user.orgId) {
+            return await this.callToActionService.selectCTA({ orgId: req.user.orgId, data: selectCTADto });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.");
         }
     }
 
     @Post()
-    @ApiOkResponse({type: CallToAction})
-    async create(@Body() createCTADto: CreateCTADto, @Req() req: ZautoRequest)
-    {
-        if(req.user && req.user.orgId)
-        {
-            createCTADto.orgId = req.user.orgId;
-            return await this.callToActionService.create(createCTADto);
+    @ApiOkResponse({ type: CallToAction })
+    async create(@Body() createCTADto: CreateCTADto, @Req() req: ZautoRequest) {
+        if (req.user && req.user.orgId) {
+            const orgId = req.user.orgId;
+            return await this.callToActionService.create({ orgId, data: createCTADto });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.");
         }
     }
@@ -62,57 +53,45 @@ export class CallToActionController {
     @Get()
     @ApiQuery({ name: 'page', description: 'Page number.', required: false })
     @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
-    @ApiOkResponse({type: CallToAction})
-    async findAll(@Req() req: ZautoRequest,@Query() paginationDto: PaginationDto)
-    {
-        if(req.user && req.user.orgId)
-        {
-            return await this.callToActionService.findAll(req.user.orgId,paginationDto);
+    @ApiOkResponse({ type: CallToAction })
+    async findAll(@Req() req: ZautoRequest, @Query() paginationDto: PaginationDto) {
+        if (req.user && req.user.orgId) {
+            return await this.callToActionService.findAll({ orgId: req.user.orgId, data: paginationDto });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.");
         }
     }
 
     @Get(':id')
-    @ApiOkResponse({type: CallToAction})
-    async find(@Param('id') id: string,@Req() req: ZautoRequest)
-    {
-        if(req.user && req.user.orgId)
-        {
-            return await this.callToActionService.find(id);
+    @ApiOkResponse({ type: CallToAction })
+    async find(@Param('id') id: string, @Req() req: ZautoRequest) {
+        if (req.user && req.user.orgId) {
+            return await this.callToActionService.find({ orgId: req.user.orgId, data: { id } });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.");
         }
     }
 
     @Patch(':id')
     @ApiOkResponse()
-    async update(@Param('id') id: string,@Body() updateCTADto: UpdateCTADto,@Req() req: ZautoRequest)
-    {
-        if(req.user && req.user.orgId)
-        {
-            return await this.callToActionService.update(id,updateCTADto);
+    async update(@Param('id') id: string, @Body() updateCTADto: UpdateCTADto, @Req() req: ZautoRequest) {
+        if (req.user && req.user.orgId) {
+            return await this.callToActionService.update({ orgId: req.user.orgId, data: { id, updateCTADto } });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.");
         }
     }
 
     @Delete(':id')
     @HttpCode(204)
-    async delete(@Param('id') id: string,@Req() req: ZautoRequest)
-    {
-        if(req.user && req.user.orgId)
-        {
-            return await this.callToActionService.delete(id);
+    async delete(@Param('id') id: string, @Req() req: ZautoRequest) {
+        if (req.user && req.user.orgId) {
+            return await this.callToActionService.delete({ orgId: req.user.orgId, data: { id } });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.");
         }
     }

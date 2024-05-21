@@ -1,18 +1,18 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import e from 'express';
+import { Injectable } from '@nestjs/common';
+import { ServiceParams } from 'src/common/models/service-param.model';
+import { BaseService } from 'src/common/services/base.service';
 import { WebScraperService } from 'src/common/services/web-scraper.service';
 import { CTA_CREATOR_PROMPT } from 'src/common/templates/cta-creator.template';
-import { HelperName } from 'src/helpers/entities/helpers.model';
 import { LLMModels, LLMNames } from 'src/llm/llm.contants';
-import { LlmService } from 'src/llm/llm.service';;
-import { PrismaService } from 'src/prisma/prisma.service';
+import { LlmService } from 'src/llm/llm.service';
+;
 
 @Injectable()
-export class CTACreatorService implements OnModuleInit {
+export class CTACreatorService extends BaseService {
 
     constructor(private readonly llmService: LlmService,
-        private readonly prisma: PrismaService,
         private readonly webscrapper: WebScraperService) {
+        super()
     }
 
     extractJsonFromMarkdown(mdContent: string) {
@@ -37,9 +37,7 @@ export class CTACreatorService implements OnModuleInit {
         }
     }
 
-    onModuleInit() {
 
-    }
 
     getFieldTitle(field) {
         return field
@@ -48,24 +46,20 @@ export class CTACreatorService implements OnModuleInit {
             .join(' '); // Join the words with a space
     }
 
-    async createCTAs(agentId: string) {
-        const agent = await this.prisma.agent.findUnique({
-            where: { id: agentId }
-        });
+    async createCTAs(orgId: string) {
+        const prisma = await this.getPrismaClient(orgId);
 
-        const sites = await this.getSites(agent.id);
+        const sites = await this.getSites(orgId);
         for (let site of sites) {
-            const message = await this.getMessageForCTACreation(agent, [site]);
+            const message = await this.getMessageForCTACreation([site]);
             console.log(`CTACreator: CTAs are ${message}`)
             const ctaList = await this.getCTAs(message);
             console.log(`CTACreator: CTAs are ${JSON.stringify(ctaList)}`)
             if (ctaList && ctaList.length > 0) {
                 for (let cta of ctaList) {
                     try {
-                        await this.prisma.callToAction.create({
+                        await prisma.callToAction.create({
                             data: {
-                                orgId: agent.orgId,
-                                agentId: agent.id,
                                 name: cta.label,
                                 description: cta.text,
                                 link: cta.link
@@ -79,15 +73,12 @@ export class CTACreatorService implements OnModuleInit {
         }
     }
 
-    async generateCTAs(agentId: string) {
+    async generateCTAs(orgId: string) {
         try {
-            const agent = await this.prisma.agent.findUnique({
-                where: { id: agentId }
-            });
-            const sites = await this.getSites(agent.id);
+            const sites = await this.getSites(orgId);
             let ctaList = [];
             for (let site of sites) {
-                const message = await this.getMessageForCTACreation(agent, [site]);
+                const message = await this.getMessageForCTACreation([site]);
                 console.log(`CTACreator: CTAs are ${message}`)
                 ctaList = ctaList.concat(await this.getCTAs(message));
             }
@@ -97,12 +88,13 @@ export class CTACreatorService implements OnModuleInit {
         }
     }
 
-    async getMessageForCTACreation(agent: any, sites: any[]) {
+    async getMessageForCTACreation(sites: any[]) {
         return `${JSON.stringify(sites)}`;
     }
 
-    async getSites(agentId: string) {
-        const sites = await this.prisma.site.findMany()
+    async getSites(orgId: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        const sites = await prisma.site.findMany()
         let _sites = [];
         for (let site of sites) {
             _sites.push({

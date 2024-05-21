@@ -419,8 +419,6 @@ CREATE TABLE "OrgSMTPConfig" (
 -- CreateTable
 CREATE TABLE "CallToAction" (
     "id" TEXT NOT NULL,
-    "agentId" TEXT,
-    "orgId" TEXT,
     "name" VARCHAR(100) NOT NULL,
     "description" VARCHAR(256) NOT NULL,
     "link" TEXT,
@@ -647,13 +645,7 @@ CREATE UNIQUE INDEX "OpenAIAssistant_name_key" ON "OpenAIAssistant"("name");
 CREATE INDEX "SMTPConfig_orgId_fkey" ON "OrgSMTPConfig"("orgId");
 
 -- CreateIndex
-CREATE INDEX "Cta_agentId_fkey" ON "CallToAction"("agentId");
-
--- CreateIndex
-CREATE INDEX "Cta_orgId_fkey" ON "CallToAction"("orgId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "CallToAction_agentId_name_key" ON "CallToAction"("agentId", "name");
+CREATE UNIQUE INDEX "CallToAction_name_key" ON "CallToAction"("name");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -762,12 +754,6 @@ ALTER TABLE "Stage" ADD CONSTRAINT "Stage_agentId_fkey" FOREIGN KEY ("agentId") 
 
 -- AddForeignKey
 ALTER TABLE "Stage" ADD CONSTRAINT "Stage_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "CallToAction" ADD CONSTRAINT "CallToAction_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "CallToAction" ADD CONSTRAINT "CallToAction_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "availableHours" ADD CONSTRAINT "availableHours_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "AvailabilitySchedule"("id") ON DELETE CASCADE ON UPDATE CASCADE;

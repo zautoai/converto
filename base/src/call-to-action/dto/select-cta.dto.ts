@@ -3,34 +3,24 @@ import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-valid
 import { CTAType } from "src/common/enums/enums";
 
 
-export class SelectCTADto{
+export class SelectCTADto {
 
-    @ApiProperty({required:false})
-    @IsOptional()
-    @IsString()
-    agentId: string;
-
-    @ApiProperty({required:false})
-    @IsOptional()
-    @IsString()
-    orgId: string;
-
-    @ApiProperty({required:true})
+    @ApiProperty({ required: true })
     @IsNotEmpty()
     @IsString()
     label: string;
 
-    @ApiProperty({required:true})
+    @ApiProperty({ required: true })
     @IsNotEmpty()
     @IsString()
     text: string;
 
-    @ApiProperty({required:true})
+    @ApiProperty({ required: true })
     @IsNotEmpty()
     @IsString()
     link: string;
 
-    @ApiProperty({required:false})
+    @ApiProperty({ required: false })
     @IsEnum(CTAType)
     type: CTAType = CTAType.NAVIGATOR;
 }

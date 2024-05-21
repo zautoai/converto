@@ -7,16 +7,19 @@ import { PAGE_SELECTOR_PROMPT } from 'src/common/templates/page-selector.templat
 import { CTAType } from 'src/common/enums/enums';
 import { STARTER_GENERATOR_PROMPT } from 'src/common/templates/starter-generator.template';
 import { LLMModels, LLMNames } from 'src/llm/llm.contants';
+import { BaseService } from 'src/common/services/base.service';
+import { ServiceParams } from 'src/common/models/service-param.model';
 
 @Injectable()
-export class CTASelectorService implements OnModuleInit {
+export class CTASelectorService extends BaseService implements OnModuleInit {
 
   private redisPublisher: RedisClient;
   private redisSubscriber: RedisClient;
 
   constructor(private readonly llmService: LlmService,
-    private readonly prisma: PrismaService) {
+  ) {
 
+    super();
     this.redisPublisher = new Redis({
       host: process.env.REDIS_IP,
       port: parseInt(process.env.REDIS_PORT, 10) || 6379,
@@ -60,64 +63,73 @@ export class CTASelectorService implements OnModuleInit {
       console.error('Failed to subscribe: %s', err.message);
       return; // Stop execution if subscription fails
     }
-  
+
     this.redisSubscriber.on('message', this.handleMessage.bind(this));
   }
-  
-  async handleMessage(channel, message) {
+
+  async handleMessage(serviceParams: ServiceParams<{ channel: any, message: any }>) {
     try {
+      const { orgId, data: { channel, message } } = serviceParams;
+      const prisma = await this.getPrismaClient(orgId);
       console.log(`Received message from ${channel}: ${message}`);
       const payload = JSON.parse(message);
       if (!payload.clientId) return; // No clientId to proceed with
-  
-      const agent = await this.prisma.agent.findUnique({ where: { id: payload.agentId } });
+
+      const agent = await prisma.agent.findUnique({ where: { id: payload.agentId } });
       if (!agent) return; // No agent found
       // Perform all relevant DB queries in parallel to improve performance
       const [content, ctaList, pageList] = await Promise.all([
-        this.getContent(payload),  
-        this.getCtaList(agent.orgId, [CTAType.CALENDAR, CTAType.CTA]),
-        this.getCtaList(agent.orgId, [CTAType.NAVIGATOR])
+        this.getContent(payload),
+        this.getCtaList({ orgId, data: { types: [CTAType.CALENDAR, CTAType.CTA] } }),
+        this.getCtaList({ orgId, data: { types: [CTAType.NAVIGATOR] } })
       ]);
 
-      if(content.length >= 2) {
-        this.generateStarters(payload.clientId, content, agent);
+      if (content.length >= 2) {
+        this.generateStarters({ orgId, data: { clientId: payload.clientId, content, agent } });
       }
-  
-      const ctaIds = [...await this.processContentForCTAs(content, ctaList), ...await this.processContentForCTAs(content, pageList, false)];
-  
+
+      const ctaIds = [...await this.processContentForCTAs({ orgId, data: { content, ctaList } }), ...await this.processContentForCTAs({ orgId, data: { content, ctaList: pageList }, isCTA: false })];
+
       if (ctaIds.length > 0) {
-        const selectedCTAs = await this.prisma.callToAction.findMany({ where: { id: { in: ctaIds } }});
+
+        const selectedCTAs = await prisma.callToAction.findMany({ where: { id: { in: ctaIds } } });
         const ctaObjects = {
           ctas: selectedCTAs.filter(cta => (cta.type === CTAType.CTA || cta.type === CTAType.CALENDAR)),
           pageNavigators: selectedCTAs.filter(cta => cta.type === CTAType.NAVIGATOR)
         }
         this.redisPublisher.publish('ctaselected', JSON.stringify({ clientId: payload.clientId, content: ctaObjects }));
-        
+
       }
     } catch (error) {
       console.error(error);
     }
   }
-  
-  async getContent(payload) {
-    return await this.prisma.zautoMessage.findMany({
-      where: {convId: payload.convId, type: 'TEXT'},
+
+  async getContent(serviceParams: ServiceParams<{ payload }>) {
+    const { orgId, data: { payload } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    return await prisma.zautoMessage.findMany({
+      where: { convId: payload.convId, type: 'TEXT' },
       take: -2, // Take the last two records
       orderBy: {
-          createdAt: 'asc' 
+        createdAt: 'asc'
       }
-    }); 
-  }
-  
-  async getCtaList(orgId, types) {
-    return this.prisma.callToAction.findMany({
-      where: { orgId, type: { in: types } },
     });
   }
-  
-  async processContentForCTAs(content, ctaList, isCTA = true) {
-    const result = isCTA ? await this.selectCTA(content, ctaList)
-    : await this.selectPage(content, ctaList);
+
+  async getCtaList(serviceParams: ServiceParams<{ types }>) {
+    const { orgId, data: { types } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    return prisma.callToAction.findMany({
+      where: { type: { in: types } },
+    });
+  }
+
+  async processContentForCTAs(serviceParams: ServiceParams<{ content, ctaList }>) {
+    const { orgId, data: { content, ctaList }, isCTA = true } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    const result = isCTA ? await this.selectCTA({ orgId, data: { content, ctaList } })
+      : await this.selectPage({ orgId, data: { content, pageList: ctaList } });
     console.log("selected cta ", result);
     let selectedCTAs = [];
     if (result.content && result.content.includes('```json')) {
@@ -128,14 +140,16 @@ export class CTASelectorService implements OnModuleInit {
     return selectedCTAs.length > 0 ? selectedCTAs : [];
   }
 
-  getFieldTitle(field) {
+  getFieldTitle(serviceParams: ServiceParams<{ field }>) {
+    const { orgId, data: { field } } = serviceParams;
     return field
       .split('_') // Split the string on underscores
       .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
       .join(' '); // Join the words with a space
   }
 
-  async selectCTA(content: any, ctaList: any) {
+  async selectCTA(serviceParams: ServiceParams<{ content: any, ctaList: any }>) {
+    const { orgId, data: { content, ctaList } } = serviceParams;
     let prompt = CTA_SELECTOR_PROMPT;
     prompt = prompt.replaceAll('{{conversation}}', JSON.stringify(content));
     prompt = prompt.replaceAll('{{ctasList}}', JSON.stringify(ctaList));
@@ -150,7 +164,8 @@ export class CTASelectorService implements OnModuleInit {
     return await this.llmService.sendDirect(promptMesssage, LLMNames.COHERE, LLMModels.COHER_COMMAND_R_PLUS);
   }
 
-  async selectPage(content: any, pageList: any) {
+  async selectPage(serviceParams: ServiceParams<{ content: any, pageList: any }>) {
+    const { orgId, data: { content, pageList } } = serviceParams;
     let prompt = PAGE_SELECTOR_PROMPT;
     prompt = prompt.replaceAll('{{conversation}}', JSON.stringify(content));
     prompt = prompt.replaceAll('{{pageList}}', JSON.stringify(pageList));
@@ -163,20 +178,21 @@ export class CTASelectorService implements OnModuleInit {
     return await this.llmService.sendDirect(promptMesssage, LLMNames.COHERE, LLMModels.COHER_COMMAND_R_PLUS);
   }
 
-  async generateStarters(clientId: string, content: any, agent: any) {
+  async generateStarters(serviceParams: ServiceParams<{ clientId: string, content: any, agent: any }>) {
+    const { orgId, data: { clientId, content, agent } } = serviceParams;
     let prompt = STARTER_GENERATOR_PROMPT;
     let starts = agent.starters ? agent.starters.split(',') : "";
     let starterList = [];
-    for(let starter of starts) {
-      starterList.push({content:starter,type:'starters'});
+    for (let starter of starts) {
+      starterList.push({ content: starter, type: 'starters' });
     }
     prompt = prompt.replaceAll('{{companyName}}', agent.companyName);
     prompt = prompt.replaceAll('{{companyBusiness}}', agent.companyBusiness);
     prompt = prompt.replaceAll('{{companyValues}}', agent.companyValue);
     const _messages = content.map(message => {
       return {
-        content:message.content,
-        role:message.role
+        content: message.content,
+        role: message.role
       }
     })
     prompt = prompt.replaceAll('{{conversation}}', JSON.stringify(_messages));
@@ -185,13 +201,13 @@ export class CTASelectorService implements OnModuleInit {
       { role: 'system', content: prompt },
       // { role: 'user', content: JSON.stringify(content) }
     ];
-    let result =  await this.llmService.sendDirect(promptMesssage,LLMNames.COHERE,LLMModels.COHER_COMMAND_R);
+    let result = await this.llmService.sendDirect(promptMesssage, LLMNames.COHERE, LLMModels.COHER_COMMAND_R);
 
-    if (result.content && result.content.includes('```json')) { 
+    if (result.content && result.content.includes('```json')) {
       starterList = this.extractJsonFromMarkdown(result.content);
     } else {
       starterList = JSON.parse(result.content);
     }
-    this.redisPublisher.publish('ctaselected', JSON.stringify({ clientId, content: {starters: starterList} }));
+    this.redisPublisher.publish('ctaselected', JSON.stringify({ clientId, content: { starters: starterList } }));
   }
 }
