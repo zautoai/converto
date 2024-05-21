@@ -31,8 +31,6 @@ import { HelpersModule } from './helpers/helpers.module';
 import { BullModule } from '@nestjs/bull';
 import { SocketModule } from './socket/socket.module';
 import { ActiveClientModule } from './active-client/active-client.module';
-import { SubscriptionPlanModule } from './subscription-plan/subscription-plan.module';
-import { AccountModule } from './account/account.module';
 import { OrgSmtpconfigModule } from './org-smtpconfig/org-smtpconfig.module';
 import { CallToActionModule } from './call-to-action/call-to-action.module';
 import { AvailabilityScheduleModule } from './availability-schedule/availability-schedule.module';
@@ -98,8 +96,6 @@ import { SchemaManagerModule } from './schema-manager/schema-manager.module';
     }),
     SocketModule,
     ActiveClientModule,
-    SubscriptionPlanModule,
-    AccountModule,
     OrgSmtpconfigModule,
     CallToActionModule,
     AvailabilityScheduleModule,

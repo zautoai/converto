@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, NotAcceptableException, Param, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -10,7 +10,6 @@ import { CampaignService } from './campaign.service';
 import { Campaign } from './entities/campaign.entity';
 import { UpdateCampaignDto } from './dto/update.campaign.dto';
 import { CampaignFilterDto } from './dto/campaign-filter.dto';
-import { UsageService } from 'src/account/usage.service';
 
 @ApiTags('Campaigns')
 @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
@@ -21,8 +20,7 @@ export class CampaignController
 {
 
     constructor(
-        private readonly campaignService:CampaignService,
-        private readonly usageService: UsageService){}
+        private readonly campaignService:CampaignService){}
 
     @Get()
     @ApiQuery({ name: 'page', description: 'Page number.', required: false })

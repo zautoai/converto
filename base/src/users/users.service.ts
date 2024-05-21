@@ -1,45 +1,30 @@
-import { BadRequestException, ConflictException, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { RolesService } from 'src/roles/roles.service';
 import { SYSTEM_CONST } from 'src/common/constants/system.constants';
 import { UpdateProfilePicDto } from './dto/profile-pic-update.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { StaticFileService } from 'src/common/services/static.service';
-import { UsageService } from 'src/account/usage.service';
-import { OrgAccountService } from 'src/account/account.service';
-import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
+import { BaseService } from 'src/common/services/base.service';
+
 
 export const roundsOfHashing = 10;
 
 @Injectable()
-export class UsersService {
+export class UsersService extends BaseService{
 
   constructor(
     private rolesService: RolesService,
     private readonly staticFileService: StaticFileService,
-    private readonly usageService: UsageService,
-    private readonly prismaClientManager: PrismaClientManager
-  ) { }
-
-  async updateUserCount(count: number, orgId: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
-    const account = await prisma.orgAccount.findFirst({
-      where: { orgId }
-    })
-  }
+  ) {
+    super();
+   }
 
 
   async create(orgId: string,createUserDto: CreateUserDto, verified: boolean = false) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
-    // const userUsage = await this.usageService.getUserCount(createUserDto.orgId);
-    // const remainingUser = userUsage.maxCount - userUsage.count;
-    // if (remainingUser <= 0) {
-    //   throw new NotAcceptableException(`Remaining user ${remainingUser}`);
-    // }
-
+    const prisma = await this.getPrismaClient(orgId);
     const existingUser = await prisma.user.findFirst({
       where: { email: createUserDto.email }
     });
@@ -67,7 +52,7 @@ export class UsersService {
   }
 
   async findAll(orgId: string,paginationDto: PaginationDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     const userList = await prisma.user.findMany({select: {
       id: true,
       name: true,
@@ -92,7 +77,7 @@ export class UsersService {
   async findAllByOrg(paginationDto: PaginationDto, orgId: string) {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     const userList = await prisma.
     user.findMany({
       skip, take: limit,
@@ -120,7 +105,7 @@ export class UsersService {
   }
 
   async findOne(orgId: string,id: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     const userData = await prisma.user.findFirst({
       where: { id, }, select: {
         id: true,
@@ -150,7 +135,7 @@ export class UsersService {
   }
 
   async update(orgId: string,id: string, updateUserDto: UpdateUserDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     const userData = await prisma.user.findFirst({
       where: { id, }
     });
@@ -176,7 +161,7 @@ export class UsersService {
   }
 
   async updateProfilePicUrl(orgId:string,id: string, updateProfilePicDto: UpdateProfilePicDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     const userData = await prisma.user.findFirst({
       where: { id, },
     });
@@ -190,7 +175,7 @@ export class UsersService {
   }
 
   async remove(orgId: string,id: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     const userData = await prisma.user.findFirst({
       where: { id, }
     });
@@ -202,7 +187,7 @@ export class UsersService {
   }
 
   async isRoleExist(orgId: string,id: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     const roleData = await prisma.role.findFirst({
       where: { id, }
     })
@@ -213,7 +198,7 @@ export class UsersService {
   }
 
   async getUserById(orgId: string,id: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     const userData = await prisma.user.findFirst({
       where: { id, }, select: {
         id: true,
@@ -232,12 +217,12 @@ export class UsersService {
   }
 
   async findByEmail(orgId: string,email: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     return await prisma.user.findFirst({ where: { email }, include: { role: true } });
   }
 
   async changePassword(orgId: string,id: string, password: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     const hashedPassword = await bcrypt.hash(
       password,
       roundsOfHashing,
@@ -247,7 +232,7 @@ export class UsersService {
   }
 
   async verifyEmail(orgId: string,userId: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     return await prisma.user.update({ data: { verified: true }, where: { id: userId } });
   }
 }

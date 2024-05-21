@@ -4,27 +4,35 @@ import { UpdateVisitorDto } from './dto/update-visitor.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateVisitDto } from './dto/create-visit.dto';
+import { ServiceParams } from 'src/common/models/service-param.model';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class VisitorService {
+export class VisitorService extends BaseService{
 
-  constructor(private prisma: PrismaService) {}
-
-  async create(createVisitorDto: CreateVisitorDto, orgId: string) {
-    return await this.prisma.visitor.create({data: {...createVisitorDto, orgId}});
+  constructor() {
+    super();
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  async create(serviceParams: ServiceParams<CreateVisitorDto>):Promise<any> {
+    const { orgId, data: createVisitorDto } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    return await prisma.visitor.create({data: createVisitorDto});
+  }
+
+  async findAll(serviceParams:ServiceParams<PaginationDto>) {
+    const { orgId, data: paginationDto } = serviceParams;
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
-    const roleData =  await this.prisma.visitor.findMany({
+    const prisma = await this.getPrismaClient(orgId);
+    const roleData =  await prisma.visitor.findMany({
       skip, 
       take: limit,
       include:{
         visits:true
       } 
     });
-    const total = await this.prisma.visitor.count();
+    const total = await prisma.visitor.count();
     return {
       data: roleData,
       page: page,
@@ -32,11 +40,13 @@ export class VisitorService {
     };
   }
 
-  async findAllByAgent(agentId: string, paginationDto: PaginationDto) {
+  async findAllByAgent(serviceParams:ServiceParams<PaginationDto> ) {
+    const { orgId, data: paginationDto } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
-    const roleData =  await this.prisma.visitor.findMany({skip, take: limit, where: {agentId} });
-    const total = await this.prisma.visitor.count({where: {agentId}});
+    const roleData =  await prisma.visitor.findMany({skip, take: limit});
+    const total = await prisma.visitor.count();
     return {
       data: roleData,
       page: page,
@@ -44,20 +54,21 @@ export class VisitorService {
     };
   }
 
-  async findAllByOrg(orgId: string, paginationDto: PaginationDto) {
+  async findAllByOrg(serviceParams: ServiceParams<PaginationDto>) {
+    const { orgId, data: paginationDto } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
-    const roleData =  await this.prisma.visitor.findMany(
+    const roleData =  await prisma.visitor.findMany(
       {
         skip, 
         take: limit, 
-        where: {orgId},
         orderBy:{ modifiedAt: 'desc'},
         include:{
           visits:true
         }
       });
-    const total = await this.prisma.visitor.count({where: {orgId}});
+    const total = await prisma.visitor.count();
     return {
       data: roleData,
       page: page,
@@ -66,8 +77,9 @@ export class VisitorService {
   }
 
 
-  async findOne(id: string) {
-    const existingVisitor = await this.prisma.visitor.findUnique({where: {id},include:{
+  async findOne(orgId:string,id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    const existingVisitor = await prisma.visitor.findUnique({where: {id},include:{
       visits:{
         select:{
           source:true,
@@ -77,85 +89,82 @@ export class VisitorService {
         }
       }
     }});
-    if(existingVisitor) {
-      return existingVisitor;
-    } else throw new NotFoundException(`Visitor with id ${id} not found.`);
+    return existingVisitor;
   }
 
-  async findById(id: string) {
-    if(id) {
-      const existingVisitor = await this.prisma.visitor.findUnique({where: {id}});
-      if(existingVisitor) {
-        return existingVisitor;
-      } else null;
-    } else {
-      return null;
-    }
-    
-  }
-
-  async findVisit(id: string) {
-    const existingVisit = await this.prisma.visit.findUnique({where: {id}});
+  async findVisit(orgId:string,id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    const existingVisit = await prisma.visit.findUnique({where: {id}});
     if(existingVisit) {
       return existingVisit;
     } else throw new NotFoundException(`Visitor with id ${id} not found.`);
   }
 
-  async findOneByUserAgent(userAgent: string) {
-    const existingVisitor = await this.prisma.visitor.findFirst({where: {userAgent}});
+  async findOneByUserAgent(orgId: string,userAgent: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    const existingVisitor = await prisma.visitor.findFirst({where: {userAgent}});
     if(existingVisitor) {
       return existingVisitor;
     } else throw new NotFoundException(`Visitor with id ${userAgent} not found.`);
   }
 
-  async createOrUpdateByUserAgent(createVisitorDto: CreateVisitorDto) {
-    const visitor = await this.prisma.visitor.findFirst({
+  async createOrUpdateByUserAgent(serviceParams: ServiceParams<CreateVisitorDto>) {
+    const { orgId, data: createVisitorDto } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    const visitor = await prisma.visitor.findFirst({
       where: {
-        agentId: createVisitorDto.agentId, 
-        userAgent: createVisitorDto.userAgent, 
-      }, include: {conversations: true}});
-    if(visitor) {
-      
-      await this.prisma.visitor.update({data: {
         userAgent: createVisitorDto.userAgent,
-      }, where:{id: visitor.id}})
+      }, include: { conversations: true }
+    });
+    if (visitor) {
+
+      await prisma.visitor.update({
+        data: {
+          userAgent: createVisitorDto.userAgent,
+        }, where: { id: visitor.id }
+      })
 
       return visitor;
     } else {
       try {
-        return await this.prisma.visitor.create({data: createVisitorDto});
-      } catch(error) {
+        return await prisma.visitor.create({ data: createVisitorDto });
+      } catch (error) {
         console.log(error)
       }
     }
   }
 
-  async update(id: string, updateVisitorDto: UpdateVisitorDto) {
-    const existingVisitor = await this.prisma.visitor.findUnique({where: {id}});
+  async update(serviceParams:ServiceParams<UpdateVisitorDto>) {
+    const { orgId, data: updateVisitorDto, id } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    const existingVisitor = await prisma.visitor.findUnique({where: {id}});
     if(existingVisitor) {
-      return await this.prisma.visitor.update({data: updateVisitorDto, where:{id}});
+      return await prisma.visitor.update({data: updateVisitorDto, where:{id}});
     } else throw new NotFoundException(`Visitor with id ${id} not found.`);
   }
 
-  async remove(id: string) {
-    const existingVisitor = await this.prisma.visitor.findUnique({where: {id}});
+  async remove(orgId:string,id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    const existingVisitor = await prisma.visitor.findUnique({where: {id}});
     if(existingVisitor) {
-      return await this.prisma.visitor.delete({where: {id}})
+      return await prisma.visitor.delete({where: {id}})
     } else throw new NotFoundException(`Visitor with id ${id} not found.`);
   }
 
-  async createOrUpdateVisit(createVisitDto: CreateVisitDto) {
-    const visit = await this.prisma.visit.findFirst({
+  async createOrUpdateVisit(serviceParams: ServiceParams<CreateVisitDto>) {
+    const { orgId, data: createVisitDto } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    const visit = await prisma.visit.findFirst({
       where: {
         visitorId: createVisitDto.visitorId, 
         campaignId: createVisitDto.campaignId,
-        source: createVisitDto.source,
-        agentId: createVisitDto.agentId}});
+        source: createVisitDto.source
+        }});
     if(visit) {
       const count = visit.count + 1;
-      return await this.prisma.visit.update({data: {count}, where: {id: visit.id}})
+      return await prisma.visit.update({data: {count}, where: {id: visit.id}})
     } else {
-      return await this.prisma.visit.create({data:createVisitDto});
+      return await prisma.visit.create({data:createVisitDto});
     }
   }
 }

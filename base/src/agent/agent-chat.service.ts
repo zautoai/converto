@@ -5,19 +5,23 @@ import { AgentService } from "./agent.service";
 import { LlmService } from "src/llm/llm.service";
 import { ChromaDBService } from "src/chroma/chroma-dbservice/chroma-db.service";
 import { Agent } from "./entities/agent.entity";
-import { LLMModels, LLMNames } from "src/llm/llm.contants";
+import { ServiceParams } from "src/common/models/service-param.model";
 
 @Injectable()
 export class ChatService{
 
-    constructor(private readonly promptService: AgentPromptService,
+    constructor(
+        private readonly promptService: AgentPromptService,
         private readonly agentService: AgentService,
         private readonly llmService: LlmService,
-        private readonly chromaService: ChromaDBService){}
+        private readonly chromaService: ChromaDBService){
+        }
 
-    async chatById(agetId: string, messages: ZautoChatCompletionMessage[]) {
-        const prompt = await this.promptService.findByAgent(agetId);
-        const agent = await this.agentService.findOne(agetId)
+    async chatById(serviceParams: ServiceParams<{agetId:string ,messages: ZautoChatCompletionMessage[]}>) {
+        const {orgId, data} = serviceParams;
+        const {agetId, messages} = data;
+        const prompt = await this.promptService.findByAgent(orgId,agetId);
+        const agent = await this.agentService.findOne(orgId,agetId)
         const context = await this.chromaService.queryDocs(agent.name, messages.pop().content);
         const systemPrompt = prompt.text.replace('{{context}}', context.documents.join('\n'));
         const _messages = [{role: 'system', content: systemPrompt}, ...messages]
@@ -26,10 +30,12 @@ export class ChatService{
         return completion;
     }
 
-    async chat(agent: Agent, messages: ZautoChatCompletionMessage[]) {
+    async chat(serviceParams: ServiceParams<{agent:Agent ,messages: ZautoChatCompletionMessage[]}>) {
         try {
+            const {orgId, data} = serviceParams;
+            const {agent, messages} = data;
             console.log("Starting the chat: ", new Date())
-            const prompt = await this.promptService.findByAgent(agent.id);
+            const prompt = await this.promptService.findByAgent(orgId,agent.id);
             console.log("Got the prompt: ", new Date())
             const context = await this.chromaService.queryDocs(agent.name, messages[messages.length - 1].content);
             

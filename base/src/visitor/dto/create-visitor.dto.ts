@@ -5,11 +5,6 @@ import { ConversationType } from "src/common/enums/enums";
 
 export class CreateVisitorDto {
   @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  agentId: string;
-
-  @ApiProperty()
   @IsString()
   userAgent: string;
 

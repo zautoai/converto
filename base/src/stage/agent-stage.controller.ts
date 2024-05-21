@@ -28,10 +28,17 @@ export class AgentStageController
     @ApiResponse({
         type: ResponseDTO<Stage>
     })
-    async findAll(@Param('agentId') agentId: string,@Query() paginationDto: PaginationDto)
+    async findAll(@Param('agentId') agentId: string,@Query() paginationDto: PaginationDto,@Req() request: ZautoRequest)
     {
-
-        return await this.stageService.findAllByAgent(agentId,paginationDto);
+        if(request.user && request.user.orgId)
+        {
+            const orgId = request.user.orgId;
+            return await this.stageService.findAll({orgId,agentId,data:paginationDto});
+        }
+        else
+        {
+            throw new UnauthorizedException("Unauthorised access.")
+        }
     }
 
     @Post()
@@ -40,9 +47,9 @@ export class AgentStageController
     {
         if(zautoRequest.user && zautoRequest.orgId)
         {
-            createStageDto.orgId = zautoRequest.orgId;
             createStageDto.agentId = agentId;
-            return await this.stageService.create(createStageDto);
+            const orgId = zautoRequest.user.orgId;
+            return await this.stageService.create({orgId,data:createStageDto});
         }
         else
         {
@@ -51,9 +58,18 @@ export class AgentStageController
     }
 
     @Post('/sequence')
-    async updateSquence(@Param('agentId') agentId: string, @Body() updateSequenceDto: any)
+    async updateSquence(@Param('agentId') agentId: string, @Body() updateSquence: any,@Req() zautoRequest: ZautoRequest)
     {
-        return this.stageService.updateSquence(agentId, updateSequenceDto);
+        if(zautoRequest.user && zautoRequest.user.orgId)
+        {
+            const orgId = zautoRequest.user.orgId;
+            return await this.stageService.updateSquence({ orgId,data:{agentId, updateSquence}});
+        }
+        else
+        {
+            throw new UnauthorizedException("Unauthorised access.")
+        }
     }
+    
     
 }

@@ -1,42 +1,29 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, HttpCode, Req, UnauthorizedException, NotAcceptableException } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
-import { ApiBearerAuth, ApiNoContentResponse, ApiOkResponse, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiNoContentResponse, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/roles.decorator';
 import { SYSTEM_CONST } from 'src/common/constants/system.constants';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Conversation } from './entities/conversation.entity';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ZautoRequest } from 'src/common/models/request.model';
-import { UpdateMessageDto } from './dto/update-message.dto';
 import { ConversationFilterDto } from './dto/conversation-filter.dto';
-import { UsageService } from 'src/account/usage.service';
 
 
 @ApiTags('Conversations')
 @Controller('api/conversations')
 export class ConversationController {
   constructor(
-    private readonly conversationService: ConversationService,
-    private readonly usageService: UsageService
+    private readonly conversationService: ConversationService
     ) {}
 
   @Post()
   async create(@Body() createConversationDto: CreateConversationDto, @Req() request: ZautoRequest) {
-    if(request.user && request.orgId && request.orgId) {
-
-      const currentDate = new Date().toISOString();
-      const orgId = request.orgId;
-      const conversationUsage = await this.usageService.getConversationCount(orgId,currentDate);
-      const remainingConversation = conversationUsage.maxCount - conversationUsage.count;
-
-      if(remainingConversation <= 0)
-      {
-        throw new NotAcceptableException(`Remaining conversations ${remainingConversation}`);
-      }
-      return await this.conversationService.create(createConversationDto, request.orgId);
+    if(request.user && request.user.orgId) {
+      const orgId = request.user.orgId;
+      return await this.conversationService.create(createConversationDto, orgId);
     } else {
       throw new UnauthorizedException('Org info not found.')
     

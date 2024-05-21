@@ -6,7 +6,7 @@ import { DEFAULT_SCHEMA_NAME } from "../constants/system.constants";
 @Injectable()
 export class BaseService {
 
-    protected readonly logger;
+    protected readonly logger: Logger;
     private readonly prismaClientManager: PrismaClientManager;
 
     constructor()

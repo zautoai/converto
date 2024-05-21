@@ -16,31 +16,25 @@ import * as sharp from 'sharp';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { SelfGuard } from 'src/auth/self.guard';
 import { StaticFileService } from 'src/common/services/static.service';
-import { UsageService } from 'src/account/usage.service';
 
 @Controller('api/organization/users')
 @ApiTags('Users')
 export class OrgUsersController {
   constructor(private readonly usersService: UsersService,
-    private readonly staticFileService: StaticFileService,
-    private readonly usageService: UsageService) {}
+    private readonly staticFileService: StaticFileService) {}
 
   @Post()
   @Roles(SYSTEM_CONST.ADMIN_ROLE)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   async create(@Body() createUserDto: CreateUserDto, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
-    const userUsage = await this.usageService.getUserCount(orgId);
-    const remainingUser = userUsage.maxCount - userUsage.count;
-    if(remainingUser > 0)
+    if(request.user && request.user.orgId)
     {
-      const orgId = request.orgId;
+      const orgId = request.user.orgId;
       return await this.usersService.create(orgId,{...createUserDto, orgId }, true);
     }
-    else
-    {
-      throw new NotAcceptableException(`Remaining user ${remainingUser}`);
+    else{
+      throw new NotAcceptableException("User not found");
     }
   }
 

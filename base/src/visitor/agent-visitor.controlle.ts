@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, HttpCode, Req, UnauthorizedException } from '@nestjs/common';
 import { VisitorService } from './visitor.service';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/roles.decorator';
@@ -8,6 +8,7 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Visitor } from './entities/visitor.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ZautoRequest } from 'src/common/models/request.model';
 
 
 @ApiTags('Visitors')
@@ -26,7 +27,15 @@ export class AgentVisitorController {
   @ApiResponse({
     type: ResponseDTO<Visitor>
   })
-  async findAll(@Param('agentId') agentId: string, @Query() paginationDto: PaginationDto) {
-    return await this.visitorService.findAllByAgent(agentId, paginationDto);
+  async findAll(@Param('agentId') agentId: string, @Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
+    if(request.user && request.user.orgId)
+    {
+      const orgId = request.user.orgId;
+      return await this.visitorService.findAllByAgent({orgId,agentId,data:paginationDto});
+    }
+    else
+    {
+      throw new UnauthorizedException("Unauthorised access.")
+    }
   }
 }
