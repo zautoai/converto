@@ -23,6 +23,21 @@ import { BaseService } from 'src/common/services/base.service';
 
 @Injectable() 
 export class AgentService extends BaseService{
+    updateAvatar(arg0: {
+        orgId: string; data: {
+            orgId: string; name: string; companyName: string; displayName: string; role: string; purpouse: any; leadInfo: any; companyBusiness: any; companyValue: any; usetools: boolean; conversationType: import("../common/enums/enums").ConversationType;
+            //   id: agent.assistantId,
+            //   instructions: agentPrompt.text,
+            //   model: agent.llmModel,
+            //   fileIds: [agentFile.id], 
+            //   name: agent.displayName
+            // });
+            siteObjUrl: any; //   instructions: agentPrompt.text,
+            useAssistant: boolean;
+        }; avatarId: string;
+    }) {
+        throw new Error("Method not implemented.");
+    }
  
   constructor(
     private readonly promptService: AgentPromptService,
@@ -66,8 +81,8 @@ export class AgentService extends BaseService{
 
     //Default LLM Model for all avatar
     createAgentDto.llmModel = process.env.OPENAI_ASSISTANT_DEFAULT_MODEL;
-    
-    if(isExist) {
+
+    if (isExist) {
       throw new ConflictException('Agent name alread taken.')
     } else {
       const prisma = await this.getPrismaClient(orgId);
@@ -78,17 +93,18 @@ export class AgentService extends BaseService{
         await this.chroma.createNameSapce(agent.name);
         await this.promptService.create({orgId, data: {agentId: agent.id, type: 'system', text: instruction}})
         //Create Default stages for agent
-        if(agent)
-        {
+        if (agent) {
           await this.stageService.setDefaultStages(agent);
         }
 
         //create file if fileId found
-        if(fileId) {
-          await prisma.agentFile.create({data:{
-            agentId: agent.id,
-            fileId: fileId
-          }});
+        if (fileId) {
+          await prisma.agentFile.create({
+            data: {
+              agentId: agent.id,
+              fileId: fileId
+            }
+          });
         }
       })
 
@@ -103,7 +119,7 @@ export class AgentService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     const agents = await prisma.agent.findMany({
       skip,
-      take: limit, where: {status: { not: AgentStatus.DELETED}}
+      take: limit, where: { status: { not: AgentStatus.DELETED } }
     });
     const total = await prisma.agent.count();
     return {
@@ -173,7 +189,7 @@ export class AgentService extends BaseService{
           agentId: agent.id
         }
       })
-      await this.promptService.updateAssistent(agent,agentPrompt,agentFile);
+      await this.promptService.updateAssistent(agent, agentPrompt, agentFile);
       return updatedAgent;
       // await this.llmService.updateAgent({
       //   id: agent.assistantId,
@@ -196,9 +212,9 @@ export class AgentService extends BaseService{
     });
     if (agent) {
       const data = {
-        ...styledata.styles ? {styles : styledata.styles} : {},
-        ...styledata.wakeupTime ? {wakeupTime : styledata.wakeupTime} : {},
-        ...styledata.position ? {position : styledata.position} : {},
+        ...styledata.styles ? { styles: styledata.styles } : {},
+        ...styledata.wakeupTime ? { wakeupTime: styledata.wakeupTime } : {},
+        ...styledata.position ? { position: styledata.position } : {},
       }
       const updatedAgent = await prisma.agent.update({
         data: data,
@@ -218,7 +234,7 @@ export class AgentService extends BaseService{
     });
     if (agent) {
       const updatedAgent = await prisma.agent.update({
-        data: {leadInfo},
+        data: { leadInfo },
         where: { id },
       });
       const prompt = await this.promptService.getAssistantPrompt(orgId,updatedAgent)
@@ -228,7 +244,7 @@ export class AgentService extends BaseService{
           agentId: agent.id
         }
       })
-      await this.promptService.updateAssistent(agent,agentPrompt,agentFile);
+      await this.promptService.updateAssistent(agent, agentPrompt, agentFile);
       return updatedAgent;
     } else {
       throw new NotFoundException(`Agent not found with id ${id}`);
@@ -266,8 +282,8 @@ export class AgentService extends BaseService{
       }
       const prisma = await this.getPrismaClient(orgId);
       await this.llmService.unlinkFileFromAgent(agentConfig);
-      await prisma.agentFile.delete({where: {id: agent.AgentFiles[0].id}});
-    } catch(error) {
+      await prisma.agentFile.delete({ where: { id: agent.AgentFiles[0].id } });
+    } catch (error) {
       console.log(error)
     }
   }
@@ -280,21 +296,24 @@ export class AgentService extends BaseService{
         const prisma = await this.getPrismaClient(orgId);
         await prisma.agent.update({data: {
           siteObjUrl: response.Location,
-        }, where:{id: agent.id}});
+        }, where: { id: agent.id }
+      });
 
-        const file = await this.llmService.uploadFile(filePath);
+      const file = await this.llmService.uploadFile(filePath);
 
-        await prisma.agentFile.create({data:{
+      await prisma.agentFile.create({
+        data: {
           agentId: agent.id,
           fileId: file.id
-        }});
-
-        await this.fileService.deleteFile(filePath);
-
-        if(agent.AgentFiles && agent.AgentFiles[0]) {
-          this.removeOldFile({orgId, data: agent});
         }
-    } catch(error) {
+      });
+
+      await this.fileService.deleteFile(filePath);
+
+      if (agent.AgentFiles && agent.AgentFiles[0]) {
+        this.removeOldFile(agent);
+      }
+    } catch (error) {
       console.log(error)
     }
   }
@@ -314,11 +333,9 @@ export class AgentService extends BaseService{
           await this.s3Service.deleteFile(fileName);
         }
         await this.chroma.deleteNameSapce(agent.name);
-        await prisma.site.deleteMany({
-          where: {agentId: agent.id}
-        })
+        await prisma.site.deleteMany()
         await prisma.callToAction.deleteMany({
-          where: {agentId: agent.id}
+          where: { agentId: agent.id }
         })
         return await prisma.agent.delete({
           where: { id },
@@ -326,11 +343,11 @@ export class AgentService extends BaseService{
       } else {
         throw new NotFoundException(`Agent not found with id ${id}`);
       }
-    } catch(error) {
+    } catch (error) {
       console.log(error)
       throw new InternalServerErrorException(`Agent not deleted`);
     }
-    
+
   }
 
   async makeDeleted(orgId: string,id: string) {
@@ -339,7 +356,8 @@ export class AgentService extends BaseService{
       where: { id },
     });
     if (agent) {
-      return await prisma.agent.update({data: { status: AgentStatus.DELETED },
+      return await prisma.agent.update({
+        data: { status: AgentStatus.DELETED },
         where: { id },
       });
     } else {
@@ -365,7 +383,7 @@ export class AgentService extends BaseService{
     if (agent) {
       await this.staticFileService.deleteExistingFile(agent.logoUrl)
       return await prisma.agent.update({
-        data: {logoUrl},
+        data: { logoUrl },
         where: { id },
       });
     } else {
@@ -396,7 +414,7 @@ export class AgentService extends BaseService{
     } catch(error) {
       const prisma = await this.getPrismaClient(orgId)
       const _avatar = await prisma.agent.findFirst();
-      await prisma.agent.delete({where: {id: _avatar.id}});
+      await prisma.agent.delete({ where: { id: _avatar.id } });
       console.log(error)
       throw new InternalServerErrorException('Unable to create avatar');
     }
@@ -405,9 +423,9 @@ export class AgentService extends BaseService{
   async updateAvatar(serviceParams: ServiceParams<CreateAgentDto>) {
     const {orgId, data: createAgentDto, id, fileId} = serviceParams;
     try {
-    //Default UseAssistant to false for all avatar
-    createAgentDto.useAssistant = false;
-    const useAssistant = createAgentDto.useAssistant;
+      //Default UseAssistant to false for all avatar
+      createAgentDto.useAssistant = false;
+      const useAssistant = createAgentDto.useAssistant;
 
     //Default LLM Model for all avatar
     createAgentDto.llmModel = process.env.OPENAI_ASSISTANT_DEFAULT_MODEL;
@@ -417,9 +435,8 @@ export class AgentService extends BaseService{
       const agent = await prisma.agent.update({ data: {...createAgentDto, 
       status: AgentStatus.ACTIVE} , where: {id}});
       //Create Default stages for agent
-      if(agent)
-      {
-          await this.stageService.setDefaultStages(agent);
+      if (agent) {
+        await this.stageService.setDefaultStages(agent);
       }
       const instruction = await this.promptService.getAssistantPrompt(orgId,agent);
   
@@ -437,7 +454,7 @@ export class AgentService extends BaseService{
       }
 
       return agent;
-    } catch(error) {
+    } catch (error) {
       console.error(error);
     }
   }
@@ -453,22 +470,20 @@ export class AgentService extends BaseService{
       throw new NotFoundException();
     }
 
-    try
-    {
-      const filePath = path.resolve(__dirname, '../../', 'public','assets','bot','js','zautobot_v2.js');
+    try {
+      const filePath = path.resolve(__dirname, '../../', 'public', 'assets', 'bot', 'js', 'zautobot_v2.js');
       let jsCode = fs.readFileSync(filePath, 'utf8')
-      .replaceAll("{{avatarId}}",agentId)
-      .replaceAll("{{ApiUrl}}",host + "/")
-      .replaceAll("{{BaseUrl}}",host + "/")
-      .replaceAll("'{{standAloneFlag}}'",`${standalone}`)
-  
-      const options = {toplevel: true,};
-      const uglifiedCode = minify(jsCode,options).code;
-  
+        .replaceAll("{{avatarId}}", agentId)
+        .replaceAll("{{ApiUrl}}", host + "/")
+        .replaceAll("{{BaseUrl}}", host + "/")
+        .replaceAll("'{{standAloneFlag}}'", `${standalone}`)
+
+      const options = { toplevel: true, };
+      const uglifiedCode = minify(jsCode, options).code;
+
       return uglifiedCode;
     }
-    catch(error)
-    {
+    catch (error) {
       return (error);
     }
   }

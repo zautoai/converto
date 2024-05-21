@@ -13,8 +13,4 @@ export class ScrapMultipleDto {
     @IsNotEmpty()
     urls: string[];
 
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    agentId: string;
 }

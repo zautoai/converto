@@ -4,8 +4,8 @@ import { IsEnum, IsString, MaxLength } from 'class-validator';
 import { SiteProcessStatus } from 'src/common/enums/enums';
 
 export class UpdateSiteDto {
-    @ApiProperty()
-    @IsString()
-    @MaxLength(500)
-    url: string;
-  }
+  @ApiProperty()
+  @IsString()
+  @MaxLength(500)
+  url: string;
+}

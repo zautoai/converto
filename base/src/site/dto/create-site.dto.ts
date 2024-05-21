@@ -7,11 +7,6 @@ export class CreateSiteDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  agentId: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
   @MaxLength(500)
   url: string;
 }

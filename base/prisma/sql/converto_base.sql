@@ -202,7 +202,6 @@ CREATE TABLE "LeadConfig" (
 -- CreateTable
 CREATE TABLE "Site" (
     "id" TEXT NOT NULL,
-    "agentId" TEXT NOT NULL,
     "url" VARCHAR(500) NOT NULL,
     "status" "SiteProcessStatus" DEFAULT 'IN_PROGRESS',
     "info" TEXT,
@@ -368,6 +367,7 @@ CREATE TABLE "Campaign" (
     "endDate" TIMESTAMP,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
+    "organizationId" TEXT,
 
     CONSTRAINT "Campaign_pkey" PRIMARY KEY ("id")
 );
@@ -434,7 +434,6 @@ CREATE TABLE "CallToAction" (
 -- CreateTable
 CREATE TABLE "AvailabilitySchedule" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
     "availableDays" TEXT NOT NULL,
     "eventDuration" INTEGER NOT NULL,
     "calendarId" TEXT,
@@ -447,7 +446,6 @@ CREATE TABLE "AvailabilitySchedule" (
 -- CreateTable
 CREATE TABLE "availableHours" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
     "start" TEXT NOT NULL,
     "end" TEXT NOT NULL,
     "scheduleId" TEXT NOT NULL,
@@ -460,8 +458,7 @@ CREATE TABLE "availableHours" (
 -- CreateTable
 CREATE TABLE "ExternalToolCredential" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
-    "tokeType" TEXT,
+    "tokenType" TEXT,
     "refreshToken" TEXT NOT NULL,
     "accessToken" TEXT NOT NULL,
     "expiresIn" INTEGER NOT NULL,
@@ -537,9 +534,6 @@ CREATE INDEX "OrgId_leadconfig_fkey" ON "LeadConfig"("orgId");
 
 -- CreateIndex
 CREATE INDEX "AgentId_LeadConfig_fkey" ON "LeadConfig"("agentId");
-
--- CreateIndex
-CREATE INDEX "AgentId_Site_fkey" ON "Site"("agentId");
 
 -- CreateIndex
 CREATE INDEX "Agentprompt_orgId_fkey" ON "AgentPrompt"("orgId");
@@ -661,9 +655,6 @@ CREATE INDEX "Cta_orgId_fkey" ON "CallToAction"("orgId");
 -- CreateIndex
 CREATE UNIQUE INDEX "CallToAction_agentId_name_key" ON "CallToAction"("agentId", "name");
 
--- CreateIndex
-CREATE UNIQUE INDEX "AvailabilitySchedule_orgId_key" ON "AvailabilitySchedule"("orgId");
-
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -687,9 +678,6 @@ ALTER TABLE "LeadConfig" ADD CONSTRAINT "LeadConfig_agentId_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "LeadConfig" ADD CONSTRAINT "LeadConfig_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Site" ADD CONSTRAINT "Site_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AgentPrompt" ADD CONSTRAINT "AgentPrompt_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -767,6 +755,9 @@ ALTER TABLE "LeadCategoryMap" ADD CONSTRAINT "LeadCategoryMap_leadId_fkey" FOREI
 ALTER TABLE "LeadCategoryMap" ADD CONSTRAINT "LeadCategoryMap_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "LeadCategory"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Campaign" ADD CONSTRAINT "Campaign_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Stage" ADD CONSTRAINT "Stage_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -779,10 +770,4 @@ ALTER TABLE "CallToAction" ADD CONSTRAINT "CallToAction_agentId_fkey" FOREIGN KE
 ALTER TABLE "CallToAction" ADD CONSTRAINT "CallToAction_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AvailabilitySchedule" ADD CONSTRAINT "AvailabilitySchedule_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "availableHours" ADD CONSTRAINT "availableHours_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "AvailabilitySchedule"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ExternalToolCredential" ADD CONSTRAINT "ExternalToolCredential_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -1,26 +1,29 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateScheduleDto } from './dto/create-schedule.dto';
+import { CreateScheduleDto, availableHour } from './dto/create-schedule.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
+import { BaseService } from 'src/common/services/base.service';
+import { ServiceParams } from 'src/common/models/service-param.model';
 
 @Injectable()
-export class AvailabilityScheduleService {
+export class AvailabilityScheduleService extends BaseService {
 
-    constructor(
-        private readonly prisma: PrismaService
-    ) { }
+    constructor() {
+        super()
+    }
 
-    async create(createScheduleDto: CreateScheduleDto) {
+    async create(serviceParams: ServiceParams<CreateScheduleDto>) {
+        const { orgId, data: createScheduleDto } = serviceParams
         const scheduleData = {
-            orgId: createScheduleDto.orgId,
             availableDays: createScheduleDto.availableDays,
             eventDuration: createScheduleDto.eventDuration,
             calendarId: createScheduleDto.calendarId
         }
         try {
-            const schedule = await this.prisma.availabilitySchedule.create({ data: scheduleData });
-            await this.deleteAndCreateAvailableHours(createScheduleDto.orgId,schedule.id,createScheduleDto.availableHours);
+            const prisma = await this.getPrismaClient(orgId)
+            const schedule = await prisma.availabilitySchedule.create({ data: scheduleData });
+            await this.deleteAndCreateAvailableHours({ orgId, data: { scheduleId: schedule.id, availableHours: createScheduleDto.availableHours } });
             return schedule;
         }
         catch (error) {
@@ -33,46 +36,43 @@ export class AvailabilityScheduleService {
         }
     }
 
-    async findAll() {
+    async findAll(orgId: string) {
         try {
-            const allSchedules = await this.prisma.availabilitySchedule.findMany();
+            const prisma = await this.getPrismaClient(orgId)
+            const allSchedules = await prisma.availabilitySchedule.findMany();
             return allSchedules;
         } catch (error) {
             throw new BadRequestException(error);
         }
     }
 
-    async findByOrg(orgId: string) {
-        const existingSchedule = await this.prisma.availabilitySchedule.findFirst({
-            where: {
-                orgId
-            },
-            include: {
-                availableHours: true
-            }
-        });
-        if (!existingSchedule) {
-            throw new NotFoundException('Availability schedule not found');
+    async findOne(orgId: string) {
+        try {
+            const prisma = await this.getPrismaClient(orgId)
+            const allSchedules = await prisma.availabilitySchedule.findFirst({ include: { availableHours: true } });
+            return allSchedules;
+        } catch (error) {
+            throw new BadRequestException(error);
         }
-        return existingSchedule;
     }
 
-    async update(id: string, updateScheduleDto: UpdateScheduleDto) {
+    async update(serviceParams: ServiceParams<UpdateScheduleDto>) {
+        const { orgId, id, data: updateScheduleDto } = serviceParams;
         try {
-            const existingSchedule = await this.prisma.availabilitySchedule.findUnique({
+            const prisma = await this.getPrismaClient(orgId)
+            const existingSchedule = await prisma.availabilitySchedule.findUnique({
                 where: { id }
             });
             if (!existingSchedule) {
                 throw new NotFoundException('Availability schedule not found');
             }
-            await this.deleteAndCreateAvailableHours(updateScheduleDto.orgId,existingSchedule.id,updateScheduleDto.availableHours);
+            await this.deleteAndCreateAvailableHours({ orgId, data: { scheduleId: existingSchedule.id, availableHours: updateScheduleDto.availableHours } });
             const scheduleData = {
-                orgId: updateScheduleDto.orgId,
                 availableDays: updateScheduleDto.availableDays,
                 eventDuration: updateScheduleDto.eventDuration,
                 calendarId: updateScheduleDto.calendarId
             }
-            const updatedSchedule = await this.prisma.availabilitySchedule.update({
+            const updatedSchedule = await prisma.availabilitySchedule.update({
                 where: { id },
                 data: scheduleData
             });
@@ -82,24 +82,27 @@ export class AvailabilityScheduleService {
         }
     }
 
-    async delete(id: string) {
+    async delete(serviceParams: ServiceParams<{ id: string }>) {
+        const { orgId, data: { id } } = serviceParams
         try {
-            const existingSchedule = await this.prisma.availabilitySchedule.findUnique({
+            const prisma = await this.getPrismaClient(orgId)
+            const existingSchedule = await prisma.availabilitySchedule.findUnique({
                 where: { id }
             });
             if (!existingSchedule) {
                 throw new NotFoundException('Availability schedule not found');
             }
-            await this.prisma.availabilitySchedule.delete({ where: { id } });
+            await prisma.availabilitySchedule.delete({ where: { id } });
         } catch (error) {
             throw new BadRequestException(error);
         }
     }
 
-    async deleteAndCreateAvailableHours(orgId: string, scheduleId: string, availableHours: any[]) {
-        await this.prisma.availableHours.deleteMany({
+    async deleteAndCreateAvailableHours(serviceParams: ServiceParams<{ scheduleId: string, availableHours: any[] }>) {
+        const { orgId, data: { scheduleId, availableHours } } = serviceParams;
+        const prisma = await this.getPrismaClient(orgId)
+        await prisma.availableHours.deleteMany({
             where: {
-                orgId: orgId,
                 scheduleId: scheduleId
             }
         });
@@ -107,11 +110,10 @@ export class AvailabilityScheduleService {
             const availableHourData = {
                 ...availableHour,
                 ...{
-                    orgId: orgId,
                     scheduleId: scheduleId
                 }
             }
-            await this.prisma.availableHours.create({ data: availableHourData })
+            await prisma.availableHours.create({ data: availableHourData })
         }
     }
 

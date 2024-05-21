@@ -61,10 +61,8 @@ model Organization {
   modifiedAt DateTime    @updatedAt
 
   Leads                  Lead[]
-  AvailabilitySchedule   AvailabilitySchedule[]
   LeradCategory          LeadCategory[]
   LeadCategoryMap        LeadCategoryMap[]
-  ExternalToolCredential ExternalToolCredential[]
 }
 
 model ActiveClient {
@@ -131,7 +129,6 @@ model Agent {
   autoAnalysis     Boolean          @default(false)
   wakeupTime       Float?           @default(5000)
   position         BotPosition?     @default(BOTTOM_RIGHT)
-  sites            Site[]
   AgentPrompt      AgentPrompt[]
   Leads            Lead[]
   LeadConfig       LeadConfig[]
@@ -171,20 +168,19 @@ model LeadConfig {
   @@index([agentId], map: "AgentId_LeadConfig_fkey")
 }
 
+// ... and so on for the remaining models ...
+
 model Site {
   id         String             @id @default(uuid())
-  agentId    String // Updated to String
   url        String             @db.VarChar(500)
   status     SiteProcessStatus? @default(IN_PROGRESS)
   info       String?            @db.Text
   greeting   String?            @db.Text
   createdAt  DateTime           @default(now())
   modifiedAt DateTime           @updatedAt
-  agent      Agent              @relation(fields: [agentId], references: [id], onDelete: Cascade)
-
-  @@index([agentId], map: "AgentId_Site_fkey")
 }
 
+// Continue this pattern for all models in your schema.
 model AgentPrompt {
   id         String        @id @default(uuid())
   agentId    String // Updated to String
@@ -419,6 +415,7 @@ model Campaign {
   Conversations Conversation[]
   Visits        Visit[]
 
+
 }
 
 model Stage {
@@ -487,19 +484,16 @@ model CallToAction {
 
 model AvailabilitySchedule {
   id             String           @id @default(uuid())
-  orgId          String           @unique
   availableDays  String           @db.Text
   eventDuration  Int
   calendarId     String?          @db.Text
   createdAt      DateTime         @default(now())
   modifiedAt     DateTime         @updatedAt
-  org            Organization?    @relation(fields: [orgId], references: [id], onDelete: Cascade)
   availableHours availableHours[]
 }
 
 model availableHours {
   id         String   @id @default(uuid())
-  orgId      String
   start      String
   end        String
   scheduleId String
@@ -510,14 +504,12 @@ model availableHours {
 }
 
 model ExternalToolCredential {
-  id           String        @id @default(uuid())
-  orgId        String
-  tokeType     String?
+  id           String   @id @default(uuid())
+  tokenType    String?
   refreshToken String
   accessToken  String
   expiresIn    Int
   toolName     String
-  createdAt    DateTime      @default(now())
-  modifiedAt   DateTime      @updatedAt
-  org          Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  modifiedAt   DateTime @updatedAt
 }

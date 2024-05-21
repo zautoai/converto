@@ -52,15 +52,15 @@ export class CTACreatorService implements OnModuleInit {
         const agent = await this.prisma.agent.findUnique({
             where: { id: agentId }
         });
-        
+
         const sites = await this.getSites(agent.id);
-        for(let site of sites) {
+        for (let site of sites) {
             const message = await this.getMessageForCTACreation(agent, [site]);
             console.log(`CTACreator: CTAs are ${message}`)
             const ctaList = await this.getCTAs(message);
             console.log(`CTACreator: CTAs are ${JSON.stringify(ctaList)}`)
-            if(ctaList && ctaList.length > 0) {
-                for(let cta of ctaList) {
+            if (ctaList && ctaList.length > 0) {
+                for (let cta of ctaList) {
                     try {
                         await this.prisma.callToAction.create({
                             data: {
@@ -69,8 +69,9 @@ export class CTACreatorService implements OnModuleInit {
                                 name: cta.label,
                                 description: cta.text,
                                 link: cta.link
-                            }})
-                    } catch(error) {
+                            }
+                        })
+                    } catch (error) {
                         console.log(error)
                     }
                 }
@@ -85,13 +86,13 @@ export class CTACreatorService implements OnModuleInit {
             });
             const sites = await this.getSites(agent.id);
             let ctaList = [];
-            for(let site of sites) {
+            for (let site of sites) {
                 const message = await this.getMessageForCTACreation(agent, [site]);
                 console.log(`CTACreator: CTAs are ${message}`)
                 ctaList = ctaList.concat(await this.getCTAs(message));
             }
             return ctaList;
-        } catch(error) {
+        } catch (error) {
             console.log(error)
         }
     }
@@ -101,11 +102,9 @@ export class CTACreatorService implements OnModuleInit {
     }
 
     async getSites(agentId: string) {
-        const sites = await this.prisma.site.findMany({
-            where: { agentId: agentId }
-        })
+        const sites = await this.prisma.site.findMany()
         let _sites = [];
-        for(let site of sites) {
+        for (let site of sites) {
             _sites.push({
                 id: site.id,
                 url: site.url,
@@ -119,11 +118,11 @@ export class CTACreatorService implements OnModuleInit {
         try {
             const systemPrompt = CTA_CREATOR_PROMPT.replace("{{context}}", message)
             const messages = [
-                {role: 'system', content: systemPrompt},
+                { role: 'system', content: systemPrompt },
                 // {role: 'user', content: 'Provide CTA for the Given Webpage'}
             ];
             // const response = await this.llmService.chat(messages);
-            const response = await this.llmService.sendDirect(messages,LLMNames.COHERE,LLMModels.COHER_COMMAND_R_PLUS);
+            const response = await this.llmService.sendDirect(messages, LLMNames.COHERE, LLMModels.COHER_COMMAND_R_PLUS);
             if (!response || !response.content) {
                 if (retry < 1) {
                     return await this.getCTAs(message, retry + 1);
@@ -135,7 +134,7 @@ export class CTACreatorService implements OnModuleInit {
                 return this.extractJsonFromMarkdown(_jsonstr)
             }
             return JSON.parse(_jsonstr);
-        } catch(error) {
+        } catch (error) {
             console.log(error)
         }
     }
