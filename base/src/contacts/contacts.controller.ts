@@ -29,7 +29,7 @@ import { CreateFieldDto } from './dto/create-field.dto';
 @ApiBearerAuth()
 @Controller('api/contacts')
 export class ContactsController {
-  constructor(private readonly contactsService: ContactsService) {}
+  constructor(private readonly contactsService: ContactsService) { }
 
   @ApiBody({ type: CreateContactDto })
   @Post()
@@ -57,6 +57,27 @@ export class ContactsController {
       throw new UnauthorizedException('Org Id not found');
     }
     return await this.contactsService.getContactFields(orgId);
+  }
+
+
+  @Get('conversation/:id')
+  async getContactsByConversation(@Req() request: ZautoRequest, @Param('id') id: string) {
+    const orgId = request.orgId;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    return await this.contactsService.getContactsByConversation(orgId, id);
+  }
+
+  @Get('date-range')
+  async getContactsByDateRange(@Req() request: ZautoRequest, @Query('startDate') startDate: Date, @Query('endDate') endDate: Date) {
+    const orgId = request.orgId;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    if (startDate && endDate) {
+      return await this.contactsService.getContactsByDate(orgId, startDate, endDate);
+    }
   }
 
   @Get(':id')
@@ -92,7 +113,7 @@ export class ContactsController {
   }
 
   @Post('customfield')
-  async createCustomField(@Body() createFieldDto:CreateFieldDto, @Req() request: ZautoRequest){
+  async createCustomField(@Body() createFieldDto: CreateFieldDto, @Req() request: ZautoRequest) {
     const orgId = request.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');

@@ -53,16 +53,12 @@ model Verification {
 }
 
 model Organization {
-  id         String      @id @default(uuid())
-  name       String      @default("default") @db.VarChar(50)
-  siteUrl    String?     @db.Text()
+  id         String   @id @default(uuid())
+  name       String   @default("default") @db.VarChar(50)
+  siteUrl    String?  @db.Text()
   emails     String[]
-  createdAt  DateTime    @default(now())
-  modifiedAt DateTime    @updatedAt
-
-  Leads                  Lead[]
-  LeradCategory          LeadCategory[]
-  LeadCategoryMap        LeadCategoryMap[]
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
 }
 
 model ActiveClient {
@@ -105,7 +101,7 @@ enum BotPosition {
 }
 
 model Agent {
-  id String @id @default(uuid())
+  id               String           @id @default(uuid())
   name             String?          @unique @db.VarChar(100)
   displayName      String           @db.VarChar(50)
   usetools         Boolean          @default(true)
@@ -130,11 +126,9 @@ model Agent {
   wakeupTime       Float?           @default(5000)
   position         BotPosition?     @default(BOTTOM_RIGHT)
   AgentPrompt      AgentPrompt[]
-  Leads            Lead[]
   LeadConfig       LeadConfig[]
   AgentFiles       AgentFile[]
   Stages           Stage[]
-  CallToAction     CallToAction[]
   starters         String?          @db.Text
 }
 
@@ -154,15 +148,15 @@ model AgentFile {
 }
 
 model LeadConfig {
-  id         String        @id @default(uuid())
+  id         String   @id @default(uuid())
   agentId    String // Updated to String
-  name       Boolean       @default(false)
-  email      Boolean       @default(false)
-  mobile     Boolean       @default(false)
-  whatsapp   Boolean       @default(false)
-  createdAt  DateTime      @default(now())
-  modifiedAt DateTime      @updatedAt
-  agent      Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  name       Boolean  @default(false)
+  email      Boolean  @default(false)
+  mobile     Boolean  @default(false)
+  whatsapp   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+  agent      Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId], map: "AgentId_LeadConfig_fkey")
 }
@@ -181,14 +175,14 @@ model Site {
 
 // Continue this pattern for all models in your schema.
 model AgentPrompt {
-  id         String        @id @default(uuid())
+  id         String   @id @default(uuid())
   agentId    String // Updated to String
   templateId String?
-  type       String        @db.VarChar(50)
-  text       String        @db.Text
-  createdAt  DateTime      @default(now())
-  modifiedAt DateTime      @updatedAt
-  agent      Agent         @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  type       String   @db.VarChar(50)
+  text       String   @db.Text
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
+  agent      Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 }
 
 model Visitor {
@@ -205,7 +199,6 @@ model Visitor {
 
   conversations Conversation[]
   visits        Visit[]
-
 }
 
 model Visit {
@@ -249,7 +242,6 @@ model Conversation {
 
   type             ConversationType
   threadId         String?            @db.VarChar(150)
-  Lead             Lead?
   messages         ZautoMessage[]
   createdAt        DateTime           @default(now())
   modifiedAt       DateTime           @updatedAt
@@ -316,77 +308,6 @@ model ZautoMessage {
   @@index([sentById], map: "sentById_ZautoMessage_fkey")
 }
 
-enum LeadStatus {
-  REPORTING
-  CLOSEDWON
-  CLOSEDLOST
-}
-
-model Lead {
-  id           String     @id @default(uuid())
-  convId       String?    @unique
-  agentId      String? // Updated to String
-  orgId        String? // Updated to String
-  name         String?    @db.VarChar(50)
-  email        String?    @db.VarChar(50)
-  mobile       String?    @db.VarChar(15)
-  whatsapp     String?    @db.VarChar(15)
-  info         String?    @db.Text
-  crm_id       String?    @db.VarChar(100)
-  crmContactid String?    @unique
-  status       LeadStatus @default(REPORTING)
-
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-
-  conversation Conversation? @relation(fields: [convId], references: [id], onDelete: SetNull)
-  Agent        Agent?        @relation(fields: [agentId], references: [id], onDelete: SetNull)
-  org          Organization? @relation(fields: [orgId], references: [id])
-
-  LeadCategoryMap LeadCategoryMap[]
-
-  @@index([orgId], map: "orgId_Lead_fkey")
-  @@index([convId], map: "convId_Lead_fkey")
-  @@index([agentId], map: "agentId_Lead_fkey")
-}
-
-model LeadCategory {
-  id          String @id @default(uuid())
-  orgId       String
-  name        String
-  title       String
-  description String
-  color       String
-
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-
-  LeadCategoryMap LeadCategoryMap[]
-
-  org Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
-
-  @@unique([orgId, name], name: "LeadCategory_unique_orgId_name")
-  @@index([orgId], map: "orgId_LeadCategory_fkey")
-}
-
-model LeadCategoryMap {
-  orgId      String
-  leadId     String
-  categoryId String
-
-  org      Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  lead     Lead?         @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  category LeadCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-
-  @@unique([orgId, leadId, categoryId], name: "LeadCategory_unique_orgId_name")
-  @@index([orgId], map: "orgId_LeadCategoryMap_fkey")
-  @@index([leadId], map: "leadId_LeadCategoryMap_fkey")
-  @@index([categoryId], map: "categoryId_LeadCategoryMap_fkey")
-}
-
 enum CampaignStatus {
   ACTIVE
   INACTIVE
@@ -411,8 +332,6 @@ model Campaign {
   modifiedAt    DateTime       @updatedAt
   Conversations Conversation[]
   Visits        Visit[]
-
-
 }
 
 model Stage {
@@ -425,7 +344,7 @@ model Stage {
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @updatedAt
 
-  agent Agent?        @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  agent Agent? @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@unique([agentId, name], name: "Unique_Agent_Name")
   @@unique([agentId, sequence], name: "Unique_Agent_Sequence")
@@ -465,18 +384,12 @@ enum CTAType {
 
 model CallToAction {
   id          String   @id @default(uuid())
-  agentId     String?
-  name        String   @db.VarChar(100)
+  name        String   @unique @db.VarChar(100)
   description String   @db.VarChar(256)
   link        String?  @db.Text
   type        CTAType? @default(NAVIGATOR)
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @updatedAt
-
-  agent Agent?        @relation(fields: [agentId], references: [id], onDelete: Cascade)
-
-  @@unique([agentId, name], name: "Unique_Agent_Name")
-  @@index([agentId], map: "Cta_agentId_fkey")
 }
 
 model AvailabilitySchedule {

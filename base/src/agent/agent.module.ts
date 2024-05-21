@@ -15,7 +15,6 @@ import { HelpersModule } from 'src/helpers/helpers.module';
 import { BullModule } from '@nestjs/bull';
 import { AvatarQueueProcessor } from './worker/avatar-queue.processor';
 import { AvatarQueueService } from './worker/avatar-queue.service';
-import { LeadModule } from 'src/lead/lead.module';
 import { OrganizationsModule } from 'src/organizations/organizations.module';
 import { StageModule } from 'src/stage/stage.module';
 import { AssistantsModule } from 'src/assistants/assistants.module';
@@ -24,20 +23,19 @@ import { DemandGenModule } from 'src/demand-gen/demand-gen.module';
 import { TrackingService } from './tracking.service';
 
 @Module({
-  imports:[
-    PrismaModule, 
-    ConversationModule, 
-    AgentPromptModule, 
-    ConversationModule, 
-    LlmModule, 
-    ChromaModule, 
-    CommonModule, 
+  imports: [
+    PrismaModule,
+    ConversationModule,
+    AgentPromptModule,
+    ConversationModule,
+    LlmModule,
+    ChromaModule,
+    CommonModule,
     VisitorModule,
     HelpersModule,
     BullModule.registerQueue({
       name: 'AvatarTaskQueue',
     }),
-    LeadModule,
     CommonModule,
     OrganizationsModule,
     StageModule,
@@ -46,7 +44,7 @@ import { TrackingService } from './tracking.service';
     DemandGenModule
   ],
   controllers: [AgentController, AgentChatController],
-  providers: [AgentService, ChatService, AvatarCreatorService, AvatarQueueProcessor, AvatarQueueService,TrackingService],
+  providers: [AgentService, ChatService, AvatarCreatorService, AvatarQueueProcessor, AvatarQueueService, TrackingService],
   exports: [AgentService, ChatService, AvatarCreatorService, AvatarQueueProcessor, AvatarQueueService]
 })
-export class AgentModule {}
+export class AgentModule { }

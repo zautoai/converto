@@ -90,7 +90,6 @@ export class ConversationService extends BaseService{
           }
         },
         campaign: true,
-        Lead: true,
         visitor: true,
         visit: true
       }
@@ -116,8 +115,7 @@ export class ConversationService extends BaseService{
               }
             }
           }
-        },
-        Lead: { include: {LeadCategoryMap: { include: {category: true}}}},
+        }
       }
     });
     if (existingConversation) {
@@ -146,7 +144,6 @@ export class ConversationService extends BaseService{
           }
         },
         campaign: true,
-        Lead: true,
         visitor: true,
         visit: true
       }
@@ -438,7 +435,7 @@ export class ConversationService extends BaseService{
           }
         }
       });
-    return lastMessage;
+      return lastMessage;
     } catch (error) {
       throw new InternalServerErrorException('Unable to fetch last message');
     }

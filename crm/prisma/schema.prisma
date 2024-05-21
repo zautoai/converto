@@ -67,6 +67,7 @@ model Contact {
   notes                    String?
   leadSource               String?
   status                   String?
+  conversationId           String?
   createdAt                DateTime                  @default(now())
   modifiedAt               DateTime                  @updatedAt
   contactTag               ContactTag[]
@@ -137,7 +138,7 @@ enum accountType {
 }
 
 model Account {
-  id              String       @id @default(uuid())
+  id              String      @id @default(uuid())
   parentAccountId String?
   photoUrl        String?
   accountName     String
@@ -158,10 +159,10 @@ model Account {
   notes           String?
   source          String?
   status          String?
-  createdAt       DateTime     @default(now())
-  modifiedAt      DateTime     @updatedAt
-  parentAccount   Account?     @relation("ParentAccount", fields: [parentAccountId], references: [id])
-  subAccounts     Account[]    @relation("ParentAccount")
+  createdAt       DateTime    @default(now())
+  modifiedAt      DateTime    @updatedAt
+  parentAccount   Account?    @relation("ParentAccount", fields: [parentAccountId], references: [id])
+  subAccounts     Account[]   @relation("ParentAccount")
 }
 
 model AccountBasedMarketingTarget {
@@ -202,5 +203,5 @@ model CrmMapping {
   createdAt             DateTime @default(now())
   modifiedAt            DateTime @updatedAt
 
-  @@unique([objectType,fieldName,externalCRMObjectType,externalCRMFieldName])
+  @@unique([objectType, fieldName, externalCRMObjectType, externalCRMFieldName])
 }

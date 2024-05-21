@@ -4,9 +4,9 @@ import { CampaignService } from './campaign.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  imports:[PrismaModule],
+  imports: [PrismaModule],
   controllers: [CampaignController],
   providers: [CampaignService]
-  
+
 })
-export class CampaignModule {}
+export class CampaignModule { }

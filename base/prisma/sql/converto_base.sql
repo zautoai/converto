@@ -29,9 +29,6 @@ CREATE TYPE "Sentimental" AS ENUM ('POSITIVE', 'NEGATIVE', 'NUTRAL');
 CREATE TYPE "Vote" AS ENUM ('UPVOTE', 'DOWNVOTE');
 
 -- CreateEnum
-CREATE TYPE "LeadStatus" AS ENUM ('REPORTING', 'CLOSEDWON', 'CLOSEDLOST');
-
--- CreateEnum
 CREATE TYPE "CampaignStatus" AS ENUM ('ACTIVE', 'INACTIVE');
 
 -- CreateEnum
@@ -307,49 +304,6 @@ CREATE TABLE "ZautoMessage" (
 );
 
 -- CreateTable
-CREATE TABLE "Lead" (
-    "id" TEXT NOT NULL,
-    "convId" TEXT,
-    "agentId" TEXT,
-    "orgId" TEXT,
-    "name" VARCHAR(50),
-    "email" VARCHAR(50),
-    "mobile" VARCHAR(15),
-    "whatsapp" VARCHAR(15),
-    "info" TEXT,
-    "crm_id" VARCHAR(100),
-    "crmContactid" TEXT,
-    "status" "LeadStatus" NOT NULL DEFAULT 'REPORTING',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Lead_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "LeadCategory" (
-    "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "color" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "LeadCategory_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "LeadCategoryMap" (
-    "orgId" TEXT NOT NULL,
-    "leadId" TEXT NOT NULL,
-    "categoryId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL
-);
-
--- CreateTable
 CREATE TABLE "Campaign" (
     "id" TEXT NOT NULL,
     "hash" TEXT,
@@ -591,39 +545,6 @@ CREATE INDEX "convId_ZautoMessage_fkey" ON "ZautoMessage"("convId");
 CREATE INDEX "sentById_ZautoMessage_fkey" ON "ZautoMessage"("sentById");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Lead_convId_key" ON "Lead"("convId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Lead_crmContactid_key" ON "Lead"("crmContactid");
-
--- CreateIndex
-CREATE INDEX "orgId_Lead_fkey" ON "Lead"("orgId");
-
--- CreateIndex
-CREATE INDEX "convId_Lead_fkey" ON "Lead"("convId");
-
--- CreateIndex
-CREATE INDEX "agentId_Lead_fkey" ON "Lead"("agentId");
-
--- CreateIndex
-CREATE INDEX "orgId_LeadCategory_fkey" ON "LeadCategory"("orgId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "LeadCategory_orgId_name_key" ON "LeadCategory"("orgId", "name");
-
--- CreateIndex
-CREATE INDEX "orgId_LeadCategoryMap_fkey" ON "LeadCategoryMap"("orgId");
-
--- CreateIndex
-CREATE INDEX "leadId_LeadCategoryMap_fkey" ON "LeadCategoryMap"("leadId");
-
--- CreateIndex
-CREATE INDEX "categoryId_LeadCategoryMap_fkey" ON "LeadCategoryMap"("categoryId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "LeadCategoryMap_orgId_leadId_categoryId_key" ON "LeadCategoryMap"("orgId", "leadId", "categoryId");
-
--- CreateIndex
 CREATE INDEX "agentId_Stage_fkey" ON "Stage"("agentId");
 
 -- CreateIndex
@@ -724,27 +645,6 @@ ALTER TABLE "ZautoMessage" ADD CONSTRAINT "ZautoMessage_convId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "ZautoMessage" ADD CONSTRAINT "ZautoMessage_sentById_fkey" FOREIGN KEY ("sentById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Lead" ADD CONSTRAINT "Lead_convId_fkey" FOREIGN KEY ("convId") REFERENCES "Conversation"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Lead" ADD CONSTRAINT "Lead_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Lead" ADD CONSTRAINT "Lead_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "LeadCategory" ADD CONSTRAINT "LeadCategory_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "LeadCategoryMap" ADD CONSTRAINT "LeadCategoryMap_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "LeadCategoryMap" ADD CONSTRAINT "LeadCategoryMap_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "Lead"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "LeadCategoryMap" ADD CONSTRAINT "LeadCategoryMap_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "LeadCategory"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Campaign" ADD CONSTRAINT "Campaign_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;

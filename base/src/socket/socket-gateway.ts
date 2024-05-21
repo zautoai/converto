@@ -9,7 +9,6 @@ import { ZautoChatCompletionMessage } from 'src/llm/llms/llm.models';
 import { LlmService } from 'src/llm/llm.service';
 import { VisitorService } from 'src/visitor/visitor.service';
 import { ConversationStatus } from 'src/conversation/entities/conversation.entity';
-import { LeadService } from 'src/lead/lead.service';
 import Redis, { Redis as RedisClient } from 'ioredis';
 import { JwtService } from '@nestjs/jwt';
 import { ActiveClientService } from 'src/active-client/active-client.service';
@@ -17,6 +16,7 @@ import { MessageMediaType } from 'src/conversation/entities/conversation.enums';
 import { UsageService } from 'src/account/usage.service';
 import { SiteService } from 'src/site/site.service';
 import { ZautoRequest } from 'src/common/models/request.model';
+import { ContactsService } from 'src/contacts/contacts.service';
 
 
 
@@ -40,10 +40,10 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     private chatService: ChatService,
     private llmService: LlmService,
     private visitorService: VisitorService,
-    private leadService: LeadService,
     private jwtService: JwtService,
     private activeClientService: ActiveClientService,
     private siteService: SiteService,
+    private contactsService: ContactsService,
     private readonly usageService: UsageService,
   ) {
 
@@ -513,8 +513,9 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
 
       //If agent uses openai assistant then create thread for the conversation
       if (conversation.threadId
-        && conversation.agent.useAssistant
-        && conversation.agent.assistantId) {
+        // && conversation.agent.useAssistant
+        // && conversation.agent.assistantId
+      ) {
         if (!conversation.aiSuspended) {
           return await this.sendToZautoRAG(conversation, message.chatMessage.messages[0])
         } else {
@@ -611,6 +612,7 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
   }
 
   async leadFromUserMessage(message, conversation) {
+    const orgId = "From SubDomain"
     let content = message.chatMessage.messages[0].content;
     const emailRegex = /([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
     const phoneRegex = /(\d{3}[-.\s]??\d{3}[-.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-.\s]??\d{4}|\d{3}[-.\s]??\d{4})/g;
@@ -625,12 +627,7 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
         const emailStr = emails.join(',');
         const phoneStr = phoneNumbers.join(',');
 
-        await this.leadService.create({
-          convId: conversation.id,
-          agentId: conversation.agentId,
-          mobile: phoneStr,
-          email: emailStr,
-        }, conversation.orgId);
+        await this.contactsService.create(orgId, { email: emailStr, phone: phoneStr })
 
         content = maskedContent;
       }

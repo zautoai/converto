@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SocketGateway } from './socket-gateway';
 import { LlmModule } from 'src/llm/llm.module';
-import { LeadModule } from 'src/lead/lead.module';
 import { AgentModule } from 'src/agent/agent.module';
 import { ConversationModule } from 'src/conversation/conversation.module';
 import { VisitorModule } from 'src/visitor/visitor.module';
@@ -9,13 +8,14 @@ import { ActiveClientModule } from 'src/active-client/active-client.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AccountModule } from 'src/account/account.module';
 import { SiteModule } from 'src/site/site.module';
+import { ContactsModule } from 'src/contacts/contacts.module';
 
 @Module({
     imports: [
         LlmModule,
-        LeadModule,
         AgentModule,
         ConversationModule,
+        ContactsModule,
         VisitorModule,
         ActiveClientModule,
         JwtModule.register({
@@ -28,4 +28,4 @@ import { SiteModule } from 'src/site/site.module';
     providers: [SocketGateway],
     exports: [SocketGateway],
 })
-export class SocketModule {}
+export class SocketModule { }

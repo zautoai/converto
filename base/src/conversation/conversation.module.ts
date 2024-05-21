@@ -4,6 +4,7 @@ import { ConversationController } from './conversation.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { AgentConversationController } from './agent-conversation.controller';
 import { AssistantsModule } from 'src/assistants/assistants.module';
+import { ContactsModule } from 'src/contacts/contacts.module';
 
 @Module({
   imports: [PrismaModule, AssistantsModule],
@@ -11,4 +12,4 @@ import { AssistantsModule } from 'src/assistants/assistants.module';
   providers: [ConversationService],
   exports: [ConversationService]
 })
-export class ConversationModule {}
+export class ConversationModule { }

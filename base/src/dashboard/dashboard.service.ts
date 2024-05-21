@@ -7,12 +7,14 @@ import { Sql } from '@prisma/client/runtime/library';
 import { Prisma } from '@prisma/client';
 import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ContactsService } from 'src/contacts/contacts.service';
 
 @Injectable()
 export class DashboardService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly prismaClientManager: PrismaClientManager,
+    private contactsService: ContactsService
   ) { }
 
   async getAgentsCount(orgId: string) {
@@ -63,17 +65,11 @@ export class DashboardService {
     try {
       const prisma = await this.prismaClientManager.getClient(orgId);
       if (startDate && endDate) {
-        return await prisma.lead.count({
-          where: {
-            orgId,
-            createdAt: {
-              gte: new Date(startDate), // Greater than or equal to start date
-              lte: new Date(endDate), // Less than or equal to end date
-            },
-          },
-        });
+        const leads = await this.contactsService.getContactsByDate(orgId, startDate, endDate)
+        return leads.length;
       } else {
-        return await prisma.lead.count({ where: { orgId } });
+        const leads = await this.contactsService.findAll(orgId)
+        return leads.length;
       }
     } catch (error) {
       console.log(error);
@@ -132,19 +128,6 @@ export class DashboardService {
     }
   }
 
-  async getLeadsCountAgentWise(orgId: string) {
-    try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
-      return await prisma.lead.groupBy({
-        by: ['agentId'],
-        where: { orgId },
-        _count: { agentId: true },
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   async getConversationCountAgentWise(orgId: string) {
 
     try {
@@ -187,16 +170,7 @@ export class DashboardService {
       console.log(error);
     }
   }
-  async getLeadCountByAgent(orgId: string, agentId: string) {
-    try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
 
-      const leads = await prisma.lead.count({ where: { agentId } });
-      return leads;
-    } catch (error) {
-      console.log(error);
-    }
-  }
   async getVisitorCountByAgent(orgId: string, agentId: string) {
     try {
       const prisma = await this.prismaClientManager.getClient(orgId);
@@ -581,33 +555,16 @@ export class DashboardService {
     const prisma = await this.prismaClientManager.getClient(orgId);
 
     let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-    const leads = await prisma.lead.findMany({
-      where: {
-        orgId,
-        createdAt: {
-          gte: startDate.toISOString(),
-          lte: endDate.toISOString(),
-        },
-      },
-      include: {
-        conversation: {
-          include: {
-            visit: {
-              select: {
-                source: true,
-                campaignId: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
+    const leads = await this.contactsService.getContactsByDate(orgId, startDate, endDate)
     const sourceCountMap = {};
 
     for (let lead of leads) {
-      if (lead && lead.conversation) {
-        const { source } = lead.conversation.visit;
+      const conversation = await this.prisma.conversation.findFirst({
+        where: { id: lead.conversationId },
+        include: { visit: { select: { source: true, campaignId: true } } }
+      })
+      if (lead && conversation) {
+        const { source } = conversation.visit;
 
         if (!sourceCountMap[source]) {
           sourceCountMap[source] = 0;
