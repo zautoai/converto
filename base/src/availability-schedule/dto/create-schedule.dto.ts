@@ -4,12 +4,12 @@ import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-valid
 
 
 export class availableHour {
-    @ApiProperty({required: true})
+    @ApiProperty({ required: true })
     @IsNotEmpty()
     @IsString()
     start: string;
 
-    @ApiProperty({required: true})
+    @ApiProperty({ required: true })
     @IsNotEmpty()
     @IsString()
     end: string;
@@ -17,24 +17,22 @@ export class availableHour {
 
 export class CreateScheduleDto {
 
-    orgId:string;
-
-    @ApiProperty({required: true, type:[String]})
+    @ApiProperty({ required: true, type: [String] })
     @IsNotEmpty()
     @Transform(({ value }) => value.join(','))
     availableDays: string;
-    
-    @ApiProperty({required: true})
+
+    @ApiProperty({ required: true })
     @IsNotEmpty()
     @IsNumber()
     eventDuration: number;
-    
-    @ApiProperty({required: true,type:[availableHour]})
+
+    @ApiProperty({ required: true, type: [availableHour] })
     @IsNotEmpty()
     @IsArray()
     availableHours: availableHour[];
-    
-    @ApiProperty({required: false})
+
+    @ApiProperty({ required: false })
     @IsOptional()
     calendarId?: string;
 

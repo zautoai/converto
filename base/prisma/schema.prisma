@@ -61,21 +61,19 @@ model Organization {
   modifiedAt DateTime    @updatedAt
   OrgAccount OrgAccount?
 
-  Agents                 Agent[]
-  Campaigns              Campaign[]
-  LeadConfigs            LeadConfig[]
-  AgentPrompts           AgentPrompt[]
-  Visitors               Visitor[]
-  Conversations          Conversation[]
-  Leads                  Lead[]
-  ZautoMessages          ZautoMessage[]
-  Stages                 Stage[]
-  Visits                 Visit[]
-  CallToAction           CallToAction[]
-  AvailabilitySchedule   AvailabilitySchedule[]
-  LeradCategory          LeadCategory[]
-  LeadCategoryMap        LeadCategoryMap[]
-  ExternalToolCredential ExternalToolCredential[]
+  Agents          Agent[]
+  Campaigns       Campaign[]
+  LeadConfigs     LeadConfig[]
+  AgentPrompts    AgentPrompt[]
+  Visitors        Visitor[]
+  Conversations   Conversation[]
+  Leads           Lead[]
+  ZautoMessages   ZautoMessage[]
+  Stages          Stage[]
+  Visits          Visit[]
+  CallToAction    CallToAction[]
+  LeradCategory   LeadCategory[]
+  LeadCategoryMap LeadCategoryMap[]
 }
 
 model ActiveClient {
@@ -599,19 +597,16 @@ model CallToAction {
 
 model AvailabilitySchedule {
   id             String           @id @default(uuid())
-  orgId          String           @unique
   availableDays  String           @db.Text
   eventDuration  Int
   calendarId     String?          @db.Text
   createdAt      DateTime         @default(now())
   modifiedAt     DateTime         @updatedAt
-  org            Organization?    @relation(fields: [orgId], references: [id], onDelete: Cascade)
   availableHours availableHours[]
 }
 
 model availableHours {
   id         String   @id @default(uuid())
-  orgId      String
   start      String
   end        String
   scheduleId String
@@ -622,14 +617,12 @@ model availableHours {
 }
 
 model ExternalToolCredential {
-  id           String        @id @default(uuid())
-  orgId        String
-  tokeType     String?
+  id           String   @id @default(uuid())
+  tokenType    String?
   refreshToken String
   accessToken  String
   expiresIn    Int
   toolName     String
-  createdAt    DateTime      @default(now())
-  modifiedAt   DateTime      @updatedAt
-  org          Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  modifiedAt   DateTime @updatedAt
 }
