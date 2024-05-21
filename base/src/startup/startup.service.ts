@@ -33,12 +33,6 @@ export class StartupService extends BaseService implements OnModuleInit {
     }
 
     async executeOnStartup() {
-<<<<<<< HEAD
-=======
-        console.log("Startup called");
-
-        await this.createSubscriptions();
->>>>>>> 9d49473aec2a1fa488ca34b18da6984d517514c1
         await this.createZautoOrg()
         // await this.createDefaultRoles();
         //await this.resyncHelpers();
