@@ -130,9 +130,7 @@ export class AgentService extends BaseService{
 
   async findOne(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst({
-      where: { id },
-    });
+    const agent = await prisma.agent.findFirst();
     if (agent) {
       return agent;
     } else {
@@ -447,7 +445,7 @@ export class AgentService extends BaseService{
   {
     const host = process.env.HOST_URL;
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findUnique({where:{id:agentId}}); 
+    const agent = await prisma.agent.findFirst();
     if(!agent)
     {
       throw new NotFoundException();

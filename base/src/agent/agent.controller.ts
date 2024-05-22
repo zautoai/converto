@@ -26,6 +26,7 @@ import { DemandGenService } from 'src/demand-gen/demand-gen.service';
 import { TrackingDto } from './dto/tracking.dto';
 import { TrackingService } from './tracking.service';
 import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
+import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
 
 @ApiTags('Agents')
 @Controller('api/agents')
@@ -125,7 +126,7 @@ export class AgentController {
   })
   @UseGuards(SubdomainGuard)
   async findOne(@Query() sourceQuery: any, @Param('id') id: string, @Req() request: Request) {
-    const orgId = request.headers['org-id'];
+    const orgId = request['orgId'];
     const agent = await this.agentsService.findOne(orgId,id);
     if(sourceQuery.source) {
 
@@ -337,9 +338,10 @@ export class AgentController {
 
   @Get('widget/standalone/:agentId')
   @Header('Content-Type', 'application/javascript')
-  async standaloneEmbedding(@Param('agentId') agentId: string, @Req() request: Request)
+  @UseGuards(SubdomainGuard)
+  async standaloneEmbedding(@Param('agentId') agentId: string, @Req() request: SubdomainRequest)
   {
-    const orgId = request.headers['org-id'];
+    const orgId = request.orgId;
     if(agentId.includes('.js'))
     {
       agentId = agentId.replace('.js','');

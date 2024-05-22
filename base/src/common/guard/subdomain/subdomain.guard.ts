@@ -10,7 +10,11 @@ export class SubdomainGuard implements CanActivate {
     const host = request.hostname;
     const subdomain = host.split('.')[0];
     const orgId = this.extractOrgIdFromSubdomain(subdomain);
-    return !!orgId; 
+    if (orgId) {
+      request.orgId = orgId;
+      return true;
+    }
+    return false; 
   }
 
   private extractOrgIdFromSubdomain(subdomain: string): string | null {
