@@ -411,8 +411,12 @@ export class AgentService extends BaseService{
     
     createAgentDto.welcomeMsg = this.getWelcomeMessage({...createAgentDto});
     const prisma = await this.getPrismaClient(orgId);
+    const existingAgent = await prisma.agent.findFirst();
+    if(!existingAgent) {
+      throw new InternalServerErrorException('Unable to create avatar');
+    }
       const agent = await prisma.agent.update({ data: {...createAgentDto, 
-      status: AgentStatus.ACTIVE} , where: {id}});
+      status: AgentStatus.ACTIVE} , where: {id:existingAgent.id}});
       //Create Default stages for agent
       if (agent) {
         await this.stageService.setDefaultStages(orgId,agent);

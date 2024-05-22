@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, InternalServerErrorException, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, InternalServerErrorException, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AgentService } from './agent.service';
 import { Agent } from './entities/agent.entity';
 import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
@@ -6,6 +6,8 @@ import { ChatMessage } from './dto/chat.dto';
 import { ConversationService } from 'src/conversation/conversation.service';
 import { ConversationType } from 'src/common/enums/enums';
 import { ChatService } from './agent-chat.service';
+import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
+import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
 
 
 @ApiTags('Agents')
@@ -74,8 +76,9 @@ export class AgentChatController {
 
   @Get(':convId')
   @ApiCreatedResponse({type: Agent})
-  async fetchMessages(@Param('convId') conversationId: string, @Param('agentId') agentId: string, @Req() request: Request) {
-    const orgId = request.headers['org-id'];
+  @UseGuards(SubdomainGuard)
+  async fetchMessages(@Param('convId') conversationId: string, @Param('agentId') agentId: string, @Req() request: SubdomainRequest) {
+    const orgId = request.orgId;
     const conversation = await this.conversationService.findOneNoSummay(orgId,conversationId);
     if(conversation ) {
       throw new UnauthorizedException('You are not authorized to access this conversation.')

@@ -17,12 +17,6 @@ export class CreateAgentDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsString()
-  @IsOptional()
-  orgId: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
   @IsBoolean()
   usetools: boolean;
 
