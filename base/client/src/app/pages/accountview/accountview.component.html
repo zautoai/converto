@@ -1,57 +1,71 @@
-<div class="profile-card">
-  <img src="https://via.placeholder.com/80" alt="Profile">
-  <h5>Merri Diamond <span class="rating"><i class="fas fa-star"></i> 3.6</span></h5>
-  <p class="text-muted">{{selectedData.fullname}}</p>
-  
-  <div class="info-item">
-      <i class="fas fa-calendar-alt"></i>
-      <span>Date: 15 Jan 2023</span>
+<div class="profile-card bg-light row  mt-2">
+  <div class="col-7 p-5">
+    <div class="d-flex align-item-center justify-content-evenly">
+      <div class="mt-5"><img src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Profile" /></div>
+      <div>
+        <h5>
+          Merri Diamond <span class="rating"><i class="fas fa-star"></i> 3.6</span>
+        </h5>
+        <p class="text-muted">{{ selectedData.fullname }}</p>
+        <div class="info-item">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Date: 15 Jan 2023</span>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-phone"></i>
+          <span>Phone: +1 23456 78910</span>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-envelope"></i>
+          <span>Email: supportmannatthemes.com</span>
+        </div>
+      </div>
+    </div>
+    <div class="mt-3">
+      <div class="info-item">
+        <div class="p-3 border">
+          <p class="text-muted mb-0">
+            <strong>Last Message:</strong> popular belief, Lorem Ipsum is not simply
+            random text. It has roots in a piece of classical Latin literature.
+          </p>
+        </div>
+      </div>
+      <div class="buttons">
+        <button class="btn btn-outline-primary">Send SMS</button>
+        <button class="btn btn-outline-success">Send Email</button>
+      </div>
+    </div> 
   </div>
-  <div class="info-item">
-      <i class="fas fa-phone"></i>
-      <span>Phone: +1 23456 78910</span>
-  </div>
-  <div class="info-item">
-      <i class="fas fa-envelope"></i>
-      <span>Email: supportmannatthemes.com</span>
-  </div>
-  <div class="info-item">
-      <p class="text-muted mb-0"><strong>Last Message:</strong> popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature.</p>
-  </div>
-  
-  <div class="buttons">
-      <button class="btn btn-outline-primary">Send SMS</button>
-      <button class="btn btn-outline-success">Send Email</button>
-  </div>
+  <div class="col-5"> <div style="border-radius: 50%; height: 50px; width: 50px;border: 5px rgb(29, 255, 59) solid;"></div></div>
 </div>
 
-  <!--below tab-->
-        <div class="tab-menu-heading border-bottom-0" style="border: none !important;">
-            <div class="tabs-menu1">
-              <ul ngbNav #nav="ngbNav" [(activeId)]="active">
-                <li class="me-2 mb-1" [ngbNavItem]="1">
-                  <a ngbNavLink><i class="fe fe-eye"></i> Overview</a>
-                  <ng-template ngbNavContent>
-                   <br>
-                        <div class="row">
-                          <div class="col-md-12">
-                         
-                          </div>
-                          <div class="col-md-12">
-                            <div class="card shadow-sm">
-                                
-                              <div class="card-header">
-                                <h5 class="card-title">Basic Information</h5>
-                                
-                              </div>
-                              <div class="card-body">
-                                <ul class="list-group">
-                                  <li class="list-group-item">Account Name : {{selectedData.accountName}}</li>
-                                  <li class="list-group-item">Account Type : {{selectedData.accountType}} </li>
-                                </ul>
-                              </div>
-                            </div  >
-                            <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
+<!--below tab-->
+<div class="tab-menu-heading border-bottom-0" style="border: none !important">
+  <div class="tabs-menu1">
+    <ul ngbNav #nav="ngbNav" [(activeId)]="active">
+      <li class="me-2 mb-1" [ngbNavItem]="1">
+        <a ngbNavLink><i class="fe fe-eye"></i> Overview</a>
+        <ng-template ngbNavContent>
+          <br />
+          <div class="row">
+            <div class="col-md-12"></div>
+            <div class="col-md-12">
+              <div class="card shadow-sm">
+                <div class="card-header">
+                  <h5 class="card-title">Basic Information</h5>
+                </div>
+                <div class="card-body">
+                  <ul class="list-group">
+                    <li class="list-group-item">
+                      Account Name : {{ selectedData.accountName }}
+                    </li>
+                    <li class="list-group-item">
+                      Account Type : {{ selectedData.accountType }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                               <h5 class="card-title">Contact Information</h5>  </div>
                             <div class="card-body">
                               <ul class="list-group">
@@ -68,7 +82,7 @@
                               </ul>
                             </div>
                           </div> -->
-                          <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
+              <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                             <h5 class="card-title">Business Details </h5>  </div>
                           <div class="card-body">
                             <ul class="list-group">
@@ -78,7 +92,7 @@
                                </ul>
                           </div>
                         </div> -->
-                        <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
+              <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                           <h5 class="card-title">Status and Timeline</h5>  </div>
                         <div class="card-body">
                           <ul class="list-group">
@@ -89,7 +103,7 @@
                           </ul>
                         </div>
                       </div> -->
-                      <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
+              <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                         <h5 class="card-title">Additional Information</h5>  </div>
                       <div class="card-body">
                         <ul class="list-group">
@@ -99,7 +113,7 @@
                         </ul>
                       </div>
                     </div> -->
-                    <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
+              <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                       <h5 class="card-title">Optional Fields</h5>  </div>
                     <div class="card-body">
                       <ul class="list-group">
@@ -114,105 +128,105 @@
                         </ul>
                     </div>
                   </div> -->
-                          </div>
-                        </div>
-                    
-                  </ng-template>
-                </li>
-                <li class="me-2 mb-1" [ngbNavItem]="2">
-                  <a ngbNavLink><i class="fe fe-activity"></i> Activity</a>
-                  <ng-template ngbNavContent>
-                    <!--activity-->
-                    <div class="container">
-                      <div class="roadmap">
-                        <h2>User Journey</h2>
-                        <div class="roadmap-timeline">
-                          <div class="roadmap-line"></div>
-                          <div class="roadmap-milestone">
-                            <div class="milestone-icon">
-                              <i class="fas fa-flag"></i>
-                            </div>
-                            <div class="milestone-content">
-                              <h3> Discovery</h3>
-                              <!-- <p>Discovery</p> -->
-                              <p>The user discovers your brand</p>
-                            </div>
-                          </div>
-                          <div class="roadmap-milestone">
-                            <div class="milestone-icon">
-                              <i class="fas fa-flag"></i>
-                            </div>
-                            <div class="milestone-content">
-                              <h3>Consideration</h3>
-                              
-                              <p>The user discovers your brand through a campaign or other marketing channel.</p>
-                            </div>
-                          </div>
-                          <div class="roadmap-milestone">
-                            <div class="milestone-icon">
-                              <i class="fas fa-flag"></i>
-                            </div>
-                            <div class="milestone-content">
-                              <h3>Engagement</h3>
-                              <p> </p>
-                              <p>Enhance user onboarding</p>
-                            </div>
-                          </div>
-                          <div class="roadmap-milestone">
-                            <div class="milestone-icon">
-                              <i class="fas fa-flag"></i>
-                            </div>
-                            <div class="milestone-content">
-                              <h3>Conversion</h3>
-                              <!-- <p>Conversion </p> -->
-                              <p>Enhance user onboarding</p>
-                            </div>
-                          </div>
-                          <div class="roadmap-milestone">
-                            <div class="milestone-icon">
-                              <i class="fas fa-flag"></i>
-                            </div>
-                            <div class="milestone-content">
-                              <h3>Retention</h3>
-                              
-                              <p>Enhance user onboarding</p>
-                            </div>
-                          </div>
-                          <div class="roadmap-milestone">
-                            <div class="milestone-icon">
-                              <i class="fas fa-flag"></i>
-                            </div>
-                            <div class="milestone-content">
-                              <h3>Advocacy</h3>
-                              <p></p>
-                              <p>Expand to new markets</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                     </div>
-                     
-                    <!--activity-->
-                  </ng-template>
-                </li>
-                <li class="me-2 mb-1" [ngbNavItem]="3">
-                  <a ngbNavLink><i class="fe fe-users"></i> Prospects</a>
-                  <ng-template ngbNavContent>
-                    <div class="card lead-card">
-                      <div class="card-body">
-                        <h5 class="card-title">Sridhar Dhamodharan</h5>
-                        <p class="card-text"><strong>Email:</strong> sridharexample.com</p>
-                        <p class="card-text"><strong>Source:</strong> Campaign</p>
-                        <p class="card-text"><strong>Status:</strong> New</p>
-                      </div>
-                    </div>
-                  </ng-template>
-                </li>
-              </ul>
-              <div [ngbNavOutlet]="nav"></div>
             </div>
           </div>
-          
+        </ng-template>
+      </li>
+      <li class="me-2 mb-1" [ngbNavItem]="2">
+        <a ngbNavLink><i class="fe fe-activity"></i> Activity</a>
+        <ng-template ngbNavContent>
+          <!--activity-->
+          <div class="container">
+            <div class="roadmap">
+              <h2>User Journey</h2>
+              <div class="roadmap-timeline">
+                <div class="roadmap-line"></div>
+                <div class="roadmap-milestone">
+                  <div class="milestone-icon">
+                    <i class="fas fa-flag"></i>
+                  </div>
+                  <div class="milestone-content">
+                    <h3>Discovery</h3>
+                    <!-- <p>Discovery</p> -->
+                    <p>The user discovers your brand</p>
+                  </div>
+                </div>
+                <div class="roadmap-milestone">
+                  <div class="milestone-icon">
+                    <i class="fas fa-flag"></i>
+                  </div>
+                  <div class="milestone-content">
+                    <h3>Consideration</h3>
 
-        
-     
+                    <p>
+                      The user discovers your brand through a campaign or other
+                      marketing channel.
+                    </p>
+                  </div>
+                </div>
+                <div class="roadmap-milestone">
+                  <div class="milestone-icon">
+                    <i class="fas fa-flag"></i>
+                  </div>
+                  <div class="milestone-content">
+                    <h3>Engagement</h3>
+                    <p></p>
+                    <p>Enhance user onboarding</p>
+                  </div>
+                </div>
+                <div class="roadmap-milestone">
+                  <div class="milestone-icon">
+                    <i class="fas fa-flag"></i>
+                  </div>
+                  <div class="milestone-content">
+                    <h3>Conversion</h3>
+                    <!-- <p>Conversion </p> -->
+                    <p>Enhance user onboarding</p>
+                  </div>
+                </div>
+                <div class="roadmap-milestone">
+                  <div class="milestone-icon">
+                    <i class="fas fa-flag"></i>
+                  </div>
+                  <div class="milestone-content">
+                    <h3>Retention</h3>
+
+                    <p>Enhance user onboarding</p>
+                  </div>
+                </div>
+                <div class="roadmap-milestone">
+                  <div class="milestone-icon">
+                    <i class="fas fa-flag"></i>
+                  </div>
+                  <div class="milestone-content">
+                    <h3>Advocacy</h3>
+                    <p></p>
+                    <p>Expand to new markets</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!--activity-->
+        </ng-template>
+      </li>
+      <li class="me-2 mb-1" [ngbNavItem]="3">
+        <a ngbNavLink><i class="fe fe-users"></i> Prospects</a>
+        <ng-template ngbNavContent>
+          <div class="card lead-card">
+            <div class="card-body">
+              <h5 class="card-title">Sridhar Dhamodharan</h5>
+              <p class="card-text">
+                <strong>Email:</strong> sridharexample.com
+              </p>
+              <p class="card-text"><strong>Source:</strong> Campaign</p>
+              <p class="card-text"><strong>Status:</strong> New</p>
+            </div>
+          </div>
+        </ng-template>
+      </li>
+    </ul>
+    <div [ngbNavOutlet]="nav"></div>
+  </div>
+</div>
