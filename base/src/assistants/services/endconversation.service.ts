@@ -40,7 +40,6 @@ export class EndOfConversationService {
                 include: {
                     visit: true,
                     visitor: true,
-                    agent: true,
                     messages: {
                         where: { type: 'TEXT' },
                         orderBy: { createdAt: 'asc' },

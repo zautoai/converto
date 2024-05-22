@@ -7,9 +7,6 @@ import { DEFAULT_SCHEMA_NAME, EMAIL_VERIFICATION_EXPIRES_TIME, SYSTEM_CONST } fr
 import { RolesService } from 'src/roles/roles.service';
 import { VerificationType } from 'src/common/enums/enums';
 import { OrganizationsService } from 'src/organizations/organizations.service';
-import { CreateOrgAccountDto } from 'src/account/dto/create-account.dto';
-import { OrgAccountStatus } from 'src/common/enums/enums'; 
-import { OrgAccountService } from 'src/account/account.service';
 import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 
 @Injectable()
@@ -19,7 +16,6 @@ export class RegistrationService {
     private readonly emailService: EmailService,
     private readonly roleService: RolesService,
     private readonly orgService: OrganizationsService,
-    private readonly orgAccountService:OrgAccountService,
     private readonly prismaClientManager: PrismaClientManager
   ) {}
 
@@ -231,18 +227,4 @@ export class RegistrationService {
     }, EMAIL_VERIFICATION_EXPIRES_TIME * 60 * 60 * 1000);
   }
 
-  async getSubscription(subId: string)
-  {
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
-    const subsPlan = await prisma.subscriptionPlan.findUnique({where:{id:subId}});
-    if(subsPlan)
-    {
-      return subsPlan;
-    }
-    else
-    {
-      const freePlan = await prisma.subscriptionPlan.findFirst({where:{price:0}});
-      return freePlan;
-    }
-  }
 }

@@ -48,9 +48,6 @@ export class DashboardController {
             } if(widgets.includes('visitByDate')) {
                 const visitByDateData = await this.dashboardService.getVisitCountByDate(orgId,dashboardDto);
                 data = { ...data, visitByDate: visitByDateData };
-            } if(widgets.includes('visitBySource')) {
-                const visitBySourceData = await this.dashboardService.getVisitCountByPlatform(orgId,dashboardDto);
-                data = { ...data, visitBySource: visitBySourceData };
             } if(widgets.includes('leadByDate')) {
                 const leadByDateData = await this.dashboardService.getLeadCountByDate(orgId,dashboardDto);
                 data = { ...data, leadByDate: leadByDateData };

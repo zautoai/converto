@@ -26,7 +26,7 @@ export class LeadConfigController {
   async create(@Param('agentId') agentId: string, @Body() createLeadConfigDto: CreateLeadConfigDto, @Req() zautoRequest: ZautoRequest) {
     if (zautoRequest.user && zautoRequest.user.orgId) {
       const orgId = zautoRequest.user.orgId;
-      return await this.leadConfigService.create(createLeadConfigDto);
+      return await this.leadConfigService.create({orgId,data:createLeadConfigDto});
     } else {
       throw new UnauthorizedException('You are unauthorized to perform this action')
     }
@@ -61,7 +61,8 @@ export class LeadConfigController {
   })
   async findOneByAgent(@Param('agentId') agentId: string, @Req() zautoRequest: ZautoRequest) {
     if(zautoRequest.user && zautoRequest.user.orgId) {
-      return await  this.leadConfigService.findByAgent(agentId);
+      const orgId = zautoRequest.user.orgId;
+      return await  this.leadConfigService.findByOrg(orgId);
     }
     throw new UnauthorizedException('You are unauthorized to perform this action.')
   }
@@ -71,7 +72,8 @@ export class LeadConfigController {
   @ApiBearerAuth()
   async findOne(@Param('agentId') agentId: string, @Param('id') id: string, @Req() zautoRequest: ZautoRequest) {
     if(zautoRequest.user && zautoRequest.user.orgId) {
-      return await  this.leadConfigService.findOne(id);
+      const orgId = zautoRequest.user.orgId;
+      return await  this.leadConfigService.findOne(orgId,id);
     }
     throw new UnauthorizedException('You are unauthorized to perform this action.')
   }
@@ -82,7 +84,8 @@ export class LeadConfigController {
   async update(@Param('agentId') agentId: string, @Param('id') id: string,
    @Body() updateLeadConfigDto: UpdateLeadConfigDto, @Req() zautoRequest: ZautoRequest) {
     if(zautoRequest.user && zautoRequest.user.orgId) {
-      return await  this.leadConfigService.update(id, updateLeadConfigDto)
+      const orgId = zautoRequest.user.orgId;
+      return await  this.leadConfigService.update({orgId,data:{id, updateLeadConfigDto}})
     }
     throw new UnauthorizedException('You are unauthorized to perform this action.')
   }
@@ -92,7 +95,8 @@ export class LeadConfigController {
   @ApiBearerAuth()
   async remove(@Param('agentId') agentId: string, @Param('id') id: string,  @Req() zautoRequest: ZautoRequest) {
     if(zautoRequest.user && zautoRequest.user.orgId) {
-      return await  this.leadConfigService.remove(id)
+      const orgId = zautoRequest.user.orgId;
+      return await  this.leadConfigService.remove(orgId,id)
     }
     throw new UnauthorizedException('You are unauthorized to perform this action.')
   }

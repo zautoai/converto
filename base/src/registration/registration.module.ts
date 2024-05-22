@@ -7,7 +7,6 @@ import { CommonModule } from 'src/common/common.module';
 import { ForgotPasswordController } from './forgot-password.controller';
 import { RolesModule } from 'src/roles/roles.module';
 import { OrganizationsModule } from 'src/organizations/organizations.module';
-import { AccountModule } from 'src/account/account.module';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { AccountModule } from 'src/account/account.module';
     CommonModule, 
     RolesModule, 
     OrganizationsModule,
-    AccountModule,
   ],
   controllers: [RegistrationController, ForgotPasswordController],
   providers: [RegistrationService],

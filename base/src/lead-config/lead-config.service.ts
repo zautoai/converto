@@ -35,6 +35,11 @@ export class LeadConfigService extends BaseService{
     };
   }
 
+  async findByOrg(orgId:string) {
+    const prisma = await this.getPrismaClient(orgId);
+    return await prisma.leadConfig.findFirst();
+  }
+
   async findOne(orgId:string,id: string) {
     const prisma = await this.getPrismaClient(orgId);
     return await prisma.leadConfig.findFirst({where: {id}});

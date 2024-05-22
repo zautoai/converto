@@ -10,7 +10,6 @@ import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 import { JSDOM } from 'jsdom';
 import robotsParser from 'robots-parser';
-import { UsageService } from 'src/account/usage.service';
 import { Agent } from 'src/agent/entities/agent.entity';
 import { PageGreeterService } from 'src/assistants/services/page-greeters.service';
 import { ChromaDBService } from 'src/chroma/chroma-dbservice/chroma-db.service';
@@ -31,7 +30,6 @@ export class SiteService extends BaseService {
     private chromaService: ChromaDBService,
     private webClient: WebClientService,
     private fileService: FileUtilService,
-    private readonly usageService: UsageService,
     private readonly pageGreeterService: PageGreeterService,
     private readonly s3Service: S3Service) {
     super();
@@ -53,16 +51,8 @@ export class SiteService extends BaseService {
   // Train Agent on multiple site urls (selected urls)
   async trainAvatar(serviceParams: ServiceParams<ScrapMultipleDto>) {
     const { orgId, data: scrapMultipleDto } = serviceParams;
-
     const prisma = await this.getPrismaClient(orgId);
-
-    const siteUsage = await this.usageService.getSiteCount(orgId);
-    const remainingSite = siteUsage.maxCount - siteUsage.count;
-    if (remainingSite <= 0) {
-      throw new NotAcceptableException(`Remaining site ${remainingSite}`);
-    }
-
-    const agent = await prisma.agent.findFirst({ include: { org: true, AgentFiles: true } });
+    const agent = await prisma.agent.findFirst({ include: { AgentFiles: true } });
     if (agent) {
       await this.trainZautoRAG({ orgId, agent, data: scrapMultipleDto });
     } else {
@@ -412,7 +402,7 @@ export class SiteService extends BaseService {
   async generateGreeting(orgId: string) {
     const prisma = await this.getPrismaClient(orgId);
 
-    const agent = await prisma.agent.findFirst({ where: { orgId } });
+    const agent = await prisma.agent.findFirst();
     if (!agent) {
       throw new NotFoundException('Agent not found');
     }
@@ -424,7 +414,7 @@ export class SiteService extends BaseService {
     try {
       const prisma = await this.getPrismaClient(orgId);
 
-      const agent = await prisma.agent.findFirst({ where: { orgId: orgId } });
+      const agent = await prisma.agent.findFirst();
       if (!agent) {
         throw new NotFoundException(`Agent not found for this organization`);
       }

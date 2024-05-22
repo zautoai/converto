@@ -13,7 +13,6 @@ import Redis, { Redis as RedisClient } from 'ioredis';
 import { JwtService } from '@nestjs/jwt';
 import { ActiveClientService } from 'src/active-client/active-client.service';
 import { MessageMediaType } from 'src/conversation/entities/conversation.enums';
-import { UsageService } from 'src/account/usage.service';
 import { SiteService } from 'src/site/site.service';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { ContactsService } from 'src/contacts/contacts.service';
@@ -44,7 +43,6 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     private activeClientService: ActiveClientService,
     private siteService: SiteService,
     private contactsService: ContactsService,
-    private readonly usageService: UsageService,
   ) {
 
     this.redisPublisher = new Redis({
@@ -213,7 +211,7 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
   }
 
   async notifyAuthSubscribers(eventName: string, orgId: string, message: any) {
-    const activeClients = await this.activeClientService.findByOrg(orgId);
+    const activeClients = await this.activeClientService.findAll(orgId);
     for (let activeClient of activeClients) {
       this.server.to(activeClient.clientId).emit(eventName, message);
     }
@@ -461,7 +459,6 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
 
     const converationObj = {
       agentId: agent.id,
-      orgId: agent.orgId,
       type: ConversationType.CHAT,
       visitorId: visitor.id,
       visitId: visit.id,

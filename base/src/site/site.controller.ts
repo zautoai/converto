@@ -13,7 +13,6 @@ import { ZautoRequest } from 'src/common/models/request.model';
 import { Roles } from 'src/auth/roles.decorator';
 import { SYSTEM_CONST } from 'src/common/constants/system.constants';
 import { RolesGuard } from 'src/auth/roles.guard';
-import { UsageService } from 'src/account/usage.service';
 import { SelectGreetingDto } from './dto/select-greeting.dto';
 
 
@@ -24,8 +23,7 @@ import { SelectGreetingDto } from './dto/select-greeting.dto';
 @Controller('api/sites')
 export class SiteController {
   constructor(private readonly siteService: SiteService,
-    private readonly websraperService: WebScraperService,
-    private readonly usageService: UsageService) { }
+    private readonly websraperService: WebScraperService) { }
 
   @Post()
   @ApiBody({ type: CreateSiteDto })
@@ -115,11 +113,6 @@ export class SiteController {
   @ApiCreatedResponse()
   async processURLs(@Body() scrapMultipleDto: ScrapMultipleDto, @Req() zautoRequest: ZautoRequest) {
     const orgId = zautoRequest.user.orgId;
-    const siteUsage = await this.usageService.getSiteCount(orgId);
-    const remainingSite = siteUsage.maxCount - siteUsage.count;
-    if (remainingSite <= 0) {
-      throw new NotAcceptableException(`Remaining site ${remainingSite}`)
-    }
     return await this.siteService.trainAvatar({ orgId, data: scrapMultipleDto });
   }
 
