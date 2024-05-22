@@ -10,6 +10,8 @@ import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Conversation } from './entities/conversation.entity';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { ConversationFilterDto } from './dto/conversation-filter.dto';
+import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
+import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
 
 
 @ApiTags('Conversations')
@@ -20,8 +22,9 @@ export class ConversationController {
     ) {}
 
   @Post()
-  async create(@Body() createConversationDto: CreateConversationDto, @Req() request: Request) {
-    const orgId = request.headers['org-id'];
+  @UseGuards(SubdomainGuard)
+  async create(@Body() createConversationDto: CreateConversationDto, @Req() request: SubdomainRequest) {
+    const orgId = request.orgId;
     if(orgId) {
       return await this.conversationService.create({ orgId ,data: createConversationDto});
     } else {
@@ -117,16 +120,10 @@ export class ConversationController {
 
   //update message
   @Patch('/message/:id')
+  @UseGuards(SubdomainGuard)
   @ApiOkResponse({type: Conversation})
-  async updateMessage(@Param('id') id: string, @Body() updateMessageDto: any,@Req() request: ZautoRequest) {
-    if(request.user && request.user.orgId)
-    {
-      const orgId = request.user.orgId;
-      return await this.conversationService.updateMessage({orgId,data:{id,updateMessageDto}});
-    }
-    else
-    {
-      throw new UnauthorizedException('You are not authorized to access this resource')
-    }
+  async updateMessage(@Param('id') id: string, @Body() updateMessageDto: any,@Req() request: SubdomainRequest) {
+    const orgId = request.orgId;
+    return await this.conversationService.updateMessage({orgId,data:{id,updateMessageDto}});
   }
 }
