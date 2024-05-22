@@ -97,12 +97,12 @@ body {
   // a:hover {
   //   text-decoration: underline;
   // }
-  label {
-    background-color: #6cd284; 
-    padding: 5px 10px;         
+  .label {
+  
+    padding:5px 10px;         
     border: 1px solid #ccc;    
     border-radius: 3px;       
-        font-weight: bold;       
+    font-weight: bold;       
     color:black;           
     display: inline-block;
     border-radius: 30px;   
@@ -256,7 +256,7 @@ body {
 .circular-chart {
   display: block;
   margin: 10px auto;
-  max-width: 70%;
+  max-width: 60%;
   max-height: 200px;
 
 }

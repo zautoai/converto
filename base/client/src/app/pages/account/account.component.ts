@@ -119,7 +119,7 @@ export class AccountsComponent implements OnInit {
     this.Form.reset();
     this.resetErrorFeedback();
     console.log("datas",data.id)
-    this.router.navigate(['/view-account', data.id]);
+    this.router.navigate(['accounts/view-account', data.id]);
 
   
 

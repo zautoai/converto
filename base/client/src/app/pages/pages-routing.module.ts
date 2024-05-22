@@ -42,8 +42,8 @@ const routes: Routes = [
     component: LaunchAvatarComponent,
     canActivate:[SetupCompletedGuard]
   },
-   { path: 'view-account/:id', component: AccountviewComponent },
-   { path: 'view-contacts/:id', component: ContactviewComponent },
+   { path: 'accounts/view-account/:id', component: AccountviewComponent },
+   { path: 'contacts/view-contacts/:id', component: ContactviewComponent },
 
   {
     path: 'dashboard',

@@ -142,7 +142,7 @@ export class ContactsComponent implements OnInit {
     this.selectedData = data;
     this.Form.reset();
     this.resetErrorFeedback();
-    this.router.navigate(['/view-contacts', data.id]);
+    this.router.navigate(['contacts/view-contacts', data.id]);
   }
 
   toggleDescription(): void {
