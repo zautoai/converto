@@ -25,6 +25,8 @@ export class AccountviewComponent {
 
   userId: string="";
   userData: any;
+  
+  leadscore:any=100;
   selectedData: any;
   constructor(
     private route: ActivatedRoute,
