@@ -220,7 +220,7 @@ body {
     padding: 20px;
     max-width: 1150px;
     margin: auto;
-    text-align: center;
+    
     background-color: #fff;
 }
 .profile-card img {
@@ -247,4 +247,48 @@ body {
 }
 .profile-card .buttons .btn {
     margin-right: 10px;
+}
+/*progress bar*/
+.flex-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+}
+.single-chart {
+  width: 33%;
+  justify-content: space-around ;
+  margin-left: 150px;
+}
+.circular-chart {
+  display: block;
+  margin: 10px auto;
+  max-width: 80%;
+  max-height: 250px;
+
+}
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+.circular-chart.blue .circle {
+  stroke: #191e21;
+}
+.percentage {
+  fill: #666;
+  font-family: sans-serif;
+  font-size: 0.5em;
+  text-anchor: middle;
 }

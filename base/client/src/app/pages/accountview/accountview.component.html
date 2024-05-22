@@ -1,28 +1,33 @@
-<div class="profile-card">
+<div class="profile-card row bg-light">
+  <div class="col-6 ">
   <img src="https://via.placeholder.com/80" alt="Profile">
-  <h5>Merri Diamond <span class="rating"><i class="fas fa-star"></i> 3.6</span></h5>
-  <p class="text-muted">{{selectedData.fullname}}</p>
+  <a href="{{selectedData.website}}"> 
+     <h5>{{selectedData.accountName }}</h5>
+    </a>
+  <p class="text-muted"></p>
   
   <div class="info-item">
-      <i class="fas fa-calendar-alt"></i>
-      <span>Date: 15 Jan 2023</span>
+      <i class="fas fa-user"></i>
+      <span>CompanySize: {{selectedData.companySize}}</span>
   </div>
   <div class="info-item">
-      <i class="fas fa-phone"></i>
-      <span>Phone: +1 23456 78910</span>
+      <i class="fas fa-dollar"></i>
+      <span>Annual Revenue: {{selectedData.annualRevenue}}</span>
   </div>
   <div class="info-item">
       <i class="fas fa-envelope"></i>
-      <span>Email: supportmannatthemes.com</span>
+      <span>{{selectedData.email}}</span>
   </div>
-  <div class="info-item">
-      <p class="text-muted mb-0"><strong>Last Message:</strong> popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature.</p>
-  </div>
+ 
   
-  <div class="buttons">
-      <button class="btn btn-outline-primary">Send SMS</button>
-      <button class="btn btn-outline-success">Send Email</button>
-  </div>
+  <div class="social-icons mt-3">
+    <a href="https://twitter.com/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-twitter"></i></a>
+    <a href="https://facebook.com/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-facebook"></i></a>
+    <a href="https://linkedin.com/in/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-linkedin"></i></a>
+    <a href="https://instagram.com/yourprofile" class="text-muted mx-2" target="_blank"><i class="fab fa-instagram"></i></a>
+</div>
+</div>
+
 </div>
 
   <!--below tab-->
