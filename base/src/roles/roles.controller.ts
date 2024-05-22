@@ -18,14 +18,14 @@ import { ZautoRequest } from 'src/common/models/request.model';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+  constructor(private readonly rolesService: RolesService) { }
 
   @Post()
   @ApiBody({ type: CreateRoleDto })
-  @ApiCreatedResponse({type: Role})
-  async create(@Body() createRoleDto: CreateRoleDto, @Req() request:ZautoRequest) {
-    const orgId = request.orgId;
-    return await this.rolesService.create(orgId,createRoleDto);
+  @ApiCreatedResponse({ type: Role })
+  async create(@Body() createRoleDto: CreateRoleDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.rolesService.create(orgId, createRoleDto);
   }
 
   @Get()
@@ -34,30 +34,30 @@ export class RolesController {
   @ApiResponse({
     type: ResponseDTO<Role>
   })
-  async findAll(@Query() paginationDto: PaginationDto, @Req() request:ZautoRequest) {
-    const orgId = request.orgId;
-    return await this.rolesService.findAll(orgId,paginationDto);
+  async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.rolesService.findAll(orgId, paginationDto);
   }
 
   @Get(':id')
-  @ApiOkResponse({type: Role})
-  async findOne(@Param('id') id: string, @Req() request:ZautoRequest) {
-    const orgId = request.orgId;
-    return await this.rolesService.findOne(orgId,id);
+  @ApiOkResponse({ type: Role })
+  async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.rolesService.findOne(orgId, id);
   }
 
   @Patch(':id')
-  @ApiOkResponse({type: Role})
-  async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto, @Req() request:ZautoRequest) {
-    const orgId = request.orgId;
-    return await this.rolesService.update(orgId,id, updateRoleDto);
+  @ApiOkResponse({ type: Role })
+  async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.rolesService.update(orgId, id, updateRoleDto);
   }
 
   @Delete(':id')
   @ApiNoContentResponse()
   @HttpCode(204)
-  async remove(@Param('id') id: string, @Req() request:ZautoRequest) {
-    const orgId = request.orgId;
-    await this.rolesService.remove(orgId,id);
+  async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    await this.rolesService.remove(orgId, id);
   }
 }
