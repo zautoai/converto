@@ -2,9 +2,6 @@
 CREATE TYPE "VerificationType" AS ENUM ('VERIFYEMAIL', 'FORGOTPASSWORD');
 
 -- CreateEnum
-CREATE TYPE "OrgAccountStatus" AS ENUM ('ACTIVE', 'EXPAIRED', 'PENDING');
-
--- CreateEnum
 CREATE TYPE "ConversationType" AS ENUM ('CALL', 'CHAT');
 
 -- CreateEnum
@@ -88,48 +85,7 @@ CREATE TABLE "Organization" (
 -- CreateTable
 CREATE TABLE "ActiveClient" (
     "userId" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
     "clientId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL
-);
-
--- CreateTable
-CREATE TABLE "SubscriptionPlan" (
-    "id" TEXT NOT NULL,
-    "name" VARCHAR(100) NOT NULL,
-    "type" VARCHAR(10) NOT NULL DEFAULT 'monthly',
-    "description" TEXT NOT NULL,
-    "agentsCount" INTEGER NOT NULL DEFAULT 1,
-    "messageCount" INTEGER NOT NULL DEFAULT 0,
-    "conversationCount" INTEGER NOT NULL DEFAULT 0,
-    "sitesCount" INTEGER NOT NULL DEFAULT 0,
-    "campaignCount" INTEGER NOT NULL DEFAULT 0,
-    "userCount" INTEGER NOT NULL DEFAULT 0,
-    "price" DOUBLE PRECISION NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "SubscriptionPlan_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "OrgAccount" (
-    "orgId" TEXT NOT NULL,
-    "subscriptionId" TEXT NOT NULL,
-    "status" "OrgAccountStatus" NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL
-);
-
--- CreateTable
-CREATE TABLE "Usage" (
-    "orgId" TEXT NOT NULL,
-    "month" VARCHAR(20) NOT NULL,
-    "year" VARCHAR(10) NOT NULL,
-    "inputToken" INTEGER NOT NULL DEFAULT 0,
-    "ountputToken" INTEGER NOT NULL DEFAULT 0,
-    "message" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL
 );
@@ -137,7 +93,6 @@ CREATE TABLE "Usage" (
 -- CreateTable
 CREATE TABLE "Agent" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
     "name" VARCHAR(100),
     "displayName" VARCHAR(50) NOT NULL,
     "usetools" BOOLEAN NOT NULL DEFAULT true,
@@ -185,7 +140,6 @@ CREATE TABLE "AgentFile" (
 CREATE TABLE "LeadConfig" (
     "id" TEXT NOT NULL,
     "agentId" TEXT NOT NULL,
-    "orgId" TEXT,
     "name" BOOLEAN NOT NULL DEFAULT false,
     "email" BOOLEAN NOT NULL DEFAULT false,
     "mobile" BOOLEAN NOT NULL DEFAULT false,
@@ -213,7 +167,6 @@ CREATE TABLE "Site" (
 CREATE TABLE "AgentPrompt" (
     "id" TEXT NOT NULL,
     "agentId" TEXT NOT NULL,
-    "orgId" TEXT,
     "templateId" TEXT,
     "type" VARCHAR(50) NOT NULL,
     "text" TEXT NOT NULL,
@@ -226,8 +179,6 @@ CREATE TABLE "AgentPrompt" (
 -- CreateTable
 CREATE TABLE "Visitor" (
     "id" TEXT NOT NULL,
-    "agentId" TEXT NOT NULL,
-    "orgId" TEXT,
     "userAgent" TEXT NOT NULL,
     "infoJson" TEXT NOT NULL,
     "trackingInfo" TEXT,
@@ -241,8 +192,6 @@ CREATE TABLE "Visitor" (
 -- CreateTable
 CREATE TABLE "Visit" (
     "id" TEXT NOT NULL,
-    "agentId" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
     "visitorId" TEXT NOT NULL,
     "count" INTEGER NOT NULL DEFAULT 1,
     "source" VARCHAR(50) NOT NULL DEFAULT 'site',
@@ -256,8 +205,6 @@ CREATE TABLE "Visit" (
 -- CreateTable
 CREATE TABLE "Conversation" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
-    "agentId" TEXT NOT NULL,
     "visitorId" TEXT NOT NULL,
     "campaignId" VARCHAR(200),
     "visitId" TEXT NOT NULL,
@@ -284,8 +231,6 @@ CREATE TABLE "Conversation" (
 -- CreateTable
 CREATE TABLE "ZautoMessage" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
-    "agentId" TEXT NOT NULL,
     "convId" TEXT NOT NULL,
     "role" VARCHAR(20) NOT NULL,
     "content" TEXT,
@@ -321,7 +266,6 @@ CREATE TABLE "Campaign" (
     "endDate" TIMESTAMP,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
-    "organizationId" TEXT,
 
     CONSTRAINT "Campaign_pkey" PRIMARY KEY ("id")
 );
@@ -330,7 +274,6 @@ CREATE TABLE "Campaign" (
 CREATE TABLE "Stage" (
     "id" TEXT NOT NULL,
     "agentId" TEXT,
-    "orgId" TEXT,
     "name" VARCHAR(100) NOT NULL,
     "instruction" TEXT NOT NULL,
     "sequence" INTEGER NOT NULL,
@@ -446,61 +389,13 @@ CREATE INDEX "UserId_ActiveClient_fkey" ON "ActiveClient"("userId");
 CREATE UNIQUE INDEX "ActiveClient_userId_clientId_key" ON "ActiveClient"("userId", "clientId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SubscriptionPlan_name_key" ON "SubscriptionPlan"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "OrgAccount_orgId_key" ON "OrgAccount"("orgId");
-
--- CreateIndex
-CREATE INDEX "OrgId_OrgAccount_fkey" ON "OrgAccount"("orgId");
-
--- CreateIndex
-CREATE INDEX "subscriptionId_OrgAccount_fkey" ON "OrgAccount"("subscriptionId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "OrgAccount_orgId_subscriptionId_key" ON "OrgAccount"("orgId", "subscriptionId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Usage_orgId_key" ON "Usage"("orgId");
-
--- CreateIndex
-CREATE INDEX "OrgAccount_orgId_fkey" ON "Usage"("orgId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Usage_orgId_month_year_key" ON "Usage"("orgId", "month", "year");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Agent_name_key" ON "Agent"("name");
-
--- CreateIndex
-CREATE INDEX "OrgId_agent_fkey" ON "Agent"("orgId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Agent_name_orgId_key" ON "Agent"("name", "orgId");
 
 -- CreateIndex
 CREATE INDEX "AgentId_agentFile_fkey" ON "AgentFile"("agentId");
 
 -- CreateIndex
-CREATE INDEX "OrgId_leadconfig_fkey" ON "LeadConfig"("orgId");
-
--- CreateIndex
 CREATE INDEX "AgentId_LeadConfig_fkey" ON "LeadConfig"("agentId");
-
--- CreateIndex
-CREATE INDEX "Agentprompt_orgId_fkey" ON "AgentPrompt"("orgId");
-
--- CreateIndex
-CREATE INDEX "OrgId_visitor_fkey" ON "Visitor"("orgId");
-
--- CreateIndex
-CREATE INDEX "AgentId_visitor_fkey" ON "Visitor"("agentId");
-
--- CreateIndex
-CREATE INDEX "Visitor_orgId_fkey" ON "Visit"("orgId");
-
--- CreateIndex
-CREATE INDEX "Visitor_agentId_fkey" ON "Visit"("agentId");
 
 -- CreateIndex
 CREATE INDEX "Visitor_visitorId_fkey" ON "Visit"("visitorId");
@@ -521,12 +416,6 @@ CREATE UNIQUE INDEX "Conversation_socketId_key" ON "Conversation"("socketId");
 CREATE INDEX "assignee_Conversation_fkey" ON "Conversation"("assigneeId");
 
 -- CreateIndex
-CREATE INDEX "orgId_Conversation_fkey" ON "Conversation"("orgId");
-
--- CreateIndex
-CREATE INDEX "agentId_Conversation_fkey" ON "Conversation"("agentId");
-
--- CreateIndex
 CREATE INDEX "campaignId_Conversation_fkey" ON "Conversation"("campaignId");
 
 -- CreateIndex
@@ -536,9 +425,6 @@ CREATE INDEX "visitorId_Conversation_fkey" ON "Conversation"("visitorId");
 CREATE INDEX "visitId_Conversation_fkey" ON "Conversation"("visitId");
 
 -- CreateIndex
-CREATE INDEX "orgId_ZautoMessage_fkey" ON "ZautoMessage"("orgId");
-
--- CreateIndex
 CREATE INDEX "convId_ZautoMessage_fkey" ON "ZautoMessage"("convId");
 
 -- CreateIndex
@@ -546,9 +432,6 @@ CREATE INDEX "sentById_ZautoMessage_fkey" ON "ZautoMessage"("sentById");
 
 -- CreateIndex
 CREATE INDEX "agentId_Stage_fkey" ON "Stage"("agentId");
-
--- CreateIndex
-CREATE INDEX "orgId_Stage_fkey" ON "Stage"("orgId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Stage_agentId_name_key" ON "Stage"("agentId", "name");
@@ -575,52 +458,19 @@ ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFE
 ALTER TABLE "ActiveClient" ADD CONSTRAINT "ActiveClient_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrgAccount" ADD CONSTRAINT "OrgAccount_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "OrgAccount" ADD CONSTRAINT "OrgAccount_subscriptionId_fkey" FOREIGN KEY ("subscriptionId") REFERENCES "SubscriptionPlan"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Agent" ADD CONSTRAINT "Agent_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "AgentFile" ADD CONSTRAINT "AgentFile_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LeadConfig" ADD CONSTRAINT "LeadConfig_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "LeadConfig" ADD CONSTRAINT "LeadConfig_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "AgentPrompt" ADD CONSTRAINT "AgentPrompt_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "AgentPrompt" ADD CONSTRAINT "AgentPrompt_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Visitor" ADD CONSTRAINT "Visitor_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Visitor" ADD CONSTRAINT "Visitor_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Visit" ADD CONSTRAINT "Visit_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Visit" ADD CONSTRAINT "Visit_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Visit" ADD CONSTRAINT "Visit_visitorId_fkey" FOREIGN KEY ("visitorId") REFERENCES "Visitor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Visit" ADD CONSTRAINT "Visit_campaignId_fkey" FOREIGN KEY ("campaignId") REFERENCES "Campaign"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_visitorId_fkey" FOREIGN KEY ("visitorId") REFERENCES "Visitor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -635,25 +485,13 @@ ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_visitId_fkey" FOREIGN KE
 ALTER TABLE "Conversation" ADD CONSTRAINT "Conversation_assigneeId_fkey" FOREIGN KEY ("assigneeId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ZautoMessage" ADD CONSTRAINT "ZautoMessage_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ZautoMessage" ADD CONSTRAINT "ZautoMessage_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "ZautoMessage" ADD CONSTRAINT "ZautoMessage_convId_fkey" FOREIGN KEY ("convId") REFERENCES "Conversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ZautoMessage" ADD CONSTRAINT "ZautoMessage_sentById_fkey" FOREIGN KEY ("sentById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Campaign" ADD CONSTRAINT "Campaign_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Stage" ADD CONSTRAINT "Stage_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Stage" ADD CONSTRAINT "Stage_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "availableHours" ADD CONSTRAINT "availableHours_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "AvailabilitySchedule"("id") ON DELETE CASCADE ON UPDATE CASCADE;

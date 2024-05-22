@@ -64,7 +64,6 @@ model Organization {
 model ActiveClient {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
-  orgId  String
 
   clientId String @unique
 

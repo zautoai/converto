@@ -11,11 +11,12 @@ import { ZautoChatCompletionMessage } from 'src/llm/llms/llm.models';
 import { BaseService } from 'src/common/services/base.service';
 import { ServiceParams } from 'src/common/models/service-param.model';
 import { data } from 'cheerio/lib/api/attributes';
+import { ContactsService } from 'src/contacts/contacts.service';
 
 @Injectable()
-export class ConversationService extends BaseService{
+export class ConversationService extends BaseService {
 
-  constructor(private summarizer: SummarizerService) {
+  constructor(private summarizer: SummarizerService, private contactsService: ContactsService) {
     super();
   }
 
@@ -25,7 +26,7 @@ export class ConversationService extends BaseService{
     return await prisma.conversation.create({ data: createConversationDto });
   }
 
-  async createIfNotExist(serviceParams: ServiceParams<{createConversationDto:CreateConversationDto,message?: ZautoChatCompletionMessage}>, ) {
+  async createIfNotExist(serviceParams: ServiceParams<{ createConversationDto: CreateConversationDto, message?: ZautoChatCompletionMessage }>,) {
     const { orgId, data: { createConversationDto, message } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     const conversation = await prisma.conversation.findFirst({
@@ -36,13 +37,15 @@ export class ConversationService extends BaseService{
     if (conversation) {
       return conversation;
     }
-    const newConv = await prisma.conversation.create({ data:  createConversationDto });
+    const newConv = await prisma.conversation.create({ data: createConversationDto });
     if (message) {
-      await this.createMessage({orgId,data:{
-        convId: newConv.id,
-        role: message.role,
-        content: message.content
-      }});
+      await this.createMessage({
+        orgId, data: {
+          convId: newConv.id,
+          role: message.role,
+          content: message.content
+        }
+      });
     }
     return newConv;
   }
@@ -73,7 +76,7 @@ export class ConversationService extends BaseService{
     return conversation;
   }
 
-  async findOne(orgId: string,id: string) {
+  async findOne(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     let existingConversation = await prisma.conversation.findUnique({
       where: { id },
@@ -99,7 +102,7 @@ export class ConversationService extends BaseService{
     } else throw new NotFoundException(`Conversation with id ${id} not found.`);
   }
 
-  async findOneWithSummary(orgId:string,id: string) {
+  async findOneWithSummary(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     let existingConversation = await prisma.conversation.findUnique({
       where: { id },
@@ -127,7 +130,7 @@ export class ConversationService extends BaseService{
     } else throw new NotFoundException(`Conversation with id ${id} not found.`);
   }
 
-  async findOneNoSummay(orgId: string,id: string) {
+  async findOneNoSummay(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     let existingConversation = await prisma.conversation.findUnique({
       where: { id },
@@ -160,7 +163,7 @@ export class ConversationService extends BaseService{
   //   } else throw new NotFoundException(`Conversation with id ${id} not found.`);
   // }
 
-  async remove(orgId: string,id: string) {
+  async remove(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     const existingConversation = await prisma.conversation.findUnique({ where: { id } });
     if (existingConversation) {
@@ -168,7 +171,7 @@ export class ConversationService extends BaseService{
     } else throw new NotFoundException(`Conversation with id ${id} not found.`);
   }
 
-  async updateStatusByClient(serviceParams: ServiceParams<{socketId: string, status: ConversationStatus}>) {
+  async updateStatusByClient(serviceParams: ServiceParams<{ socketId: string, status: ConversationStatus }>) {
     const { orgId, data: { socketId, status } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
@@ -191,7 +194,7 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async updateStatus(serviceParams: ServiceParams<{id: string, status: ConversationStatus}>) {
+  async updateStatus(serviceParams: ServiceParams<{ id: string, status: ConversationStatus }>) {
     const { orgId, data: { id, status } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
@@ -206,7 +209,7 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async endConversation(orgId:string,id: string) {
+  async endConversation(orgId: string, id: string) {
     try {
       const prisma = await this.getPrismaClient(orgId);
       const _conversation = await prisma.conversation.update({
@@ -220,7 +223,7 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async updateClientId(serviceParams: ServiceParams<{visitId: string, socketId: string}>) {
+  async updateClientId(serviceParams: ServiceParams<{ visitId: string, socketId: string }>) {
     const { orgId, data: { visitId, socketId } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
@@ -235,26 +238,27 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async assignConvToHumanAgent(serviceParams: ServiceParams<{id: string, user: any}>) {
+  async assignConvToHumanAgent(serviceParams: ServiceParams<{ id: string, user: any }>) {
     const { orgId, data: { id, user } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
-      const conversation = await this.findOneNoSummay(orgId,id)
+      const conversation = await this.findOneNoSummay(orgId, id)
       if (conversation) {
         const agent = await prisma.agent.findFirst();
-        if(!agent) 
-        {
+        if (!agent) {
           throw new Error("No agent found");
         }
         await prisma.conversation.update({ data: { aiSuspended: true, assigneeId: user.id }, where: { id } })
-        const message = await this.createMessage({orgId,data:{
-          convId: conversation.id,
-          role: 'assistant',
-          content: `${user.name} has joined in the chat. AI ${agent.displayName} is Off.`,
-          type: MessageMediaType.ACTIVITY,
-          sentById: user.id,
+        const message = await this.createMessage({
+          orgId, data: {
+            convId: conversation.id,
+            role: 'assistant',
+            content: `${user.name} has joined in the chat. AI ${agent.displayName} is Off.`,
+            type: MessageMediaType.ACTIVITY,
+            sentById: user.id,
 
-        }})
+          }
+        })
         return {
           conversation,
           message,
@@ -268,20 +272,22 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async sendByHuman(serviceParams: ServiceParams<{id: string, user: any, _message: any}>) {
+  async sendByHuman(serviceParams: ServiceParams<{ id: string, user: any, _message: any }>) {
     const { orgId, data: { id, user, _message } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
-      const conversation = await this.findOneNoSummay(orgId,id)
+      const conversation = await this.findOneNoSummay(orgId, id)
       if (conversation) {
         await prisma.conversation.update({ data: { aiSuspended: true, assigneeId: user.id }, where: { id } })
-        const message = await this.createMessage({orgId,data:{
-          convId: conversation.id,
-          role: 'assistant',
-          content: _message.content,
-          type: MessageMediaType.TEXT,
-          sentById: user.id
-        }})
+        const message = await this.createMessage({
+          orgId, data: {
+            convId: conversation.id,
+            role: 'assistant',
+            content: _message.content,
+            type: MessageMediaType.TEXT,
+            sentById: user.id
+          }
+        })
         return {
           conversation,
           message,
@@ -295,25 +301,26 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async resumeAIAgent(serviceParams: ServiceParams<{id: string, user?: any}>) {
+  async resumeAIAgent(serviceParams: ServiceParams<{ id: string, user?: any }>) {
     const { orgId, data: { id, user } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
-      const conversation = await this.findOneNoSummay(orgId,id)
+      const conversation = await this.findOneNoSummay(orgId, id)
       if (conversation) {
         const agent = await prisma.agent.findFirst();
-        if(!agent) 
-        {
+        if (!agent) {
           throw new Error("No agent found");
         }
         await prisma.conversation.update({ data: { aiSuspended: false }, where: { id } })
-        const message = await this.createMessage({orgId,data:{
-          convId: conversation.id,
-          role: 'assistant',
-          content: `AI ${agent.displayName} is online to assist you.`,
-          type: MessageMediaType.ACTIVITY,
-          sentById: user?.id
-        }})
+        const message = await this.createMessage({
+          orgId, data: {
+            convId: conversation.id,
+            role: 'assistant',
+            content: `AI ${agent.displayName} is online to assist you.`,
+            type: MessageMediaType.ACTIVITY,
+            sentById: user?.id
+          }
+        })
         return {
           conversation,
           message
@@ -326,21 +333,23 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async requestForHumanSupport(serviceParams: ServiceParams<{id: string, lead?: any}>) {
+  async requestForHumanSupport(serviceParams: ServiceParams<{ id: string, lead?: any }>) {
     const { orgId, data: { id, lead } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
-      const conversation = await this.findOneNoSummay(orgId,id)
+      const conversation = await this.findOneNoSummay(orgId, id)
       if (conversation) {
-        await this.createMessage({orgId,data:{
-          convId: conversation.id,
-          role: 'user',
-          content: 'I need Human Agent Support.',
-          type: MessageMediaType.ACTIVITY
-        }})
+        await this.createMessage({
+          orgId, data: {
+            convId: conversation.id,
+            role: 'user',
+            content: 'I need Human Agent Support.',
+            type: MessageMediaType.ACTIVITY
+          }
+        })
       }
       if (lead) {
-        await this.addLead({ orgId,data: {conversation, lead}});
+        await this.addLead({ orgId, data: { conversation, lead } });
       }
       return conversation;
     } catch (error) {
@@ -348,18 +357,16 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async addLead(serviceParams: ServiceParams<{conversation: any, lead: any}>) {
+  async addLead(serviceParams: ServiceParams<{ conversation: any, lead: any }>) {
     const { orgId, data: { conversation, lead } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
-      const _lead = await prisma.lead.findFirst({ where: { convId: conversation.id } });
-      if (_lead) {
-        return await prisma.lead.update({ data: { ..._lead, orgId: conversation.orgId }, where: { id: _lead.id } })
-      } else {
-        return await prisma.lead.create({
-          data:
-            { ...lead, orgId: conversation.orgId, convId: conversation.id, agentId: conversation.agentId }
-        });
+      const _convlead = await this.contactsService.getContactsByConversation(orgId, conversation.id);
+      if (_convlead) {
+        const _lead = await this.contactsService.update(orgId, _convlead[0].id, lead);
+      }
+      else {
+        const _lead = await this.contactsService.create(orgId, lead)
       }
     } catch (error) {
       throw new InternalServerErrorException(error)
@@ -371,8 +378,8 @@ export class ConversationService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try {
       const message = await prisma.zautoMessage.create({ data: createMessageDto });
-      const count = await prisma.zautoMessage.count({ where: { convId: createMessageDto.convId, type:'TEXT' } });
-      if(count > 3) {
+      const count = await prisma.zautoMessage.count({ where: { convId: createMessageDto.convId, type: 'TEXT' } });
+      if (count > 3) {
         await prisma.conversation.update({ data: { isValid: true }, where: { id: createMessageDto.convId } })
       }
       return message;
@@ -381,7 +388,7 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async updateMessage(serviceParams: ServiceParams<{id: string, updateMessageDto: UpdateMessageDto}>) {
+  async updateMessage(serviceParams: ServiceParams<{ id: string, updateMessageDto: UpdateMessageDto }>) {
     const { orgId, data: { id, updateMessageDto } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
@@ -392,7 +399,7 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async getMessages(orgId:string,convId: string) {
+  async getMessages(orgId: string, convId: string) {
     const prisma = await this.getPrismaClient(orgId);
     try {
       const messages = await prisma.zautoMessage.findMany({
@@ -414,16 +421,16 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async findByAssignee(orgId:string,assigneeId: string) {
+  async findByAssignee(orgId: string, assigneeId: string) {
     const prisma = await this.getPrismaClient(orgId);
     return await prisma.conversation.findFirst({ where: { assigneeId } });
   }
 
-  async getLastMessage(orgId:string,convId: string) {
+  async getLastMessage(orgId: string, convId: string) {
     const prisma = await this.getPrismaClient(orgId);
     try {
       const lastMessage = await prisma.zautoMessage.findFirst({
-        where: { convId , type: "TEXT"},
+        where: { convId, type: "TEXT" },
         orderBy: { createdAt: 'desc' },
         include: {
           sentBy: {
@@ -441,18 +448,19 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async createNavigationActivity(serviceParams: ServiceParams<{convId: string,url: string}>)
-  {
+  async createNavigationActivity(serviceParams: ServiceParams<{ convId: string, url: string }>) {
     const { orgId, data: { convId, url } } = serviceParams;
     try {
-      const conversation = await this.findOne(orgId,convId);
+      const conversation = await this.findOne(orgId, convId);
       if (conversation) {
-        const message = await this.createMessage({orgId,data:{
-          convId: conversation.id,
-          role: 'user',
-          content: `Navigated to ${url}`,
-          type: MessageMediaType.NAVIGATION,
-        }})
+        const message = await this.createMessage({
+          orgId, data: {
+            convId: conversation.id,
+            role: 'user',
+            content: `Navigated to ${url}`,
+            type: MessageMediaType.NAVIGATION,
+          }
+        })
         return {
           conversation,
           message,
@@ -465,16 +473,17 @@ export class ConversationService extends BaseService{
     }
   }
 
-  async updateNavigationActivity(serviceParams: ServiceParams<{messageId: string, url: string}>)
-  {
+  async updateNavigationActivity(serviceParams: ServiceParams<{ messageId: string, url: string }>) {
     const { orgId, data: { messageId, url } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
-      const message = await prisma.zautoMessage.update({ data: {
-        role: 'user',
-        content: `Left from ${url}`,
-        type: MessageMediaType.ACTIVITY,
-      }, where: {id: messageId}})
+      const message = await prisma.zautoMessage.update({
+        data: {
+          role: 'user',
+          content: `Left from ${url}`,
+          type: MessageMediaType.ACTIVITY,
+        }, where: { id: messageId }
+      })
       return {
         message,
       }

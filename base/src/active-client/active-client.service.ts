@@ -29,7 +29,7 @@ export class ActiveClientService extends BaseService{
 
     async findAll(orgId: string) {
         const prisma = await this.getPrismaClient(orgId);
-        return await prisma.activeClient.findMany({where: {orgId}});
+        return await prisma.activeClient.findMany();
     }
 
     async findByUser(orgId: string,userId: string) {

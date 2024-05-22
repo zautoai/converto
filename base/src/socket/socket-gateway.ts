@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, OnModuleInit, Req } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit, Req, UnauthorizedException } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AgentService } from '../agent/agent.service';
@@ -16,6 +16,7 @@ import { MessageMediaType } from 'src/conversation/entities/conversation.enums';
 import { SiteService } from 'src/site/site.service';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { ContactsService } from 'src/contacts/contacts.service';
+import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 
 
 
@@ -43,6 +44,7 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     private activeClientService: ActiveClientService,
     private siteService: SiteService,
     private contactsService: ContactsService,
+    private prismaClientManager: PrismaClientManager
   ) {
 
     this.redisPublisher = new Redis({
@@ -141,11 +143,11 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     });
   }
 
-  async findReplayRequiredAndSend(converation: any, client: string) {
-    const messages = await this.conversationService.getMessages(converation.id);
+  async findReplayRequiredAndSend(orgId: string, converation: any, client: string) {
+    const messages = await this.conversationService.getMessages(orgId, converation.id);
     const lastMessage = messages[0];
     if (lastMessage && lastMessage.role == 'user') {
-      const replay = await this.sendToZautoRAG(converation, { role: lastMessage.role, content: lastMessage.content });
+      const replay = await this.sendToZautoRAG(orgId, converation, { role: lastMessage.role, content: lastMessage.content });
       this.server.to(client).emit('replyMessage', replay);
       //this.notifyAuthSubscribers(converation.id+'_messages', replay.orgInfo, replay);
     }
@@ -155,21 +157,22 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
   async handleDisconnect(client: Socket) {
     console.log('Client: ' + client.id + ' got disconnected...')
     try {
-      const agentClient = await this.activeClientService.findByClient(client.id);
+      const { orgId } = await this.getClientInfo(client)
+      const agentClient = await this.activeClientService.findByClient(orgId, client.id);
       if (agentClient) {
         console.log('Active Client Found for ' + client.id + ' Trying to handover to ')
-        const conversation = await this.conversationService.findByAssignee(agentClient.userId);
+        const conversation = await this.conversationService.findByAssignee(orgId, agentClient.userId);
         if (conversation && conversation.assigneeId && conversation.aiSuspended) {
-          await this.conversationService.resumeAIAgent(conversation.id);
-          await this.findReplayRequiredAndSend(conversation, client.id);
+          await this.conversationService.resumeAIAgent({ orgId, data: { id: conversation.id } });
+          await this.findReplayRequiredAndSend(orgId, conversation, client.id);
         }
-        await this.activeClientService.deleteByClient(client.id);
+        await this.activeClientService.deleteByClient(orgId, client.id);
       } else {
         console.log('Marking status to OFFLINE')
-        const conv = await this.conversationService.updateStatusByClient(client.id, ConversationStatus.OFFLINE);
+        const conv = await this.conversationService.updateStatusByClient({ orgId, data: { socketId: client.id, status: ConversationStatus.OFFLINE } });
         if (conv) {
           console.log('Conversation is ' + conv._conversation.id + ' Is updated to OFFLINE.')
-          await this.notifyAuthSubscribers('convStatusUpdate', conv._conversation.orgId,
+          await this.notifyAuthSubscribers('convStatusUpdate', orgId,
             { convId: conv._conversation.id, status: ConversationStatus.OFFLINE });
           this.redisPublisher.publish('updateSummary', JSON.stringify({ id: conv._conversation.id }));
           this.redisPublisher.publish('endOfConversation', JSON.stringify({ id: conv._conversation.id }));
@@ -180,26 +183,25 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     }
   }
 
-  async handleConnection(client: any, ...args: any[]) {
+  async handleConnection(client: Socket, ...args: any[]) {
     console.log('Client Connected..' + client.id);
     try {
       if (client.handshake.headers.authorization) {
-        const token = client.handshake.headers.authorization;
-        // Extract the token value if it's a Bearer token
-        const authToken = token?.split(' ')[1];
-        const authInfo = await this.jwtService.verify(authToken);
+        const authInfo = await this.getClientInfo(client)
 
         await this.activeClientService.create({
-          userId: authInfo.userId,
-          clientId: client.id,
-          orgId: authInfo.orgId
+          orgId: authInfo.orgId, data: {
+            userId: authInfo.userId,
+            clientId: client.id,
+          }
         })
       } else if (client.handshake.query?.visitId) {
-        const visitId = client.handshake.query?.visitId;
+        const { orgId } = await this.getClientInfo(client)
+        const visitId = client.handshake.query?.visitId as string;
         if (visitId && visitId !== 'undefined') {
-          const _conv = await this.conversationService.updateClientId(visitId, client.id);
+          const _conv = await this.conversationService.updateClientId({ orgId, data: { visitId, socketId: client.id } });
           if (_conv) {
-            await this.notifyAuthSubscribers('convStatusUpdate', _conv.orgId,
+            await this.notifyAuthSubscribers('convStatusUpdate', orgId,
               { convId: _conv.id, status: ConversationStatus.ONLINE });
           }
 
@@ -235,32 +237,26 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     if (!message.agentId) {
       this.server.to(client.id).emit('convCreateFailed', { message: "agentId is required." });
     } else {
-      const conversation = await this.onInitConv(message, client.id);
+      const { orgId } = await this.getClientInfo(client)
+      const conversation = await this.onInitConv(orgId, message, client.id);
       const currentDate = new Date().toISOString();
-      const orgId = conversation.orgId;
-      const messageUsage = await this.usageService.getMessageCount(orgId, currentDate);
-      const remainingMessages = messageUsage.maxCount - messageUsage.count;
 
-      if (remainingMessages <= 0) {
-        this.server.to(client.id).emit('convCreateFailed', { message: "Unable to create conversation." });
+      // Emit the message to the specific client
+      this.server.to(client.id).emit('convCreated', conversation);
+
+      if (conversation.createdAt.getTime() > new Date().getTime() - (1000 * 60 * 3)) {
+        await this.notifyAuthSubscribers('newConversation', orgId, conversation);
       }
-      else {
-        // Emit the message to the specific client
-        this.server.to(client.id).emit('convCreated', conversation);
-
-        if (conversation.createdAt.getTime() > new Date().getTime() - (1000 * 60 * 3)) {
-          await this.notifyAuthSubscribers('newConversation', conversation.orgId, conversation);
-        }
-        // Emit CTAs while creating conversation
-        try {
-          this.redisPublisher.publish('selectcta', JSON.stringify({
-            clientId: client.id,
-            convId: conversation.id, agentId: conversation.agentId
-          }));
-        } catch (error) {
-          console.log(error)
-        }
-
+      // Emit CTAs while creating conversation
+      try {
+        const prisma = await this.prismaClientManager.getClient(orgId)
+        const agent = await prisma.agent.findFirst();
+        this.redisPublisher.publish('selectcta', JSON.stringify({
+          clientId: client.id,
+          convId: conversation.id, agentId: agent.id
+        }));
+      } catch (error) {
+        console.log(error)
       }
     }
   }
@@ -277,9 +273,10 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
           }
         });
     } else {
+      const { orgId } = await this.getClientInfo(client)
       const flagged = await this.llmService.isContentFlagged(message.chatMessage?.messages[0]?.content);
       if (!flagged) {
-        const conversation = await this.onChatMessage(message) as any;
+        const conversation = await this.onChatMessage(orgId, message) as any;
 
         if (conversation.message) {
           this.redisPublisher.publish('checklead', JSON.stringify({
@@ -303,14 +300,14 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
           this.server.to(client.id).emit('replyMessage', conversation);
           this.server.to(client.id).emit('conversationEnded', { convId: message.convId });
           await this.notifyAuthSubscribers('conversationEnded', conversation.orgInfo, { convId: message.convId });
-          this.conversationService.endConversation(message.convId);
+          this.conversationService.endConversation(orgId, message.convId);
         } else if (conversation.message && conversation.message.content && conversation.message.content.includes('<END_OF_CHAT>')) {
           // Emit the message to the specific client
           this.server.to(client.id).emit('replyMessage', conversation);
           await this.notifyAuthSubscribers(message.convId + '_messages', conversation.orgInfo, conversation);
           this.server.to(client.id).emit('conversationEnded', { convId: message.convId });
           await this.notifyAuthSubscribers('conversationEnded', conversation.orgInfo, { convId: message.convId });
-          this.conversationService.endConversation(message.convId);
+          this.conversationService.endConversation(orgId, message.convId);
         } else {
           // Emit the message to the specific client
           this.server.to(client.id).emit('replyMessage', conversation);
@@ -363,10 +360,11 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
   @SubscribeMessage('suspendAI')
   async suspendAIForConv(@MessageBody() message: any, @ConnectedSocket() client: Socket) {
     if (message.convId) {
-      const activeClient = await this.activeClientService.findByClient(client.id)
+      const { orgId } = await this.getClientInfo(client)
+      const activeClient = await this.activeClientService.findByClient(orgId, client.id)
       if (activeClient) {
-        const convInfo = await this.conversationService.assignConvToHumanAgent(message.convId, activeClient.user)
-        await this.notifyAuthSubscribers('aiSuspended', convInfo.conversation.orgId, convInfo.conversation);
+        const convInfo = await this.conversationService.assignConvToHumanAgent({ orgId, data: { id: message.convId, user: activeClient.user } })
+        await this.notifyAuthSubscribers('aiSuspended', orgId, convInfo.conversation);
         this.server.to(convInfo.conversation.socketId).emit('replyMessage', convInfo);
         this.server.to(convInfo.conversation.socketId).emit('aiSuspended', convInfo);
       }
@@ -376,23 +374,26 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
   @SubscribeMessage('resumeAI')
   async resumeAIForConv(@MessageBody() message: any, @ConnectedSocket() client: Socket) {
     if (message.convId) {
-      const activeClient = await this.activeClientService.findByClient(client.id)
-      const convInfo = await this.conversationService.resumeAIAgent(message.convId, activeClient.user);
-      await this.notifyAuthSubscribers('resumeAIAgent', convInfo.conversation.orgId, convInfo.conversation);
+      const { orgId } = await this.getClientInfo(client)
+
+      const activeClient = await this.activeClientService.findByClient(orgId, client.id)
+      const convInfo = await this.conversationService.resumeAIAgent({ orgId, data: { id: message.convId, user: activeClient.user } });
+      await this.notifyAuthSubscribers('resumeAIAgent', orgId, convInfo.conversation);
       this.server.to(convInfo.conversation.socketId).emit('resumeAIAgent', convInfo);
       this.server.to(convInfo.conversation.socketId).emit('replyMessage', convInfo);
-      this.findReplayRequiredAndSend(convInfo.conversation, convInfo.conversation.socketId);
+      this.findReplayRequiredAndSend(orgId, convInfo.conversation, convInfo.conversation.socketId);
     }
   }
 
   @SubscribeMessage('messageByHuman')
   async messageFromHuman(@MessageBody() message: any, @ConnectedSocket() client: Socket) {
     if (message.convId) {
-      const activeClient = await this.activeClientService.findByClient(client.id)
+      const { orgId } = await this.getClientInfo(client)
+      const activeClient = await this.activeClientService.findByClient(orgId, client.id)
       if (activeClient) {
-        const convInfo = await this.conversationService.sendByHuman(message.convId, activeClient.user, message)
+        const convInfo = await this.conversationService.sendByHuman({ orgId, data: { id: message.convId, user: activeClient.user, _message: message } })
         this.server.to(convInfo.conversation.socketId).emit('replyMessage', { message: convInfo.message });
-        await this.notifyAuthSubscribers(message.convId + '_messages', convInfo.conversation.orgId, { message: convInfo.message });
+        await this.notifyAuthSubscribers(message.convId + '_messages', orgId, { message: convInfo.message });
       }
     }
   }
@@ -400,9 +401,10 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
   @SubscribeMessage('requestHumanSupport')
   async requestHumanSupport(@MessageBody() message: any, @ConnectedSocket() client: Socket) {
     if (message.convId) {
+      const { orgId } = await this.getClientInfo(client)
       const lead = message.lead;
-      const conversation = await this.conversationService.requestForHumanSupport(message.convId, lead)
-      await this.notifyAuthSubscribers('customerRequest', conversation.orgId, { convId: conversation.id, name: lead.name });
+      const conversation = await this.conversationService.requestForHumanSupport({ orgId, data: { id: message.convId, lead } })
+      await this.notifyAuthSubscribers('customerRequest', orgId, { convId: conversation.id, name: lead.name });
     }
   }
 
@@ -410,27 +412,26 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
   async onNavigate(@MessageBody() message: any, @ConnectedSocket() client: Socket, @Req() request: ZautoRequest) {
     console.log(message);
     if (!message) return;
-    const orgId = request.orgId;
-
+    const { orgId } = await this.getClientInfo(client)
     let greeting = await this.siteService.getGreetingByUrl({ orgId, data: { pageUrl: message.url } });
     greeting = greeting + "<END_OF_CHAT>";
-    const conversation = await this.conversationService.findOne(message.convId);
-    const agent = await this.agentsService.findOne(message.agentId);
+    const conversation = await this.conversationService.findOne(orgId, message.convId);
+    const agent = await this.agentsService.findOne(orgId, message.agentId);
     if (conversation && agent) {
-      const lastMessage = await this.conversationService.getLastMessage(conversation.id);
+      const lastMessage = await this.conversationService.getLastMessage(orgId, conversation.id);
       let _message = null;
       if (lastMessage && lastMessage.content == greeting) {
         _message = lastMessage;
       }
       else {
         if (greeting.includes("null")) return;
-        _message = await this.updateConversation({ role: 'assistant', content: greeting ? greeting : agent.welcomeMsg }, conversation);
-        this.conversationService.createNavigationActivity(conversation.id, message.url);
+        _message = await this.updateConversation({ role: 'assistant', content: greeting ? greeting : agent.welcomeMsg }, { id: conversation.id, orgId, agentId: agent.id });
+        this.conversationService.createNavigationActivity({ orgId, data: { convId: conversation.id, url: message.url } });
       }
 
       if (!_message) return;
 
-      const convInfo = { message: _message, orgInfo: conversation.orgId };
+      const convInfo = { message: _message, orgInfo: orgId };
       this.server.to(client.id).emit('replyMessage', convInfo);
       await this.notifyAuthSubscribers(message.convId + '_messages', convInfo.orgInfo, convInfo);
     }
@@ -439,18 +440,20 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
   @SubscribeMessage('updateNavigate')
   async onChange(@MessageBody() message: any, @ConnectedSocket() client: Socket) {
     if (!message && message.messageId && message.url) {
-      this.conversationService.updateNavigationActivity(message.messageId, message.url);
+      const { orgId } = await this.getClientInfo(client)
+
+      this.conversationService.updateNavigationActivity({ orgId, data: { messageId: message.messageId, url: message.url } });
     }
   }
 
-  async onInitConv(message: any, clientId: string) {
-    const agent = await this.agentsService.findOne(message.agentId);
+  async onInitConv(orgId: string, message: any, clientId: string) {
+    const agent = await this.agentsService.findOne(orgId, message.agentId);
     let visitor = null, visit = null;
     if (message.visitorId) {
-      visitor = await this.visitorService.findOne(message.visitorId);
+      visitor = await this.visitorService.findOne(orgId, message.visitorId);
     }
     if (message.visitId) {
-      visit = await this.visitorService.findVisit(message.visitId);
+      visit = await this.visitorService.findVisit(orgId, message.visitId);
     }
 
     if (!agent) {
@@ -472,9 +475,13 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
       converationObj['threadId'] = thread.id
     }
 
-    const converation = await this.conversationService.createIfNotExist(converationObj, agent.orgId, {
-      role: 'assistant',
-      content: agent.welcomeMsg
+    const converation = await this.conversationService.createIfNotExist({
+      orgId, data: {
+        createConversationDto: converationObj, message: {
+          role: 'assistant',
+          content: agent.welcomeMsg
+        }
+      }
     })
 
     if (converation) {
@@ -486,18 +493,18 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     }
   }
 
-  async onChatMessage(message: any) {
+  async onChatMessage(orgId: string, message: any) {
     try {
       const agentId = message.agentId;
 
-      const conversation = await this.conversationService.findOneNoSummay(message.convId);
+      const conversation = await this.conversationService.findOneNoSummay(orgId, message.convId);
 
       if (conversation.status == ConversationStatus.OFFLINE) {
-        const conv = await this.conversationService.updateStatus(conversation.id, ConversationStatus.ONLINE);
-        await this.notifyAuthSubscribers('convStatusUpdate', conversation.orgId, { convId: message.convId, status: ConversationStatus.ONLINE });
+        const conv = await this.conversationService.updateStatus({ orgId, data: { id: conversation.id, status: ConversationStatus.ONLINE } });
+        await this.notifyAuthSubscribers('convStatusUpdate', orgId, { convId: message.convId, status: ConversationStatus.ONLINE });
       }
 
-      if (conversation && conversation.agentId != agentId) {
+      if (conversation) {
         return { message: 'Not authorised to perform this acetion' };
       }
 
@@ -514,18 +521,18 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
         // && conversation.agent.assistantId
       ) {
         if (!conversation.aiSuspended) {
-          return await this.sendToZautoRAG(conversation, message.chatMessage.messages[0])
+          return await this.sendToZautoRAG(orgId, conversation, message.chatMessage.messages[0])
         } else {
           console.log('AI is suspended for this conversation: ' + conversation.id);
-          const _message = await this.updateConversation(message.chatMessage.messages[0], conversation)
-          await this.notifyAuthSubscribers(conversation.id + '_messages', conversation.orgId, { message: _message });
+          const _message = await this.updateConversation(message.chatMessage.messages[0], { id: conversation.id, orgId, agentId })
+          await this.notifyAuthSubscribers(conversation.id + '_messages', orgId, { message: _message });
         }
       } else {
         if (!conversation.aiSuspended) {
-          return await this.sendToZautoRAG(conversation, message.chatMessage.messages[0])
+          return await this.sendToZautoRAG(orgId, conversation, message.chatMessage.messages[0])
         } else {
-          const _message = await this.updateConversation(message.chatMessage.messages[0], conversation)
-          await this.notifyAuthSubscribers(conversation.id + '_messages', conversation.orgId, { message: _message });
+          const _message = await this.updateConversation(message.chatMessage.messages[0], { id: conversation.id, orgId, agentId })
+          await this.notifyAuthSubscribers(conversation.id + '_messages', orgId, { message: _message });
         }
       }
     } catch (e) {
@@ -562,19 +569,23 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
 
 
   //ZautoAI RAG System
-  async sendToZautoRAG(conversation: any, message: ZautoChatCompletionMessage) {
+  async sendToZautoRAG(orgId: string, conversation: any, message: ZautoChatCompletionMessage) {
     try {
       const _message = await this.updateConversation(message, conversation)
-      let history = await this.conversationService.getMessages(conversation.id)
+      let history = await this.conversationService.getMessages(orgId, conversation.id)
 
       await this.notifyAuthSubscribers(_message.convId + '_messages', conversation.orgId, { message: _message });
 
-      const response = await this.chatService.chat(conversation.agent, history.map(message => {
-        return {
-          role: message.role,
-          content: message.content
+      const response = await this.chatService.chat({
+        orgId, data: {
+          agent: conversation.agent, messages: history.map(message => {
+            return {
+              role: message.role,
+              content: message.content
+            }
+          })
         }
-      }));
+      });
 
       const agentMessage = {
         role: response.message.role,
@@ -599,13 +610,11 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
 
   async updateConversation(message: ZautoChatCompletionMessage, { id, orgId, agentId, }) {
     const _messageObj = {
-      orgId: orgId,
-      agentId: agentId,
       convId: id,
       role: message.role,
       content: message.content
     }
-    return await this.conversationService.createMessage(_messageObj);
+    return await this.conversationService.createMessage({ orgId, data: _messageObj });
   }
 
   async leadFromUserMessage(message, conversation) {
@@ -632,6 +641,22 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     return content;
   }
 
+
+  async getClientInfo(client: Socket) {
+    if (client.handshake.headers.authorization) {
+      const token = client.handshake.headers.authorization;
+      // Extract the token value if it's a Bearer token
+      const authToken = token?.split(' ')[1];
+      const authInfo = await this.jwtService.verify(authToken);
+      return authInfo;
+    }
+    else if (client.handshake.query?.orgId) {
+      return { orgId: client.handshake.query?.orgId }
+    }
+    else {
+      throw new UnauthorizedException("Token Not Found");
+    }
+  }
 
   onModuleDestroy() {
     this.server.disconnectSockets();

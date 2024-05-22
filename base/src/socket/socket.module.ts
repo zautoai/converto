@@ -6,9 +6,9 @@ import { ConversationModule } from 'src/conversation/conversation.module';
 import { VisitorModule } from 'src/visitor/visitor.module';
 import { ActiveClientModule } from 'src/active-client/active-client.module';
 import { JwtModule } from '@nestjs/jwt';
-import { AccountModule } from 'src/account/account.module';
 import { SiteModule } from 'src/site/site.module';
 import { ContactsModule } from 'src/contacts/contacts.module';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
     imports: [
@@ -18,12 +18,12 @@ import { ContactsModule } from 'src/contacts/contacts.module';
         ContactsModule,
         VisitorModule,
         ActiveClientModule,
+        PrismaModule,
         JwtModule.register({
             secret: process.env.JWT_SECRET, // Use your secret or private key here
             signOptions: { expiresIn: '60s' },
         }),
         SiteModule,
-        AccountModule
     ],
     providers: [SocketGateway],
     exports: [SocketGateway],
