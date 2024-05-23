@@ -273,7 +273,6 @@ CREATE TABLE "Campaign" (
 -- CreateTable
 CREATE TABLE "Stage" (
     "id" TEXT NOT NULL,
-    "agentId" TEXT,
     "name" VARCHAR(100) NOT NULL,
     "instruction" TEXT NOT NULL,
     "sequence" INTEGER NOT NULL,
@@ -430,13 +429,7 @@ CREATE INDEX "convId_ZautoMessage_fkey" ON "ZautoMessage"("convId");
 CREATE INDEX "sentById_ZautoMessage_fkey" ON "ZautoMessage"("sentById");
 
 -- CreateIndex
-CREATE INDEX "agentId_Stage_fkey" ON "Stage"("agentId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Stage_agentId_name_key" ON "Stage"("agentId", "name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Stage_agentId_sequence_key" ON "Stage"("agentId", "sequence");
+CREATE UNIQUE INDEX "Stage_sequence_key" ON "Stage"("sequence");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "OpenAIAssistant_assistantId_key" ON "OpenAIAssistant"("assistantId");
@@ -485,9 +478,6 @@ ALTER TABLE "ZautoMessage" ADD CONSTRAINT "ZautoMessage_convId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "ZautoMessage" ADD CONSTRAINT "ZautoMessage_sentById_fkey" FOREIGN KEY ("sentById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Stage" ADD CONSTRAINT "Stage_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "availableHours" ADD CONSTRAINT "availableHours_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "AvailabilitySchedule"("id") ON DELETE CASCADE ON UPDATE CASCADE;
