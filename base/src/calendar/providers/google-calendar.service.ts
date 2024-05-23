@@ -65,6 +65,7 @@ export class GoogleCalendarService extends BaseCalendar {
             return {
                 statusCode: 200,
                 message: 'Access token fetched successfully',
+                
                 data: null
             };
         } catch (error) {

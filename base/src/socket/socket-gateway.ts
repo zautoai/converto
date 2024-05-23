@@ -234,6 +234,11 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
 
   @SubscribeMessage('createConversation')
   async intConversation(@MessageBody() message: any, @ConnectedSocket() client: Socket) {
+    const orgId = message.orgId;
+    if(!orgId)
+    {
+      
+    }
     if (!message.agentId) {
       this.server.to(client.id).emit('convCreateFailed', { message: "agentId is required." });
     } else {
