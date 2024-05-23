@@ -127,7 +127,6 @@ model Agent {
   AgentPrompt      AgentPrompt[]
   LeadConfig       LeadConfig[]
   AgentFiles       AgentFile[]
-  Stages           Stage[]
   starters         String?          @db.Text
 }
 
@@ -335,19 +334,12 @@ model Campaign {
 
 model Stage {
   id          String   @id @default(uuid())
-  agentId     String?
   name        String   @db.VarChar(100)
   instruction String   @db.Text
-  sequence    Int      @db.Integer()
+  sequence    Int      @unique @db.Integer()
   canEdit     Boolean  @default(true)
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @updatedAt
-
-  agent Agent? @relation(fields: [agentId], references: [id], onDelete: Cascade)
-
-  @@unique([agentId, name], name: "Unique_Agent_Name")
-  @@unique([agentId, sequence], name: "Unique_Agent_Sequence")
-  @@index([agentId], map: "agentId_Stage_fkey")
 }
 
 model OpenAIAssistant {

@@ -13,24 +13,24 @@ import { BaseService } from 'src/common/services/base.service';
 export const roundsOfHashing = 10;
 
 @Injectable()
-export class UsersService extends BaseService{
+export class UsersService extends BaseService {
 
   constructor(
     private rolesService: RolesService,
     private readonly staticFileService: StaticFileService,
   ) {
     super();
-   }
+  }
 
 
-  async create(orgId: string,createUserDto: CreateUserDto, verified: boolean = false) {
+  async create(orgId: string, createUserDto: CreateUserDto, verified: boolean = false) {
     const prisma = await this.getPrismaClient(orgId);
     const existingUser = await prisma.user.findFirst({
       where: { email: createUserDto.email }
     });
     if (!existingUser) {
 
-      if (createUserDto.roleId != null && !await this.isRoleExist(orgId,createUserDto.roleId)) {
+      if (createUserDto.roleId != null && !await this.isRoleExist(orgId, createUserDto.roleId)) {
         throw new NotFoundException(`Role not found with id ${createUserDto.roleId}`);
       }
       const hashedPassword = await bcrypt.hash(
@@ -39,11 +39,11 @@ export class UsersService extends BaseService{
       );
       createUserDto.password = hashedPassword;
       if (!createUserDto.roleId) {
-        let defaultRole = await this.rolesService.findOneByName(orgId,SYSTEM_CONST.DEFALT_ROLE);
+        let defaultRole = await this.rolesService.findOneByName(orgId, SYSTEM_CONST.DEFALT_ROLE);
         createUserDto.roleId = defaultRole.id;
       }
       const userData = await prisma.user.create({ data: { ...createUserDto, verified } });
-      delete userData.password; 
+      delete userData.password;
 
       return userData;
     } else {
@@ -51,23 +51,25 @@ export class UsersService extends BaseService{
     }
   }
 
-  async findAll(orgId: string,paginationDto: PaginationDto) {
+  async findAll(orgId: string, paginationDto: PaginationDto) {
     const prisma = await this.getPrismaClient(orgId);
-    const userList = await prisma.user.findMany({select: {
-      id: true,
-      name: true,
-      email: true,
-      imgUrl: true,
-      createdAt: true,
-      modifiedAt: true,
-      role: {
-        // Include specific fields from the related role model
-        select: {
-          id: true,
-          name: true,
+    const userList = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        imgUrl: true,
+        createdAt: true,
+        modifiedAt: true,
+        role: {
+          // Include specific fields from the related role model
+          select: {
+            id: true,
+            name: true,
+          },
         },
-      },
-    }});
+      }
+    });
     return {
       statusCode: 200,
       data: userList
@@ -79,24 +81,25 @@ export class UsersService extends BaseService{
     const skip = (page - 1) * limit;
     const prisma = await this.getPrismaClient(orgId);
     const userList = await prisma.
-    user.findMany({
-      skip, take: limit,
-      select: {
-      id: true,
-      name: true,
-      email: true,
-      imgUrl: true,
-      createdAt: true,
-      modifiedAt: true,
-      role: {
-        // Include specific fields from the related role model
+      user.findMany({
+        skip, take: limit,
         select: {
           id: true,
           name: true,
-        },
-      },
-    }, where: {orgId}});
-    const total = await prisma.user.count({where: {orgId}});
+          email: true,
+          imgUrl: true,
+          createdAt: true,
+          modifiedAt: true,
+          role: {
+            // Include specific fields from the related role model
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        }, where: { orgId }
+      });
+    const total = await prisma.user.count({ where: { orgId } });
     return {
       data: userList,
       page: page,
@@ -104,7 +107,7 @@ export class UsersService extends BaseService{
     }
   }
 
-  async findOne(orgId: string,id: string) {
+  async findOne(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     const userData = await prisma.user.findFirst({
       where: { id, }, select: {
@@ -134,39 +137,38 @@ export class UsersService extends BaseService{
     }
   }
 
-  async update(orgId: string,id: string, updateUserDto: UpdateUserDto) {
+  async update(orgId: string, id: string, updateUserDto: UpdateUserDto) {
     const prisma = await this.getPrismaClient(orgId);
     const userData = await prisma.user.findFirst({
       where: { id, }
     });
     if (userData) {
-      if (updateUserDto.roleId != null && !await this.isRoleExist(orgId,updateUserDto.roleId)) {
+      if (updateUserDto?.roleId != null && !await this.isRoleExist(orgId, updateUserDto.roleId)) {
         throw new NotFoundException(`Role not found with id ${updateUserDto.roleId}`);
       } else {
         updateUserDto.roleId = userData.roleId;
       }
-      if(updateUserDto.password.length > 0)
-      {
+      if (updateUserDto.password && updateUserDto.password.length > 0) {
         const hashedPassword = await bcrypt.hash(
           updateUserDto.password,
           roundsOfHashing,
         );
         updateUserDto.password = hashedPassword;
       }
-      const updatedUserData = await prisma.user.update({data: updateUserDto, where:{id,}});
+      const updatedUserData = await prisma.user.update({ data: updateUserDto, where: { id, } });
       return updatedUserData;
     } else {
       throw new NotFoundException(`User not found with id ${id}`);
     }
   }
 
-  async updateProfilePicUrl(orgId:string,id: string, updateProfilePicDto: UpdateProfilePicDto) {
+  async updateProfilePicUrl(orgId: string, id: string, updateProfilePicDto: UpdateProfilePicDto) {
     const prisma = await this.getPrismaClient(orgId);
     const userData = await prisma.user.findFirst({
       where: { id, },
     });
     if (userData) {
-      const updatedUserData = await prisma.user.update({ data: updateProfilePicDto, where: { id, } });
+      const updatedUserData = await prisma.user.update({ data: updateProfilePicDto, where: { id } });
       await this.staticFileService.deleteExistingFile(userData.imgUrl);
       return updatedUserData;
     } else {
@@ -174,7 +176,7 @@ export class UsersService extends BaseService{
     }
   }
 
-  async remove(orgId: string,id: string) {
+  async remove(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     const userData = await prisma.user.findFirst({
       where: { id, }
@@ -186,7 +188,7 @@ export class UsersService extends BaseService{
     }
   }
 
-  async isRoleExist(orgId: string,id: string) {
+  async isRoleExist(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     const roleData = await prisma.role.findFirst({
       where: { id, }
@@ -197,7 +199,7 @@ export class UsersService extends BaseService{
     return false;
   }
 
-  async getUserById(orgId: string,id: string) {
+  async getUserById(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     const userData = await prisma.user.findFirst({
       where: { id, }, select: {
@@ -216,12 +218,12 @@ export class UsersService extends BaseService{
     return userData;
   }
 
-  async findByEmail(orgId: string,email: string) {
+  async findByEmail(orgId: string, email: string) {
     const prisma = await this.getPrismaClient(orgId);
     return await prisma.user.findFirst({ where: { email }, include: { role: true } });
   }
 
-  async changePassword(orgId: string,id: string, password: string) {
+  async changePassword(orgId: string, id: string, password: string) {
     const prisma = await this.getPrismaClient(orgId);
     const hashedPassword = await bcrypt.hash(
       password,
@@ -231,7 +233,7 @@ export class UsersService extends BaseService{
     await prisma.user.update({ data: { password }, where: { id } });
   }
 
-  async verifyEmail(orgId: string,userId: string) {
+  async verifyEmail(orgId: string, userId: string) {
     const prisma = await this.getPrismaClient(orgId);
     return await prisma.user.update({ data: { verified: true }, where: { id: userId } });
   }

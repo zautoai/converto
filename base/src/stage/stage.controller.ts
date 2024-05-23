@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query, UseGuards,Req } from '@nestjs/common';
-import {UnauthorizedException} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query, UseGuards, Req } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { StageService } from './stage.service';
 import { CreateStageDto } from './dto/create-stage.dto';
 import { UpdateStageDto } from './dto/update-stage.dto';
@@ -18,87 +18,82 @@ import { ZautoRequest } from 'src/common/models/request.model';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class StageController {
-    constructor(private readonly stageService:StageService){}
+    constructor(private readonly stageService: StageService) { }
 
     @Get()
     @ApiQuery({ name: 'page', description: 'Page number.', required: false })
     @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
     @ApiOkResponse({
-      type: ResponseDTO<Stage>
+        type: ResponseDTO<Stage>
     })
-    async findAll(@Req() request: ZautoRequest)
-    {
-        if(request.user && request.orgId)
-        {
-            const orgId = request.orgId;
+    async findAll(@Req() request: ZautoRequest) {
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
             return await this.stageService.findAllByOrg(orgId);
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.")
         }
     }
 
     @Get(':id')
-    @ApiOkResponse({type:Stage})
-    async findOne(@Param('id') id: string,@Req() request: ZautoRequest)
-    {
-        if(request.user && request.user.orgId)
-        {
+    @ApiOkResponse({ type: Stage })
+    async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
+        if (request.user && request.user.orgId) {
             const orgId = request.user.orgId;
             return await this.stageService.findOne(orgId, id);
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.")
         }
     }
-    
+
     @Post()
-    @ApiOkResponse({type:Stage})
-    async create(@Body() createStageDto: CreateStageDto,@Req() zautoRequest: ZautoRequest)
-    {
-        if(zautoRequest.user && zautoRequest.user.orgId)
-        {
+    @ApiOkResponse({ type: Stage })
+    async create(@Body() createStageDto: CreateStageDto, @Req() zautoRequest: ZautoRequest) {
+        if (zautoRequest.user && zautoRequest.user.orgId) {
             const orgId = zautoRequest.user.orgId;
-            return await this.stageService.create({orgId,data:createStageDto});
+            return await this.stageService.create({ orgId, data: createStageDto });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.")
         }
     }
-    
+
     @Patch(':id')
-    @ApiOkResponse({type:Stage})
-    async update(@Param('id') id: string, @Body() updateStageDto:UpdateStageDto,@Req() zautoRequest: ZautoRequest)
-    {
-        if(zautoRequest.user && zautoRequest.user.orgId)
-        {
+    @ApiOkResponse({ type: Stage })
+    async update(@Param('id') id: string, @Body() updateStageDto: UpdateStageDto, @Req() zautoRequest: ZautoRequest) {
+        if (zautoRequest.user && zautoRequest.user.orgId) {
             const orgId = zautoRequest.user.orgId;
-            return await this.stageService.update({orgId,id, data:updateStageDto});
+            return await this.stageService.update({ orgId, id, data: updateStageDto });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.")
         }
     }
-    
+
 
     @Delete(':id')
     @HttpCode(204)
-    async delete(@Param('id') id: string,@Req() zautoRequest: ZautoRequest)
-    {
-        if(zautoRequest.user && zautoRequest.user.orgId)
-        {
+    async delete(@Param('id') id: string, @Req() zautoRequest: ZautoRequest) {
+        if (zautoRequest.user && zautoRequest.user.orgId) {
             const orgId = zautoRequest.user.orgId;
             return await this.stageService.delete(orgId, id);
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.")
         }
     }
-       
-   
+
+    @Post('/sequence')
+    async updateSquence(@Body() updateSquence: any, @Req() zautoRequest: ZautoRequest) {
+        if (zautoRequest.user && zautoRequest.user.orgId) {
+            const orgId = zautoRequest.user.orgId;
+            return await this.stageService.updateSquence({ orgId, data: { updateSquence } });
+        }
+        else {
+            throw new UnauthorizedException("Unauthorised access.")
+        }
+    }
+
 }

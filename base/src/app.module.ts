@@ -37,7 +37,6 @@ import { AvailabilityScheduleModule } from './availability-schedule/availability
 import { FileManagerModule } from './file-manager/file-manager.module';
 import { PromptTemplateModule } from './prompt-template/prompt-template.module';
 import { DemandGenModule } from './demand-gen/demand-gen.module';
-import { SecureExchangeModule } from './secure-exchange/secure-exchange.module';
 import { MicroservicesModule } from './microservices/microservices.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { FormBuilderModule } from './form-builder/form-builder.module';
@@ -102,7 +101,6 @@ import { SchemaManagerModule } from './schema-manager/schema-manager.module';
     FileManagerModule,
     PromptTemplateModule,
     DemandGenModule,
-    SecureExchangeModule,
     MicroservicesModule,
     ContactsModule,
     FormBuilderModule,

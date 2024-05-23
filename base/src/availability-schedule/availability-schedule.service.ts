@@ -20,36 +20,44 @@ export class AvailabilityScheduleService extends BaseService {
             eventDuration: createScheduleDto.eventDuration,
             calendarId: createScheduleDto.calendarId
         }
-        try {
-            const prisma = await this.getPrismaClient(orgId)
-            const schedule = await prisma.availabilitySchedule.create({ data: scheduleData });
-            await this.deleteAndCreateAvailableHours({ orgId, data: { scheduleId: schedule.id, availableHours: createScheduleDto.availableHours } });
-            return schedule;
+        const prisma = await this.getPrismaClient(orgId)
+        const existingSchedule = await prisma.availabilitySchedule.findFirst();
+        if(existingSchedule)
+        {
+            throw new ConflictException("This calendar already have an availability schedule");
         }
-        catch (error) {
-            if (error instanceof PrismaClientKnownRequestError && error.code == 'P2002') {
-                throw new ConflictException("This Availability schedule already exist for this org");
-            }
-            else {
-                throw new BadRequestException(error);
-            }
-        }
+        const schedule = await prisma.availabilitySchedule.create({ data: scheduleData });
+        await this.deleteAndCreateAvailableHours({ orgId, data: { scheduleId: schedule.id, availableHours: createScheduleDto.availableHours } });
+        return schedule;
     }
 
     async findAll(orgId: string) {
         try {
             const prisma = await this.getPrismaClient(orgId)
-            const allSchedules = await prisma.availabilitySchedule.findMany();
+            const allSchedules = await prisma.availabilitySchedule.findMany({
+                include: { availableHours: true }
+            });
             return allSchedules;
         } catch (error) {
             throw new BadRequestException(error);
         }
     }
 
-    async findOne(orgId: string) {
+    async findOneByOrgId(orgId:string)
+    {
         try {
             const prisma = await this.getPrismaClient(orgId)
             const allSchedules = await prisma.availabilitySchedule.findFirst({ include: { availableHours: true } });
+            return allSchedules;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    }
+
+    async findOne(orgId: string,id:string) {
+        try {
+            const prisma = await this.getPrismaClient(orgId)
+            const allSchedules = await prisma.availabilitySchedule.findFirst({ where:{id},include: { availableHours: true } });
             return allSchedules;
         } catch (error) {
             throw new BadRequestException(error);

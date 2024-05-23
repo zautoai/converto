@@ -28,12 +28,12 @@ export class OrgSmtpconfigService extends BaseService{
         if (!isConnectionOk) {
             throw new BadRequestException("Failed to establish a connection with the SMTP server. Please check your SMTP configuration and try again.");
         }
-        let data;
-        data.pass = this.hashingService.encryt(createOrgSmtpconfigDto.pass);
+        let data = createOrgSmtpconfigDto;
+        data.pass = this.hashingService.encryt(data.pass);
 
         const existingConfigs = await this.getActiveConfigByOrg(orgId);
         if (!existingConfigs) {
-            data = { ...createOrgSmtpconfigDto, ...{ isActive: true } };
+            data = { ...data, ...{ isActive: true } };
         }
         const smtpConfig = await prisma.orgSMTPConfig.create({ data: data });
         delete smtpConfig.pass;
@@ -87,7 +87,7 @@ export class OrgSmtpconfigService extends BaseService{
             return existing;
         }
         else {
-            throw null;
+            return null;
         }
     }
 

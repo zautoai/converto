@@ -300,7 +300,6 @@ CREATE TABLE "OpenAIAssistant" (
 -- CreateTable
 CREATE TABLE "OrgSMTPConfig" (
     "id" TEXT NOT NULL,
-    "orgId" TEXT NOT NULL,
     "host" TEXT NOT NULL,
     "port" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
@@ -444,9 +443,6 @@ CREATE UNIQUE INDEX "OpenAIAssistant_assistantId_key" ON "OpenAIAssistant"("assi
 
 -- CreateIndex
 CREATE UNIQUE INDEX "OpenAIAssistant_name_key" ON "OpenAIAssistant"("name");
-
--- CreateIndex
-CREATE INDEX "SMTPConfig_orgId_fkey" ON "OrgSMTPConfig"("orgId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "CallToAction_name_key" ON "CallToAction"("name");
