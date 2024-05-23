@@ -39,6 +39,17 @@ export class AvailabilityScheduleController {
         }
     }
 
+    @Get(':scheduleId')
+    async findOneById(@Param('scheduleId') scheduleId: string, @Req() request: ZautoRequest) {
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            return await this.scheduleService.findOne(orgId,scheduleId);
+        }
+        else {
+            throw new UnauthorizedException("Unauthorised access.")
+        }
+    }
+
     @Patch(':scheduleId')
     async update(@Param('scheduleId') scheduleId: string, @Body() updateScheduleDto: UpdateScheduleDto, @Req() request: ZautoRequest) {
         if (request.user && request.user.orgId) {
