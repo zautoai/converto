@@ -58,9 +58,10 @@ import { BaseService } from 'src/common/services/base.service';
     }
 
     async getUserInfo(user: any) {
-      const prisma = await this.getPrismaClient(user.org.id);
+      const orgId = user.orgId;
+      const prisma = await this.getPrismaClient(orgId);
       return {
-        user: await this.userService.findOne(user.org.id,user.id),
+        user: await this.userService.findOne(orgId,user.id),
         avatar: await prisma.agent.findFirst()
       };
     }
