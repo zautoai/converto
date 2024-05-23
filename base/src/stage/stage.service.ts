@@ -85,7 +85,7 @@ export class StageService extends BaseService {
         const existingStage = await prisma.stage.findUnique({ where: { id } });
         if (existingStage && existingStage.canEdit) {
             const satgeData = await prisma.stage.update({ data: updateStageDto, where: { id } });
-            const agent = await prisma.agent.findUnique({ where: { id: existingStage.agentId } });
+            const agent = await prisma.agent.findFirst();
             if (agent) {
                 const agentPrompt = await this.promptService.findByAgent(orgId, agent.id);
                 const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
@@ -112,7 +112,7 @@ export class StageService extends BaseService {
         if (existingStage && existingStage.canEdit) {
             const stageData = await prisma.stage.delete({ where: { id } });
 
-            const agent = await prisma.agent.findUnique({ where: { id: existingStage.agentId } });
+            const agent = await prisma.agent.findFirst();
             if (agent) {
                 const agentPrompt = await this.promptService.findByAgent(orgId, agent.id);
                 const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
@@ -194,11 +194,10 @@ export class StageService extends BaseService {
     async getStagesText(orgId: string, agentId: string) {
         let stagestext = "";
         const prisma = await this.getPrismaClient(orgId);
-        const stages = await prisma.stage.findMany({ where: { agentId }, orderBy: { sequence: 'asc' } });
+        const stages = await prisma.stage.findMany({ orderBy: { sequence: 'asc' } });
         for (let [index, stage] of stages.entries()) {
             stagestext += `${index + 1}.${stage.name}: ${stage.instruction}\n`;
         }
         return stagestext;
     }
-
 }
