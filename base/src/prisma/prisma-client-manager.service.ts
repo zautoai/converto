@@ -2,18 +2,19 @@ import { BadRequestException, Injectable, Logger, OnModuleDestroy } from '@nestj
 import { PrismaClient } from '@prisma/client';
 import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
 import { getSchemaName } from 'src/common/helpers/cast.helper';
+import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class PrismaClientManager implements OnModuleDestroy{
     private logger = new Logger(PrismaClientManager.name);
-    private clients: { [key: string]: PrismaClient } = {};
+    private clients: { [key: string]: PrismaService } = {};
 
     async getClient(orgId: string): Promise<PrismaClient> {
         const schemaName = orgId != DEFAULT_SCHEMA_NAME ? getSchemaName(orgId) : DEFAULT_SCHEMA_NAME;
         let client = this.clients[orgId];
         const databaseUrl = process.env.DATABASE_URL.replaceAll(`?schema=${DEFAULT_SCHEMA_NAME}`, `?schema=${schemaName}`);
         if (!client) {
-            client = new PrismaClient({
+            client = new PrismaService({
                 datasources: {
                     db: {
                         url: databaseUrl,
@@ -47,6 +48,7 @@ export class PrismaClientManager implements OnModuleDestroy{
                     WHERE schema_name = ${schemaName}
                 ) as "exists"
             `;
+        client.$disconnect();
         return result[0].exists;
     }
 
