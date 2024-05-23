@@ -9,7 +9,7 @@ import { InjectQueue } from '@nestjs/bull';
 
 
 @Injectable()
-export class ExternalCrmService implements OnModuleInit {
+export class ExternalCrmService {
 
     private logger = new Logger(ExternalCrmService.name);
 
@@ -19,10 +19,6 @@ export class ExternalCrmService implements OnModuleInit {
         private readonly mappingService: MappingService,
         @InjectQueue('crm_sync_queue') private crmSyncQueue: Queue,
     ) { }
-
-    async onModuleInit() {
-
-    }
 
     getAuthUrl(orgId: string, crmName: string): any {
         const crm = this.crmProvider.getCRM(crmName);
@@ -68,6 +64,9 @@ export class ExternalCrmService implements OnModuleInit {
 
     async getContactFields(orgId: string) {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const fields = await crm.getContactProperties(orgId);
         return fields;
@@ -75,6 +74,9 @@ export class ExternalCrmService implements OnModuleInit {
 
     async getCompanyFields(orgId: string) {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const fields = await crm.getCompanyProperties(orgId);
         return fields;
@@ -93,24 +95,36 @@ export class ExternalCrmService implements OnModuleInit {
 
     async getContacts(orgId: string): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const contacts = await crm.getContacts(orgId);
         return contacts;
     }
     async getContact(orgId: string, id: any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const contact = await crm.getContact(orgId, id);
         return contact;
     }
     async getContactByEmail(orgId: string, email: string): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const contact = await crm.getContactByEmail(orgId, email);
         return contact;
     }
     async createContact(orgId: string, data: any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const mappedData = await this.mappingService.handleMapping(orgId, crmName, ObjectType.CONTACT, data);
         const objects = Object.keys(mappedData);
@@ -120,6 +134,9 @@ export class ExternalCrmService implements OnModuleInit {
     }
     async updateContact(orgId: string, id: any, data: any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const mappedData = await this.mappingService.handleMapping(orgId, crmName, ObjectType.CONTACT, data);
         const objects = Object.keys(mappedData);
@@ -129,18 +146,27 @@ export class ExternalCrmService implements OnModuleInit {
     }
     async deleteContact(orgId: string, id: any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const contact = await crm.deleteContact(orgId, id);
         return contact;
     }
     async getCompanies(orgId: string): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const companies = await crm.getCompanies(orgId);
         return companies;
     }
     async getCompany(orgId: string, id: any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const company = await crm.getCompany(orgId, id);
         return company;
@@ -148,6 +174,9 @@ export class ExternalCrmService implements OnModuleInit {
     async getCompanyByName(orgId: string, domain: string): Promise<any> {
         try {
             const crmName = await this.getActiveCRM(orgId);
+            if (!crmName) {
+                return
+            }
             const crm = this.crmProvider.getCRM(crmName);
             const company = await crm.getCompanyByName(orgId, domain);
             return company;
@@ -159,6 +188,9 @@ export class ExternalCrmService implements OnModuleInit {
     }
     async createCompany(orgId: string, data: any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const mappedData = await this.handleMapping(orgId, crmName, ObjectType.COMPANY, data);
         const objects = Object.keys(mappedData);
@@ -168,6 +200,9 @@ export class ExternalCrmService implements OnModuleInit {
     }
     async updateCompany(orgId: string, id: any, data: any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const mappedData = await this.handleMapping(orgId, crmName, ObjectType.COMPANY, data);
         const objects = Object.keys(mappedData);
@@ -177,6 +212,9 @@ export class ExternalCrmService implements OnModuleInit {
     }
     async deleteCompany(orgId: string, id: any): Promise<any> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         const company = await crm.deleteCompany(orgId, id);
         return company;
@@ -249,6 +287,9 @@ export class ExternalCrmService implements OnModuleInit {
 
     async hasPriority(orgId: string): Promise<Boolean> {
         const crmName = await this.getActiveCRM(orgId);
+        if (!crmName) {
+            return
+        }
         const crm = this.crmProvider.getCRM(crmName);
         return await crm.hasPriority(orgId);
     }

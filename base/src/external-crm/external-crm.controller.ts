@@ -20,7 +20,7 @@ export class ExternalCrmController {
 
   @Get('auth-url')
   async getAuthUrl(@Query() crmAuthDto: CRMAuthDto, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -29,7 +29,7 @@ export class ExternalCrmController {
 
   @Get('callback')
   async callback(@Query() hubspotCallBackDto: HubspotCallBackDto, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -38,16 +38,16 @@ export class ExternalCrmController {
 
   @Get('mappings/:crm_name/:object_type')
   async getMappings(@Param('crm_name') crmName: string, @Param('object_type') object_type: string, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
-    return await this.externalCrmService.getMappings(orgId, crmName,object_type);
+    return await this.externalCrmService.getMappings(orgId, crmName, object_type);
   }
 
   @Post('mappings')
   async createMappings(@Body() createCRMMappingsDto: CreateCRMMappingsDto, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -55,8 +55,8 @@ export class ExternalCrmController {
   }
 
   @Get('fields/:crm_name/:object_type')
-  async getContactFields(@Param('crm_name') crmName: string,  @Param('object_type') objectType:string,@Req() request: ZautoRequest) {
-    const orgId = request.orgId;
+  async getContactFields(@Param('crm_name') crmName: string, @Param('object_type') objectType: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -65,7 +65,7 @@ export class ExternalCrmController {
 
   @Get('profile')
   async getProfile(@Query() crmAuthDto: CRMAuthDto, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -73,8 +73,8 @@ export class ExternalCrmController {
   }
 
   @Get('auto-mapping/:crm_name/:object_type')
-  async getAutoMapping(@Param('crm_name') crmName: string,  @Param('object_type') objectType:string,@Req() request: ZautoRequest) {
-    const orgId = request.orgId;
+  async getAutoMapping(@Param('crm_name') crmName: string, @Param('object_type') objectType: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -83,7 +83,7 @@ export class ExternalCrmController {
 
   @Delete('revoke/:crm_name')
   async revoke(@Param('crm_name') crmName: string, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
