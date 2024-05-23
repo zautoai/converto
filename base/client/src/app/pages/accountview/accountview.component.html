@@ -1,4 +1,8 @@
 <div class="profile-card bg-light row mt-2">
+  <a routerLink="/accounts"
+    ><i class="fa fa-arrow-left fs-6 text-primary"></i>
+  </a>
+
   <div class="col-6 p-3">
     <div class="d-flex align-item-center justify-content-start gap-5">
       <div class="mt-5">
@@ -8,113 +12,133 @@
         />
       </div>
       <div>
-        <h5>
-          {{selectedData.accountName}}
-        </h5>
-        <p class="text-muted">{{ selectedData.industry}}</p>
+        <a href="{{ selectedData.website }}">
+          <h5>
+            {{ selectedData.accountName }}
+          </h5>
+        </a>
+        <p class="text-muted">{{ selectedData.industry }}</p>
         <div class="info-item">
           <i class="fe fe-map-pin"></i>
-          <span>Location: {{selectedData.country}}</span>
+          <span>Location: {{ selectedData.country }}</span>
         </div>
         <div class="info-item">
           <i class="fas fa-dollar"></i>
-          <span>Revenue: {{selectedData.annualRevenue
-          }}</span>
+          <span>Revenue: {{ selectedData.annualRevenue }}</span>
         </div>
         <div class="info-item">
           <i class="fas fa-building"></i>
-          <span>Company Size: {{selectedData.companySize}}</span>
+          <span>Company Size: {{ selectedData.companySize }}</span>
         </div>
         <div class="info-item">
           <i class="fas fa-envelope"></i>
-          <span>Email: {{selectedData.email}}</span>
+          <span>Email: {{ selectedData.email }}</span>
         </div>
-        <div class="info-item  mt-6">
+        <div class="info-item mt-6">
           <div class="social-icons mt-4">
-            <a href="https://twitter.com/yourprofile" class="text-muted mx-3"  target="_blank"><i class="fab fa-twitter "></i></a>
-            <a href="https://facebook.com/yourprofile" class="text-muted mx-3" target="_blank"><i class="fab fa-facebook "></i></a>
-            <a href="https://linkedin.com/in/yourprofile" class="text-muted mx-3" target="_blank"><i class="fab fa-linkedin "></i></a>
-            <a href="https://instagram.com/yourprofile" class="text-muted mx-3" target="_blank"><i class="fab fa-instagram "></i></a>
-        </div>
+            <a
+              href="https://twitter.com/yourprofile"
+              class="text-muted mx-3"
+              target="_blank"
+              ><i class="fab fa-twitter fs-6"></i
+            ></a>
+            <a
+              href="https://facebook.com/yourprofile"
+              class="text-muted mx-3"
+              target="_blank"
+              ><i class="fab fa-facebook"></i
+            ></a>
+            <a
+              href="https://linkedin.com/in/yourprofile"
+              class="text-muted mx-3"
+              target="_blank"
+              ><i class="fab fa-linkedin"></i
+            ></a>
+            <a
+              href="https://instagram.com/yourprofile"
+              class="text-muted mx-3"
+              target="_blank"
+              ><i class="fab fa-instagram"></i
+            ></a>
+          </div>
         </div>
       </div>
     </div>
-    
   </div>
   <!--right Side-->
-  <div class="col-5 me-2 mt-3 "> 
+  <div class="col-5 me-2 mt-3">
     <div class="row border p-2 shadow-sm">
- 
-        <div class="col-6 mt-3 ">
-          <div class="single-chart">
-            <svg viewBox="0 0 36 36" class="circular-chart blue">
-              <path class="circle-bg"
-                d="M18 2.0845
+      <div class="col-6 mt-3">
+        <div class="single-chart">
+          <svg viewBox="0 0 36 36" class="circular-chart blue">
+            <path
+              class="circle-bg"
+              d="M18 2.0845
                   a 15.9155 15.9155 0 0 1 0 31.831
                   a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-              <path class="circle"
-                stroke-dasharray="70, 100"
-                d="M18 2.0845
+            />
+            <path
+              class="circle"
+              stroke-dasharray="70, 100"
+              d="M18 2.0845
                   a 15.9155 15.9155 0 0 1 0 31.831
                   a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-              <text x="18" y="20.35" class="percentage">90%</text>
-            </svg>
-          </div>
-          <h4 class="mt-4 ms-4">Lead Scoring</h4>
+            />
+            <text x="18" y="20.35" class="percentage">90%</text>
+          </svg>
         </div>
-        
-        <div class="col-6 mt-3 ">
-          <div class="single-chart">
-            <svg viewBox="0 0 36 36" class="circular-chart blue">
-              <path class="circle-bg"
-                d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-              <path class="circle"
-                stroke-dasharray="70, 100"
-                d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-              <text x="18" y="20.35" class="percentage">90%</text>
-            </svg>
-          </div>
-          <h4 class="mt-4 ms-4">Intent Scoring</h4>
-        </div>
-        
-        
-    </div> 
-    <div class="col-md-12 " style="margin-top:20px;">
-      <div class="">
-       <div  for="segment" class="mb-2 label me-1 ">Mid Market</div>
-       <div for="segment" class="mb-2 label me-1">High Potential</div>
-       <div for="segment" class="mb-2 label me-1">ICP Match</div>
-       <div for="segment" class="mb-2 label me-1">ICP Match</div>
+        <h4 class="mt-4 ms-4">Predictive Lead Scoring</h4>
       </div>
-  
-     </div>
-</div>
-<!--bottom-->
-<div class="p-3 border mt-1">
-  <p class="text-muted mb-0">
-    <strong>AI Insights:</strong> popular belief, Lorem Ipsum is not simply
-    random text. It has roots in a piece of classical Latin literature.
-  </p>
-</div>
+
+      <div class="col-6 mt-3">
+        <div class="single-chart">
+          <svg viewBox="0 0 36 36" class="circular-chart blue">
+            <path
+              class="circle-bg"
+              d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <path
+              class="circle"
+              stroke-dasharray="70, 100"
+              d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <text x="18" y="20.35" class="percentage">90%</text>
+          </svg>
+        </div>
+        <h4 class="mt-4 ms-4">Intent Scoring</h4>
+      </div>
+    </div>
+    <div class="col-md-12" style="margin-top: 26px">
+      <div class="">
+        <div for="segment" class="mb-2 label me-1">Mid Market</div>
+        <div for="segment" class="mb-2 label me-1">High Potential</div>
+        <div for="segment" class="mb-2 label me-1">ICP Match</div>
+        <div for="segment" class="mb-2 label me-1">ICP Match</div>
+      </div>
+    </div>
+  </div>
+  <!--bottom-->
+  <div class="p-3 border mt-1">
+    <p class="text-muted mb-0">
+      <strong>AI Insights:</strong> popular belief, Lorem Ipsum is not simply
+      random text. It has roots in a piece of classical Latin literature.
+    </p>
+  </div>
 </div>
 
 <!--below tab-->
 <div class="tab-menu-heading border-bottom-0" style="border: none !important">
   <div class="tabs-menu1">
     <ul ngbNav #nav="ngbNav" [(activeId)]="active">
-      <li class="me-2 mb-1" [ngbNavItem]="1">
+      <!-- <li class="me-2 mb-1" [ngbNavItem]="1">
         <a ngbNavLink><i class="fe fe-eye"></i> Overview</a>
         <ng-template ngbNavContent>
-          <br />
-          <div class="row">
+          <br /> -->
+      <!-- <div class="row">
             <div class="col-md-12"></div>
             <div class="col-md-12">
               <div class="card shadow-sm">
@@ -131,8 +155,8 @@
                     </li>
                   </ul>
                 </div>
-              </div>
-              <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
+              </div> -->
+      <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                               <h5 class="card-title">Contact Information</h5>  </div>
                             <div class="card-body">
                               <ul class="list-group">
@@ -149,7 +173,7 @@
                               </ul>
                             </div>
                           </div> -->
-              <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
+      <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                             <h5 class="card-title">Business Details </h5>  </div>
                           <div class="card-body">
                             <ul class="list-group">
@@ -159,7 +183,7 @@
                                </ul>
                           </div>
                         </div> -->
-              <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
+      <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                           <h5 class="card-title">Status and Timeline</h5>  </div>
                         <div class="card-body">
                           <ul class="list-group">
@@ -170,7 +194,7 @@
                           </ul>
                         </div>
                       </div> -->
-              <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
+      <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                         <h5 class="card-title">Additional Information</h5>  </div>
                       <div class="card-body">
                         <ul class="list-group">
@@ -180,7 +204,7 @@
                         </ul>
                       </div>
                     </div> -->
-              <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
+      <!-- <div class="card shadow-sm mt-3">  <div class="card-header">
                       <h5 class="card-title">Optional Fields</h5>  </div>
                     <div class="card-body">
                       <ul class="list-group">
@@ -195,11 +219,11 @@
                         </ul>
                     </div>
                   </div> -->
-            </div>
+      <!-- </div>
           </div>
         </ng-template>
-      </li>
-      <li class="me-2 mb-1" [ngbNavItem]="2">
+      </li> -->
+      <li class="me-2 mb-1" [ngbNavItem]="1">
         <a ngbNavLink><i class="fe fe-activity"></i> Activity</a>
         <ng-template ngbNavContent>
           <!--activity-->

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { error } from 'console';
 import { response } from 'express';
 import { API } from 'src/app/config/endpoint.config';
@@ -7,12 +7,17 @@ import { NotificationService } from 'src/app/shared/services/notification.servic
 import { RestService } from 'src/app/shared/services/rest.service';
 import { DatePipe } from '@angular/common';
 
+
 @Component({
   selector: 'app-accountview',
   templateUrl: './accountview.component.html',
   styleUrl: './accountview.component.scss'
 })
 export class AccountviewComponent {
+ 
+calltoaction() {
+  this.router.navigate(['../accounts']);
+}
 
   userImageUrl = 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600';
   userName = 'Erica Goodig'; 
@@ -32,8 +37,7 @@ export class AccountviewComponent {
     private route: ActivatedRoute,
     private restService: RestService,
     private notifService: NotificationService,
-
-  
+    private router: Router
   ) {}
 
   ngOnInit(): void {

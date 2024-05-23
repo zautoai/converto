@@ -5,8 +5,13 @@
         <i class="fa-solid fa-file-invoice"></i> Accounts
       </h3>
       <div class="card-options">
-        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addUser"
-          (click)="openCreateUser()">
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#addUser"
+          (click)="openCreateUser()"
+        >
           <i class="fa fa-plus"></i>
           Create Accounts
         </button>
@@ -15,51 +20,66 @@
 
     <div class="card-body">
       <div class="table-responsive mb-3">
-        <table class="table border card-table table-vcenter text-nowrap align-items-center">
+        <table
+          class="table border card-table table-vcenter text-nowrap align-items-center"
+        >
           <thead class="bg-primary text-white">
             <th class="text-white">Accountname</th>
             <th class="text-white">Industry</th>
             <th class="text-white">Company Size</th>
             <th class="text-white">Location</th>
-          
+
             <th class="text-white">Annual Reveneue</th>
             <th class="text-white">Status</th>
             <th class="text-white">Score</th>
-             <th class="text-white">Engagement</th>
+            <th class="text-white">Engagement</th>
 
             <th class="text-white">Action</th>
-          
-            
           </thead>
           <tbody>
             <ng-container>
-              <tr *ngFor="let data of submittedData">
+              <tr
+                *ngFor="let data of submittedData"
+                (mouseenter)="onMouseEnter(data)"
+              >
                 <td>
-                  {{ data.accountName }}
+                  <button [ngbPopover]="popContent" [popoverTitle]="popTitle">
+                    {{ data.accountName }}
+                  </button>
                 </td>
                 <td>
-                  {{ data.industry }}
+                  <button>
+                    {{ data.industry }}
+                  </button>
                 </td>
                 <td>
-                  {{ data.companySize}}
+                  <button>
+                    {{ data.companySize }}
+                  </button>
                 </td>
                 <td>
-                  {{data.city}}
+                  <button>
+                    {{ data.city }}
+                  </button>
                 </td>
-               
+
                 <td>
-                  {{ data.
-                    annualRevenue
-                    }}
-                </td>
-                <td>
-                  {{data.status}}
+                  <button>{{ data.annualRevenue }}</button>
                 </td>
                 <td>
-                  {{data.Score}}
+                  <button>
+                    {{ data.status }}
+                  </button>
                 </td>
                 <td>
-                  {{data.Engagement}}
+                  <button>
+                    {{ data.Score }}
+                  </button>
+                </td>
+                <td>
+                  <button>
+                    {{ data.Engagement }}
+                  </button>
                 </td>
                 <td class="icon w-1">
                   <button (click)="openViewUser(data)">
@@ -79,7 +99,11 @@
           </tbody>
         </table>
       </div>
-      <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
+      <app-pagination
+        [totalPages]="totalItems"
+        [limit]="limit"
+        (pageChanged)="onPageChange($event)"
+      />
     </div>
   </div>
 </div>
@@ -89,13 +113,22 @@
   <div class="modal-content">
     <div class="modal-header">
       <h4><i class="fa fa-exclamation-triangle"></i> Delete Form</h4>
-      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss('Cross click')"
+      ></button>
     </div>
     <div class="modal-body">
       <p>Are you sure you want to delete ?</p>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline-primary" (click)="closeModal()">
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="closeModal()"
+      >
         Cancel
       </button>
       <button class="btn btn-danger" type="button">Yes</button>
@@ -106,102 +139,236 @@
 <ng-template #createUserOffcanvas let-offcanvas>
   <div class="offcanvas-header">
     <h4 class="offcanvas-title"><i class="fe fe-cube"></i> Create Accounts</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="offcanvas.dismiss()"
+    ></button>
   </div>
   <hr class="m-0" />
   <div class="offcanvas-body">
     <form [formGroup]="Form" (ngSubmit)="onCreateuserSubmit()">
       <div class="form-group">
         <label class="form-label">ParentaccountId</label>
-        <input type="text" class="form-control" formControlName="parentAccountId" name="title"  (keydown)="preventDefault($event)"
-          placeholder="parentAccountId" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="parentAccountId"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="parentAccountId"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">PhotoURL</label>
-        <input type="text" class="form-control" formControlName="photoUrl" name="title"  (keydown)="preventDefault($event)" placeholder="photourl" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="photoUrl"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="photourl"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Accountname</label>
-        <input type="text" class="form-control" formControlName="accountName" name="title"  (keydown)="preventDefault($event)" placeholder="accountName" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="accountName"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="accountName"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Industry</label>
-        <input type="text" class="form-control" formControlName="industry" name="title"  (keydown)="preventDefault($event)" placeholder="industry" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="industry"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="industry"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Companysize</label>
-        <input type="number" class="form-control" formControlName="companySize"   (keydown)="preventDefault($event)" name="title"
-          placeholder="companysize" />
+        <input
+          type="number"
+          class="form-control"
+          formControlName="companySize"
+          (keydown)="preventDefault($event)"
+          name="title"
+          placeholder="companysize"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Annualreveneue</label>
-        <input type="number" class="form-control" formControlName="annualRevenue"   (keydown)="preventDefault($event)"name="title"
-          placeholder="annualreveneue" />
+        <input
+          type="number"
+          class="form-control"
+          formControlName="annualRevenue"
+          (keydown)="preventDefault($event)"
+          name="title"
+          placeholder="annualreveneue"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">AccountType</label>
-        <input type="text" class="form-control" formControlName="accountType" name="title"  (keydown)="preventDefault($event)" placeholder="accounttype" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="accountType"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="accounttype"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Website</label>
-        <input type="text" class="form-control" formControlName="website" name="title"   (keydown)="preventDefault($event)" placeholder="website" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="website"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="website"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Address</label>
-        <input type="text" class="form-control" formControlName="address" name="title"   (keydown)="preventDefault($event)" placeholder="address" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="address"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="address"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">City</label>
-        <input type="text" class="form-control" formControlName="city" name="title"   (keydown)="preventDefault($event)" placeholder="city" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="city"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="city"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">State</label>
-        <input type="text" class="form-control" formControlName="state" name="title"  (keydown)="preventDefault($event)" placeholder="state" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="state"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="state"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Zip</label>
-        <input type="text" class="form-control" formControlName="zip" name="title"  (keydown)="preventDefault($event)"  placeholder="zip" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="zip"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="zip"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Socialmedia</label>
-        <input type="text" class="form-control" formControlName="socialMedia" name="title"   (keydown)="preventDefault($event)"placeholder="socialmedia" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="socialMedia"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="socialmedia"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Notes</label>
-        <input type="text" class="form-control" formControlName="notes" name="title"  (keydown)="preventDefault($event)" placeholder="notes" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="notes"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="notes"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Source</label>
-        <input type="text" class="form-control" formControlName="source" name="title"     (keydown)="preventDefault($event)"placeholder="source" />
+        <input
+          type="text"
+          class="form-control"
+          formControlName="source"
+          name="title"
+          (keydown)="preventDefault($event)"
+          placeholder="source"
+        />
       </div>
 
       <div class="form-group">
         <label class="form-label">Phone</label>
-        <input rows="5" placeholder="phone" formControlName="phone"  (keydown)="preventDefault($event)"
-          class="form-control ng-pristine ng-invalid ng-touched" />
+        <input
+          rows="5"
+          placeholder="phone"
+          formControlName="phone"
+          (keydown)="preventDefault($event)"
+          class="form-control ng-pristine ng-invalid ng-touched"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input placeholder="Email" formControlName="email"   (keydown)="preventDefault($event)"class="form-control  ng-pristine ng-invalid ng-touched" />
+        <input
+          placeholder="Email"
+          formControlName="email"
+          (keydown)="preventDefault($event)"
+          class="form-control ng-pristine ng-invalid ng-touched"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Country</label>
-        <input placeholder="country" formControlName="country"   (keydown)="preventDefault($event)"class="form-control ng-pristine ng-invalid ng-touched" />
+        <input
+          placeholder="country"
+          formControlName="country"
+          (keydown)="preventDefault($event)"
+          class="form-control ng-pristine ng-invalid ng-touched"
+        />
       </div>
       <div class="form-group">
         <label class="form-label">Status</label>
-        <input placeholder="status" formControlName="status"   (keydown)="preventDefault($event)" class="form-control ng-pristine ng-invalid ng-touched" />
+        <input
+          placeholder="status"
+          formControlName="status"
+          (keydown)="preventDefault($event)"
+          class="form-control ng-pristine ng-invalid ng-touched"
+        />
       </div>
-     
-        <label class="custom-control custom-checkbox mb-2">
-          <input type="checkbox" name="label" class="custom-control-input" formControlName="isabm" />
-          <span class="custom-control-label">Is Account Based Marketing</span>
-        </label>
-      
-      
+
+      <label class="custom-control custom-checkbox mb-2">
+        <input
+          type="checkbox"
+          name="label"
+          class="custom-control-input"
+          formControlName="isabm"
+        />
+        <span class="custom-control-label">Is Account Based Marketing</span>
+      </label>
 
       <div class="d-flex justify-content-end mt-4">
-        <button class="btn btn-outline-primary me-3" type="button"  (click)="offcanvas.dismiss()">
+        <button
+          class="btn btn-outline-primary me-3"
+          type="button"
+          (click)="offcanvas.dismiss()"
+        >
           <i class="fa fa-times"></i>Close
         </button>
         <button class="btn btn-primary" type="submit">
@@ -215,115 +382,241 @@
 <ng-template #updateUserOffcanvas let-offcanvas>
   <div class="offcanvas-header">
     <h4 class="offcanvas-title"><i class="fe fe-user"></i>Edit Accounts</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="offcanvas.dismiss()"
+    ></button>
   </div>
   <hr class="m-0" />
   <div class="offcanvas-body">
     <form [formGroup]="Form" (ngSubmit)="onUpdateuserSubmit()">
       <div class="form-group">
         <label class="form-label">ParentaccountId</label>
-        <input type="title" class="form-control" formControlName="parentAccountId" name="Title"
-          placeholder="parentAccountId" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="parentAccountId"
+          name="Title"
+          placeholder="parentAccountId"
+        />
         <div class="invalid-feedback">{{ errorFeedback.email }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">PhotoURL</label>
-        <input type="title" class="form-control" formControlName="photoUrl" name="Title" placeholder="photoUrl" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="photoUrl"
+          name="Title"
+          placeholder="photoUrl"
+        />
         <div class="invalid-feedback">{{ errorFeedback.email }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Accountname</label>
-        <input type="title" class="form-control" formControlName="accountName" name="Title" placeholder="accountName" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="accountName"
+          name="Title"
+          placeholder="accountName"
+        />
         <div class="invalid-feedback">{{ errorFeedback.email }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Industry</label>
-        <input type="title" class="form-control" formControlName="industry" name="Title" placeholder="industry" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="industry"
+          name="Title"
+          placeholder="industry"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Companysize</label>
-        <input type="number" class="form-control" formControlName="companySize" name="Title" placeholder="companySize" />
+        <input
+          type="number"
+          class="form-control"
+          formControlName="companySize"
+          name="Title"
+          placeholder="companySize"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Annualreveneue</label>
-        <input type="number" class="form-control" formControlName="annualRevenue" name="Title"
-          placeholder="annualRevenue" />
+        <input
+          type="number"
+          class="form-control"
+          formControlName="annualRevenue"
+          name="Title"
+          placeholder="annualRevenue"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">AccountType</label>
-        <input type="title" class="form-control" formControlName="accountType" name="Title" placeholder="accountType" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="accountType"
+          name="Title"
+          placeholder="accountType"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Website</label>
-        <input type="title" class="form-control" formControlName="website" name="Title" placeholder="website" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="website"
+          name="Title"
+          placeholder="website"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Address</label>
-        <input type="title" class="form-control" formControlName="address" name="Title" placeholder="address" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="address"
+          name="Title"
+          placeholder="address"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">City</label>
-        <input type="title" class="form-control" formControlName="city" name="Title" placeholder="city" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="city"
+          name="Title"
+          placeholder="city"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">State</label>
-        <input type="title" class="form-control" formControlName="state" name="Title" placeholder="state" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="state"
+          name="Title"
+          placeholder="state"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Zip</label>
-        <input type="title" class="form-control" formControlName="zip" name="Title" placeholder="zip" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="zip"
+          name="Title"
+          placeholder="zip"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Country</label>
-        <input type="title" class="form-control" formControlName="country" name="Title" placeholder="country" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="country"
+          name="Title"
+          placeholder="country"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Phone</label>
-        <input type="title" class="form-control" formControlName="phone" name="Title" placeholder="phone" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="phone"
+          name="Title"
+          placeholder="phone"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="title" class="form-control" formControlName="email" name="Title" placeholder="email" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="email"
+          name="Title"
+          placeholder="email"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Socialmedia</label>
-        <input type="title" class="form-control" formControlName="socialMedia" name="Title" placeholder="socialMedia" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="socialMedia"
+          name="Title"
+          placeholder="socialMedia"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Notes</label>
-        <input type="title" class="form-control" formControlName="notes" name="Title" placeholder="notes" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="notes"
+          name="Title"
+          placeholder="notes"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Source</label>
-        <input type="title" class="form-control" formControlName="source" name="Title" placeholder="source" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="source"
+          name="Title"
+          placeholder="source"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <div class="form-group">
         <label class="form-label">Status</label>
-        <input type="title" class="form-control" formControlName="status" name="Title" placeholder="status" />
+        <input
+          type="title"
+          class="form-control"
+          formControlName="status"
+          name="Title"
+          placeholder="status"
+        />
         <div class="invalid-feedback">{{ errorFeedback.password }}</div>
       </div>
       <label class="custom-control custom-checkbox mb-2">
-        <input type="checkbox" name="label" class="custom-control-input" formControlName="isabm" />
+        <input
+          type="checkbox"
+          name="label"
+          class="custom-control-input"
+          formControlName="isabm"
+        />
         <span class="custom-control-label">Is Account Based Marketing</span>
       </label>
       <div class="d-flex justify-content-end">
-        <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()">
+        <button
+          class="btn btn-outline-primary me-3"
+          type="button"
+          (click)="offcanvas.dismiss()"
+        >
           <i class="fa fa-times"></i> Close
         </button>
         <button class="btn btn-primary" type="submit">
@@ -337,7 +630,12 @@
 <ng-template #viewUserOffcanvas let-offcanvas>
   <div class="offcanvas-header">
     <h5 class="offcanvas-title"><i class="fe fe-cube"></i> View Accounts</h5>
-    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="offcanvas.dismiss()"
+    ></button>
   </div>
   <hr class="m-0" />
   <div class="offcanvas-body">
@@ -363,7 +661,67 @@
       <p><strong>Notes:</strong> {{ selectedData.notes }}</p>
       <p><strong>Source:</strong> {{ selectedData.source }}</p>
       <p><strong>Status:</strong> {{ selectedData.status }}</p>
-      <p><strong>is Account Based Marketing: </strong> {{selectedData.isabm}} </p>
+      <p>
+        <strong>is Account Based Marketing: </strong> {{ selectedData.isabm }}
+      </p>
+    </div>
+  </div>
+</ng-template>
+<ng-template #popTitle>
+  <!-- <h5 class="card-title">Account Overview</h5> -->
+</ng-template>
+<ng-template #popContent>
+  <div class="card mb-3" style="max-width: 1800px">
+    <div class="card-body text-primary">
+      <p class="card-text">
+        <strong>Account Name:</strong> {{ hoveredData.accountName }}<br />
+        <strong>Industry:</strong> {{ hoveredData.industry }}<br />
+      </p>
+      <div class="d-flex">
+        <div class="col-6 mt-3">
+          <div class="single-chart">
+            <svg viewBox="0 0 36 36" class="circular-chart blue">
+              <path
+                class="circle-bg"
+                d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9045 0 0 1 0 -31.831"
+              />
+              <path
+                class="circle"
+                stroke-dasharray="70, 100"
+                d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+              <text x="18" y="20.35" class="percentage">90%</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="col-6 mt-3">
+          <div class="single-chart">
+            <svg viewBox="0 0 36 36" class="circular-chart green">
+              <path
+                class="circle-bg"
+                d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9045 0 0 1 0 -31.831"
+              />
+              <path
+                class="circle"
+                stroke-dasharray="70, 100"
+                d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+              <text x="18" y="20.35" class="percentage">75%</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="badge-group mt-3">
+        <span class="badge badge-light text-dark mr-1 mx-3">Mid Market</span>
+        <span class="badge badge-light text-dark mr-1">High Potential</span>
+        <!-- Add more labels here -->
+      </div>
     </div>
   </div>
 </ng-template>

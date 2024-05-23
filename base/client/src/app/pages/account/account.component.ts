@@ -23,6 +23,12 @@ import { error } from 'console';
   styleUrl: './account.component.scss',
 })
 export class AccountsComponent implements OnInit {
+  
+onMouseEnter(data: any) {
+this.hoveredData=data;
+console.log("hovereddata",this.hoveredData)
+
+}
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
@@ -40,6 +46,7 @@ export class AccountsComponent implements OnInit {
   selectedData: any = null;
   totalItems: number = 0;
   accountcontact: Object="";
+  hoveredData: any;
 
   constructor(
     private avatarService: AvatarService,
@@ -121,10 +128,7 @@ export class AccountsComponent implements OnInit {
     console.log("datas",data.id)
     this.router.navigate(['accounts/view-account', data.id]);
 
-  
-
-
-    
+      
     // this.offcanvasService.open(this.viewUserOffcanvas, {
     //   position: 'end',
     //   backdrop: 'static',
