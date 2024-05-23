@@ -25,6 +25,10 @@ export class SchemaManager {
       } catch (error) {
         console.error('Error applying migration:', error);
       }
+      finally
+      {
+        prisma.$disconnect();
+      }
       return {
         code: 200,
         success: true,
@@ -33,6 +37,10 @@ export class SchemaManager {
     } catch (error) {
       rollback();
       throw error;
+    }
+    finally
+    {
+      prisma.$disconnect();
     }
   }
 
@@ -51,8 +59,8 @@ export class SchemaManager {
   }
 
   async delete(orgId: string): Promise<void> {
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     try {
-      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
       const schemaName = getSchemaName(orgId);
       const query: Sql = Prisma.sql`DROP SCHEMA IF EXISTS ${raw(schemaName)} CASCADE;`;
       await prisma.$executeRaw(query);
@@ -60,12 +68,16 @@ export class SchemaManager {
       console.error('Error deleting tenant schema:', error);
       throw error;
     }
+    finally
+    {
+      prisma.$disconnect();
+    }
   }
 
   async applyMigration(orgId: string, rollback?: Function) {
+    const schemaName = getSchemaName(orgId);
+    const prisma = await this.prismaClientManager.getClient(orgId);
     try {
-      const schemaName = getSchemaName(orgId);
-      const prisma = await this.prismaClientManager.getClient(orgId);
       await prisma.$executeRaw(
         Prisma.sql`SET search_path TO ${raw(schemaName)}`,
       );
@@ -86,16 +98,25 @@ export class SchemaManager {
           catch (error) {
             this.logger.error('Error executing migration statement:', error.message);
           }
+          finally
+          {
+            prisma.$disconnect();
+          }
         }
         this.logger.debug('Migration applied:', migrationFile);
       }
       this.logger.debug('All migrations applied for tenant:', orgId);
-    } catch (error) {
+    } 
+    catch (error) {
       if (rollback) {
         rollback();
       }
       console.error('Error applying migrations for tenant:', error);
       throw error;
+    }
+    finally
+    {
+      prisma.$disconnect();
     }
   }
 

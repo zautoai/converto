@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
 import { getSchemaName } from 'src/common/helpers/cast.helper';
 
 @Injectable()
-export class PrismaClientManager {
+export class PrismaClientManager implements OnModuleDestroy{
     private logger = new Logger(PrismaClientManager.name);
     private clients: { [key: string]: PrismaClient } = {};
 
