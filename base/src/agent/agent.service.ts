@@ -47,232 +47,334 @@ export class AgentService extends BaseService{
       fileIds: [fileId]
     });
     const prisma = await this.getPrismaClient(orgId);
-    await prisma.agent.update({data: {
-      assistantId: assistant.id,
-    }, where: {id: agent.id}});
+    try
+    {
+      await prisma.agent.update({data: {
+        assistantId: assistant.id,
+      }, where: {id: agent.id}});
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
+    }
   }
 
   async create(serviceParams: ServiceParams<CreateAgentDto>) {
     const {orgId, data: createAgentDto, fileId} = serviceParams;
-    const isExist = await this.isNameExists(orgId,createAgentDto.name);
-
-    //Default UseAssistant for all avatar
-    createAgentDto.useAssistant = true;
-    const useAssistant = createAgentDto.useAssistant;
-
-    //Default LLM Model for all avatar
-    createAgentDto.llmModel = process.env.OPENAI_ASSISTANT_DEFAULT_MODEL;
-
-    if (isExist) {
-      throw new ConflictException('Agent name alread taken.')
-    } else {
-      const prisma = await this.getPrismaClient(orgId);
-      createAgentDto.welcomeMsg = this.getWelcomeMessage({...createAgentDto});
-      const agent = await prisma.agent.create({ data: createAgentDto });
-      setImmediate(async () => {
-        const instruction = await this.promptService.getAssistantPrompt(orgId,agent);
-        await this.chroma.createNameSapce(agent.name);
-        await this.promptService.create({orgId, data: {agentId: agent.id, type: 'system', text: instruction}})
-        //Create Default stages for agent
-        if (agent) {
-          await this.stageService.setDefaultStages(orgId,agent);
-        }
-
-        //create file if fileId found
-        if (fileId) {
-          await prisma.agentFile.create({
-            data: {
-              agentId: agent.id,
-              fileId: fileId
-            }
-          });
-        }
-      })
-
-      return agent;
+    const prisma = await this.getPrismaClient(orgId);
+    try
+    {
+      const isExist = await this.isNameExists(orgId,createAgentDto.name);
+      //Default UseAssistant for all avatar
+      createAgentDto.useAssistant = true;
+      const useAssistant = createAgentDto.useAssistant;
+      //Default LLM Model for all avatar
+      createAgentDto.llmModel = process.env.OPENAI_ASSISTANT_DEFAULT_MODEL;
+  
+      if (isExist) {
+        throw new ConflictException('Agent name alread taken.')
+      } else {
+        createAgentDto.welcomeMsg = this.getWelcomeMessage({...createAgentDto});
+        const agent = await prisma.agent.create({ data: createAgentDto });
+        setImmediate(async () => {
+          const instruction = await this.promptService.getAssistantPrompt(orgId,agent);
+          await this.chroma.createNameSapce(agent.name);
+          await this.promptService.create({orgId, data: {agentId: agent.id, type: 'system', text: instruction}})
+          //Create Default stages for agent
+          if (agent) {
+            await this.stageService.setDefaultStages(orgId,agent);
+          }
+  
+          //create file if fileId found
+          if (fileId) {
+            await prisma.agentFile.create({
+              data: {
+                agentId: agent.id,
+                fileId: fileId
+              }
+            });
+          }
+        })
+  
+        return agent;
+      }
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async findAll(serviceParams: ServiceParams<PaginationDto>) {
     const { orgId, data: paginationDto } = serviceParams;
-    const { page, limit } = paginationDto;
-    const skip = (page - 1) * limit;
     const prisma = await this.getPrismaClient(orgId);
-    const agents = await prisma.agent.findMany({
-      skip,
-      take: limit, where: { status: { not: AgentStatus.DELETED } }
-    });
-    const total = await prisma.agent.count();
-    return {
-      data: agents,
-      page: page,
-      total: total,
-    };
+    try
+    {
+      const { page, limit } = paginationDto;
+      const skip = (page - 1) * limit;
+      const agents = await prisma.agent.findMany({
+        skip,
+        take: limit, where: { status: { not: AgentStatus.DELETED } }
+      });
+      const total = await prisma.agent.count();
+      return {
+        data: agents,
+        page: page,
+        total: total,
+      };
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
+    }
   }
 
   async findAllByOrg(serviceParams: ServiceParams<PaginationDto>) {
     const {orgId, data: paginationDto} = serviceParams;
-    const { page, limit } = paginationDto;
-    const skip = (page - 1) * limit;
     const prisma = await this.getPrismaClient(orgId);
-    const agents = await prisma.agent.findMany({
-      skip,
-      take: limit,
-      where: {status: { not: AgentStatus.DELETED}}
-    });
-    const total = await prisma.agent.count();
-    return {
-      data: agents,
-      page: page,
-      total: total,
-    };
+    try
+    {
+
+      const { page, limit } = paginationDto;
+      const skip = (page - 1) * limit;
+      const agents = await prisma.agent.findMany({
+        skip,
+        take: limit,
+        where: {status: { not: AgentStatus.DELETED}}
+      });
+      const total = await prisma.agent.count();
+      return {
+        data: agents,
+        page: page,
+        total: total,
+      };
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
+    }
   }
 
   async findOne(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst();
-    if (agent) {
-      return agent;
-    } else {
-      throw new NotFoundException(`Agent not found with id ${id}`);
+    try
+    {
+      const agent = await prisma.agent.findFirst();
+      if (agent) {
+        return agent;
+      } else {
+        throw new NotFoundException(`Agent not found with id ${id}`);
+      }
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async findOneByOrg(orgId: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst();
-    if (agent) {
-      return agent;
-    } else {
-      return null;
+    try{
+      const agent = await prisma.agent.findFirst();
+      if (agent) {
+        return agent;
+      } else {
+        return null;
+      }
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async update(serviceParams: ServiceParams<UpdateAgentDto>) {
     const {orgId, data: updateAgentDto, id} = serviceParams;
-    const welcomeMsg = this.getWelcomeMessage({...updateAgentDto});
-    updateAgentDto.welcomeMsg = welcomeMsg;
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst({
-      where: { id },
-    });
-    if (agent) {
-      const updatedAgent = await prisma.agent.update({
-        data: updateAgentDto,
+    try
+    {
+      const welcomeMsg = this.getWelcomeMessage({...updateAgentDto});
+      updateAgentDto.welcomeMsg = welcomeMsg;
+      const agent = await prisma.agent.findFirst({
         where: { id },
       });
-      const prompt = await this.promptService.getAssistantPrompt(orgId,agent);
-      const agentPrompt = await this.promptService.updateByAgent({orgId,data:{type: 'system', text: prompt},agentId: agent.id})
-      const agentFile = await prisma.agentFile.findFirst({
-        where: {
-          agentId: agent.id
-        }
-      })
-      await this.promptService.updateAssistent(agent, agentPrompt, agentFile);
-      return updatedAgent;
-      // await this.llmService.updateAgent({
-      //   id: agent.assistantId,
-      //   instructions: agentPrompt.text,
-      //   model: agent.llmModel,
-      //   fileIds: [agentFile.id], 
-      //   name: agent.displayName
-      // });
-    } else {
-      throw new NotFoundException(`Agent not found with id ${id}`);
+      if (agent) {
+        const updatedAgent = await prisma.agent.update({
+          data: updateAgentDto,
+          where: { id },
+        });
+        const prompt = await this.promptService.getAssistantPrompt(orgId,agent);
+        const agentPrompt = await this.promptService.updateByAgent({orgId,data:{type: 'system', text: prompt},agentId: agent.id})
+        const agentFile = await prisma.agentFile.findFirst({
+          where: {
+            agentId: agent.id
+          }
+        })
+        await this.promptService.updateAssistent(agent, agentPrompt, agentFile);
+        return updatedAgent;
+      } else {
+        throw new NotFoundException(`Agent not found with id ${id}`);
+      }
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async updateStyles(serviceParams: ServiceParams<{id: string, styledata: any}>) {
     const {orgId, data} = serviceParams;
-    const {id, styledata} = data;
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst({
-      where: { id },
-    });
-    if (agent) {
-      const data = {
-        ...styledata.styles ? { styles: styledata.styles } : {},
-        ...styledata.wakeupTime ? { wakeupTime: styledata.wakeupTime } : {},
-        ...styledata.position ? { position: styledata.position } : {},
-      }
-      const updatedAgent = await prisma.agent.update({
-        data: data,
+    try
+    {
+      const {id, styledata} = data;
+      const agent = await prisma.agent.findFirst({
         where: { id },
       });
-    } else {
-      throw new NotFoundException(`Agent not found with id ${id}`);
+      if (agent) {
+        const data = {
+          ...styledata.styles ? { styles: styledata.styles } : {},
+          ...styledata.wakeupTime ? { wakeupTime: styledata.wakeupTime } : {},
+          ...styledata.position ? { position: styledata.position } : {},
+        }
+        const updatedAgent = await prisma.agent.update({
+          data: data,
+          where: { id },
+        });
+      } else {
+        throw new NotFoundException(`Agent not found with id ${id}`);
+      }
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async updateLeadInfo(serviceParams: ServiceParams<{id: string, leadInfo: string}>) {
     const {orgId, data} = serviceParams;
-    const {id, leadInfo} = data;
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst({
-      where: { id },
-    });
-    if (agent) {
-      const updatedAgent = await prisma.agent.update({
-        data: { leadInfo },
+    try
+    {
+      const {id, leadInfo} = data;
+      const agent = await prisma.agent.findFirst({
         where: { id },
       });
-      const prompt = await this.promptService.getAssistantPrompt(orgId,updatedAgent)
-      const agentPrompt = await this.promptService.updateByAgent({orgId,agentId: agent.id, data: {type: 'system', text: prompt}});
-      const agentFile = await prisma.agentFile.findFirst({
-        where: {
-          agentId: agent.id
-        }
-      })
-      await this.promptService.updateAssistent(agent, agentPrompt, agentFile);
-      return updatedAgent;
-    } else {
-      throw new NotFoundException(`Agent not found with id ${id}`);
+      if (agent) {
+        const updatedAgent = await prisma.agent.update({
+          data: { leadInfo },
+          where: { id },
+        });
+        const prompt = await this.promptService.getAssistantPrompt(orgId,updatedAgent)
+        const agentPrompt = await this.promptService.updateByAgent({orgId,agentId: agent.id, data: {type: 'system', text: prompt}});
+        const agentFile = await prisma.agentFile.findFirst({
+          where: {
+            agentId: agent.id
+          }
+        })
+        await this.promptService.updateAssistent(agent, agentPrompt, agentFile);
+        return updatedAgent;
+      } else {
+        throw new NotFoundException(`Agent not found with id ${id}`);
+      }
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async updateStatus(serviceParams:ServiceParams<{id: string, status: AgentStatus}>) {
+    const {orgId, data} = serviceParams;
+    const {id, status} = data;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const {orgId, data} = serviceParams;
-      const {id, status} = data;
-      const prisma = await this.getPrismaClient(orgId);
       prisma.agent.update({data: {status}, where: {id}});
     } catch(error) {
-      console.log(error)
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async updateStarters(serviceParams: ServiceParams<{id: string, starters: string}>) {
+    const {orgId, data} = serviceParams;
+    const {id, starters} = data;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const {orgId, data} = serviceParams;
-      const {id, starters} = data;
-      const prisma = await this.getPrismaClient(orgId);
       return await prisma.agent.update({data: {starters}, where: {id}});
     } catch(error) {
-      console.log(error)
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async removeOldFile(serviceParams: ServiceParams<Agent>) {
     const {orgId, data: agent} = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
       const agentConfig = {
         id: agent.assistantId,
         fileId: agent.AgentFiles[0].fileId
       }
-      const prisma = await this.getPrismaClient(orgId);
       await this.llmService.unlinkFileFromAgent(agentConfig);
       await prisma.agentFile.delete({ where: { id: agent.AgentFiles[0].id } });
     } catch (error) {
       console.log(error)
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async updateTrainingStatus(serviceParams: ServiceParams<{agent: Agent, filePath: string}>) {
+    const {orgId, data} = serviceParams;
+    const {agent, filePath} = data;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const {orgId, data} = serviceParams;
-      const {agent, filePath} = data;
         const response = await this.s3Service.uploadTextFile(filePath);
-        const prisma = await this.getPrismaClient(orgId);
         await prisma.agent.update({data: {
           siteObjUrl: response.Location,
         }, where: { id: agent.id }
@@ -293,7 +395,11 @@ export class AgentService extends BaseService{
         this.removeOldFile({orgId,data:agent});
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
@@ -329,50 +435,83 @@ export class AgentService extends BaseService{
 
   async makeDeleted(orgId: string,id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst({
-      where: { id },
-    });
-    if (agent) {
-      return await prisma.agent.update({
-        data: { status: AgentStatus.DELETED },
+    try
+    {
+      const agent = await prisma.agent.findFirst({
         where: { id },
       });
-    } else {
-      throw new NotFoundException(`Agent not found with id ${id}`);
+      if (agent) {
+        return await prisma.agent.update({
+          data: { status: AgentStatus.DELETED },
+          where: { id },
+        });
+      } else {
+        throw new NotFoundException(`Agent not found with id ${id}`);
+      }
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async isNameExists(orgId:string,name: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst({where: {name: name}});
-    if(agent) {
-      return true;
-    } return false;
+    try
+    {
+      const agent = await prisma.agent.findFirst({where: {name: name}});
+      if(agent) {
+        return true;
+      } return false;
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
+    }
   }
 
   async updateLogo(serviceParams: ServiceParams<{id: string, logoUrl: string}>) {
     const {orgId, data} = serviceParams;
     const {id, logoUrl} = data;
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst({
-      where: { id },
-    });
-    if (agent) {
-      await this.staticFileService.deleteExistingFile(agent.logoUrl)
-      return await prisma.agent.update({
-        data: { logoUrl },
+    try
+    {
+      const agent = await prisma.agent.findFirst({
         where: { id },
       });
-    } else {
-      throw new NotFoundException(`Agent not found with id ${id}`);
+      if (agent) {
+        await this.staticFileService.deleteExistingFile(agent.logoUrl)
+        return await prisma.agent.update({
+          data: { logoUrl },
+          where: { id },
+        });
+      } else {
+        throw new NotFoundException(`Agent not found with id ${id}`);
+      }
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async launchAvatarWithAssistant(serviceParams: ServiceParams<CreateAvatarDto>) {
     const {orgId, data: createAvatarDto} = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
       const name = createAvatarDto.displayName.replaceAll(" ", "_").toLowerCase().trim();
-      const prisma = await this.getPrismaClient(orgId);
       const avatar = await prisma.agent.create({data: {
         displayName: createAvatarDto.displayName, 
         name,companyName: createAvatarDto.companyName,
@@ -408,10 +547,14 @@ export class AgentService extends BaseService{
       console.log(error)
       throw new InternalServerErrorException('Unable to create avatar');
     }
+    finally {
+      await this.closeConnection(orgId);
+    }
   }
 
   async updateAvatar(serviceParams: ServiceParams<CreateAgentDto>) {
     const {orgId, data: createAgentDto, id, fileId} = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
       //Default UseAssistant to false for all avatar
       createAgentDto.useAssistant = false;
@@ -421,7 +564,6 @@ export class AgentService extends BaseService{
     createAgentDto.llmModel = process.env.OPENAI_ASSISTANT_DEFAULT_MODEL;
     
     createAgentDto.welcomeMsg = this.getWelcomeMessage({...createAgentDto});
-    const prisma = await this.getPrismaClient(orgId);
     const existingAgent = await prisma.agent.findFirst();
     if(!existingAgent) {
       throw new InternalServerErrorException('Unable to create avatar');
@@ -450,6 +592,10 @@ export class AgentService extends BaseService{
       return agent;
     } catch (error) {
       console.error(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
@@ -458,46 +604,81 @@ export class AgentService extends BaseService{
   {
     const host = process.env.HOST_URL;
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst();
-    if(!agent)
+    try
     {
-      throw new NotFoundException();
+
+      const agent = await prisma.agent.findFirst();
+      if(!agent)
+      {
+        throw new NotFoundException();
+      }
+  
+      try {
+        const filePath = path.resolve(__dirname, '../../', 'public', 'assets', 'bot', 'js', 'zautobot_v2.js');
+        let jsCode = fs.readFileSync(filePath, 'utf8')
+          .replaceAll("{{avatarId}}", agentId)
+          .replaceAll("{{ApiUrl}}", host + "/")
+          .replaceAll("{{BaseUrl}}", host + "/")
+          .replaceAll("'{{standAloneFlag}}'", `${standalone}`)
+  
+        const options = { toplevel: true, };
+        const uglifiedCode = minify(jsCode, options).code;
+  
+        return uglifiedCode;
+      }
+      catch (error) {
+        console.log(error);
+        throw error;
+      }
     }
-
-    try {
-      const filePath = path.resolve(__dirname, '../../', 'public', 'assets', 'bot', 'js', 'zautobot_v2.js');
-      let jsCode = fs.readFileSync(filePath, 'utf8')
-        .replaceAll("{{avatarId}}", agentId)
-        .replaceAll("{{ApiUrl}}", host + "/")
-        .replaceAll("{{BaseUrl}}", host + "/")
-        .replaceAll("'{{standAloneFlag}}'", `${standalone}`)
-
-      const options = { toplevel: true, };
-      const uglifiedCode = minify(jsCode, options).code;
-
-      return uglifiedCode;
+    catch(error)
+    {
+      console.log(error);
+      throw error;
     }
-    catch (error) {
-      return (error);
+    finally {
+      await this.closeConnection(orgId);
     }
   }
 
   async getDefaultCampaign(orgId: string) {
     const prisma = await this.getPrismaClient(orgId);
-    return await prisma.campaign.findFirst({
-      where: {
-        isDefault: true
-      }
-    })
+    try
+    {
+      return await prisma.campaign.findFirst({
+        where: {
+          isDefault: true
+        }
+      })
+    }
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
+    }
   }
   async getCampaignByParam(orgId: string, params: string[], paramObj: any){
     const prisma = await this.getPrismaClient(orgId);
-    let campigns = await prisma.campaign.findMany({ where: {idParam: {in: params}}});
-    for(let campign of campigns) {
-      if(campign.idValue === paramObj[campign.idParam]) {
-        return campign;
+    try
+    {
+      let campigns = await prisma.campaign.findMany({ where: {idParam: {in: params}}});
+      for(let campign of campigns) {
+        if(campign.idValue === paramObj[campign.idParam]) {
+          return campign;
+        }
       }
+      return null;
     }
-    return null;
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeConnection(orgId);
+    }
   }
 }
