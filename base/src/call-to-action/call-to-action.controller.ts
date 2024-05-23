@@ -7,6 +7,7 @@ import { ZautoRequest } from 'src/common/models/request.model';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { UpdateCTADto } from './dto/update-cta.dto';
 import { CallToAction } from './entities/cta.entity';
+import { SelectCTADto } from './dto/select-cta.dto';
 
 @ApiTags('Call To Action')
 @Controller('api/cta')
@@ -29,7 +30,7 @@ export class CallToActionController {
     }
 
     @Post('select')
-    async select(@Body() selectCTADto: any, @Req() req: ZautoRequest) {
+    async select(@Body() selectCTADto: SelectCTADto[], @Req() req: ZautoRequest) {
         if (req.user && req.user.orgId) {
             return await this.callToActionService.selectCTA({ orgId: req.user.orgId, data: selectCTADto });
         }
