@@ -9,27 +9,32 @@ import * as PDFParser from 'pdf-parse';
 import { S3Service } from 'src/common/services/s3.service';
 import { FileUtilService } from 'src/common/services/file-utility.service';
 import { ChromaDBService } from 'src/chroma/chroma-dbservice/chroma-db.service';
+import { BaseService } from 'src/common/services/base.service';
+import { ServiceParams } from 'src/common/models/service-param.model';
 
 const MAX_TOTAL_FILE_SIZE = +process.env.MAX_TOTAL_FILE_SIZE * 1024 * 1024;
 
 @Injectable()
-export class FileManagerService {
+export class FileManagerService extends BaseService{
 
     constructor(
-        private readonly prisma: PrismaService,
         private readonly s3Service: S3Service,
         private fileService: FileUtilService,
         private chromaService: ChromaDBService,
-    ) { }
+    ) {
+        super();
+     }
 
-    async getFiles(orgId: string, paginationDto: PaginationDto) {
+    async getFiles(serviceParams: ServiceParams<PaginationDto>) {
+        const { orgId, data: paginationDto } = serviceParams;
         const { page, limit } = paginationDto;
         const skip = (page - 1) * limit;
-        const agent = await this.prisma.agent.findFirst();
+        const prisma = await this.getPrismaClient(orgId);
+        const agent = await prisma.agent.findFirst();
         if (!agent) {
             throw new NotFoundException(`Agnet not found`);
         }
-        const data = await this.prisma.agentFile.findMany({
+        const data = await prisma.agentFile.findMany({
             where: {
                 agentId: agent.id,
                 fileId: null
@@ -37,7 +42,7 @@ export class FileManagerService {
             skip,
             take: limit
         });
-        const total = await this.prisma.agentFile.count({
+        const total = await prisma.agentFile.count({
             where: {
                 agentId: agent.id,
                 fileId: null
@@ -52,8 +57,9 @@ export class FileManagerService {
         };
     }
 
-    async getFile(id: string) {
-        const existingFile = await this.prisma.agentFile.findUnique({
+    async getFile(orgId: string,id: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        const existingFile = await prisma.agentFile.findUnique({
             where: {
                 id
             }
@@ -61,19 +67,20 @@ export class FileManagerService {
         if (!existingFile) {
             throw new NotFoundException(`File not found with ${id}`);
         }
-        return await existingFile;
+        return existingFile;
     }
 
     async uploadFiles(orgId: string, files: Multer.files) {
         const uploadedFiles = [];
         const failedFiles = [];
+        const prisma = await this.getPrismaClient(orgId);
         try {
-            const agent = await this.prisma.agent.findFirst();
+            const agent = await prisma.agent.findFirst();
             if (!agent) {
                 throw new NotFoundException(`Agnet not found`);
             }
 
-            const oldFiles = await this.prisma.agentFile.findMany({
+            const oldFiles = await prisma.agentFile.findMany({
                 where: {
                     agentId: agent.id,
                     fileId: null,
@@ -110,7 +117,7 @@ export class FileManagerService {
                     if (!s3Response || !s3Response.Location) throw 'File not uplaoded to s3.';
                     this.fileService.deleteFile(filePath);
 
-                    const newFile = await this.prisma.agentFile.create({
+                    const newFile = await prisma.agentFile.create({
                         data: {
                             agentId: agent.id,
                             path: s3Response.Location,
@@ -146,15 +153,16 @@ export class FileManagerService {
                 await this.unlink(filePath);
             }
             for (const file of uploadedFiles) {
-                await this.prisma.agentFile.delete({ where: { id: file.id } });
+                await prisma.agentFile.delete({ where: { id: file.id } });
                 this.s3Service.deleteFile(file.path);
             }
             throw error;
         }
     }
 
-    async deleteFile(id: string): Promise<void> {
-        const existingFile = await this.prisma.agentFile.findUnique({
+    async deleteFile(orgId: string,id: string): Promise<void> {
+        const prisma = await this.getPrismaClient(orgId);
+        const existingFile = await prisma.agentFile.findUnique({
             where: {
                 id
             },
@@ -165,15 +173,17 @@ export class FileManagerService {
         if (!existingFile) {
             throw new NotFoundException(`File not found with ${id}`);
         }
-        await this.prisma.agentFile.delete({ where: { id } });
+        await prisma.agentFile.delete({ where: { id } });
         await this.chromaService.removeFileDocs(existingFile.agent.name, existingFile.id);
         // await this.unlink(existingFile.path);
         this.s3Service.deleteFile(existingFile.path);
     }
 
-    async deleteFiles(deleteFilesDto: DeleteFilesDto): Promise<void> {
+    async deleteFiles(serviceParams: ServiceParams<DeleteFilesDto>): Promise<void> {
+        const { orgId, data: deleteFilesDto } = serviceParams;
+        const prisma = await this.getPrismaClient(orgId);
         for (const fileId of deleteFilesDto.fileIds) {
-            const existingFile = await this.prisma.agentFile.findUnique({
+            const existingFile = await prisma.agentFile.findUnique({
                 where: {
                     id: fileId
                 },
@@ -184,7 +194,7 @@ export class FileManagerService {
             if (!existingFile) {
                 continue;
             }
-            await this.prisma.agentFile.delete({ where: { id: fileId } });
+            await prisma.agentFile.delete({ where: { id: fileId } });
             await this.chromaService.removeFileDocs(existingFile.agent.name, existingFile.id);
             // await this.unlink(existingFile.path);
             this.s3Service.deleteFile(existingFile.path);            

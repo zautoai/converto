@@ -43,6 +43,17 @@ export class AvailabilityScheduleService extends BaseService {
         }
     }
 
+    async findOneByOrgId(orgId:string)
+    {
+        try {
+            const prisma = await this.getPrismaClient(orgId)
+            const allSchedules = await prisma.availabilitySchedule.findFirst({ include: { availableHours: true } });
+            return allSchedules;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    }
+
     async findOne(orgId: string,id:string) {
         try {
             const prisma = await this.getPrismaClient(orgId)

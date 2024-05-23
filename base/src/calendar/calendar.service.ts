@@ -102,7 +102,7 @@ export class CalendarService extends BaseService {
 
     async getCalendarId(orgId: string): Promise<string> {
         try {
-            const calendarId = (await this.availabilityScheduleService.findOne(orgId)).calendarId;
+            const calendarId = (await this.availabilityScheduleService.findOneByOrgId(orgId)).calendarId;
             if (!calendarId) {
                 throw new NotFoundException('Calendar id not found');
             }
@@ -199,7 +199,7 @@ export class CalendarService extends BaseService {
 
     async getAvailabilitySchedule(orgId: string): Promise<AvailabilitySchedule> {
         try {
-            const schedule = await this.availabilityScheduleService.findOne(orgId);
+            const schedule = await this.availabilityScheduleService.findOneByOrgId(orgId);
             let availabilitySchedule: AvailabilitySchedule = {
                 availableDays: schedule.availableDays.split(','),
                 availableHours: schedule.availableHours,

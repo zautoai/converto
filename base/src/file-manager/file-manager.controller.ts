@@ -62,7 +62,7 @@ export class FileManagerController {
         if(req.user)
         {
             const orgId = req.user.orgId;
-            return await this.fileManagerService.getFiles(orgId,pagination);
+            return await this.fileManagerService.getFiles({orgId,data:pagination});
         }
         else
         {
@@ -73,9 +73,10 @@ export class FileManagerController {
     @Get(':id')
     async find(@Param('id') id:string,@Req() req: ZautoRequest)
     {
-        if(req.user)
+        if(req.user && req.user.orgId)
         {
-            return await this.fileManagerService.getFile(id);
+            const orgId = req.user.orgId;
+            return await this.fileManagerService.getFile(orgId,id);
         }
         else
         {
@@ -86,9 +87,10 @@ export class FileManagerController {
     @Delete(':id')
     async deleteFile(@Param('id') id:string,@Req() req: ZautoRequest)
     {
-        if(req.user)
+        if(req.user && req.user.orgId)
         {
-            return await this.fileManagerService.deleteFile(id);
+            const orgId = req.user.orgId;
+            return await this.fileManagerService.deleteFile(orgId,id);
         }
         else
         {
@@ -99,9 +101,10 @@ export class FileManagerController {
     @Delete()
     async deleteFiles(@Body() deleteFilesDto:DeleteFilesDto,@Req() req: ZautoRequest)
     {
-        if(req.user)
+        if(req.user && req.user.orgId)
         {
-            return await this.fileManagerService.deleteFiles(deleteFilesDto);
+            const orgId = req.user.orgId;
+            return await this.fileManagerService.deleteFiles({orgId,data:deleteFilesDto});
         }
         else
         {
