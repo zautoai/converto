@@ -16,8 +16,10 @@ export class RolesService {
     const existingRole = await prisma.role.findFirst({ where: { name: createRoleDto.name } })
     if (!existingRole) {
       const roleData = await prisma.role.create({ data: createRoleDto });
+      this.prismaClientManager.disconnectClient(orgId)
       return roleData;
     } else {
+      this.prismaClientManager.disconnectClient(orgId)
       throw new ConflictException(`Role ${createRoleDto.name} already exist`);
     }
   }

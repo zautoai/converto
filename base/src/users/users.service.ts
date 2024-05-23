@@ -25,64 +25,43 @@ export class UsersService extends BaseService {
 
   async create(orgId: string, createUserDto: CreateUserDto, verified: boolean = false) {
     const prisma = await this.getPrismaClient(orgId);
-    const existingUser = await prisma.user.findFirst({
-      where: { email: createUserDto.email }
-    });
-    if (!existingUser) {
+    try {
+      const existingUser = await prisma.user.findFirst({
+        where: { email: createUserDto.email }
+      });
+      if (!existingUser) {
+        if (createUserDto.roleId != null && !await this.isRoleExist(orgId, createUserDto.roleId)) {
+          throw new NotFoundException(`Role not found with id ${createUserDto.roleId}`);
+        }
+        const hashedPassword = await bcrypt.hash(
+          createUserDto.password,
+          roundsOfHashing,
+        );
+        createUserDto.password = hashedPassword;
+        if (!createUserDto.roleId) {
+          let defaultRole = await this.rolesService.findOneByName(orgId, SYSTEM_CONST.DEFALT_ROLE);
+          createUserDto.roleId = defaultRole.id;
+        }
+        const userData = await prisma.user.create({ data: { ...createUserDto, verified } });
+        delete userData.password;
 
-      if (createUserDto.roleId != null && !await this.isRoleExist(orgId, createUserDto.roleId)) {
-        throw new NotFoundException(`Role not found with id ${createUserDto.roleId}`);
+        return userData;
+      } else {
+        throw new ConflictException(`User with ${createUserDto.email} already exists.`)
       }
-      const hashedPassword = await bcrypt.hash(
-        createUserDto.password,
-        roundsOfHashing,
-      );
-      createUserDto.password = hashedPassword;
-      if (!createUserDto.roleId) {
-        let defaultRole = await this.rolesService.findOneByName(orgId, SYSTEM_CONST.DEFALT_ROLE);
-        createUserDto.roleId = defaultRole.id;
-      }
-      const userData = await prisma.user.create({ data: { ...createUserDto, verified } });
-      delete userData.password;
-
-      return userData;
-    } else {
-      throw new ConflictException(`User with ${createUserDto.email} already exists.`)
+    }
+    catch (err) {
+      throw err
+    }
+    finally {
+      await this.closeConnection(orgId)
     }
   }
 
   async findAll(orgId: string, paginationDto: PaginationDto) {
     const prisma = await this.getPrismaClient(orgId);
-    const userList = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        imgUrl: true,
-        createdAt: true,
-        modifiedAt: true,
-        role: {
-          // Include specific fields from the related role model
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      }
-    });
-    return {
-      statusCode: 200,
-      data: userList
-    }
-  }
-
-  async findAllByOrg(paginationDto: PaginationDto, orgId: string) {
-    const { page, limit } = paginationDto;
-    const skip = (page - 1) * limit;
-    const prisma = await this.getPrismaClient(orgId);
-    const userList = await prisma.
-      user.findMany({
-        skip, take: limit,
+    try {
+      const userList = await prisma.user.findMany({
         select: {
           id: true,
           name: true,
@@ -97,140 +76,244 @@ export class UsersService extends BaseService {
               name: true,
             },
           },
-        }, where: { orgId }
+        }
       });
-    const total = await prisma.user.count({ where: { orgId } });
-    return {
-      data: userList,
-      page: page,
-      total: total,
+      return {
+        statusCode: 200,
+        data: userList
+      }
+    } catch (error) {
+      throw error
+    }
+    finally {
+      await this.closeConnection(orgId)
+    }
+  }
+
+  async findAllByOrg(paginationDto: PaginationDto, orgId: string) {
+    const { page, limit } = paginationDto;
+    const skip = (page - 1) * limit;
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const userList = await prisma.
+        user.findMany({
+          skip, take: limit,
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            imgUrl: true,
+            createdAt: true,
+            modifiedAt: true,
+            role: {
+              // Include specific fields from the related role model
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          }, where: { orgId }
+        });
+      const total = await prisma.user.count({ where: { orgId } });
+      return {
+        data: userList,
+        page: page,
+        total: total,
+      }
+    } catch (error) {
+      throw error
+    }
+    finally {
+      await this.closeConnection(orgId)
     }
   }
 
   async findOne(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const userData = await prisma.user.findFirst({
-      where: { id, }, select: {
-        id: true,
-        name: true,
-        imgUrl: true,
-        email: true,
-        verified: true,
-        createdAt: true,
-        modifiedAt: true,
-        orgId: true,
-        role: {
-          // Include specific fields from the related role model
-          select: {
-            id: true,
-            name: true,
-            createdAt: true,
-            modifiedAt: true,
+    try {
+      const userData = await prisma.user.findFirst({
+        where: { id, }, select: {
+          id: true,
+          name: true,
+          imgUrl: true,
+          email: true,
+          verified: true,
+          createdAt: true,
+          modifiedAt: true,
+          orgId: true,
+          role: {
+            // Include specific fields from the related role model
+            select: {
+              id: true,
+              name: true,
+              createdAt: true,
+              modifiedAt: true,
+            },
           },
         },
-      },
-    })
-    if (userData) {
-      return userData
-    } else {
-      throw new NotFoundException(`Role not found with id ${id}`);
+      })
+      if (userData) {
+        return userData
+      } else {
+        throw new NotFoundException(`Role not found with id ${id}`);
+      }
+    } catch (error) {
+      throw error
+    } finally {
+      await this.closeConnection(orgId)
     }
   }
 
   async update(orgId: string, id: string, updateUserDto: UpdateUserDto) {
     const prisma = await this.getPrismaClient(orgId);
-    const userData = await prisma.user.findFirst({
-      where: { id, }
-    });
-    if (userData) {
-      if (updateUserDto?.roleId != null && !await this.isRoleExist(orgId, updateUserDto.roleId)) {
-        throw new NotFoundException(`Role not found with id ${updateUserDto.roleId}`);
+    try {
+      const userData = await prisma.user.findFirst({
+        where: { id, }
+      });
+      if (userData) {
+        if (updateUserDto?.roleId != null && !await this.isRoleExist(orgId, updateUserDto.roleId)) {
+          throw new NotFoundException(`Role not found with id ${updateUserDto.roleId}`);
+        } else {
+          updateUserDto.roleId = userData.roleId;
+        }
+        if (updateUserDto.password && updateUserDto.password.length > 0) {
+          const hashedPassword = await bcrypt.hash(
+            updateUserDto.password,
+            roundsOfHashing,
+          );
+          updateUserDto.password = hashedPassword;
+        }
+        const updatedUserData = await prisma.user.update({ data: updateUserDto, where: { id, } });
+        return updatedUserData;
       } else {
-        updateUserDto.roleId = userData.roleId;
+        throw new NotFoundException(`User not found with id ${id}`);
       }
-      if (updateUserDto.password && updateUserDto.password.length > 0) {
-        const hashedPassword = await bcrypt.hash(
-          updateUserDto.password,
-          roundsOfHashing,
-        );
-        updateUserDto.password = hashedPassword;
-      }
-      const updatedUserData = await prisma.user.update({ data: updateUserDto, where: { id, } });
-      return updatedUserData;
-    } else {
-      throw new NotFoundException(`User not found with id ${id}`);
+    }
+    catch (err) {
+      throw err
+    }
+    finally {
+      await this.closeConnection(orgId)
     }
   }
 
   async updateProfilePicUrl(orgId: string, id: string, updateProfilePicDto: UpdateProfilePicDto) {
     const prisma = await this.getPrismaClient(orgId);
-    const userData = await prisma.user.findFirst({
-      where: { id, },
-    });
-    if (userData) {
-      const updatedUserData = await prisma.user.update({ data: updateProfilePicDto, where: { id } });
-      await this.staticFileService.deleteExistingFile(userData.imgUrl);
-      return updatedUserData;
-    } else {
-      throw new NotFoundException(`User not found with id ${id}`);
+    try {
+      const userData = await prisma.user.findFirst({
+        where: { id, },
+      });
+      if (userData) {
+        const updatedUserData = await prisma.user.update({ data: updateProfilePicDto, where: { id } });
+        await this.staticFileService.deleteExistingFile(userData.imgUrl);
+        return updatedUserData;
+      } else {
+        throw new NotFoundException(`User not found with id ${id}`);
+      }
+    }
+    catch (err) {
+      throw err
+    }
+    finally {
+      await this.closeConnection(orgId)
     }
   }
 
   async remove(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const userData = await prisma.user.findFirst({
-      where: { id, }
-    });
-    if (userData) {
-      return await prisma.user.delete({ where: { id, } });
-    } else {
-      throw new NotFoundException(`User not found with id ${id}`);
+    try {
+      const userData = await prisma.user.findFirst({
+        where: { id, }
+      });
+      if (userData) {
+        return await prisma.user.delete({ where: { id, } });
+      } else {
+        throw new NotFoundException(`User not found with id ${id}`);
+      }
+    }
+    catch (err) {
+      throw err
+    }
+    finally {
+      await this.closeConnection(orgId)
     }
   }
 
   async isRoleExist(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const roleData = await prisma.role.findFirst({
-      where: { id, }
-    })
-    if (roleData) {
-      return true;
+    try {
+      const roleData = await prisma.role.findFirst({
+        where: { id, }
+      })
+      if (roleData) {
+        return true;
+      }
+      return false;
     }
-    return false;
+    catch (err) {
+      throw err
+    }
+    finally {
+      await this.closeConnection(orgId)
+    }
   }
 
   async getUserById(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const userData = await prisma.user.findFirst({
-      where: { id, }, select: {
-        id: true,
-        name: true,
-        email: true,
-        verified: true,
-        role: {
-          select: {
-            id: true,
-            name: true,
+    try {
+      const userData = await prisma.user.findFirst({
+        where: { id, }, select: {
+          id: true,
+          name: true,
+          email: true,
+          verified: true,
+          role: {
+            select: {
+              id: true,
+              name: true,
+            },
           },
         },
-      },
-    });
-    return userData;
+      });
+      return userData;
+    }
+    catch (err) {
+      throw err;
+    }
+    finally {
+      await this.closeConnection(orgId)
+    }
   }
 
   async findByEmail(orgId: string, email: string) {
     const prisma = await this.getPrismaClient(orgId);
-    return await prisma.user.findFirst({ where: { email }, include: { role: true } });
+    try {
+      return await prisma.user.findFirst({ where: { email }, include: { role: true } });
+    }
+    catch (err) {
+      throw err;
+    }
+    finally {
+      await this.closeConnection(orgId)
+    }
   }
 
   async changePassword(orgId: string, id: string, password: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const hashedPassword = await bcrypt.hash(
-      password,
-      roundsOfHashing,
-    );
-    password = hashedPassword;
-    await prisma.user.update({ data: { password }, where: { id } });
+    try {
+      const hashedPassword = await bcrypt.hash(
+        password,
+        roundsOfHashing,
+      );
+      password = hashedPassword;
+      await prisma.user.update({ data: { password }, where: { id } });
+    }
+    catch (err) {
+      throw err;
+    }
+    finally {
+      await this.closeConnection(orgId)
+    }
   }
 
   async verifyEmail(orgId: string, userId: string) {
