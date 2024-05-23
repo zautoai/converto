@@ -1,9 +1,8 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { Sql, raw } from '@prisma/client/runtime/library';
 import * as fs from 'fs';
 import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
-import { Prisma } from '@prisma/client';
-import { CreateSchemaManagerDto } from './dto/create-schema-manager.dto';
 import { getSchemaName } from 'src/common/helpers/cast.helper';
 import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 
@@ -12,9 +11,9 @@ export class SchemaManager {
   private readonly migrationBasePath = './prisma/sql';
   private readonly logger = new Logger(SchemaManager.name);
 
-  constructor(private readonly prismaClientManager: PrismaClientManager) {}
+  constructor(private readonly prismaClientManager: PrismaClientManager) { }
 
-  async create(orgId: string,rollback: Function,): Promise<any> {
+  async create(orgId: string, rollback: Function,): Promise<any> {
     const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
 
     const schemaName = getSchemaName(orgId);
@@ -63,7 +62,7 @@ export class SchemaManager {
     }
   }
 
-  async applyMigration(orgId: string,rollback?: Function) {
+  async applyMigration(orgId: string, rollback?: Function) {
     try {
       const schemaName = getSchemaName(orgId);
       const prisma = await this.prismaClientManager.getClient(orgId);
@@ -78,20 +77,18 @@ export class SchemaManager {
         const sqls = this.processMigrationSQL(migrationSQL);
         for (let statement of sqls) {
           if (statement.trim() === '') {
-            continue; 
+            continue;
           }
-          try 
-          {
+          try {
             const query: Sql = Prisma.sql`${raw(statement)}`;
             await prisma.$executeRaw(query);
-          } 
-          catch (error)  
-          {
+          }
+          catch (error) {
             this.logger.error('Error executing migration statement:', error.message);
           }
         }
         this.logger.debug('Migration applied:', migrationFile);
-    }
+      }
       this.logger.debug('All migrations applied for tenant:', orgId);
     } catch (error) {
       if (rollback) {
@@ -125,13 +122,13 @@ export class SchemaManager {
     }
   }
 
-  processMigrationSQL(migrationSQL:string) {
-      return migrationSQL
-          .split('\n')
-          .filter((line) => !line.startsWith('--'))
-          .join('\n')
-          .replace(/(\r\n|\n|\r)/gm, ' ')
-          .replace(/\s+/g, ' ')
-          .split(';');
+  processMigrationSQL(migrationSQL: string) {
+    return migrationSQL
+      .split('\n')
+      .filter((line) => !line.startsWith('--'))
+      .join('\n')
+      .replace(/(\r\n|\n|\r)/gm, ' ')
+      .replace(/\s+/g, ' ')
+      .split(';');
   }
 }

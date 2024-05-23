@@ -54,6 +54,7 @@ CREATE TABLE "Contact" (
     "notes" TEXT,
     "leadSource" TEXT,
     "status" TEXT,
+    "conversationId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
@@ -129,6 +130,7 @@ CREATE TABLE "Account" (
     "companySize" INTEGER,
     "annualRevenue" DOUBLE PRECISION,
     "accountType" "accountType" NOT NULL DEFAULT 'PROSPECT',
+    "domain" TEXT,
     "website" TEXT,
     "address" TEXT,
     "city" TEXT,
