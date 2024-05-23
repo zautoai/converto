@@ -25,6 +25,11 @@ export class BaseService {
         return await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     }
 
+    protected async closeConnection(orgId:string)
+    {
+        await this.prismaClientManager.disconnectClient(orgId);
+    }
+
     protected handleException(data: any)
     {
         if(data?.statusCode && data?.statusCode >= 400)
