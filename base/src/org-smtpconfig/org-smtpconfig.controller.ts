@@ -29,9 +29,9 @@ export class OrgSmtpconfigController {
     @ApiBearerAuth()
     @ApiOkResponse()
     async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
-        if (request.user && request.orgId) {
-            const orgId = request.orgId;
-            return await this.orgSmtpconfigService.findAll(orgId,paginationDto);
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            return await this.orgSmtpconfigService.findAll({orgId,data:paginationDto});
         }
         else {
             throw new UnauthorizedException("Unauthorised access.")
@@ -44,9 +44,9 @@ export class OrgSmtpconfigController {
     @ApiBearerAuth()
     @ApiOkResponse()
     async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
-        if (request.user && request.orgId) {
-            const orgId = request.orgId;
-            const data = await this.orgSmtpconfigService.findOne(id);
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            const data = await this.orgSmtpconfigService.findOne(orgId,id);
             delete data.pass;
             return data;
         }
@@ -62,10 +62,9 @@ export class OrgSmtpconfigController {
     @ApiBearerAuth()
     @ApiCreatedResponse()
     async create(@Body() createOrgSmtpconfigDto: CreateOrgSmtpconfigDto, @Req() request: ZautoRequest) {
-        if (request.user && request.orgId) {
-            const orgId = request.orgId;
-            createOrgSmtpconfigDto.orgId = orgId;
-            return await this.orgSmtpconfigService.create(createOrgSmtpconfigDto);
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            return await this.orgSmtpconfigService.create({orgId,data:createOrgSmtpconfigDto});
         }
         else {
             throw new UnauthorizedException("Unauthorised access.") 
@@ -78,9 +77,9 @@ export class OrgSmtpconfigController {
     @ApiBearerAuth()
     @ApiOkResponse()
     async update(@Param('id') id: string, @Body() updateOrgSmtpconfigDto: UpdateOrgSmtpconfigDto, @Req() request: ZautoRequest) {
-        if (request.user && request.orgId) {
-            const orgId = request.orgId;
-            return await this.orgSmtpconfigService.update(id, updateOrgSmtpconfigDto);
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            return await this.orgSmtpconfigService.update({orgId,data:{id, updateOrgSmtpconfigDto}});
         }
         else {
             throw new UnauthorizedException("Unauthorised access.")
@@ -94,9 +93,9 @@ export class OrgSmtpconfigController {
     @ApiNoContentResponse()
     @HttpCode(204)
     async delete(@Param('id') id: string, @Req() request: ZautoRequest) {
-        if (request.user && request.orgId) {
-            const orgId = request.orgId;
-            return await this.orgSmtpconfigService.delete(id);
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            return await this.orgSmtpconfigService.delete(orgId,id);
         }
         else {
             throw new UnauthorizedException("Unauthorised access.")

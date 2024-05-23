@@ -362,7 +362,6 @@ model OpenAIAssistant {
 
 model OrgSMTPConfig {
   id         String   @id @default(uuid())
-  orgId      String
   host       String
   port       Int
   name       String
@@ -371,8 +370,6 @@ model OrgSMTPConfig {
   isActive   Boolean  @default(false)
   createdAt  DateTime @default(now())
   modifiedAt DateTime @updatedAt
-
-  @@index([orgId], map: "SMTPConfig_orgId_fkey")
 }
 
 enum CTAType {
