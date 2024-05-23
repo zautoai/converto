@@ -11,6 +11,8 @@ import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Visitor } from './entities/visitor.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ZautoRequest } from 'src/common/models/request.model';
+import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
+import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
 
 
 @ApiTags('Visitors')
@@ -19,9 +21,10 @@ export class VisitorController {
   constructor(private readonly visitorService: VisitorService) {}
 
   @Post()
-  async create(@Body() createVisitorDto: CreateVisitorDto, @Req() request: ZautoRequest) {
-    if(request.user && request.user.orgId) {
-      const orgId = request.user.orgId;
+  @UseGuards(SubdomainGuard)
+  async create(@Body() createVisitorDto: CreateVisitorDto, @Req() request: SubdomainRequest) {
+    const orgId = request.orgId;
+    if(orgId) {
       return await this.visitorService.create({ orgId, data: createVisitorDto});
     } else {
       throw new UnauthorizedException('Org info not found.')

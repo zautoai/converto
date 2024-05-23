@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -107,8 +107,15 @@ export class OrganizationsService {
   }
 
   async updateOrgWith(id: string, name: string, siteUrl: string) {
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
-    return await prisma.organization.update({ data: { name, siteUrl }, where: { id } });
+    try
+    {
+      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+      return await prisma.organization.update({ data: { name, siteUrl }, where: { id } });
+    }
+    catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException(err.message);
+    }
   }
 
   async createDefaultRoles(orgId: string) {

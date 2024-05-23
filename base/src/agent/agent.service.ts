@@ -130,9 +130,7 @@ export class AgentService extends BaseService{
 
   async findOne(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst({
-      where: { id },
-    });
+    const agent = await prisma.agent.findFirst();
     if (agent) {
       return agent;
     } else {
@@ -380,15 +378,28 @@ export class AgentService extends BaseService{
         name,companyName: createAvatarDto.companyName,
         status: AgentStatus.TRAINING
       }});
+      const campaignName = "Primary";
+      const existingCampaign = await prisma.campaign.findFirst({
+        where: {
+          title: campaignName
+        }
+      });
+      if(!existingCampaign)
+      {
         const campaign = await prisma.campaign.create({
           data: {
-            title: 'Primary',
+            title: campaignName,
             description: 'Default Campaign which is used for all converstation without campaign.',
             startDate: new Date(),
             endDate: null,
             isDefault: true
           }
-        })
+        });
+        if(campaign)
+        {
+          console.log('Default campaign created');
+        }
+      }
       return avatar;
     } catch(error) {
       const prisma = await this.getPrismaClient(orgId)
@@ -411,8 +422,12 @@ export class AgentService extends BaseService{
     
     createAgentDto.welcomeMsg = this.getWelcomeMessage({...createAgentDto});
     const prisma = await this.getPrismaClient(orgId);
+    const existingAgent = await prisma.agent.findFirst();
+    if(!existingAgent) {
+      throw new InternalServerErrorException('Unable to create avatar');
+    }
       const agent = await prisma.agent.update({ data: {...createAgentDto, 
-      status: AgentStatus.ACTIVE} , where: {id}});
+      status: AgentStatus.ACTIVE} , where: {id:existingAgent.id}});
       //Create Default stages for agent
       if (agent) {
         await this.stageService.setDefaultStages(orgId,agent);
@@ -443,7 +458,7 @@ export class AgentService extends BaseService{
   {
     const host = process.env.HOST_URL;
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findUnique({where:{id:agentId}}); 
+    const agent = await prisma.agent.findFirst();
     if(!agent)
     {
       throw new NotFoundException();

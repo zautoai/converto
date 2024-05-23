@@ -32,7 +32,7 @@ export class AgentPromptController {
   @ApiResponse({
     type: ResponseDTO<AgentPrompt>
   })
-  async findAll(@Body() paginationDto:PaginationDto,@Req() request: ZautoRequest) {
+  async findAll(@Query() paginationDto:PaginationDto,@Req() request: ZautoRequest) {
     if(request.user)
     {
       const orgId = request.user.orgId;

@@ -7,7 +7,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { NameAvailability, NameCheckDto } from './dto/namecheck.dto';
-import { SYSTEM_CONST, ZAUTO_ORG } from 'src/common/constants/system.constants';
+import { SYSTEM_CONST } from 'src/common/constants/system.constants';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -18,7 +18,6 @@ import * as sharp from 'sharp';
 import { Multer } from 'multer';
 import { StaticFileService } from 'src/common/services/static.service';
 import { VisitorService } from 'src/visitor/visitor.service';
-import { SourceQuery } from './entities/source.entity';
 import { CreateAvatarDto } from './dto/create-avatar.dto';
 import { AvatarQueueService } from './worker/avatar-queue.service';
 import { IPTrackingService } from 'src/common/services/iptracking.service';
@@ -26,6 +25,8 @@ import { OrganizationsService } from 'src/organizations/organizations.service';
 import { DemandGenService } from 'src/demand-gen/demand-gen.service';
 import { TrackingDto } from './dto/tracking.dto';
 import { TrackingService } from './tracking.service';
+import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
+import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
 
 @ApiTags('Agents')
 @Controller('api/agents')
@@ -98,8 +99,8 @@ export class AgentController {
   // @ApiBody({ type: CreateAgentDto })
   // @ApiCreatedResponse({type: Agent})
   // async create(@Body() createAgentDto: CreateAgentDto, @Req() zautoRequest: ZautoRequest) {
-  //   if(zautoRequest.user && zautoRequest.orgId) {
-  //     createAgentDto.orgId = zautoRequest.orgId;
+  //   if(zautoRequest.user && zautoRequest.user.orgId) {
+  //     createAgentDto.orgId = zautoRequest.user.orgId;
   //     return await this.agentsService.create(createAgentDto);
   //   } else throw new UnauthorizedException('Unauthorised access.')
   // }
@@ -123,8 +124,9 @@ export class AgentController {
   @ApiOkResponse({
     type: Agent
   })
+  @UseGuards(SubdomainGuard)
   async findOne(@Query() sourceQuery: any, @Param('id') id: string, @Req() request: Request) {
-    const orgId = request.headers['org-id'];
+    const orgId = request['orgId'];
     const agent = await this.agentsService.findOne(orgId,id);
     if(sourceQuery.source) {
 
@@ -261,15 +263,15 @@ export class AgentController {
   @ApiBody({ type: CreateAvatarDto })
   @ApiCreatedResponse({type: Agent})
   async launchAvatar(@Body() createAvatarDto: CreateAvatarDto, @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest.user && zautoRequest.orgId) {
+    if(zautoRequest.user && zautoRequest.user.orgId) {
       const orgId = zautoRequest.user.orgId;
       const avatarName = createAvatarDto.displayName.replaceAll(" ", "_").toLowerCase().trim();
       const avatarExists = await this.agentsService.isNameExists(orgId,avatarName);
       if(avatarExists) {
         throw new ConflictException('Avatar Name already taken.');
       } else {
-        const org = await this.orgService.updateOrgWith(zautoRequest.orgId, createAvatarDto.companyName, createAvatarDto.companySite);
-        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.orgId);
+        const org = await this.orgService.updateOrgWith(zautoRequest.user.orgId, createAvatarDto.companyName, createAvatarDto.companySite);
+        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.user.orgId);
         if(orgAvatar) {
           throw new ConflictException('Avatar already launched. Only one avatar can be created per Organization.');
         }
@@ -292,11 +294,11 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiCreatedResponse({type: Agent})
   async retryAvatarLaunch(@Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest.user && zautoRequest.orgId) {
+    if(zautoRequest.user && zautoRequest.user.orgId) {
       const orgId = zautoRequest.user.orgId;
       const org = await this.orgService.findOne(orgId)
       if(org) {
-        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.orgId);
+        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.user.orgId);
         if(orgAvatar) {
           const createAvatarDto  = {
             displayName: orgAvatar.displayName,
@@ -309,7 +311,7 @@ export class AgentController {
             name: 'launchAvatar',
             id: avatar.id,
             dto: createAvatarDto,
-            org: zautoRequest.orgId,
+            org: zautoRequest.user.orgId,
           });
           return avatar;
         }
@@ -336,9 +338,10 @@ export class AgentController {
 
   @Get('widget/standalone/:agentId')
   @Header('Content-Type', 'application/javascript')
-  async standaloneEmbedding(@Param('agentId') agentId: string, @Req() request: Request)
+  @UseGuards(SubdomainGuard)
+  async standaloneEmbedding(@Param('agentId') agentId: string, @Req() request: SubdomainRequest)
   {
-    const orgId = request.headers['org-id'];
+    const orgId = request.orgId;
     if(agentId.includes('.js'))
     {
       agentId = agentId.replace('.js','');

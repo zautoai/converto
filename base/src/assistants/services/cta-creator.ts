@@ -66,7 +66,7 @@ export class CTACreatorService extends BaseService {
                             }
                         })
                     } catch (error) {
-                        console.log(error)
+                        console.log("CTA already exist with name:"+cta.label);
                     }
                 }
             }
