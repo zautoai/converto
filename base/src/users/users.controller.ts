@@ -24,46 +24,38 @@ import { StaticFileService } from 'src/common/services/static.service';
 @ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService,
-    private readonly staticFileService: StaticFileService) {}
+    private readonly staticFileService: StaticFileService) { }
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
-    return await this.usersService.create(orgId,createUserDto);
+    const orgId = request.user.orgId;
+    return await this.usersService.create(orgId, createUserDto);
   }
 
   @Get()
   @ApiQuery({ name: 'page', description: 'Page number.', required: false })
   @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
   async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
-    return await this.usersService.findAll(orgId,paginationDto);
-  }
-
-  @Get('organization')
-  @ApiQuery({ name: 'page', description: 'Page number.', required: false })
-  @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
-  async findAllByOrg(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
-    return await this.usersService.findAllByOrg(paginationDto,orgId);
+    const orgId = request.user.orgId;
+    return await this.usersService.findAll(orgId, paginationDto);
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
-    return await this.usersService.findOne(orgId,id);
+    const orgId = request.user.orgId;
+    return await this.usersService.findOne(orgId, id);
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
+    const orgId = request.user.orgId;
     return await this.usersService.update(orgId, id, updateUserDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.orgId;
-    return await this.usersService.remove(orgId,id);
+    const orgId = request.user.orgId;
+    return await this.usersService.remove(orgId, id);
   }
 
   @Post('profilePic')
@@ -87,7 +79,7 @@ export class UsersController {
       fileSize: 5 * 1024 * 1024, // 5MB
     },
   }))
-  async uploadProfilePic(@UploadedFile() file: Multer.File, @Req() request: ZautoRequest) { 
+  async uploadProfilePic(@UploadedFile() file: Multer.File, @Req() request: ZautoRequest) {
     try {
       // Use sharp to compress and optionally resize the image
       const outputPath = `./public/images/compressed-${file.filename}`;
@@ -100,9 +92,9 @@ export class UsersController {
       await this.staticFileService.deleteExistingFile(file.path);
 
       const userId = request.user.id;
-      const orgId = request.orgId;
+      const orgId = request.user.orgId;
       const imgUrl = `${process.env.HOST_URL}/images/compressed-${file.filename}`
-      this.usersService.updateProfilePicUrl(orgId,userId, {
+      this.usersService.updateProfilePicUrl(orgId, userId, {
         imgUrl: imgUrl,
       });
 

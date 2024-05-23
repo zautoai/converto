@@ -26,7 +26,7 @@ import { IRequest } from 'src/common/model/request.model';
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
 export class SchemaManagerController {
-  constructor(private readonly schemaManagerService: SchemaManagerService) {}
+  constructor(private readonly schemaManagerService: SchemaManagerService) { }
 
   @Post()
   @ApiOperation({
@@ -41,7 +41,7 @@ export class SchemaManagerController {
     const rollback = () => {
       this.schemaManagerService.delete(createSchemaManagerDto.orgId);
     };
-    return this.schemaManagerService.create(createSchemaManagerDto, rollback);
+    return this.schemaManagerService.create(createSchemaManagerDto.orgId, rollback);
   }
 
   @Post(':orgId/migrate')
