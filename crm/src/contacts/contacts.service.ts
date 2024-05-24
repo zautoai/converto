@@ -31,271 +31,295 @@ export class ContactsService {
     const { page, limit, sort, searchTerm } = filterDto;
     const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const contacts = await prisma.contact.findMany({
-      where: {
-        ...(searchTerm
-          ? {
-            OR: [
-              { firstName: { contains: searchTerm } },
-              { lastName: { contains: searchTerm } },
-              { jobTitle: { contains: searchTerm } },
-              { organizationName: { contains: searchTerm } },
-              { email: { contains: searchTerm } },
-              { phone: { contains: searchTerm } },
-              { address: { contains: searchTerm } },
-              { website: { contains: searchTerm } },
-              { notes: { contains: searchTerm } },
-              { leadSource: { contains: searchTerm } },
-              { status: { contains: searchTerm } },
-            ],
-          }
-          : {}),
-      },
-      take: limit,
-      skip: skip,
-      orderBy: {
-        createdAt: sort,
-      },
-      include: {
-        contactTag: { select: { tag: true } },
-        contactCustomFieldValues: {
-          select: { value: true, customField: true },
+    try {
+      const contacts = await prisma.contact.findMany({
+        where: {
+          ...(searchTerm
+            ? {
+              OR: [
+                { firstName: { contains: searchTerm } },
+                { lastName: { contains: searchTerm } },
+                { jobTitle: { contains: searchTerm } },
+                { organizationName: { contains: searchTerm } },
+                { email: { contains: searchTerm } },
+                { phone: { contains: searchTerm } },
+                { address: { contains: searchTerm } },
+                { website: { contains: searchTerm } },
+                { notes: { contains: searchTerm } },
+                { leadSource: { contains: searchTerm } },
+                { status: { contains: searchTerm } },
+              ],
+            }
+            : {}),
         },
-      },
-    });
-    const transformedContacts = contacts.map((contact) => ({
-      ...contact,
-      contactTag: contact.contactTag.map((ct) => ct.tag),
-    }));
-    const total = await prisma.contact.count({
-      where: {
-        ...(searchTerm
-          ? {
-            OR: [
-              { firstName: { contains: searchTerm } },
-              { lastName: { contains: searchTerm } },
-              { jobTitle: { contains: searchTerm } },
-              { organizationName: { contains: searchTerm } },
-              { email: { contains: searchTerm } },
-              { phone: { contains: searchTerm } },
-              { address: { contains: searchTerm } },
-              { website: { contains: searchTerm } },
-              { notes: { contains: searchTerm } },
-              { leadSource: { contains: searchTerm } },
-              { status: { contains: searchTerm } },
-            ],
-          }
-          : {}),
-      }
-    });
-    return {
-      code: 200,
-      success: true,
-      message: 'Contacts fetched successfully',
-      data: transformedContacts,
-      page: page,
-      total: total,
-    };
+        take: limit,
+        skip: skip,
+        orderBy: {
+          createdAt: sort,
+        },
+        include: {
+          contactTag: { select: { tag: true } },
+          contactCustomFieldValues: {
+            select: { value: true, customField: true },
+          },
+        },
+      });
+      const transformedContacts = contacts.map((contact) => ({
+        ...contact,
+        contactTag: contact.contactTag.map((ct) => ct.tag),
+      }));
+      const total = await prisma.contact.count({
+        where: {
+          ...(searchTerm
+            ? {
+              OR: [
+                { firstName: { contains: searchTerm } },
+                { lastName: { contains: searchTerm } },
+                { jobTitle: { contains: searchTerm } },
+                { organizationName: { contains: searchTerm } },
+                { email: { contains: searchTerm } },
+                { phone: { contains: searchTerm } },
+                { address: { contains: searchTerm } },
+                { website: { contains: searchTerm } },
+                { notes: { contains: searchTerm } },
+                { leadSource: { contains: searchTerm } },
+                { status: { contains: searchTerm } },
+              ],
+            }
+            : {}),
+        }
+      });
+      return {
+        code: 200,
+        success: true,
+        message: 'Contacts fetched successfully',
+        data: transformedContacts,
+        page: page,
+        total: total,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async getContact(orgId: string, id: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const contact = await prisma.contact.findUnique({
-      where: { id },
-      include: {
-        contactTag: { include: { tag: true } },
-        contactCustomFieldValues: {
-          select: { value: true, customField: true },
+    try {
+      const contact = await prisma.contact.findUnique({
+        where: { id },
+        include: {
+          contactTag: { include: { tag: true } },
+          contactCustomFieldValues: {
+            select: { value: true, customField: true },
+          },
         },
-      },
-    });
-    if (!contact) {
-      throw new NotFoundException('Contact not found');
+      });
+      if (!contact) {
+        throw new NotFoundException('Contact not found');
+      }
+      const transformedContact = {
+        ...contact,
+        contactTag: contact.contactTag.map((ct) => ct.tag),
+      };
+      return {
+        code: 200,
+        success: true,
+        message: 'Contact fetched successfully',
+        data: transformedContact,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    const transformedContact = {
-      ...contact,
-      contactTag: contact.contactTag.map((ct) => ct.tag),
-    };
-    return {
-      code: 200,
-      success: true,
-      message: 'Contact fetched successfully',
-      data: transformedContact,
-    };
   }
 
   async createContact(orgId: string, createContactDto: any) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const defaultFields = await this.customFieldsService.getTableFields(
-      orgId,
-      'Contact',
-    );
-
-    const { _defaultFields, _customFields } = Object.keys(
-      createContactDto,
-    ).reduce(
-      (result, key) => {
-        if (defaultFields.includes(key)) {
-          result._defaultFields[key] = createContactDto[key];
-        } else {
-          result._customFields[key] = createContactDto[key];
-        }
-        return result;
-      },
-      { _defaultFields: {}, _customFields: {} },
-    );
-    const existingContact = await this.getContactByEmail(
-      orgId,
-      createContactDto.email,
-    );
-    if (existingContact) {
-      throw new BadRequestException('Contact already exists');
-    }
-    const contact = await prisma.contact.create({
-      data: {
-        ..._defaultFields,
-      },
-    });
-
-    for (let [key, value] of Object.entries(_customFields)) {
-      const _key: string = this.convertToKey(key);
-
-      const existingCustomField = await prisma.customField.findFirst({
-        where: {
-          key: _key,
-          customFieldParent: CustomFieldParent.CONTACT,
-        },
-      });
-
-      if (!existingCustomField) {
-        continue;
-      }
-
-      await prisma.contactCustomFieldValue.create({
-        data: {
-          value: value as string,
-          customFieldId: existingCustomField.id,
-          contactId: contact.id,
-        },
-      });
-    }
-
-    // enriche
-    if (contact.email) {
-      await this.enrichmentService.enrichContact(orgId, contact.id);
-    }
-
     try {
-      // push to external crm
-      await this.externalCRMService.createContact(orgId, createContactDto);
-    }
-    catch (err) {
-      this.logger.error(err);
-    }
+      const defaultFields = await this.customFieldsService.getTableFields(
+        orgId,
+        'Contact',
+      );
 
-    return {
-      code: 201,
-      success: true,
-      message: 'Contact created successfully',
-    };
-  }
-
-  async updateContact(orgId: string, id: string, updateContactDto: any) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
-    const existingContact = await this.getContact(orgId, id);
-    if (!existingContact.data) {
-      throw new NotFoundException('Contact not found');
-    }
-    const tags = updateContactDto.tags;
-    const defaultFields = await this.customFieldsService.getTableFields(
-      orgId,
-      'Contact',
-    );
-    const { _defaultFields, _customFields } = Object.keys(
-      updateContactDto,
-    ).reduce(
-      (result, key) => {
-        if (defaultFields.includes(key)) {
-          result._defaultFields[key] = updateContactDto[key];
-        } else if (key === 'tags') {
-        } else {
-          result._customFields[key] = updateContactDto[key];
-        }
-        return result;
-      },
-      { _defaultFields: {}, _customFields: {} },
-    );
-
-    await prisma.contact.update({
-      where: { id },
-      data: {
-        ..._defaultFields,
-      },
-    });
-
-    if (tags) {
-      for (let tag of tags) {
-        await this.mapContactTag(orgId, id, tag);
+      const { _defaultFields, _customFields } = Object.keys(
+        createContactDto,
+      ).reduce(
+        (result, key) => {
+          if (defaultFields.includes(key)) {
+            result._defaultFields[key] = createContactDto[key];
+          } else {
+            result._customFields[key] = createContactDto[key];
+          }
+          return result;
+        },
+        { _defaultFields: {}, _customFields: {} },
+      );
+      const existingContact = await this.getContactByEmail(
+        orgId,
+        createContactDto.email,
+      );
+      if (existingContact) {
+        throw new BadRequestException('Contact already exists');
       }
-    }
-
-    for (let [key, value] of Object.entries(_customFields)) {
-      const _key: string = this.convertToKey(key);
-      const existingCustomField = await prisma.customField.findFirst({
-        where: {
-          key: _key,
-          customFieldParent: CustomFieldParent.CONTACT,
+      const contact = await prisma.contact.create({
+        data: {
+          ..._defaultFields,
         },
       });
 
-      if (!existingCustomField) {
-        continue;
-      }
+      for (let [key, value] of Object.entries(_customFields)) {
+        const _key: string = this.convertToKey(key);
 
-      const existingCustomValue =
-        await prisma.contactCustomFieldValue.findFirst({
+        const existingCustomField = await prisma.customField.findFirst({
           where: {
-            customFieldId: existingCustomField.id,
-            contactId: id,
+            key: _key,
+            customFieldParent: CustomFieldParent.CONTACT,
           },
         });
 
-      if (existingCustomValue) {
-        await prisma.contactCustomFieldValue.update({
-          where: {
-            id: existingCustomValue.id,
-          },
-          data: {
-            value: value as string,
-          },
-        });
-      } else {
+        if (!existingCustomField) {
+          continue;
+        }
+
         await prisma.contactCustomFieldValue.create({
           data: {
             value: value as string,
             customFieldId: existingCustomField.id,
-            contactId: id,
+            contactId: contact.id,
           },
         });
       }
-    }
 
-    try {
-      const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, existingContact.data.email);
-      if (existingCrmContact) {
-        this.externalCRMService.updateContact(orgId, existingCrmContact.hs_object_id, updateContactDto);
+      // enriche
+      if (contact.email) {
+        await this.enrichmentService.enrichContact(orgId, contact.id);
       }
-    }
-    catch (err) {
-      this.logger.error(err);
-    }
 
-    return {
-      code: 200,
-      success: true,
-      message: 'Contact updated successfully',
-      data: updateContactDto,
-    };
+      try {
+        // push to external crm
+        await this.externalCRMService.createContact(orgId, createContactDto);
+      }
+      catch (err) {
+        this.logger.error(err);
+      }
+
+      return {
+        code: 201,
+        success: true,
+        message: 'Contact created successfully',
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
+  }
+
+  async updateContact(orgId: string, id: string, updateContactDto: any) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    try {
+      const existingContact = await this.getContact(orgId, id);
+      if (!existingContact.data) {
+        throw new NotFoundException('Contact not found');
+      }
+      const tags = updateContactDto.tags;
+      const defaultFields = await this.customFieldsService.getTableFields(
+        orgId,
+        'Contact',
+      );
+      const { _defaultFields, _customFields } = Object.keys(
+        updateContactDto,
+      ).reduce(
+        (result, key) => {
+          if (defaultFields.includes(key)) {
+            result._defaultFields[key] = updateContactDto[key];
+          } else if (key === 'tags') {
+          } else {
+            result._customFields[key] = updateContactDto[key];
+          }
+          return result;
+        },
+        { _defaultFields: {}, _customFields: {} },
+      );
+
+      await prisma.contact.update({
+        where: { id },
+        data: {
+          ..._defaultFields,
+        },
+      });
+
+      if (tags) {
+        for (let tag of tags) {
+          await this.mapContactTag(orgId, id, tag);
+        }
+      }
+
+      for (let [key, value] of Object.entries(_customFields)) {
+        const _key: string = this.convertToKey(key);
+        const existingCustomField = await prisma.customField.findFirst({
+          where: {
+            key: _key,
+            customFieldParent: CustomFieldParent.CONTACT,
+          },
+        });
+
+        if (!existingCustomField) {
+          continue;
+        }
+
+        const existingCustomValue =
+          await prisma.contactCustomFieldValue.findFirst({
+            where: {
+              customFieldId: existingCustomField.id,
+              contactId: id,
+            },
+          });
+
+        if (existingCustomValue) {
+          await prisma.contactCustomFieldValue.update({
+            where: {
+              id: existingCustomValue.id,
+            },
+            data: {
+              value: value as string,
+            },
+          });
+        } else {
+          await prisma.contactCustomFieldValue.create({
+            data: {
+              value: value as string,
+              customFieldId: existingCustomField.id,
+              contactId: id,
+            },
+          });
+        }
+      }
+
+      try {
+        const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, existingContact.data.email);
+        if (existingCrmContact) {
+          this.externalCRMService.updateContact(orgId, existingCrmContact.hs_object_id, updateContactDto);
+        }
+      }
+      catch (err) {
+        this.logger.error(err);
+      }
+
+      return {
+        code: 200,
+        success: true,
+        message: 'Contact updated successfully',
+        data: updateContactDto,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async deleteContact(orgId: string, id: string) {
@@ -304,30 +328,42 @@ export class ContactsService {
       throw new NotFoundException('Contact not found');
     }
     const prisma = await this.prismaClientManager.getClient(orgId);
-    await this.getContact(orgId, id);
-    await prisma.contact.delete({ where: { id } });
     try {
-      const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, existingContact.data.email);
-      if (existingCrmContact) {
-        await this.externalCRMService.deleteContact(orgId, existingCrmContact.hs_object_id);
+      await this.getContact(orgId, id);
+      await prisma.contact.delete({ where: { id } });
+      try {
+        const existingCrmContact = await this.externalCRMService.getContactByEmail(orgId, existingContact.data.email);
+        if (existingCrmContact) {
+          await this.externalCRMService.deleteContact(orgId, existingCrmContact.hs_object_id);
+        }
       }
+      catch (err) {
+        this.logger.error(err);
+      }
+      return {
+        code: 204,
+        success: true,
+        message: 'Contact deleted successfully',
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    catch (err) {
-      this.logger.error(err);
-    }
-    return {
-      code: 204,
-      success: true,
-      message: 'Contact deleted successfully',
-    };
   }
 
   async getContactByEmail(orgId: string, email: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const contact = await prisma.contact.findFirst({
-      where: { email },
-    });
-    return contact;
+    try {
+      const contact = await prisma.contact.findFirst({
+        where: { email },
+      });
+      return contact;
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async getCustomField(orgId: string, id: string) {
@@ -359,23 +395,35 @@ export class ContactsService {
   async mapContactTag(orgId: string, contactId: string, tagId: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
 
-    await prisma.contactTag.create({
-      data: {
-        contactId,
-        tagId,
-      },
-    });
+    try {
+      await prisma.contactTag.create({
+        data: {
+          contactId,
+          tagId,
+        },
+      });
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async mapCustomFields(orgId: string, contactId: string, field: any) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    await prisma.contactCustomFieldValue.create({
-      data: {
-        contactId,
-        customFieldId: field.id,
-        value: field.value,
-      },
-    });
+    try {
+      await prisma.contactCustomFieldValue.create({
+        data: {
+          contactId,
+          customFieldId: field.id,
+          value: field.value,
+        },
+      });
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async getContactFields(orgId: string) {
@@ -403,10 +451,10 @@ export class ContactsService {
   }
 
   async enrichPeopleByContact(orgId: string, contactId: string, matchRequest: { [key: string]: string }, provider: string = EnrichmentProviderName.APOLLO,) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
     try {
       this.logger.log(`Enriching people with contactId: ${contactId}`);
       const enrichedData = await this.enrichmentService.getPeople(matchRequest);
-      const prisma = await this.prismaClientManager.getClient(orgId);
       const existingContact = await prisma.contact.findUnique({
         where: { id: contactId },
       });
@@ -435,15 +483,17 @@ export class ContactsService {
 
       this.logger.log(`Enriched contact with id: ${enrichedContact.email}`);
       return enrichedContact;
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.error(error)
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
   }
 
   async hasMapping(orgId: string): Promise<Boolean> {
+    const prisma = await this.prismaClientManager.getClient(orgId);
     try {
       const crmName = await this.externalCRMService.getActiveCRM(orgId);
-      const prisma = await this.prismaClientManager.getClient(orgId);
       const contacts = await prisma.crmMapping.count({
         where: {
           crmName,
@@ -454,6 +504,9 @@ export class ContactsService {
     }
     catch (e) {
       return false;
+    }
+    finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
   }
 
@@ -546,24 +599,36 @@ export class ContactsService {
 
   async getContactsByConversation(orgId: string, id: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const contact = await prisma.contact.findFirst({
-      where: {
-        conversationId: id
-      }
-    });
-    return contact;
+    try {
+      const contact = await prisma.contact.findFirst({
+        where: {
+          conversationId: id
+        }
+      });
+      return contact;
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async getContactsByDate(orgId: string, startDate: Date, endDate: Date) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const contacts = await prisma.contact.findMany({
-      where: {
-        createdAt: {
-          gte: startDate.toISOString(),
-          lte: endDate.toISOString()
+    try {
+      const contacts = await prisma.contact.findMany({
+        where: {
+          createdAt: {
+            gte: startDate.toISOString(),
+            lte: endDate.toISOString()
+          }
         }
-      }
-    });
-    return contacts;
+      });
+      return contacts;
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 }

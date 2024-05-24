@@ -51,14 +51,16 @@ export class ExternalCrmService {
     }
 
     async getActiveCRM(orgId: string): Promise<string> {
+        const prisma = await this.prismaClientManager.getClient(orgId);
         try {
-            const prisma = await this.prismaClientManager.getClient(orgId);
             const crm = await prisma.externalCrmCredential.findMany();
             return crm[0]?.crmName;
         }
         catch (err) {
             this.logger.error(err);
             throw new Error(err);
+        } finally {
+            await this.prismaClientManager.disconnectClient(orgId)
         }
     }
 

@@ -10,12 +10,11 @@ export class AccountBasedMarketingService {
   constructor(
     private readonly prismaClientManager: PrismaClientManager,
     private readonly customFieldsService: CustomFieldsService,
-  ) {}
+  ) { }
 
-  async create(orgId: string,createAccountBasedMarketingDto: CreateAccountBasedMarketingDto,) {
-    try
-    {
-      const prisma = await this.prismaClientManager.getClient(orgId);
+  async create(orgId: string, createAccountBasedMarketingDto: CreateAccountBasedMarketingDto,) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    try {
       await prisma.accountBasedMarketingTarget.create({
         data: createAccountBasedMarketingDto,
       });
@@ -25,63 +24,88 @@ export class AccountBasedMarketingService {
         message: 'Account Based Marketing created successfully',
       };
     }
-    catch(error)
-    {
+    catch (error) {
       throw new BadRequestException(error)
+    }
+    finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
   }
 
   async findAll(orgId: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const data = await prisma.accountBasedMarketingTarget.findMany();
-    return {
-      code: 200,
-      success: true,
-      message: 'Account Based Marketing fetched successfully',
-      data,
-    };
+    try {
+      const data = await prisma.accountBasedMarketingTarget.findMany();
+      return {
+        code: 200,
+        success: true,
+        message: 'Account Based Marketing fetched successfully',
+        data,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async findOne(orgId: string, id: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const data = await prisma.accountBasedMarketingTarget.findUnique({
-      where: { id },
-    });
-    if(!data)
-    {
-      throw new NotFoundException('Account Based Marketing not found'); 
+    try {
+      const data = await prisma.accountBasedMarketingTarget.findUnique({
+        where: { id },
+      });
+      if (!data) {
+        throw new NotFoundException('Account Based Marketing not found');
+      }
+      return {
+        code: 200,
+        success: true,
+        message: 'Account Based Marketing fetched successfully',
+        data,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    return {
-      code: 200,
-      success: true,
-      message: 'Account Based Marketing fetched successfully',
-      data,
-    };
   }
 
-  async update(orgId: string,id: string,updateAccountBasedMarketingDto: UpdateAccountBasedMarketingDto,) {
+  async update(orgId: string, id: string, updateAccountBasedMarketingDto: UpdateAccountBasedMarketingDto,) {
     await this.findOne(orgId, id);
     const prisma = await this.prismaClientManager.getClient(orgId);
-    await prisma.accountBasedMarketingTarget.update({
-      where: { id },
-      data: updateAccountBasedMarketingDto,
-    });
-    return {
-      code: 200,
-      success: true,
-      message: 'Account Based Marketing updated successfully',
-    };
+    try {
+      await prisma.accountBasedMarketingTarget.update({
+        where: { id },
+        data: updateAccountBasedMarketingDto,
+      });
+      return {
+        code: 200,
+        success: true,
+        message: 'Account Based Marketing updated successfully',
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async remove(orgId: string, id: string) {
     await this.findOne(orgId, id);
     const prisma = await this.prismaClientManager.getClient(orgId);
-    await prisma.accountBasedMarketingTarget.delete({ where: { id } });
-    return {
-      code: 204,
-      success: true,
-      message: 'Account Based Marketing deleted successfully',
-    };
+    try {
+      await prisma.accountBasedMarketingTarget.delete({ where: { id } });
+      return {
+        code: 204,
+        success: true,
+        message: 'Account Based Marketing deleted successfully',
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async getABMFields(orgId: string) {

@@ -14,121 +14,139 @@ export class FormBuilderService {
   constructor(
     private readonly prismaClientManager: PrismaClientManager,
     private readonly contactService: ContactsService,
-  ) {}
+  ) { }
 
   async create(orgId: string, createFormBuilderDto: CreateFormBuilderDto) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const total = await prisma.leadForm.count();
-    console.log(total);
-    if (total >= 10) {
-      return {
-        statusCode: 400,
-        success: false,
-        message: 'You can not create more than 10 forms',
-      };
-    }
-
-    let leadForm;
     try {
-      const fields = createFormBuilderDto.createLeadField;
-      delete createFormBuilderDto.createLeadField;
-      leadForm = await prisma.leadForm.create({
-        data: createFormBuilderDto,
-      });
+      const total = await prisma.leadForm.count();
+      console.log(total);
+      if (total >= 10) {
+        return {
+          statusCode: 400,
+          success: false,
+          message: 'You can not create more than 10 forms',
+        };
+      }
 
-      if (fields) {
-        for (const field of fields) {
-          await prisma.leadFormField.create({
-            data: {
-              leadFormId: leadForm.id,
-              type: field.type,
-              ...field,
+      let leadForm;
+      try {
+        const fields = createFormBuilderDto.createLeadField;
+        delete createFormBuilderDto.createLeadField;
+        leadForm = await prisma.leadForm.create({
+          data: createFormBuilderDto,
+        });
+
+        if (fields) {
+          for (const field of fields) {
+            await prisma.leadFormField.create({
+              data: {
+                leadFormId: leadForm.id,
+                type: field.type,
+                ...field,
+              },
+            });
+          }
+        }
+      } catch (error) {
+        if (leadForm) {
+          await prisma.leadForm.delete({
+            where: {
+              id: leadForm.id,
             },
           });
         }
+        throw error;
       }
+      return {
+        code: 200,
+        success: true,
+        message: 'Form created successfully',
+      };
     } catch (error) {
-      if (leadForm) {
-        await prisma.leadForm.delete({
-          where: {
-            id: leadForm.id,
-          },
-        });
-      }
-      throw error;
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    return {
-      code: 200,
-      success: true,
-      message: 'Form created successfully',
-    };
   }
 
   async findAll(orgId: string, filterDto: FilterDto) {
     const { page, limit, sort, searchTerm } = filterDto;
     const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const forms = await prisma.leadForm.findMany({
-      where: {
-        ...(searchTerm
-          ? {
+    try {
+      const forms = await prisma.leadForm.findMany({
+        where: {
+          ...(searchTerm
+            ? {
               OR: [
                 { title: { contains: searchTerm } },
                 { description: { contains: searchTerm } },
               ],
             }
-          : {}),
-      },
-      take: limit,
-      skip: skip,
-      orderBy: {
-        createdAt: sort,
-      },
-      include: {
-        LeadFormField: true,
-      },
-    });
-    const total = await prisma.leadForm.count({
-      where: {
-        ...(searchTerm
-          ? {
+            : {}),
+        },
+        take: limit,
+        skip: skip,
+        orderBy: {
+          createdAt: sort,
+        },
+        include: {
+          LeadFormField: true,
+        },
+      });
+      const total = await prisma.leadForm.count({
+        where: {
+          ...(searchTerm
+            ? {
               OR: [
                 { title: { contains: searchTerm } },
                 { description: { contains: searchTerm } },
               ],
             }
-          : {}),
-      },
-    });
-    return {
-      code: 200,
-      success: true,
-      message: 'Forms fetched successfully',
-      data: forms,
-      total: total,
-      page: page,
-    };
+            : {}),
+        },
+      });
+      return {
+        code: 200,
+        success: true,
+        message: 'Forms fetched successfully',
+        data: forms,
+        total: total,
+        page: page,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async findOne(orgId: string, id: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const form = await prisma.leadForm.findUnique({
-      where: {
-        id: id,
-      },
-      include: {
-        LeadFormField: true,
-      },
-    });
-    if (!form) {
-      throw new NotFoundException('Form not found');
+    try {
+      const form = await prisma.leadForm.findUnique({
+        where: {
+          id: id,
+        },
+        include: {
+          LeadFormField: true,
+        },
+      });
+      if (!form) {
+        throw new NotFoundException('Form not found');
+      }
+      return {
+        code: 200,
+        success: true,
+        message: 'Form fetched successfully',
+        data: form,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    return {
-      code: 200,
-      success: true,
-      message: 'Form fetched successfully',
-      data: form,
-    };
   }
 
   async update(
@@ -137,50 +155,62 @@ export class FormBuilderService {
     updateFormBuilderDto: UpdateFormBuilderDto,
   ) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    await this.findOne(orgId, id);
     try {
-      const updateFields = updateFormBuilderDto.updateLeadField;
-      delete updateFormBuilderDto.updateLeadField;
-      await prisma.leadForm.update({
-        where: { id },
-        data: updateFormBuilderDto,
-      });
-      await prisma.leadFormField.deleteMany({
-        where: { leadFormId: id },
-      });
-      if (updateFields) {
-        for (const field of updateFields) {
-          await prisma.leadFormField.create({
-            data: {
-              leadFormId: id,
-              type: field.type,
-              label: field.label,
-              isRequired: field.isRequired,
-              contactField: field.contactField,
-            },
-          });
+      await this.findOne(orgId, id);
+      try {
+        const updateFields = updateFormBuilderDto.updateLeadField;
+        delete updateFormBuilderDto.updateLeadField;
+        await prisma.leadForm.update({
+          where: { id },
+          data: updateFormBuilderDto,
+        });
+        await prisma.leadFormField.deleteMany({
+          where: { leadFormId: id },
+        });
+        if (updateFields) {
+          for (const field of updateFields) {
+            await prisma.leadFormField.create({
+              data: {
+                leadFormId: id,
+                type: field.type,
+                label: field.label,
+                isRequired: field.isRequired,
+                contactField: field.contactField,
+              },
+            });
+          }
         }
+      } catch (error) {
+        throw error;
       }
-    } catch (error) {
-      throw error;
-    }
 
-    return {
-      code: 200,
-      success: true,
-      message: 'Form updated successfully',
-    };
+      return {
+        code: 200,
+        success: true,
+        message: 'Form updated successfully',
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async remove(orgId: string, id: string) {
     await this.findOne(orgId, id);
     const prisma = await this.prismaClientManager.getClient(orgId);
-    await prisma.leadForm.delete({ where: { id } });
-    return {
-      code: 204,
-      success: true,
-      message: 'Form deleted successfully',
-    };
+    try {
+      await prisma.leadForm.delete({ where: { id } });
+      return {
+        code: 204,
+        success: true,
+        message: 'Form deleted successfully',
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async generateFormScript(orgId: string, id: string): Promise<string> {
@@ -205,44 +235,50 @@ export class FormBuilderService {
 
   async generateFormHTML(orgId: string, id: string): Promise<any> {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const form = await prisma.leadForm.findUnique({
-      where: {
-        id: id,
-      },
-      include: {
-        LeadFormField: true,
-      },
-    });
-    await this.findOne(orgId, id);
-    const formId = `form_${id.replace(' ', '')}`;
-    let formHTML = `<form id='${formId}'>`;
-    formHTML += `<h2>${form.title}</h2>`;
-    formHTML += `<p>${form.description}</p>`;
-    const formFields = form.LeadFormField;
-    formFields.forEach((field) => {
-      formHTML += `<div>`;
-      formHTML += `<label>${field.label}</label>`;
-      if (field.isRequired) {
-        formHTML +=
-          field.type === 'TEXTAREA'
-            ? `<textarea name="${field.contactField}" required></textarea>`
-            : `<input type="${field.type.toLowerCase()}" name="${field.contactField}" required>`;
-      } else {
-        formHTML +=
-          field.type === 'TEXTAREA'
-            ? `<textarea name="${field.contactField}"></textarea>`
-            : `<input type="${field.type.toLowerCase()}" name="${field.contactField}">`;
-      }
-      formHTML += `</div>`;
-    });
-    formHTML += `<button type="submit">Submit</button>`;
-    formHTML += '</form>';
-    // return formHTML;
-    return {
-      code: 200,
-      message: 'Form HTML generated successfully',
-      data: formHTML,
-    };
+    try {
+      const form = await prisma.leadForm.findUnique({
+        where: {
+          id: id,
+        },
+        include: {
+          LeadFormField: true,
+        },
+      });
+      await this.findOne(orgId, id);
+      const formId = `form_${id.replace(' ', '')}`;
+      let formHTML = `<form id='${formId}'>`;
+      formHTML += `<h2>${form.title}</h2>`;
+      formHTML += `<p>${form.description}</p>`;
+      const formFields = form.LeadFormField;
+      formFields.forEach((field) => {
+        formHTML += `<div>`;
+        formHTML += `<label>${field.label}</label>`;
+        if (field.isRequired) {
+          formHTML +=
+            field.type === 'TEXTAREA'
+              ? `<textarea name="${field.contactField}" required></textarea>`
+              : `<input type="${field.type.toLowerCase()}" name="${field.contactField}" required>`;
+        } else {
+          formHTML +=
+            field.type === 'TEXTAREA'
+              ? `<textarea name="${field.contactField}"></textarea>`
+              : `<input type="${field.type.toLowerCase()}" name="${field.contactField}">`;
+        }
+        formHTML += `</div>`;
+      });
+      formHTML += `<button type="submit">Submit</button>`;
+      formHTML += '</form>';
+      // return formHTML;
+      return {
+        code: 200,
+        message: 'Form HTML generated successfully',
+        data: formHTML,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async submitForm(orgId: string, id: string, formData: any) {

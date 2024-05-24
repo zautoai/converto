@@ -17,11 +17,11 @@ export class SchemaManagerService {
   async create(orgId: string, rollback: Function): Promise<any> {
     const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     const schemaName = getSchemaName(orgId);
-    
+
     try {
       const query: Sql = Prisma.sql`CREATE SCHEMA IF NOT EXISTS ${raw(schemaName)};`;
       await prisma.$executeRaw(query);
-      
+
       try {
         await this.applyMigration(orgId, rollback);
       } catch (error) {
@@ -37,7 +37,7 @@ export class SchemaManagerService {
       rollback();
       throw error;
     } finally {
-      await prisma.$disconnect();
+      await this.prismaClientManager.disconnectClient(orgId);
     }
   }
 
@@ -55,7 +55,7 @@ export class SchemaManagerService {
       console.error('Error migrating tenant schema:', error);
       throw error;
     } finally {
-      await prisma.$disconnect();
+      await this.prismaClientManager.disconnectClient(orgId);
     }
   }
 
@@ -70,7 +70,7 @@ export class SchemaManagerService {
       console.error('Error deleting tenant schema:', error);
       throw error;
     } finally {
-      await prisma.$disconnect();
+      await this.prismaClientManager.disconnectClient(orgId);
     }
   }
 
@@ -112,7 +112,7 @@ export class SchemaManagerService {
       console.error('Error applying migrations for tenant:', error);
       throw error;
     } finally {
-      await prisma.$disconnect();
+      await this.prismaClientManager.disconnectClient(orgId);
     }
   }
 
