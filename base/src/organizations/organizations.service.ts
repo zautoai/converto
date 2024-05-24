@@ -1,27 +1,28 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { DEFALT_ROLES, DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { BaseService } from 'src/common/services/base.service';
+import { SchemaManagerService } from 'src/microservices/crm_service/schema-manager.service';
+import { RolesService } from 'src/roles/roles.service';
+import { SchemaManager } from 'src/schema-manager/schema-manager.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { SchemaManagerService } from 'src/microservices/crm_service/schema-manager.service';
-import { SchemaManager } from 'src/schema-manager/schema-manager.service';
-import { DEFALT_ROLES, DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
-import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
-import { RolesService } from 'src/roles/roles.service';
 
 
 @Injectable()
-export class OrganizationsService {
+export class OrganizationsService extends BaseService {
 
 
   constructor(
-    private readonly prismaClientManager: PrismaClientManager,
     private readonly schemaManagerService: SchemaManagerService,
     private readonly schemaManager: SchemaManager,
     private readonly roleService: RolesService
-  ) { }
+  ) {
+    super();
+  }
 
   async findOrgByEmail(email: string) {
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const prisma = await this.getPrismaMasterClient();
     try {
       const org = await prisma.organization.findFirst({
         where: {
@@ -34,12 +35,12 @@ export class OrganizationsService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeMasterConnection()
     }
   }
 
   async create(createOrganizationDto: CreateOrganizationDto) {
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const prisma = await this.getPrismaMasterClient()
     try {
       const organization = await prisma.organization.create({ data: createOrganizationDto });
 
@@ -57,14 +58,14 @@ export class OrganizationsService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeMasterConnection()
     }
   }
 
   async findAll(paginationDto: PaginationDto) {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const prisma = await this.getPrismaMasterClient()
     try {
       const roleData = await prisma.organization.findMany({ skip, take: limit });
       const total = await prisma.organization.count();
@@ -78,12 +79,12 @@ export class OrganizationsService {
     catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeMasterConnection()
     }
   }
 
   async findOne(id: string) {
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const prisma = await this.getPrismaMasterClient()
     try {
       let org = await prisma.organization.findFirst({ where: { id } });
       if (org) {
@@ -94,13 +95,13 @@ export class OrganizationsService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeMasterConnection()
     }
   }
 
 
   async update(id: string, updateOrganizationDto: UpdateOrganizationDto) {
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const prisma = await this.getPrismaMasterClient()
     try {
       let org = await prisma.organization.findFirst({ where: { id } });
       if (org) {
@@ -112,12 +113,12 @@ export class OrganizationsService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeMasterConnection()
     }
   }
 
   async remove(id: string) {
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const prisma = await this.getPrismaMasterClient()
     try {
       let org = await prisma.organization.findFirst({ where: { id, } });
       if (org) {
@@ -135,24 +136,24 @@ export class OrganizationsService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeMasterConnection()
     }
   }
 
   async findOneByName(orgName: string) {
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const prisma = await this.getPrismaMasterClient()
     try {
       const org = await prisma.organization.findFirst({ where: { name: orgName } });
       return org
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeMasterConnection()
     }
   }
 
   async updateOrgWith(id: string, name: string, siteUrl: string) {
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    const prisma = await this.getPrismaMasterClient()
     try {
       return await prisma.organization.update({ data: { name, siteUrl }, where: { id } });
     }
@@ -161,7 +162,7 @@ export class OrganizationsService {
       throw new InternalServerErrorException(err.message);
     }
     finally {
-      await prisma.$disconnect();
+      await this.closeMasterConnection()
     }
   }
 
