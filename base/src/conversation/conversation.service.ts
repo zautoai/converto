@@ -1,17 +1,15 @@
-import { Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException } from '@nestjs/common';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { SummarizerService } from 'src/assistants/services/summarizer.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ServiceParams } from 'src/common/models/service-param.model';
+import { BaseService } from 'src/common/services/base.service';
+import { ContactsService } from 'src/contacts/contacts.service';
+import { ZautoChatCompletionMessage } from 'src/llm/llms/llm.models';
+import { CreateConversationDto } from './dto/create-conversation.dto';
 import { CreateMessageDto } from './dto/crete-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { ConversationStatus } from './entities/conversation.entity';
 import { MessageMediaType } from './entities/conversation.enums';
-import { SummarizerService } from 'src/assistants/services/summarizer.service';
-import { ZautoChatCompletionMessage } from 'src/llm/llms/llm.models';
-import { BaseService } from 'src/common/services/base.service';
-import { ServiceParams } from 'src/common/models/service-param.model';
-import { data } from 'cheerio/lib/api/attributes';
-import { ContactsService } from 'src/contacts/contacts.service';
 
 @Injectable()
 export class ConversationService extends BaseService {
@@ -23,31 +21,44 @@ export class ConversationService extends BaseService {
   async create(serviceParams: ServiceParams<CreateConversationDto>) {
     const { orgId, data: createConversationDto } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
-    return await prisma.conversation.create({ data: createConversationDto });
+    try {
+      return await prisma.conversation.create({ data: createConversationDto });
+    }
+    catch (error) {
+      throw error
+    } finally {
+      await prisma.$disconnect();
+    }
   }
 
   async createIfNotExist(serviceParams: ServiceParams<{ createConversationDto: CreateConversationDto, message?: ZautoChatCompletionMessage }>,) {
     const { orgId, data: { createConversationDto, message } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
-    const conversation = await prisma.conversation.findFirst({
-      where: {
-        visitorId: createConversationDto.visitorId
-      }
-    })
-    if (conversation) {
-      return conversation;
-    }
-    const newConv = await prisma.conversation.create({ data: createConversationDto });
-    if (message) {
-      await this.createMessage({
-        orgId, data: {
-          convId: newConv.id,
-          role: message.role,
-          content: message.content
+    try {
+      const conversation = await prisma.conversation.findFirst({
+        where: {
+          visitorId: createConversationDto.visitorId
         }
-      });
+      })
+      if (conversation) {
+        return conversation;
+      }
+      const newConv = await prisma.conversation.create({ data: createConversationDto });
+      if (message) {
+        await this.createMessage({
+          orgId, data: {
+            convId: newConv.id,
+            role: message.role,
+            content: message.content
+          }
+        });
+      }
+      return newConv;
+    } catch (error) {
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
-    return newConv;
   }
 
   async findAll(serviceParams: ServiceParams<PaginationDto>) {
@@ -55,13 +66,19 @@ export class ConversationService extends BaseService {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
     const prisma = await this.getPrismaClient(orgId);
-    const roleData = await prisma.conversation.findMany({ skip, take: limit });
-    const total = await prisma.conversation.count();
-    return {
-      data: roleData,
-      page: page,
-      total: total
-    };
+    try {
+      const roleData = await prisma.conversation.findMany({ skip, take: limit });
+      const total = await prisma.conversation.count();
+      return {
+        data: roleData,
+        page: page,
+        total: total
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await prisma.$disconnect();
+    }
   }
 
   async updateSummary(conversation: any) {
@@ -78,82 +95,100 @@ export class ConversationService extends BaseService {
 
   async findOne(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    let existingConversation = await prisma.conversation.findUnique({
-      where: { id },
-      include: {
-        messages: {
-          orderBy: { createdAt: 'asc' }, include: {
-            sentBy: {
-              select: {
-                id: true,
-                name: true,
-                imgUrl: true
+    try {
+      let existingConversation = await prisma.conversation.findUnique({
+        where: { id },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'asc' }, include: {
+              sentBy: {
+                select: {
+                  id: true,
+                  name: true,
+                  imgUrl: true
+                }
               }
             }
-          }
-        },
-        campaign: true,
-        visitor: true,
-        visit: true
-      }
-    });
-    if (existingConversation) {
-      return existingConversation;
-    } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+          },
+          campaign: true,
+          visitor: true,
+          visit: true
+        }
+      });
+      if (existingConversation) {
+        return existingConversation;
+      } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+    } catch (error) {
+      throw error
+    } finally {
+      await prisma.$disconnect();
+    }
   }
 
   async findOneWithSummary(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    let existingConversation = await prisma.conversation.findUnique({
-      where: { id },
-      include: {
-        messages: {
-          where: { type: 'TEXT' },
-          orderBy: { createdAt: 'asc' }, include: {
-            sentBy: {
-              select: {
-                id: true,
-                name: true,
-                imgUrl: true
+    try {
+      let existingConversation = await prisma.conversation.findUnique({
+        where: { id },
+        include: {
+          messages: {
+            where: { type: 'TEXT' },
+            orderBy: { createdAt: 'asc' }, include: {
+              sentBy: {
+                select: {
+                  id: true,
+                  name: true,
+                  imgUrl: true
+                }
               }
             }
           }
         }
-      }
-    });
-    if (existingConversation) {
-      const lastMessageOn = existingConversation.messages[existingConversation.messages.length - 1]?.modifiedAt.getTime();
-      if (!existingConversation.summaryUpdatedAt || lastMessageOn && lastMessageOn > existingConversation.summaryUpdatedAt.getTime()) {
-        existingConversation = await this.updateSummary(existingConversation);
-      }
-      return existingConversation;
-    } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+      });
+      if (existingConversation) {
+        const lastMessageOn = existingConversation.messages[existingConversation.messages.length - 1]?.modifiedAt.getTime();
+        if (!existingConversation.summaryUpdatedAt || lastMessageOn && lastMessageOn > existingConversation.summaryUpdatedAt.getTime()) {
+          existingConversation = await this.updateSummary(existingConversation);
+        }
+        return existingConversation;
+      } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+    } catch (error) {
+      throw error
+    } finally {
+      await prisma.$disconnect();
+    }
   }
 
   async findOneNoSummay(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    let existingConversation = await prisma.conversation.findUnique({
-      where: { id },
-      include: {
-        messages: {
-          orderBy: { createdAt: 'asc' }, include: {
-            sentBy: {
-              select: {
-                id: true,
-                name: true,
-                imgUrl: true
+    try {
+      let existingConversation = await prisma.conversation.findUnique({
+        where: { id },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'asc' }, include: {
+              sentBy: {
+                select: {
+                  id: true,
+                  name: true,
+                  imgUrl: true
+                }
               }
             }
-          }
-        },
-        campaign: true,
-        visitor: true,
-        visit: true
-      }
-    });
-    if (existingConversation) {
-      return existingConversation;
-    } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+          },
+          campaign: true,
+          visitor: true,
+          visit: true
+        }
+      });
+      if (existingConversation) {
+        return existingConversation;
+      } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+    } catch (error) {
+      throw error
+    } finally {
+      await prisma.$disconnect();
+    }
   }
 
   // async update(id: string, updateConversationDto: any) {
@@ -165,10 +200,16 @@ export class ConversationService extends BaseService {
 
   async remove(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
-    const existingConversation = await prisma.conversation.findUnique({ where: { id } });
-    if (existingConversation) {
-      return await prisma.conversation.delete({ where: { id } })
-    } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+    try {
+      const existingConversation = await prisma.conversation.findUnique({ where: { id } });
+      if (existingConversation) {
+        return await prisma.conversation.delete({ where: { id } })
+      } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+    } catch (error) {
+      throw error
+    } finally {
+      await prisma.$disconnect();
+    }
   }
 
   async updateStatusByClient(serviceParams: ServiceParams<{ socketId: string, status: ConversationStatus }>) {
@@ -190,7 +231,9 @@ export class ConversationService extends BaseService {
       }
       return null;
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -205,13 +248,15 @@ export class ConversationService extends BaseService {
       });
       return _conversation;
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
   async endConversation(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const prisma = await this.getPrismaClient(orgId);
       const _conversation = await prisma.conversation.update({
         data: {
           isEnded: true
@@ -219,7 +264,9 @@ export class ConversationService extends BaseService {
       });
       return _conversation;
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -234,7 +281,9 @@ export class ConversationService extends BaseService {
       });
       return _conversation;
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -268,7 +317,9 @@ export class ConversationService extends BaseService {
       return null;
 
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -297,7 +348,9 @@ export class ConversationService extends BaseService {
       return null;
 
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -329,7 +382,9 @@ export class ConversationService extends BaseService {
       return null;
 
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -353,7 +408,9 @@ export class ConversationService extends BaseService {
       }
       return conversation;
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -369,7 +426,9 @@ export class ConversationService extends BaseService {
         const _lead = await this.contactsService.create(orgId, lead)
       }
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -385,6 +444,8 @@ export class ConversationService extends BaseService {
       return message;
     } catch (error) {
       throw new InternalServerErrorException('Unalbe to create Message')
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -396,6 +457,8 @@ export class ConversationService extends BaseService {
       return message;
     } catch (error) {
       throw new InternalServerErrorException('Unalbe to create Message')
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -418,6 +481,8 @@ export class ConversationService extends BaseService {
       return messages;
     } catch (error) {
       throw new InternalServerErrorException('Unalbe to create Message')
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -445,6 +510,8 @@ export class ConversationService extends BaseService {
       return lastMessage;
     } catch (error) {
       throw new InternalServerErrorException('Unable to fetch last message');
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -489,7 +556,9 @@ export class ConversationService extends BaseService {
       }
 
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
   }
 }

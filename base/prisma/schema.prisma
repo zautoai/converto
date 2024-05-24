@@ -125,7 +125,6 @@ model Agent {
   wakeupTime       Float?           @default(5000)
   position         BotPosition?     @default(BOTTOM_RIGHT)
   AgentPrompt      AgentPrompt[]
-  LeadConfig       LeadConfig[]
   AgentFiles       AgentFile[]
   starters         String?          @db.Text
 }
@@ -143,20 +142,6 @@ model AgentFile {
   agent      Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
 
   @@index([agentId], map: "AgentId_agentFile_fkey")
-}
-
-model LeadConfig {
-  id         String   @id @default(uuid())
-  agentId    String // Updated to String
-  name       Boolean  @default(false)
-  email      Boolean  @default(false)
-  mobile     Boolean  @default(false)
-  whatsapp   Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
-  agent      Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
-
-  @@index([agentId], map: "AgentId_LeadConfig_fkey")
 }
 
 // ... and so on for the remaining models ...

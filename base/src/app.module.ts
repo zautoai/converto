@@ -22,7 +22,6 @@ import { RegistrationModule } from './registration/registration.module';
 
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { LeadConfigModule } from './lead-config/lead-config.module';
 import { AssistantsModule } from './assistants/assistants.module';
 import { CampaignModule } from './campaign/campaign.module';
 import { DashboardModule } from './dashboard/dashboard.module';
@@ -80,7 +79,6 @@ import { SchemaManagerModule } from './schema-manager/schema-manager.module';
       rootPath: join(__dirname, '..', 'public/assets/bot'),
       serveRoot: '/assets',
     }),
-    LeadConfigModule,
     AssistantsModule,
     CampaignModule,
     DashboardModule,
