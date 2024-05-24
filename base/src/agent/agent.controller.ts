@@ -4,7 +4,7 @@ import { UpdateAgentDto } from './dto/update-agent.dto';
 import { Agent } from './entities/agent.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { NameAvailability, NameCheckDto } from './dto/namecheck.dto';
 import { SYSTEM_CONST } from 'src/common/constants/system.constants';
@@ -41,9 +41,9 @@ export class AgentController {
     private readonly demandGenService: DemandGenService,
     private readonly trackingService:TrackingService) {}
 
-    async addVisitor(agentId: string, query: any, request: Request, orgId?: string) {
+    async addVisitor(query: any, request: Request, orgId?: string) {
       try {
-        let visitor = await this.visitorService.findOne(orgId,query.visitor)
+        let visitor = query.visitor ? await this.visitorService.findOne(orgId,query.visitor) : null;
         if(!visitor) {
           const ipaddress = request.headers['x-forwarded-for'];
           console.log(ipaddress)
@@ -125,12 +125,13 @@ export class AgentController {
     type: Agent
   })
   @UseGuards(SubdomainGuard)
+  @ApiBearerAuth("x-tenant-id")
   async findOne(@Query() sourceQuery: any, @Param('id') id: string, @Req() request: Request) {
     const orgId = request['orgId'];
     const agent = await this.agentsService.findOne(orgId,id);
     if(sourceQuery.source) {
 
-      const visitorData = await this.addVisitor(id, sourceQuery, request,orgId);
+      const visitorData = await this.addVisitor(sourceQuery, request,orgId);
       return {
         ...agent, visitor: visitorData.visitor, visit: visitorData.visit, 
       }

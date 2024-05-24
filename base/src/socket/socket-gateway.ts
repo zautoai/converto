@@ -234,33 +234,28 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
 
   @SubscribeMessage('createConversation')
   async intConversation(@MessageBody() message: any, @ConnectedSocket() client: Socket) {
-    const orgId = message.orgId;
-    if(!orgId)
-    {
-      
+    const { orgId } = await this.getClientInfo(client)
+    if (!orgId) {
+      this.server.to(client.id).emit('convCreateFailed', { message: "orgId is required" });
+      return;
     }
-    if (!message.agentId) {
-      this.server.to(client.id).emit('convCreateFailed', { message: "agentId is required." });
-    } else {
-      const { orgId } = await this.getClientInfo(client)
+    else 
+    {
       const conversation = await this.onInitConv(orgId, message, client.id);
-      const currentDate = new Date().toISOString();
-
-      // Emit the message to the specific client
       this.server.to(client.id).emit('convCreated', conversation);
-
       if (conversation.createdAt.getTime() > new Date().getTime() - (1000 * 60 * 3)) {
         await this.notifyAuthSubscribers('newConversation', orgId, conversation);
       }
-      // Emit CTAs while creating conversation
-      try {
+      try 
+      {
         const prisma = await this.prismaClientManager.getClient(orgId)
         const agent = await prisma.agent.findFirst();
         this.redisPublisher.publish('selectcta', JSON.stringify({
           clientId: client.id,
           convId: conversation.id, agentId: agent.id
         }));
-      } catch (error) {
+      } 
+      catch (error) {
         console.log(error)
       }
     }
@@ -268,7 +263,8 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
 
   @SubscribeMessage('message')
   async onMessage(@MessageBody() message: any, @ConnectedSocket() client: Socket) {
-    if (!message.agentId || !message.convId) {
+    if (!message.agentId || !message.convId) 
+    {
       this.server.to(client.id).emit('messageFailed',
         {
           message: {
@@ -277,7 +273,9 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
             type: MessageMediaType.ERROR
           }
         });
-    } else {
+    } 
+    else 
+    {
       const { orgId } = await this.getClientInfo(client)
       const flagged = await this.llmService.isContentFlagged(message.chatMessage?.messages[0]?.content);
       if (!flagged) {
@@ -452,7 +450,7 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
   }
 
   async onInitConv(orgId: string, message: any, clientId: string) {
-    const agent = await this.agentsService.findOne(orgId, message.agentId);
+    const agent = await this.agentsService.findOneByOrg(orgId);
     let visitor = null, visit = null;
     if (message.visitorId) {
       visitor = await this.visitorService.findOne(orgId, message.visitorId);
@@ -466,10 +464,9 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     }
 
     const converationObj = {
-      agentId: agent.id,
       type: ConversationType.CHAT,
-      visitorId: visitor.id,
-      visitId: visit.id,
+      visitorId: visitor?.id,
+      visitId: visit?.id,
       campaignId: visit.campaignId,
       socketId: clientId
     }
