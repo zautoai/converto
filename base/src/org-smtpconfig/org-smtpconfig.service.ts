@@ -9,7 +9,7 @@ import { BaseService } from 'src/common/services/base.service';
 import { ServiceParams } from 'src/common/models/service-param.model';
 
 @Injectable()
-export class OrgSmtpconfigService extends BaseService{
+export class OrgSmtpconfigService extends BaseService {
 
     constructor(
         private organizationsService: OrganizationsService,
@@ -23,109 +23,150 @@ export class OrgSmtpconfigService extends BaseService{
         const { orgId, data: createOrgSmtpconfigDto } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
         // verify connection
-        const isConnectionOk = await this.smtpService.verifyConnection(createOrgSmtpconfigDto);
+        try {
+            const isConnectionOk = await this.smtpService.verifyConnection(createOrgSmtpconfigDto);
 
-        if (!isConnectionOk) {
-            throw new BadRequestException("Failed to establish a connection with the SMTP server. Please check your SMTP configuration and try again.");
-        }
-        let data = createOrgSmtpconfigDto;
-        data.pass = this.hashingService.encryt(data.pass);
+            if (!isConnectionOk) {
+                throw new BadRequestException("Failed to establish a connection with the SMTP server. Please check your SMTP configuration and try again.");
+            }
+            let data = createOrgSmtpconfigDto;
+            data.pass = this.hashingService.encryt(data.pass);
 
-        const existingConfigs = await this.getActiveConfigByOrg(orgId);
-        if (!existingConfigs) {
-            data = { ...data, ...{ isActive: true } };
+            const existingConfigs = await this.getActiveConfigByOrg(orgId);
+            if (!existingConfigs) {
+                data = { ...data, ...{ isActive: true } };
+            }
+            const smtpConfig = await prisma.orgSMTPConfig.create({ data: data });
+            delete smtpConfig.pass;
+            return smtpConfig;
+        } catch (error) {
+            throw error
+        } finally {
+            await prisma.$disconnect();
         }
-        const smtpConfig = await prisma.orgSMTPConfig.create({ data: data });
-        delete smtpConfig.pass;
-        return smtpConfig;
     }
 
     async findAll(serviceParams: ServiceParams<PaginationDto>) {
-        const { orgId ,data: paginationDto } = serviceParams;
+        const { orgId, data: paginationDto } = serviceParams;
         const { page, limit } = paginationDto;
         const skip = (page - 1) * limit;
         const prisma = await this.getPrismaClient(orgId);
-        const smtpConfigs = await prisma.orgSMTPConfig.findMany({
-            skip,
-            take: limit,
-        });
-        const total = await prisma.orgSMTPConfig.count();
-        return {
-            data: smtpConfigs,
-            page: page,
-            total: total,
-        };
+        try {
+            const smtpConfigs = await prisma.orgSMTPConfig.findMany({
+                skip,
+                take: limit,
+            });
+            const total = await prisma.orgSMTPConfig.count();
+            return {
+                data: smtpConfigs,
+                page: page,
+                total: total,
+            };
+        } catch (error) {
+            throw error
+        } finally {
+            await prisma.$disconnect();
+        }
     }
 
-    async findOne(orgId: string,id: string) {
+    async findOne(orgId: string, id: string) {
         const prisma = await this.getPrismaClient(orgId);
-        const existing = await prisma.orgSMTPConfig.findUnique({ where: { id } });
-        if (existing) {
-            existing.pass = this.hashingService.decrypt(existing.pass);
-            return existing;
-        }
-        else {
-            throw new NotFoundException(`SMTP config not found with id: ${id}`);
+        try {
+            const existing = await prisma.orgSMTPConfig.findUnique({ where: { id } });
+            if (existing) {
+                existing.pass = this.hashingService.decrypt(existing.pass);
+                return existing;
+            }
+            else {
+                throw new NotFoundException(`SMTP config not found with id: ${id}`);
+            }
+        } catch (error) {
+            throw error
+        } finally {
+            await prisma.$disconnect();
         }
     }
 
     async getByOrg(orgId: string) {
         const prisma = await this.getPrismaClient(orgId);
-        const existing = await prisma.orgSMTPConfig.findFirst();
-        if (existing) {
-            return existing;
-        }
-        else {
-            throw new NotFoundException(`SMTP config not found with id: ${orgId}`);
+        try {
+            const existing = await prisma.orgSMTPConfig.findFirst();
+            if (existing) {
+                return existing;
+            }
+            else {
+                throw new NotFoundException(`SMTP config not found with id: ${orgId}`);
+            }
+        } catch (error) {
+            throw error
+        } finally {
+            await prisma.$disconnect();
         }
     }
 
     async getActiveConfigByOrg(orgId: string) {
         const prisma = await this.getPrismaClient(orgId);
-        const existing = await prisma.orgSMTPConfig.findFirst({ where: { isActive: true } });
-        if (existing) {
-            return existing;
-        }
-        else {
-            return null;
+        try {
+            const existing = await prisma.orgSMTPConfig.findFirst({ where: { isActive: true } });
+            if (existing) {
+                return existing;
+            }
+            else {
+                return null;
+            }
+        } catch (error) {
+            throw error
+        } finally {
+            await prisma.$disconnect();
         }
     }
 
-    async update(serviceParams: ServiceParams<{id: string, updateOrgSmtpconfigDto: UpdateOrgSmtpconfigDto}>) {
-        const { orgId, data: {id, updateOrgSmtpconfigDto} } = serviceParams;
+    async update(serviceParams: ServiceParams<{ id: string, updateOrgSmtpconfigDto: UpdateOrgSmtpconfigDto }>) {
+        const { orgId, data: { id, updateOrgSmtpconfigDto } } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
-        const existing = await prisma.orgSMTPConfig.findUnique({ where: { id } });
-        if (existing) {
-            // verify connection
-            let data;
-            if(!data.pass)
-            {
-                const pass = this.hashingService.decrypt(existing.pass);
-                data = {pass,...updateOrgSmtpconfigDto};
-            }
-            const isConnectionOk = await this.smtpService.verifyConnection(data);
+        try {
+            const existing = await prisma.orgSMTPConfig.findUnique({ where: { id } });
+            if (existing) {
+                // verify connection
+                let data;
+                if (!data.pass) {
+                    const pass = this.hashingService.decrypt(existing.pass);
+                    data = { pass, ...updateOrgSmtpconfigDto };
+                }
+                const isConnectionOk = await this.smtpService.verifyConnection(data);
 
-            if (!isConnectionOk) {
-                throw new BadRequestException("Failed to establish a connection with the SMTP server. Please check your SMTP configuration and try again.");
+                if (!isConnectionOk) {
+                    throw new BadRequestException("Failed to establish a connection with the SMTP server. Please check your SMTP configuration and try again.");
+                }
+                data.pass = this.hashingService.encryt(data.pass);
+                const smtpConfig = await prisma.orgSMTPConfig.update({ where: { id }, data: data });
+                delete smtpConfig.pass;
+                return smtpConfig;
             }
-            data.pass = this.hashingService.encryt(data.pass);
-            const smtpConfig = await prisma.orgSMTPConfig.update({ where: { id }, data: data });
-            delete smtpConfig.pass;
-            return smtpConfig;
-        }
-        else {
-            throw new NotFoundException(`SMTP config not found with id: ${id}`);
+            else {
+                throw new NotFoundException(`SMTP config not found with id: ${id}`);
+            }
+        } catch (error) {
+            throw error
+        } finally {
+            await prisma.$disconnect();
         }
     }
 
-    async delete(orgId: string,id: string) {
+    async delete(orgId: string, id: string) {
         const prisma = await this.getPrismaClient(orgId);
-        const existing = await prisma.orgSMTPConfig.findUnique({ where: { id } });
-        if (existing) {
-            return await prisma.orgSMTPConfig.delete({ where: { id } });
-        }
-        else {
-            throw new NotFoundException(`SMTP config not found with id: ${id}`);
+        try {
+            const existing = await prisma.orgSMTPConfig.findUnique({ where: { id } });
+            if (existing) {
+                return await prisma.orgSMTPConfig.delete({ where: { id } });
+            }
+            else {
+                throw new NotFoundException(`SMTP config not found with id: ${id}`);
+            }
+        } catch (error) {
+            throw error
+        } finally {
+            await prisma.$disconnect();
         }
     }
 }
