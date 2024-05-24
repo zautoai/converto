@@ -1,7 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateScheduleDto, availableHour } from './dto/create-schedule.dto';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { BaseService } from 'src/common/services/base.service';
 import { ServiceParams } from 'src/common/models/service-param.model';
@@ -32,14 +30,20 @@ export class AvailabilityScheduleService extends BaseService {
     }
 
     async findAll(orgId: string) {
+        const prisma = await this.getPrismaClient(orgId)
         try {
-            const prisma = await this.getPrismaClient(orgId)
             const allSchedules = await prisma.availabilitySchedule.findMany({
                 include: { availableHours: true }
             });
             return allSchedules;
-        } catch (error) {
-            throw new BadRequestException(error);
+        } 
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
         }
     }
 
@@ -49,8 +53,14 @@ export class AvailabilityScheduleService extends BaseService {
             const prisma = await this.getPrismaClient(orgId)
             const allSchedules = await prisma.availabilitySchedule.findFirst({ include: { availableHours: true } });
             return allSchedules;
-        } catch (error) {
-            throw new BadRequestException(error);
+        } 
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
         }
     }
 
@@ -59,8 +69,14 @@ export class AvailabilityScheduleService extends BaseService {
             const prisma = await this.getPrismaClient(orgId)
             const allSchedules = await prisma.availabilitySchedule.findFirst({ where:{id},include: { availableHours: true } });
             return allSchedules;
-        } catch (error) {
-            throw new BadRequestException(error);
+        } 
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
         }
     }
 
@@ -85,8 +101,14 @@ export class AvailabilityScheduleService extends BaseService {
                 data: scheduleData
             });
             return updatedSchedule;
-        } catch (error) {
-            throw new BadRequestException(error);
+        } 
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
         }
     }
 
@@ -101,27 +123,44 @@ export class AvailabilityScheduleService extends BaseService {
                 throw new NotFoundException('Availability schedule not found');
             }
             await prisma.availabilitySchedule.delete({ where: { id } });
-        } catch (error) {
-            throw new BadRequestException(error);
+        } 
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
         }
     }
 
     async deleteAndCreateAvailableHours(serviceParams: ServiceParams<{ scheduleId: string, availableHours: any[] }>) {
         const { orgId, data: { scheduleId, availableHours } } = serviceParams;
         const prisma = await this.getPrismaClient(orgId)
-        await prisma.availableHours.deleteMany({
-            where: {
-                scheduleId: scheduleId
-            }
-        });
-        for (let availableHour of availableHours) {
-            const availableHourData = {
-                ...availableHour,
-                ...{
+        try
+        {
+            await prisma.availableHours.deleteMany({
+                where: {
                     scheduleId: scheduleId
                 }
+            });
+            for (let availableHour of availableHours) {
+                const availableHourData = {
+                    ...availableHour,
+                    ...{
+                        scheduleId: scheduleId
+                    }
+                }
+                await prisma.availableHours.create({ data: availableHourData })
             }
-            await prisma.availableHours.create({ data: availableHourData })
+        }
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
         }
     }
 
