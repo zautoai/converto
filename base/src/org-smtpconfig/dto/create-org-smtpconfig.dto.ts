@@ -2,11 +2,6 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateOrgSmtpconfigDto{
-    @ApiProperty({ required: false })
-    @IsString()
-    @IsOptional()
-    orgId: string;
-
     @ApiProperty({ required: true })
     @IsString()
     host: string;

@@ -3,25 +3,26 @@ import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-valid
 import { CTAType } from "src/common/enums/enums";
 
 
-export class UpdateCTADto{
+export class UpdateCTADto {
 
-    @ApiProperty({required:false})
+    @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
-    name: string;
+    name?: string;
 
-    @ApiProperty({required:false})
+    @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
-    description: string;
+    description?: string;
 
-    @ApiProperty({required:false})
+    @ApiProperty({ required: false })
     @IsOptional()
     @IsString()
-    link: string;
+    link?: string;
 
-    @ApiProperty({required:false})
+    @ApiProperty({ required: false })
+    @IsOptional()
     @IsEnum(CTAType)
-    type: CTAType = CTAType.NAVIGATOR;
+    type?: CTAType = CTAType.NAVIGATOR;
 
 }

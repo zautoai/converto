@@ -21,8 +21,8 @@ export class EnrichmentService {
     private readonly enrichmentProvider: EnrichmentProvider,
     private readonly prismaClientManager: PrismaClientManager,
     @InjectQueue('enrichment_queue') private enrichmentQueue: Queue,
-    private readonly externalCrmService:ExternalCrmService
-  ) {}
+    private readonly externalCrmService: ExternalCrmService
+  ) { }
 
   async getPeopleByName(
     first_name: string,
@@ -78,9 +78,9 @@ export class EnrichmentService {
     return await enrichmentService.getOrganization(matchRequest);
   }
 
-  async enrichContact(orgId: string,contactId: string,provider: string = EnrichmentProviderName.APOLLO,) {
+  async enrichContact(orgId: string, contactId: string, provider: string = EnrichmentProviderName.APOLLO,) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
     try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
       const contact = await prisma.contact.findUnique({
         where: {
           id: contactId,
@@ -92,23 +92,25 @@ export class EnrichmentService {
       if (!contact.email) {
         throw new BadRequestException('Contact does not have an email');
       }
-      this.enrichmentQueue.add(provider,{orgId,id:contactId,matchRequest: { email: contact.email },type: 'contact',},{delay: 1000,removeOnComplete: true,attempts: 2,},);
+      this.enrichmentQueue.add(provider, { orgId, id: contactId, matchRequest: { email: contact.email }, type: 'contact', }, { delay: 1000, removeOnComplete: true, attempts: 2, },);
       this.logger.log(
         `Added enrichment task to queue for contact with email: ${contact.email}`,
       );
-      return { 
+      return {
         statusCode: 200,
         status: 'success',
         message: 'Contact enrichment successful',
       };
     } catch (error) {
       throw new BadRequestException(error);
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
   }
 
   async enrichAccount(orgId: string, accountId: string, provider: string = EnrichmentProviderName.APOLLO,) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
     try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
       const account = await prisma.account.findUnique({
         where: {
           id: accountId,
@@ -117,7 +119,7 @@ export class EnrichmentService {
       if (!account) {
         throw new NotFoundException('Account not found');
       }
-      this.enrichmentQueue.add(provider, {orgId, id:accountId, matchRequest: { domain: account.domain }, type: 'account', }, {delay: 1000, removeOnComplete: true, attempts: 2, },);
+      this.enrichmentQueue.add(provider, { orgId, id: accountId, matchRequest: { domain: account.domain }, type: 'account', }, { delay: 1000, removeOnComplete: true, attempts: 2, },);
       this.logger.log(
         `Added enrichment task to queue for account with domain: ${account.domain}`,
       );
@@ -128,6 +130,8 @@ export class EnrichmentService {
       };
     } catch (error) {
       throw new BadRequestException(error);
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
   }
 }

@@ -1,178 +1,208 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCampaignDto } from './dto/create-campaign.dot';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { UpdateCampaignDto } from './dto/update.campaign.dto';
 import { CampaignFilterDto } from './dto/campaign-filter.dto';
 import { CampaignStatus } from 'src/common/enums/enums';
+import { BaseService } from 'src/common/services/base.service';
+import { ServiceParams } from 'src/common/models/service-param.model';
+import { ContactsService } from 'src/contacts/contacts.service';
 
 @Injectable()
-export class CampaignService {
+export class CampaignService extends BaseService {
     constructor(
-        private readonly prisma: PrismaService,
-    ) { }
-
-    async canCreateCampaign(orgId: string) {
-        const account = await this.prisma.orgAccount.findFirst({
-            where: { orgId }
-        })
-        const subscription = await this.prisma.subscriptionPlan.findUnique({
-            where: {
-                id: account.subscriptionId
-            }
-        })
-        return subscription.campaignCount;
+        private contactsService: ContactsService
+    ) {
+        super();
     }
 
-    async updateCampaignCount(count: number, orgId: string) {
-        const account = await this.prisma.orgAccount.findFirst({
-            where: { orgId }
-        })
-
+    async create(serviceParams: ServiceParams<CreateCampaignDto>) {
+        const { orgId, data } = serviceParams;
+        try {
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + 30);
+            data.endDate = endDate;
+            const prisma = await this.getPrismaClient(orgId);
+            const campaign = await prisma.campaign.create({
+                data: {
+                    title: data.title,
+                    description: data.description,
+                    url: data.url,
+                    status: data.status,
+                    isZauto: data.isZauto,
+                    idParam: data.idParam,
+                    idValue: data.idValue,
+                    endDate: endDate
+                }
+            });
+            return campaign;
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
+        finally {
+            await this.closeConnection(orgId);
+        }
     }
 
-    async create(createCampaignDto: CreateCampaignDto) {
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() + 30);
-        createCampaignDto.endDate = endDate;
-        const campaign = await this.prisma.campaign.create({
-            data: {
-                orgId: createCampaignDto.orgId,
-                agentId: createCampaignDto.agentId,
-                title: createCampaignDto.title,
-                description: createCampaignDto.description,
-                url: createCampaignDto.url,
-                status: createCampaignDto.status,
-                isZauto: createCampaignDto.isZauto,
-                idParam: createCampaignDto.idParam,
-                idValue: createCampaignDto.idValue,
-                endDate: endDate,
-                accountId: createCampaignDto.accountId
-            }
-        });
-        await this.updateCampaignCount(1, createCampaignDto.orgId)
-        return campaign;
-    }
-
-    async findAll(paginationDto: PaginationDto) {
+    async findAll(serviceParams: ServiceParams<PaginationDto>) {
+        const { orgId, data: paginationDto } = serviceParams;
         const { page, limit } = paginationDto;
         const skip = (page - 1) * limit;
-        const campaignData = await this.prisma.campaign.findMany({ skip, take: limit });
-        const total = await this.prisma.campaign.count();
-        return {
-            data: campaignData,
-            page: page,
-            total: total
-        };
+        const prisma = await this.getPrismaClient(orgId);
+        try {
+            const campaignData = await prisma.campaign.findMany({ skip, take: limit });
+            const total = await prisma.campaign.count();
+            return {
+                data: campaignData,
+                page: page,
+                total: total
+            };
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
+        finally {
+            await this.closeConnection(orgId);
+        }
     }
 
-    async findAllByOrg(orgId: string, campaignFilterDto: CampaignFilterDto) {
+    async findAllByOrg(serviceParams: ServiceParams<CampaignFilterDto>) {
+        const { orgId, data: campaignFilterDto } = serviceParams;
         const { page, limit } = campaignFilterDto;
         const skip = (page - 1) * limit;
         let campaignData = [], total = 0;
-        if (campaignFilterDto.searchQ) {
-            campaignData = await this.prisma.campaign.findMany({
-                skip,
-                take:
-                    limit,
-                where: {
-                    orgId,
-                    OR: [
-                        { title: { contains: campaignFilterDto.searchQ } },
-                        { description: { contains: campaignFilterDto.searchQ } },
-                        { url: { contains: campaignFilterDto.searchQ } },
-                        { status: { equals: CampaignStatus[campaignFilterDto.searchQ.toUpperCase()] || undefined } }
-                    ]
-                },
-                orderBy: { modifiedAt: 'desc' }
-            });
-            total = await this.prisma.campaign.count({
-                where: {
-                    orgId,
-                    OR: [
-                        { title: { contains: campaignFilterDto.searchQ } },
-                        { description: { contains: campaignFilterDto.searchQ } },
-                        { url: { contains: campaignFilterDto.searchQ } },
-                        { status: { equals: CampaignStatus[campaignFilterDto.searchQ.toUpperCase()] || undefined } }
-                    ]
-                }
-            });
-        } else {
-            campaignData = await this.prisma.campaign.findMany({ skip, take: limit, where: { orgId }, orderBy: { modifiedAt: 'desc' } });
-            total = await this.prisma.campaign.count({ where: { orgId } });
-        }
+        const prisma = await this.getPrismaClient(orgId);
+        try {
+            if (campaignFilterDto.searchQ) {
+                campaignData = await prisma.campaign.findMany({
+                    skip,
+                    take:
+                        limit,
+                    where: {
+                        OR: [
+                            { title: { contains: campaignFilterDto.searchQ } },
+                            { description: { contains: campaignFilterDto.searchQ } },
+                            { url: { contains: campaignFilterDto.searchQ } },
+                            { status: { equals: CampaignStatus[campaignFilterDto.searchQ.toUpperCase()] || undefined } }
+                        ]
+                    },
+                    orderBy: { modifiedAt: 'desc' }
+                });
+                total = await prisma.campaign.count({
+                    where: {
+                        OR: [
+                            { title: { contains: campaignFilterDto.searchQ } },
+                            { description: { contains: campaignFilterDto.searchQ } },
+                            { url: { contains: campaignFilterDto.searchQ } },
+                            { status: { equals: CampaignStatus[campaignFilterDto.searchQ.toUpperCase()] || undefined } }
+                        ]
+                    }
+                });
+            } else {
+                campaignData = await prisma.campaign.findMany({ skip, take: limit, orderBy: { modifiedAt: 'desc' } });
+                total = await prisma.campaign.count();
+            }
 
-        return {
-            data: campaignData,
-            page: page,
-            total: total
-        };
-    }
-
-    async findAllByAgent(agentId: string, paginationDto: PaginationDto) {
-        const { page, limit } = paginationDto;
-        const skip = (page - 1) * limit;
-        const campaignData = await this.prisma.campaign.findMany({ skip, take: limit, where: { agentId } });
-        const total = await this.prisma.campaign.count({ where: { agentId } });
-        return {
-            data: campaignData,
-            page: page,
-            total: total
-        };
-    }
-
-    async findOne(id: string) {
-        const existingCampaign = await this.prisma.campaign.findUnique({ where: { id } });
-        if (existingCampaign) {
-            return existingCampaign;
-        }
-        else {
-            throw new NotFoundException(`Campaign with ${id} not found.`);
-        }
-    }
-
-    async update(id: string, updateCampaignDto: UpdateCampaignDto) {
-        const existingCampaign = await this.prisma.campaign.findUnique({ where: { id } });
-        if (existingCampaign) {
-            let campaignData: any = {
-                title: updateCampaignDto.title,
-                description: updateCampaignDto.description,
-                status: updateCampaignDto.status,
-                url: updateCampaignDto.url,
-                isZauto: updateCampaignDto.isZauto,
-                idParam: updateCampaignDto.idParam,
-                idValue: updateCampaignDto.idValue,
-                accountId: updateCampaignDto.accountId
+            return {
+                data: campaignData,
+                page: page,
+                total: total
             };
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
+        finally {
+            await this.closeConnection(orgId);
+        }
+    }
 
-            const startDateTimestamp = updateCampaignDto.startDateTimestamp;
-            const endDateTimestamp = updateCampaignDto.endDateTimestamp;
-
-            const startDate = this.formatDate(startDateTimestamp);
-            const endDate = this.formatDate(endDateTimestamp);
-
-            if (startDate !== null) {
-                campaignData = { ...campaignData, startDate };
+    async findOne(orgId: string, id: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        try {
+            const existingCampaign = await prisma.campaign.findUnique({ where: { id } });
+            if (existingCampaign) {
+                return existingCampaign;
             }
-
-            if (endDate !== null) {
-                campaignData = { ...campaignData, endDate };
+            else {
+                throw new NotFoundException(`Campaign with ${id} not found.`);
             }
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
+        finally {
+            await this.closeConnection(orgId);
+        }
+    }
 
-            return await this.prisma.campaign.update({ data: campaignData, where: { id } });
-        } else {
-            throw new NotFoundException(`Campaign with ${id} not found.`);
+    async update(serviceParams: ServiceParams<UpdateCampaignDto>) {
+        const { orgId, data, id } = serviceParams;
+        const prisma = await this.getPrismaClient(orgId);
+        try {
+            const existingCampaign = await prisma.campaign.findUnique({ where: { id } });
+            if (existingCampaign) {
+                let campaignData: any = {
+                    title: data.title,
+                    description: data.description,
+                    status: data.status,
+                    url: data.url,
+                    isZauto: data.isZauto,
+                    idParam: data.idParam,
+                    idValue: data.idValue,
+                };
+
+                const startDateTimestamp = data.startDateTimestamp;
+                const endDateTimestamp = data.endDateTimestamp;
+
+                const startDate = this.formatDate(startDateTimestamp);
+                const endDate = this.formatDate(endDateTimestamp);
+
+                if (startDate !== null) {
+                    campaignData = { ...campaignData, startDate };
+                }
+
+                if (endDate !== null) {
+                    campaignData = { ...campaignData, endDate };
+                }
+
+                return await prisma.campaign.update({ data: campaignData, where: { id } });
+            } else {
+                throw new NotFoundException(`Campaign with ${id} not found.`);
+            }
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
+        finally {
+            await this.closeConnection(orgId);
         }
     }
 
 
-    async delete(id: string) {
-        const existingCampaign = await this.prisma.campaign.findUnique({ where: { id } });
-        if (existingCampaign) {
-            return await this.prisma.campaign.delete({ where: { id } });
+    async delete(orgId: string, id: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        try {
+            const existingCampaign = await prisma.campaign.findUnique({ where: { id } });
+            if (existingCampaign) {
+                return await prisma.campaign.delete({ where: { id } });
+            }
+            else {
+                throw new NotFoundException(`Campaign with ${id} not found.`);
+            }
         }
-        else {
-            throw new NotFoundException(`Campaign with ${id} not found.`);
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
+        finally {
+            await this.closeConnection(orgId);
         }
     }
 
@@ -189,9 +219,10 @@ export class CampaignService {
         return date.toISOString().split('T')[0];
     };
 
-    async getVisitsCountByDate(id: string) {
+    async getVisitsCountByDate(orgId: string, id: string) {
         try {
-            const dateWiseVisit = await this.prisma.visit.groupBy({
+            const prisma = await this.getPrismaClient(orgId);
+            const dateWiseVisit = await prisma.visit.groupBy({
                 by: ['createdAt'],
                 _count: {
                     createdAt: true,
@@ -221,76 +252,95 @@ export class CampaignService {
                 lables: Object.keys(_dateWiseVisits),
                 values: Object.values(_dateWiseVisits)
             }
-        } catch (error) {
-            console.log(error)
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
+        finally {
+            await this.closeConnection(orgId);
         }
     }
 
-    async getLeadCountByDate(id: string) {
-        const campaign = await this.prisma.campaign.findFirst({
-            where: { id },
-            include: {
-                Conversations: {
-                    select: {
-                        Lead: {
-                            select: {
-                                createdAt: true
-                            }
-                        },
+    async getLeadCountByDate(orgId: string, id: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        try {
+            const campaign = await prisma.campaign.findFirst({
+                where: { id },
+                include: {
+                    Conversations: true
+                }
+            });
+            const leadByDate = {};
+
+            for (let conversation of campaign.Conversations) {
+                const lead = await this.contactsService.getContactsByConversation(orgId, conversation.id);
+                const createdAt = lead.createdAt;
+                if (createdAt) {
+                    const date = this.toDateString(createdAt);
+
+                    if (!leadByDate[date]) {
+                        leadByDate[date] = 0;
                     }
+                    leadByDate[date] += 1;
                 }
             }
-        });
 
-        const leadByDate = {};
+            const lables = Object.keys(leadByDate);
+            const values = Object.values(leadByDate);
 
-        for (let conversation of campaign.Conversations) {
-            const createdAt = conversation?.Lead?.createdAt;
-            if (createdAt) {
-                const date = this.toDateString(createdAt);
+            const formattedData = {
+                lables,
+                values,
+            };
 
-                if (!leadByDate[date]) {
-                    leadByDate[date] = 0;
-                }
-                leadByDate[date] += 1;
-            }
+            return formattedData;
         }
-
-        const lables = Object.keys(leadByDate);
-        const values = Object.values(leadByDate);
-
-        const formattedData = {
-            lables,
-            values,
-        };
-
-        return formattedData;
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
+        finally {
+            await this.closeConnection(orgId);
+        }
 
     }
 
-    async getCounts(campaignId: string) {
-        const uniqueVisitorCount = await this.prisma.visit.groupBy({
-            by: ['visitorId'],
-            where: {
-                campaignId,
-            },
-            _count: {
-                visitorId: true
+    async getCounts(orgId: string, campaignId: string) {
+        const prisma = await this.getPrismaClient(orgId);
+        try {
+            const uniqueVisitorCount = await prisma.visit.groupBy({
+                by: ['visitorId'],
+                where: {
+                    campaignId,
+                },
+                _count: {
+                    visitorId: true
+                }
+            });
+            const visitCount = uniqueVisitorCount.length;
+            const convoCount = await prisma.conversation.count({ where: { campaignId, isValid: true } });
+            const conversations = await prisma.conversation.findMany({ where: { campaignId, isValid: true } });
+            let totalLeadCount = 0;
+            for (const conversation of conversations) {
+                const lead = await this.contactsService.getContactsByConversation(orgId, conversation.id);
+                if (lead) {
+                    totalLeadCount += 1;
+                }
             }
-        });
-        const visitCount = uniqueVisitorCount.length;
-        const convoCount = await this.prisma.conversation.count({ where: { campaignId, isValid: true } });
-        const conversations = await this.prisma.conversation.findMany({ where: { campaignId, isValid: true } });
-        let totalLeadCount = 0;
-        for (const conversation of conversations) {
-            const leadCount = await this.prisma.lead.count({ where: { convId: conversation.id, conversation: { isValid: true } } });
-            totalLeadCount += leadCount;
-        }
 
-        return {
-            visits: visitCount,
-            conversations: convoCount,
-            leads: totalLeadCount,
-        };
+            return {
+                visits: visitCount,
+                conversations: convoCount,
+                leads: totalLeadCount,
+            };
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
+        finally {
+            await this.closeConnection(orgId);
+        }
     }
 }

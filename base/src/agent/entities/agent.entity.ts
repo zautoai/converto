@@ -8,9 +8,6 @@ export class Agent {
   id: string;
 
   @ApiProperty()
-  orgId: string;
-
-  @ApiProperty()
   name: string;
 
   @ApiProperty()

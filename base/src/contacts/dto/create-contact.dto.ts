@@ -99,4 +99,11 @@ export class CreateContactDto {
     @IsOptional()
     @IsString()
     status?: string;
+
+    @ApiProperty({ required: false, description: 'Conversation Id from which the contact is created' })
+    @IsOptional()
+    @IsString()
+    conversationId?: string;
+
+
 }

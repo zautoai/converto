@@ -115,12 +115,13 @@ export class EmailService {
 
         try {
             // ping check
-            const pingResponse = await axios.head(`https://${domain}`);
-            const isPingValid = pingResponse.status >= 200 && pingResponse.status < 300;
-            if (!isPingValid) return false;
+            // const pingResponse = await axios.head(`https://${domain}`);
+            // const isPingValid = pingResponse.status >= 200 && pingResponse.status < 300;
+            // if (!isPingValid) return false;
             // API check
-            const isDisposable = await this.validateEmailWithAPI(email);
-            return isDisposable;
+            // const isDisposable = await this.validateEmailWithAPI(email);
+            // return isDisposable;
+            return true;
         } catch (error) {
             return false;
         }

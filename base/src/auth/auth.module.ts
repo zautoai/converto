@@ -11,6 +11,7 @@ import { RolesGuard } from './roles.guard';
 import { SelfGuard } from './self.guard';
 import { RegistrationModule } from 'src/registration/registration.module';
 import { CommonModule } from 'src/common/common.module';
+import { OrganizationsModule } from 'src/organizations/organizations.module';
 
 @Module({
   imports:[
@@ -23,6 +24,7 @@ import { CommonModule } from 'src/common/common.module';
     UsersModule,
     RegistrationModule,
     CommonModule,
+    OrganizationsModule
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard, SelfGuard],

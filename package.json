@@ -6,6 +6,8 @@
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
+        "install:all": "npm install --workspaces",
+        "db-push:all": "npm run db-push --workspaces",
         "start": "npm-run-all --parallel start:base start:crm && echo All start scripts ran successfully!",
         "start:base": "cd base && npm start",
         "start:crm": "cd crm && npm start",
@@ -33,6 +35,7 @@
         "npm-run-all": "^4.1.5"
     },
     "dependencies": {
+        "@nestjs/swagger": "^7.3.1",
         "debug": "^4.3.4"
     }
 }

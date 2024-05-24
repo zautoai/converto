@@ -7,7 +7,7 @@ import { CreateContactDto } from './dto/create-contacts.dto';
 
 @Controller()
 export class ContactMicroserviceController {
-  constructor(private contactsService: ContactsService) {}
+  constructor(private contactsService: ContactsService) { }
 
   @MessagePattern({ cmd: 'GET_CONTACTS' })
   async get_contacts(data: { orgId: string; filterDto: FilterDto }) {
@@ -92,6 +92,24 @@ export class ContactMicroserviceController {
         data.orgId,
         data.createFieldDto,
       );
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'GET_CONTACTS_FOR_CONVERSATION' })
+  async get_contacts_for_conversation(data: { orgId: string, conversationId: string }) {
+    try {
+      return await this.contactsService.getContactsByConversation(data.orgId, data.conversationId);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
+
+  @MessagePattern({ cmd: 'GET_CONTACTS_BY_DATE' })
+  async get_contacts_by_date(data: { orgId: string, startDate: Date, endDate: Date }) {
+    try {
+      return await this.contactsService.getContactsByDate(data.orgId, data.startDate, data.endDate);
     } catch (error) {
       return error.response || error;
     }

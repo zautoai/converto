@@ -4,10 +4,10 @@ import { UpdateAgentDto } from './dto/update-agent.dto';
 import { Agent } from './entities/agent.entity';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { NameAvailability, NameCheckDto } from './dto/namecheck.dto';
-import { SYSTEM_CONST, ZAUTO_ORG } from 'src/common/constants/system.constants';
+import { SYSTEM_CONST } from 'src/common/constants/system.constants';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -18,7 +18,6 @@ import * as sharp from 'sharp';
 import { Multer } from 'multer';
 import { StaticFileService } from 'src/common/services/static.service';
 import { VisitorService } from 'src/visitor/visitor.service';
-import { SourceQuery } from './entities/source.entity';
 import { CreateAvatarDto } from './dto/create-avatar.dto';
 import { AvatarQueueService } from './worker/avatar-queue.service';
 import { IPTrackingService } from 'src/common/services/iptracking.service';
@@ -26,6 +25,8 @@ import { OrganizationsService } from 'src/organizations/organizations.service';
 import { DemandGenService } from 'src/demand-gen/demand-gen.service';
 import { TrackingDto } from './dto/tracking.dto';
 import { TrackingService } from './tracking.service';
+import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
+import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
 
 @ApiTags('Agents')
 @Controller('api/agents')
@@ -40,9 +41,9 @@ export class AgentController {
     private readonly demandGenService: DemandGenService,
     private readonly trackingService:TrackingService) {}
 
-    async addVisitor(agentId: string, query: any, request: Request, orgId?: string) {
+    async addVisitor(query: any, request: Request, orgId?: string) {
       try {
-        let visitor = await this.visitorService.findById(query.visitor)
+        let visitor = query.visitor ? await this.visitorService.findOne(orgId,query.visitor) : null;
         if(!visitor) {
           const ipaddress = request.headers['x-forwarded-for'];
           console.log(ipaddress)
@@ -51,17 +52,15 @@ export class AgentController {
           delete headers['Authorization']
           delete headers['Proxy-Authorization']
           const visitorObj = {
-            agentId: agentId,
             infoJson: JSON.stringify(headers),
             userAgent: headers['user-agent'],
-            orgId: orgId,
             ipAddress: ipaddress,
             trackingInfo: JSON.stringify(ipData)
           };
-          visitor = await this.visitorService.create(visitorObj, orgId);
+          visitor = await this.visitorService.create({orgId,data:visitorObj});
         } 
         if(!query.utm_campaign && Object.keys(query).length > 1){
-          const thirdPartyCampaign = await this.demandGenService.processCampaign(orgId,agentId,query);
+          const thirdPartyCampaign = await this.demandGenService.processCampaign(orgId,query);
           if(thirdPartyCampaign)
           {
             query.utm_campaign = thirdPartyCampaign.id;
@@ -78,13 +77,11 @@ export class AgentController {
           const defaultCampign = await this.agentsService.getDefaultCampaign(orgId);
           query.utm_campaign = defaultCampign.id
         }
-        const visit = await this.visitorService.createOrUpdateVisit({
-          orgId: orgId,
-          agentId: agentId,
+        const visit = await this.visitorService.createOrUpdateVisit({orgId,data:{
           campaignId: query.utm_campaign,
           source: query.source,
           visitorId: visitor.id
-        });
+        }});
         return {
           visit,
           visitor
@@ -102,8 +99,8 @@ export class AgentController {
   // @ApiBody({ type: CreateAgentDto })
   // @ApiCreatedResponse({type: Agent})
   // async create(@Body() createAgentDto: CreateAgentDto, @Req() zautoRequest: ZautoRequest) {
-  //   if(zautoRequest.user && zautoRequest.user.org) {
-  //     createAgentDto.orgId = zautoRequest.user.org.id;
+  //   if(zautoRequest.user && zautoRequest.user.orgId) {
+  //     createAgentDto.orgId = zautoRequest.user.orgId;
   //     return await this.agentsService.create(createAgentDto);
   //   } else throw new UnauthorizedException('Unauthorised access.')
   // }
@@ -116,13 +113,9 @@ export class AgentController {
   @ApiOkResponse({
     type: ResponseDTO<Agent>
   })
-  async findAll(@Query() paginationDto: PaginationDto, @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest.user && zautoRequest.user.org && zautoRequest.user.org.name == ZAUTO_ORG) {
-      console.log(zautoRequest.user.org.name)
-      return await this.agentsService.findAll(paginationDto);
-    } else {
-      return await this.agentsService.findAllByOrg(paginationDto, zautoRequest.user.org.id);
-    }
+  async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.findAll({orgId,data:paginationDto});
   }
 
   @Get(':id')
@@ -131,10 +124,14 @@ export class AgentController {
   @ApiOkResponse({
     type: Agent
   })
+  @UseGuards(SubdomainGuard)
+  @ApiBearerAuth("x-tenant-id")
   async findOne(@Query() sourceQuery: any, @Param('id') id: string, @Req() request: Request) {
-    const agent = await this.agentsService.findOne(id);
+    const orgId = request['orgId'];
+    const agent = await this.agentsService.findOne(orgId,id);
     if(sourceQuery.source) {
-      const visitorData = await this.addVisitor(id, sourceQuery, request, agent.orgId);
+
+      const visitorData = await this.addVisitor(sourceQuery, request,orgId);
       return {
         ...agent, visitor: visitorData.visitor, visit: visitorData.visit, 
       }
@@ -146,8 +143,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiBody({ type: UpdateAgentDto })
   @ApiOkResponse({type: Agent})
-  async update(@Param('id') id: string, @Body() updateAgentDto: UpdateAgentDto) {
-    return await this.agentsService.update(id, updateAgentDto);
+  async update(@Param('id') id: string, @Body() updateAgentDto: UpdateAgentDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.update({orgId, id, data:updateAgentDto});
   }
 
   @Patch(':id/styles')
@@ -156,8 +154,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiBody({ type: UpdateAgentDto })
   @ApiOkResponse({type: Agent})
-  async updateStyle(@Param('id') id: string, @Body() stylesObj: any) {
-    return await this.agentsService.updateStyles(id, stylesObj);
+  async updateStyle(@Param('id') id: string, @Body() styledata: any, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.updateStyles({orgId,data:{id, styledata}});
   }
 
   @Patch(':id/leadInfo')
@@ -166,8 +165,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiBody({ type: UpdateAgentDto })
   @ApiOkResponse({type: Agent})
-  async updateLeadInfo(@Param('id') id: string, @Body() leadInfoObj: any) {
-    return await this.agentsService.updateLeadInfo(id, leadInfoObj.leadInfo);
+  async updateLeadInfo(@Param('id') id: string, @Body() leadInfoObj: any, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.updateLeadInfo({orgId,data:{id, leadInfo: leadInfoObj.leadInfo}});
   }
 
   @Patch(':id/starters')
@@ -176,8 +176,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiBody({ type: UpdateAgentDto })
   @ApiOkResponse({type: Agent})
-  async updateStarters(@Param('id') id: string, @Body() startersObj: any) {
-    return await this.agentsService.updateStarters(id, startersObj.starters);
+  async updateStarters(@Param('id') id: string, @Body() startersObj: any, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.updateStarters({orgId , data: {id, starters: startersObj.starters}});
   }
 
   @Delete(':id')
@@ -186,8 +187,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiNoContentResponse()
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
-    return await this.agentsService.remove(id);
+  async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.remove(orgId,id);
   }
 
   @Post('availability')
@@ -195,8 +197,9 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiBody({ type: NameCheckDto })
   @ApiOkResponse({type: NameAvailability})
-  async isNameAvailable(@Body() nameCheckDto: NameCheckDto) {
-    const isExist = await this.agentsService.isNameExists(nameCheckDto.name);
+  async isNameAvailable(@Body() nameCheckDto: NameCheckDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    const isExist = await this.agentsService.isNameExists(orgId,nameCheckDto.name);
     return new NameAvailability(nameCheckDto.name, !isExist);
   }
 
@@ -223,7 +226,7 @@ export class AgentController {
       fileSize: 5 * 1024 * 1024, // 5MB
     },
   }))
-  async uploadProfilePic(@UploadedFile() file: Multer.File, @Param('id') id: string) { 
+  async uploadProfilePic(@UploadedFile() file: Multer.File, @Param('id') id: string, @Req() request: ZautoRequest) { 
     try {
       // Use sharp to compress and optionally resize the image
       const outputPath = `./public/images/compressed-${file.filename}`;
@@ -232,10 +235,10 @@ export class AgentController {
         .toFormat('jpeg') // Convert to JPEG for compression
         .jpeg({ quality: 50 }) // Set the quality of the image
         .toFile(outputPath);
-
+      const orgId = request.user.orgId;
       await this.staticService.deleteExistingFile(file.path);
-      const imgUrl = `${process.env.HOST_URL}/images/compressed-${file.filename}`
-      await this.agentsService.updateLogo(id, imgUrl);
+      const logoUrl = `${process.env.HOST_URL}/images/compressed-${file.filename}`
+      await this.agentsService.updateLogo({orgId, data: {id, logoUrl}});
 
       return {
         message: 'File uploaded and compressed successfully.',
@@ -244,7 +247,7 @@ export class AgentController {
           filename: file.filename,
           size: file.size,
           mimeType: file.mimetype,
-          path: imgUrl,
+          path: logoUrl,
         },
       };
     } catch (error) {
@@ -261,18 +264,19 @@ export class AgentController {
   @ApiBody({ type: CreateAvatarDto })
   @ApiCreatedResponse({type: Agent})
   async launchAvatar(@Body() createAvatarDto: CreateAvatarDto, @Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest.user && zautoRequest.user.org) {
+    if(zautoRequest.user && zautoRequest.user.orgId) {
+      const orgId = zautoRequest.user.orgId;
       const avatarName = createAvatarDto.displayName.replaceAll(" ", "_").toLowerCase().trim();
-      const avatarExists = await this.agentsService.isNameExists(avatarName);
+      const avatarExists = await this.agentsService.isNameExists(orgId,avatarName);
       if(avatarExists) {
         throw new ConflictException('Avatar Name already taken.');
       } else {
-        const org = await this.orgService.updateOrgWith(zautoRequest.user.org.id, createAvatarDto.companyName, createAvatarDto.companySite);
-        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.user.org.id);
+        const org = await this.orgService.updateOrgWith(zautoRequest.user.orgId, createAvatarDto.companyName, createAvatarDto.companySite);
+        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.user.orgId);
         if(orgAvatar) {
           throw new ConflictException('Avatar already launched. Only one avatar can be created per Organization.');
         }
-        const avatar = await this.agentsService.launchAvatarWithAssistant(createAvatarDto, zautoRequest.user.org.id as string);
+        const avatar = await this.agentsService.launchAvatarWithAssistant({orgId,data:createAvatarDto})
         await this.queueService.addTaskToQueue({
           name: 'launchAvatar',
           id: avatar.id,
@@ -291,23 +295,24 @@ export class AgentController {
   @ApiBearerAuth()
   @ApiCreatedResponse({type: Agent})
   async retryAvatarLaunch(@Req() zautoRequest: ZautoRequest) {
-    if(zautoRequest.user && zautoRequest.user.org) {
-      const org = await this.orgService.findOne(zautoRequest.user.org.id);
+    if(zautoRequest.user && zautoRequest.user.orgId) {
+      const orgId = zautoRequest.user.orgId;
+      const org = await this.orgService.findOne(orgId)
       if(org) {
-        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.user.org.id);
+        const orgAvatar = await this.agentsService.findOneByOrg(zautoRequest.user.orgId);
         if(orgAvatar) {
           const createAvatarDto  = {
             displayName: orgAvatar.displayName,
             companyName: org.name,
             companySite: org.siteUrl
           }
-          await this.agentsService.remove(orgAvatar.id);
-          const avatar = await this.agentsService.launchAvatarWithAssistant(createAvatarDto, zautoRequest.user.org.id as string);
+          await this.agentsService.remove(orgId,orgAvatar.id);
+          const avatar = await this.agentsService.launchAvatarWithAssistant({orgId,data:createAvatarDto});
           await this.queueService.addTaskToQueue({
             name: 'launchAvatar',
             id: avatar.id,
             dto: createAvatarDto,
-            org: zautoRequest.user.org,
+            org: zautoRequest.user.orgId,
           });
           return avatar;
         }
@@ -318,12 +323,13 @@ export class AgentController {
 
   @Get('widget/:agentId')
   @Header('Content-Type', 'application/javascript')
-  async embedding(@Param('agentId') agentId: string)
+  async embedding(@Param('agentId') agentId: string, @Req() request: Request)
   {
+    const org = request.headers['org-id'];
     if(agentId.includes('.js'))
     {
       agentId = agentId.replace('.js','');
-      return await this.agentsService.getEmbedding(agentId);
+      return await this.agentsService.getEmbedding(org,agentId);
     }
     else
     {
@@ -333,12 +339,14 @@ export class AgentController {
 
   @Get('widget/standalone/:agentId')
   @Header('Content-Type', 'application/javascript')
-  async standaloneEmbedding(@Param('agentId') agentId: string)
+  @UseGuards(SubdomainGuard)
+  async standaloneEmbedding(@Param('agentId') agentId: string, @Req() request: SubdomainRequest)
   {
+    const orgId = request.orgId;
     if(agentId.includes('.js'))
     {
       agentId = agentId.replace('.js','');
-      return await this.agentsService.getEmbedding(agentId,true);
+      return await this.agentsService.getEmbedding(orgId,agentId,true);
     }
     else
     {
@@ -347,8 +355,9 @@ export class AgentController {
   }
 
   @Post(':agentId/track/:convId')
-  async websiteTracking(@Param('agentId') agentId: string,@Param('convId') convId: string,@Body() trackingDto:TrackingDto)
+  async websiteTracking(@Param('agentId') agentId: string,@Param('convId') convId: string,@Body() trackingDto:TrackingDto, @Req() request: Request)
   {
-    return await this.trackingService.addTracking(agentId, convId, trackingDto);
+    const orgId = request.headers['org-id']; 
+    return await this.trackingService.addTracking({ orgId ,data:{convId, trackingDto}});
   }
 }

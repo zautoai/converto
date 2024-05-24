@@ -57,7 +57,7 @@ export class ExternalCrmController {
     return await this.externalCrmService.getProfile(orgId, crmAuthDto.name);
   }
 
-  @Get('mappings/:crm_name/:object_name')
+  @Get('mappings/:crm_name/:object_type')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   async getMappings(@Param('crm_name')crmName:string,@Param('object_type') object_type:string,@Req() request: IRequest) {

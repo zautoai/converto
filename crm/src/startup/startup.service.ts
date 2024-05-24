@@ -22,10 +22,9 @@ export class StartupService implements OnModuleInit {
   onModuleInit() {
     this.executeOnStartup();
   }
-
   async executeOnStartup() {
     await this.syncOrganizations();
-    await this.schemaMigration();
+    // await this.schemaMigration();
   }
 
   async syncOrganizations() {
@@ -35,7 +34,7 @@ export class StartupService implements OnModuleInit {
       let _total = 1;
       let _page = Math.ceil(_total / itemPerPage);
 
-      let page = 1;  
+      let page = 1;
       while (page <= _page) {
         const response = await this.organizationService.getOrganizations({ page: page, limit: itemPerPage });
         _total = response.total;
@@ -44,7 +43,7 @@ export class StartupService implements OnModuleInit {
           const rollback = () => { };
           try {
             await this.schemaManager.create(
-              { name: org.name, orgId: org.id },
+              org.id,
               rollback,
             );
             this.logger.log(`Organization ${org.name} synced successfully.`);
@@ -68,13 +67,13 @@ export class StartupService implements OnModuleInit {
   }
 
   async schemaMigration() {
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     try {
       this.logger.log('Schema migration completed successfully.');
-      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
       const orgs = await prisma.info.findMany();
       for (const org of orgs) {
-        try { 
-          await this.schemaManager.applyMigration(org.orgId, true);
+        try {
+          await this.schemaManager.applyMigration(org.orgId, null);
           this.logger.log(
             `${org.orgName} schema migration completed successfully.`,
           );
@@ -86,12 +85,12 @@ export class StartupService implements OnModuleInit {
     } catch (error) {
       this.logger.error(error);
       console.log(error);
-
+    } finally {
+      await this.prismaClientManager.disconnectClient(DEFAULT_SCHEMA_NAME)
     }
   }
 
-  async syncDataFromCRM(orgId: string)
-  {
+  async syncDataFromCRM(orgId: string) {
     this.contactService.syncExternalCrmToContacts(orgId);
     this.contactService.syncContactsToExternalCrm(orgId);
     this.accountService.syncExternalCrmToAccounts(orgId);

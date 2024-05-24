@@ -18,14 +18,10 @@ import { LlmModule } from './llm/llm.module';
 import { AgentPromptModule } from './agent-prompt/agent-prompt.module';
 import { VisitorModule } from './visitor/visitor.module';
 import { ConversationModule } from './conversation/conversation.module';
-import { LeadModule } from './lead/lead.module';
 import { RegistrationModule } from './registration/registration.module';
 
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { LeadConfigModule } from './lead-config/lead-config.module';
-import { PlatformModule } from './platform/platform.module';
-import { OrgPlatformModule } from './org-platform/org-platform.module';
 import { AssistantsModule } from './assistants/assistants.module';
 import { CampaignModule } from './campaign/campaign.module';
 import { DashboardModule } from './dashboard/dashboard.module';
@@ -34,24 +30,12 @@ import { HelpersModule } from './helpers/helpers.module';
 import { BullModule } from '@nestjs/bull';
 import { SocketModule } from './socket/socket.module';
 import { ActiveClientModule } from './active-client/active-client.module';
-import { SubscriptionPlanModule } from './subscription-plan/subscription-plan.module';
-import { AccountModule } from './account/account.module';
 import { OrgSmtpconfigModule } from './org-smtpconfig/org-smtpconfig.module';
 import { CallToActionModule } from './call-to-action/call-to-action.module';
-import { OauthModule } from './oauth/oauth.module';
-import { CrmKeyMapingModule } from './crm-key-maping/crm-key-maping.module';
-import { ExternalToolModule } from './external-tool/external-tool.module';
-import { OrgToolModule } from './org-tool/org-tool.module';
-import { ExternalApiModule } from './external-api/external-api.module';
-import { ExternalApiKeyMappingModule } from './external-api-key-mapping/external-api-key-mapping.module';
-import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
 import { AvailabilityScheduleModule } from './availability-schedule/availability-schedule.module';
 import { FileManagerModule } from './file-manager/file-manager.module';
-import { LeadCategoryModule } from './lead-category/lead-category.module';
 import { PromptTemplateModule } from './prompt-template/prompt-template.module';
 import { DemandGenModule } from './demand-gen/demand-gen.module';
-import { CrmModule } from './crm/crm.module';
-import { SecureExchangeModule } from './secure-exchange/secure-exchange.module';
 import { MicroservicesModule } from './microservices/microservices.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { FormBuilderModule } from './form-builder/form-builder.module';
@@ -60,8 +44,7 @@ import { AccountBasedMaretingModule } from './account-based-mareting/account-bas
 import { EnrichmentModule } from './enrichment/enrichment.module';
 import { ExternalCrmModule } from './external-crm/external-crm.module';
 import { CalendarModule } from './calendar/calendar.module';
-import { SegmentGroupModule } from './segment-group/segment-group.module';
-import { SegmentsModule } from './segments/segments.module';
+import { SchemaManagerModule } from './schema-manager/schema-manager.module';
 
 @Module({
   imports: [
@@ -73,6 +56,7 @@ import { SegmentsModule } from './segments/segments.module';
           ? undefined
           : ['.env.dev', '.env'],
     }),
+    SchemaManagerModule,
     RolesModule,
     UsersModule,
     AuthModule,
@@ -87,7 +71,6 @@ import { SegmentsModule } from './segments/segments.module';
     AgentPromptModule,
     VisitorModule,
     ConversationModule,
-    LeadModule,
     RegistrationModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
@@ -96,9 +79,6 @@ import { SegmentsModule } from './segments/segments.module';
       rootPath: join(__dirname, '..', 'public/assets/bot'),
       serveRoot: '/assets',
     }),
-    LeadConfigModule,
-    PlatformModule,
-    OrgPlatformModule,
     AssistantsModule,
     CampaignModule,
     DashboardModule,
@@ -113,24 +93,12 @@ import { SegmentsModule } from './segments/segments.module';
     }),
     SocketModule,
     ActiveClientModule,
-    SubscriptionPlanModule,
-    AccountModule,
     OrgSmtpconfigModule,
     CallToActionModule,
-    OauthModule,
-    CrmKeyMapingModule,
-    ExternalToolModule,
-    OrgToolModule,
-    ExternalApiModule,
-    ExternalApiKeyMappingModule,
-    GoogleCalendarModule,
     AvailabilityScheduleModule,
     FileManagerModule,
-    LeadCategoryModule,
     PromptTemplateModule,
     DemandGenModule,
-    CrmModule,
-    SecureExchangeModule,
     MicroservicesModule,
     ContactsModule,
     FormBuilderModule,
@@ -139,8 +107,7 @@ import { SegmentsModule } from './segments/segments.module';
     EnrichmentModule,
     ExternalCrmModule,
     CalendarModule,
-    SegmentGroupModule,
-    SegmentsModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],

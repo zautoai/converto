@@ -8,16 +8,16 @@ import { S3Service } from "src/common/services/s3.service";
 import { LlmService } from "src/llm/llm.service";
 import { ConversationType, SiteProcessStatus } from "src/common/enums/enums";
 import { WebScraperService } from "src/common/services/web-scraper.service";
-import { HelpersService } from "src/helpers/helpers.service";
 import { io, Socket } from 'socket.io-client'
 import { Agent, AgentStatus } from "./entities/agent.entity";
-import { PrismaService } from "src/prisma/prisma.service";
 import Redis, { Redis as RedisClient } from 'ioredis';
 import { PageGreeterService } from "src/assistants/services/page-greeters.service";
 import { CTACreatorService } from "src/assistants/services/cta-creator";
 import { SiteService } from "src/site/site.service";
 import { AVATAR_HELPER_PROMPT } from "src/common/templates/agent-prompt.template";
 import { ChromaDBService } from "src/chroma/chroma-dbservice/chroma-db.service";
+import { BaseService } from "src/common/services/base.service";
+import { ServiceParams } from "src/common/models/service-param.model";
 
 
 class Page {
@@ -33,37 +33,36 @@ class SiteData {
 }
 
 @Injectable()
-export class AvatarCreatorService {
+export class AvatarCreatorService extends BaseService {
 
     private socketClient: Socket;
 
     private redisPublisher: RedisClient;
 
-    constructor(private agentService: AgentService, 
+    constructor(private agentService: AgentService,
         private webScraper: WebScraperService,
         private fileService: FileUtilService,
         private s3Service: S3Service,
         private llmService: LlmService,
-        private helperService: HelpersService,
         private pageGreeterService: PageGreeterService,
         private ctaCreatorService: CTACreatorService,
-        private prisma: PrismaService,
         private siteService: SiteService,
         private chroma: ChromaDBService) {
-            this.socketClient = io(process.env.HOST_URL);
-            this.redisPublisher = new Redis({
-                host: process.env.REDIS_IP,
-                port: parseInt(process.env.REDIS_PORT, 10) || 6379,
-                password: process.env.REDIS_PASSWORD
-            });
-        }
+        super();
+        this.socketClient = io(process.env.HOST_URL);
+        this.redisPublisher = new Redis({
+            host: process.env.REDIS_IP,
+            port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+            password: process.env.REDIS_PASSWORD
+        });
+    }
 
     async createAvatar(avatarId: string, createAvatarDto: CreateAvatarDto, org: Organization) {
-        let fileRollBack : Function  = null
-        
+        let fileRollBack: Function = null
+
         try {
-            const _avatar = await this.agentService.findOne(avatarId);
-            if(_avatar && _avatar.status !== AgentStatus.ACTIVE) {
+            const _avatar = await this.agentService.findOne(org.id, avatarId);
+            if (_avatar && _avatar.status !== AgentStatus.ACTIVE) {
                 console.log('AvatarCreator: Start Creating Avatar for ' + JSON.stringify(createAvatarDto));
                 const avatarUniqueName = `${org.name.replaceAll(' ', '_').toLowerCase()}_${createAvatarDto.displayName.replaceAll(' ', '_').toLowerCase()}`;
                 this.emitEvent(avatarId, {
@@ -74,17 +73,17 @@ export class AvatarCreatorService {
                 });
                 console.log('AvatarCreator: Avatar Unique Name: ' + avatarUniqueName);
                 console.log('AvatarCreator: Getting all Links')
-                
+
                 const links = await this.getAllLinks(createAvatarDto.companySite);
-                
+
                 console.log('AvatarCreator: Got ' + links.length + ' Sites for ' + avatarUniqueName);
                 const sites = await this.getContentFromSites(links);
                 console.log('AvatarCreator: Got ' + sites.length + ' Sites are processed for ' + avatarUniqueName);
 
-                if(sites.length < 1) {
+                if (sites.length < 1) {
                     throw 'Unable to Read the Site'
                 }
-                await this.siteService.trainAvatar(_avatar.orgId, {urls:links, agentId: _avatar.id});
+                await this.siteService.trainAvatar({ orgId: org.id, data: { urls: links } });
                 this.emitEvent(avatarId, {
                     avatarId: avatarId,
                     status: AgentStatus.TRAINING,
@@ -113,9 +112,9 @@ export class AvatarCreatorService {
                 });
                 const createAgentObj = await this.getCreateAgentObj(createAvatarDto, org, file, instructions);
                 console.log('AvatarCreator: Got createAgentObj for ' + avatarUniqueName, createAgentObj);
-                
-                const agent = await this.agentService.updateAvatar(avatarId, createAgentObj);
-                if(!agent) return null;
+
+                const agent = await this.agentService.updateAvatar({ orgId: org.id, data: createAgentObj, avatarId });
+                if (!agent) return null;
                 console.log('AvatarCreator: Agent Created for ' + avatarUniqueName, agent.id);
                 this.emitEvent(avatarId, {
                     avatarId: avatarId,
@@ -123,11 +122,11 @@ export class AvatarCreatorService {
                     message: `Avatar is ready`,
                     name: avatarUniqueName,
                 });
-                
+
                 //await this.addAllSites(agent, sites);
                 console.log('AvatarCreator: updating sites greetings');
-                await this.updateGreetingsForAllSites(agent,links);
-                await this.addCTAs(agent);
+                await this.updateGreetingsForAllSites({orgId: org.id,data:{links}})
+                await this.addCTAs(org.id);
                 await this.fileService.deleteFile(fileResp.filePath);
                 return agent;
             } else {
@@ -135,11 +134,11 @@ export class AvatarCreatorService {
                     avatarId: avatarId,
                     status: AgentStatus.ACTIVE,
                     message: 'Avatar is ready to deploy.'
-                }); 
+                });
             }
-        } catch(error) {
-            if(fileRollBack) fileRollBack();
-            this.agentService.updateStatus(avatarId,AgentStatus.TRAININGFAILED)
+        } catch (error) {
+            if (fileRollBack) fileRollBack();
+            this.agentService.updateStatus({ orgId: org.id, data: { id: avatarId, status: AgentStatus.TRAININGFAILED } });
             this.emitEvent(avatarId, {
                 avatarId: avatarId,
                 status: AgentStatus.TRAININGFAILED,
@@ -151,20 +150,19 @@ export class AvatarCreatorService {
         }
     }
 
-    async getCreateAgentObj(createAvatarDto: CreateAvatarDto, 
+    async getCreateAgentObj(createAvatarDto: CreateAvatarDto,
         org: Organization,
         fileObj: any,
         instructions: any) {
-            
+
         const obj = {
-            orgId: org.id,
             name: createAvatarDto.displayName.replaceAll(" ", "_").toLowerCase(),
             companyName: createAvatarDto.companyName,
             displayName: createAvatarDto.displayName,
             role: 'Sales Development Representative',
             purpouse: instructions.toValidateProspect,
             leadInfo: instructions.prospectInfo,
-            companyBusiness: instructions.companyBusiness, 
+            companyBusiness: instructions.companyBusiness,
             companyValue: instructions.companyValue,
             usetools: true,
             conversationType: ConversationType.CHAT,
@@ -172,9 +170,9 @@ export class AvatarCreatorService {
             useAssistant: false
         }
         return obj;
-    
+
     }
-    
+
 
     async getAllLinks(baseUrl: string) {
         const links = this.webScraper.getLinks(baseUrl);
@@ -183,7 +181,7 @@ export class AvatarCreatorService {
 
     async getContentFromSites(urls: string[]) {
         const sites: SiteData[] = []
-        for(let url of urls) {
+        for (let url of urls) {
             const content = await this.webScraper.getSimpleContent(url)
             sites.push({
                 url, content
@@ -199,12 +197,12 @@ export class AvatarCreatorService {
             this.s3Service.deleteFile(filePath);
         };
         try {
-            
+
             const siteContent = JSON.stringify(sites);
             this.fileService.createOrAppendFile(filePath, siteContent);
 
             const s3Response = await this.s3Service.uploadTextFile(filePath);
-            if(!s3Response || !s3Response.Location) throw 'File not uplaoded to s3.';
+            if (!s3Response || !s3Response.Location) throw 'File not uplaoded to s3.';
 
             //this.fileService.deleteFile(filePath);
             return {
@@ -212,7 +210,7 @@ export class AvatarCreatorService {
                 filePath: filePath,
                 rollBack: fileuploadRollback
             }
-        } catch(error) {
+        } catch (error) {
             fileuploadRollback();
             console.log('AvatarCreator: Failed at uploadFile', error);
             console.log('AvatarCreator: Rolling Back the changes');
@@ -224,10 +222,10 @@ export class AvatarCreatorService {
     extractJsonFromMarkdown(mdContent: string) {
         // Regular expression to match a JSON block within Markdown
         const jsonRegex = /```json([\s\S]*?)```/;
-    
+
         // Extract JSON string
         const match = mdContent.match(jsonRegex);
-        
+
         if (match && match[1]) {
             // Clean up whitespace and parse JSON
             try {
@@ -256,24 +254,24 @@ export class AvatarCreatorService {
             let systemPrompt = AVATAR_HELPER_PROMPT;
             systemPrompt = systemPrompt.replace("{{context}}", companyDetails.join(','));
             const zautoMessages = [
-                {role: 'system', content: systemPrompt},
-                {role: 'user', content: 'Provide requiered details as Plain JSON'},
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: 'Provide requiered details as Plain JSON' },
             ]
             const response = await this.llmService.chat(zautoMessages);
-            if(!response || !response.content) {
-                if(retry < 1) {
+            if (!response || !response.content) {
+                if (retry < 1) {
                     return this.getAvatarInstructions(agentName, companyName, retry + 1);
                 }
                 throw 'Unable to get the instruction';
             }
             let _jsonstr = response.content;
-            if(_jsonstr.includes('```json')) {
+            if (_jsonstr.includes('```json')) {
                 return this.extractJsonFromMarkdown(_jsonstr)
             }
             return JSON.parse(_jsonstr);
-        } catch(error) {
+        } catch (error) {
             console.error(error)
-            if(retry < 1) {
+            if (retry < 1) {
                 return this.getAvatarInstructions(agentName, companyName, retry + 1);
             }
             throw 'Unable to get the instruction';
@@ -282,7 +280,7 @@ export class AvatarCreatorService {
 
     async getInstructionsFromHelper(name: string, companyName: string, rollBack?: Function) {
         const instructions = await this.getAvatarInstructions(name, companyName);
-        if(instructions) {
+        if (instructions) {
             return instructions;
         } else {
             console.log('AvatarCreator: Failed at getInstructionsFromHelper')
@@ -300,58 +298,57 @@ export class AvatarCreatorService {
     }
 
 
-    async addAllSites(avatar: Agent, sites: any[]) {
+    async addAllSites(serviceParams: ServiceParams<{avatar: Agent, sites: any[]}>) {
+        const { orgId, data: { avatar, sites } } = serviceParams;
+        const prisma = await this.getPrismaClient(orgId);
         try {
             const siteDtos = [];
-            for(let site of sites) {
+            for (let site of sites) {
                 siteDtos.push({
                     url: site.url,
-                    orgId: avatar.orgId,
                     agentId: avatar.id,
                     status: SiteProcessStatus.COMPLETED,
                 })
             }
-            const result = await this.prisma.site.createMany({data: siteDtos});
-        } catch(error) {
+            const result = await prisma.site.createMany({ data: siteDtos });
+        } catch (error) {
             console.log(error)
         }
     }
 
-    async addCTAs(agent: Agent) {
+    async addCTAs(orgId: string) {
         console.log("CTA Creator Called.")
         try {
-            await this.ctaCreatorService.createCTAs(agent.id)
-        } catch(error) {
+            await this.ctaCreatorService.createCTAs(orgId)
+        } catch (error) {
             console.log(error)
         }
     }
 
-    async updateGreetingsForAllSites(avatar: Agent,links: string[])
-    {
-        try{
-
+    async updateGreetingsForAllSites(serviceParams: ServiceParams<{links: string[]}>) {
+        const { orgId ,data: { links } } = serviceParams;
+        const prisma = await this.getPrismaClient(orgId);
+        try {
             const greetings = await this.pageGreeterService.getGreetings(links);
-            if(greetings.length == 0) 
-            {
+            if (greetings.length == 0) {
                 console.log("Unable to get the greetings");
                 return;
             }
-            console.log('AvatarCreator: greetings for ',greetings);
-            const sites = await this.prisma.site.findMany({where:{agentId: avatar.id}});
-            for(let greating of greetings)
-            {
+            console.log('AvatarCreator: greetings for ', greetings);
+            for (let greating of greetings) {
                 try {
-                    await this.prisma.site.updateMany({where:{
-                        url: greating.url, 
-                        status: SiteProcessStatus.COMPLETED
-                    }, data: {greeting: greating.message}});
-                } catch(error) {
+                    await prisma.site.updateMany({
+                        where: {
+                            url: greating.url,
+                            status: SiteProcessStatus.COMPLETED
+                        }, data: { greeting: greating.message }
+                    });
+                } catch (error) {
                     console.log(error);
                 }
             }
         }
-        catch(error)
-        {
+        catch (error) {
             console.log(error);
         }
     }

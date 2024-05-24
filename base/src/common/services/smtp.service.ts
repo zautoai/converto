@@ -67,7 +67,7 @@ export class SmtpService {
     }
 
     async sendMail(orgId: string, mailContent: MailContent) {
-        const config = await this.prisma.orgSMTPConfig.findFirst({ where: { orgId, isActive: true } });
+        const config = await this.prisma.orgSMTPConfig.findFirst({ where: {isActive: true } });
         if (!config) {
             return null;
         }

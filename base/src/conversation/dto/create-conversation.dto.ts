@@ -3,15 +3,6 @@ import { ConversationType } from '../../common/enums/enums';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateConversationDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  orgId: string;
-  
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  agentId: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -60,10 +51,6 @@ export class CreateAgentConversationDto {
   @IsString()
   agentId: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  orgId: string;
 
 }
 

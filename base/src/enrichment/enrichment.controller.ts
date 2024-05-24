@@ -1,31 +1,27 @@
 import {
+  Body,
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
   Query,
   Req,
   UnauthorizedException,
-  BadRequestException,
+  UseGuards
 } from '@nestjs/common';
-import { EnrichmentService } from './enrichment.service';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { Roles } from 'src/auth/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { SYSTEM_CONST } from 'src/common/constants/system.constants';
 import { EnrichmentProviderName } from 'src/common/enums/enums';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { ContactEnrichmentDto } from './dto/contact-enrich.dto';
+import { EnrichmentService } from './enrichment.service';
 
 @ApiTags('enrichment')
 @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
@@ -33,7 +29,7 @@ import { ContactEnrichmentDto } from './dto/contact-enrich.dto';
 @ApiBearerAuth()
 @Controller('enrichment')
 export class EnrichmentController {
-  constructor(private readonly enrichmentService: EnrichmentService) {}
+  constructor(private readonly enrichmentService: EnrichmentService) { }
 
   @Get('/people')
   @ApiOperation({
@@ -87,7 +83,7 @@ export class EnrichmentController {
     @Query('provider') provider: string,
     @Req() request: ZautoRequest,
   ) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -125,7 +121,7 @@ export class EnrichmentController {
     @Query('provider') provider: string,
     @Req() request: ZautoRequest,
   ) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -141,7 +137,7 @@ export class EnrichmentController {
     @Body() contactEnrichmentDto: ContactEnrichmentDto,
     @Req() req: ZautoRequest,
   ) {
-    const orgId = req.user.org.id;
+    const orgId = req.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }

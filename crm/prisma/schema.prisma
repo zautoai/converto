@@ -67,6 +67,7 @@ model Contact {
   notes                    String?
   leadSource               String?
   status                   String?
+  conversationId           String?
   createdAt                DateTime                  @default(now())
   modifiedAt               DateTime                  @updatedAt
   contactTag               ContactTag[]

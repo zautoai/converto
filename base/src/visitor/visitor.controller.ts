@@ -11,6 +11,8 @@ import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Visitor } from './entities/visitor.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ZautoRequest } from 'src/common/models/request.model';
+import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
+import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
 
 
 @ApiTags('Visitors')
@@ -19,9 +21,11 @@ export class VisitorController {
   constructor(private readonly visitorService: VisitorService) {}
 
   @Post()
-  async create(@Body() createVisitorDto: CreateVisitorDto, @Req() request: ZautoRequest) {
-    if(request.user && request.user.org && request.user.org.id) {
-      return await this.visitorService.create(createVisitorDto, request.user.org.id);
+  @UseGuards(SubdomainGuard)
+  async create(@Body() createVisitorDto: CreateVisitorDto, @Req() request: SubdomainRequest) {
+    const orgId = request.orgId;
+    if(orgId) {
+      return await this.visitorService.create({ orgId, data: createVisitorDto});
     } else {
       throw new UnauthorizedException('Org info not found.')
     }
@@ -36,12 +40,12 @@ export class VisitorController {
     @ApiOkResponse({
       type: ResponseDTO<Visitor>
     })
-    async findAll(@Query() paginationDto: PaginationDto,@Req() zautoRequest: ZautoRequest)
+    async findAll(@Query() paginationDto: PaginationDto, @Req() request: ZautoRequest)
     {
-        if(zautoRequest.user && zautoRequest.user.org)
+        if(request.user && request.user.orgId)
         {
-            const orgId = zautoRequest.user.org.id;
-            return await this.visitorService.findAllByOrg(orgId,paginationDto);
+            const orgId = request.user.orgId;
+            return await this.visitorService.findAllByOrg({orgId,data:paginationDto});
         }
         else
         {
@@ -54,8 +58,11 @@ export class VisitorController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOkResponse({type: Visitor})
-  async findOne(@Param('id') id: string) {
-    return await this.visitorService.findOne(id);
+  async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
+    if(request.user && request.user.orgId) {
+      const orgId = request.user.orgId;
+      return await this.visitorService.findOne(orgId, id);
+    }
   }
 
   @Patch(':id')
@@ -63,8 +70,11 @@ export class VisitorController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOkResponse({type: Visitor})
-  async update(@Param('id') id: string, @Body() updateVisitorDto: UpdateVisitorDto) {
-    return await this.visitorService.update(id, updateVisitorDto);
+  async update(@Param('id') id: string, @Body() updateVisitorDto: UpdateVisitorDto, @Req() request: ZautoRequest) {
+    if(request.user && request.user.orgId) {
+      const orgId = request.user.orgId;
+      return await this.visitorService.update({orgId, id, data:updateVisitorDto});
+    }
   }
 
   @Delete(':id')
@@ -73,7 +83,10 @@ export class VisitorController {
   @ApiBearerAuth()
   @ApiNoContentResponse()
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
-    await this.visitorService.remove(id);
+  async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
+    if(request.user && request.user.orgId) {
+      const orgId = request.user.orgId;
+      return await this.visitorService.remove(orgId, id);
+    }
   }
 }

@@ -2,11 +2,6 @@ import { MessageMediaType } from "../entities/conversation.enums";
 
 
 export class CreateMessageDto {
-
-    orgId: string;
-    
-    agentId: string;
-
     convId: string;
 
     role: string;

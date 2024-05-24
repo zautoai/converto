@@ -32,8 +32,5 @@ export class User {
     orgId: string; 
 
     @ApiProperty()
-    org: Organization;
-
-    @ApiProperty()
     googleAccessToken?: string;
 }

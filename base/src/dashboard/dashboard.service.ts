@@ -1,21 +1,28 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { data } from 'cheerio/lib/api/attributes';
 import { AgentStatus } from 'src/agent/entities/agent.entity';
 import { DateFilter } from 'src/common/enums/enums';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 import { DashbaordDto } from './dto/dashboard.dto';
 import { Sql } from '@prisma/client/runtime/library';
 import { Prisma } from '@prisma/client';
 import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { ContactsService } from 'src/contacts/contacts.service';
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly prismaClientManager: PrismaClientManager,
+    private contactsService: ContactsService
+  ) { }
 
   async getAgentsCount(orgId: string) {
     try {
-      return await this.prisma.agent.count({
-        where: { orgId, status: { not: AgentStatus.DELETED } },
+      const prisma = await this.prismaClientManager.getClient(orgId);
+
+      return await prisma.agent.count({
+        where: { status: { not: AgentStatus.DELETED } },
       });
     } catch (error) {
       console.log(error);
@@ -24,7 +31,8 @@ export class DashboardService {
 
   async getUsersCount(orgId: string) {
     try {
-      return await this.prisma.user.count({ where: { orgId } });
+      const prisma = await this.prismaClientManager.getClient(orgId);
+      return await prisma.user.count({ where: { orgId } });
     } catch (error) {
       console.log(error);
     }
@@ -32,10 +40,11 @@ export class DashboardService {
 
   async getVisitorsCount(orgId: string, startDate?: Date, endDate?: Date) {
     try {
+      const prisma = await this.prismaClientManager.getClient(orgId);
+
       if (startDate && endDate) {
-        return await this.prisma.visitor.count({
+        return await prisma.visitor.count({
           where: {
-            orgId,
             createdAt: {
               gte: new Date(startDate), // Greater than or equal to start date
               lte: new Date(endDate), // Less than or equal to end date
@@ -43,7 +52,8 @@ export class DashboardService {
           },
         });
       } else {
-        return await this.prisma.visitor.count({ where: { orgId } });
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        return await prisma.visitor.count();
       }
     } catch (error) {
       console.log(error);
@@ -52,18 +62,13 @@ export class DashboardService {
 
   async getLeadsCount(orgId: string, startDate?: Date, endDate?: Date) {
     try {
+      const prisma = await this.prismaClientManager.getClient(orgId);
       if (startDate && endDate) {
-        return await this.prisma.lead.count({
-          where: {
-            orgId,
-            createdAt: {
-              gte: new Date(startDate), // Greater than or equal to start date
-              lte: new Date(endDate), // Less than or equal to end date
-            },
-          },
-        });
+        const leads = await this.contactsService.getContactsByDate(orgId, startDate, endDate)
+        return leads.length;
       } else {
-        return await this.prisma.lead.count({ where: { orgId } });
+        const leads = await this.contactsService.findAll(orgId)
+        return leads.length;
       }
     } catch (error) {
       console.log(error);
@@ -72,10 +77,11 @@ export class DashboardService {
 
   async getConversationCount(orgId: string, startDate?: Date, endDate?: Date) {
     try {
+      const prisma = await this.prismaClientManager.getClient(orgId);
+
       if (startDate && endDate) {
-        return await this.prisma.conversation.count({
+        return await prisma.conversation.count({
           where: {
-            orgId,
             createdAt: {
               gte: new Date(startDate), // Greater than or equal to start date
               lte: new Date(endDate), // Less than or equal to end date
@@ -83,7 +89,7 @@ export class DashboardService {
           },
         });
       } else {
-        return await this.prisma.conversation.count({ where: { orgId } });
+        return await prisma.conversation.count();
       }
     } catch (error) {
       console.log(error);
@@ -92,10 +98,10 @@ export class DashboardService {
 
   async getCampaignCount(orgId: string, startDate?: Date, endDate?: Date) {
     try {
+      const prisma = await this.prismaClientManager.getClient(orgId);
       if (startDate && endDate) {
-        return await this.prisma.campaign.count({
+        return await prisma.campaign.count({
           where: {
-            orgId,
             startDate: {
               gte: new Date(startDate), // Greater than or equal to start date
               lte: new Date(endDate), // Less than or equal to end date
@@ -103,7 +109,7 @@ export class DashboardService {
           },
         });
       } else {
-        return await this.prisma.campaign.count({ where: { orgId } });
+        return await prisma.campaign.count();
       }
     } catch (error) {
       console.log(error);
@@ -111,168 +117,26 @@ export class DashboardService {
   }
 
   async getSitesCount(orgId: string) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
+
     try {
-      return await this.prisma.site.count({ where: { orgId } });
+      return await prisma.site.count();
     } catch (error) {
       console.log(error);
     }
   }
 
-  async getLeadsCountAgentWise(orgId: string) {
-    try {
-      return await this.prisma.lead.groupBy({
-        by: ['agentId'],
-        where: { orgId },
-        _count: { agentId: true },
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
-  async getConversationCountAgentWise(orgId: string) {
-    try {
-      return await this.prisma.conversation.groupBy({
-        by: ['agentId'],
-        where: { orgId },
-        _count: { agentId: true },
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async getCampaignCountAgentWise(orgId: string) {
-    try {
-      return await this.prisma.campaign.groupBy({
-        by: ['agentId'],
-        where: { orgId },
-        _count: { agentId: true },
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  getMessageCount(conversation: string) {}
+  getMessageCount(conversation: string) { }
 
   async getMessagesCount(orgId: string) {
     try {
-      const conversations = await this.prisma.zautoMessage.count({
-        where: { orgId, role: 'assistant', type: 'TEXT' },
+      const prisma = await this.prismaClientManager.getClient(orgId);
+
+      const conversations = await prisma.zautoMessage.count({
+        where: { role: 'assistant', type: 'TEXT' },
       });
       return conversations;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async getMessagesCountByAgent(agentId: string) {
-    try {
-      const conversations = await this.prisma.zautoMessage.count({
-        where: { agentId, role: 'assistant', type: 'TEXT' },
-      });
-      return conversations;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async getLeadCountByAgent(agentId: string) {
-    try {
-      const leads = await this.prisma.lead.count({ where: { agentId } });
-      return leads;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async getVisitorCountByAgent(agentId: string) {
-    try {
-      const visitors = await this.prisma.visitor.count({ where: { agentId } });
-      return visitors;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async getConversationCountByAgent(agentId: string) {
-    try {
-      const conversations = await this.prisma.conversation.count({
-        where: { agentId },
-      });
-      return conversations;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async getCampaignWiseVisitCount(agentId: string) {
-    try {
-      const campaignWiseData = await this.prisma.campaign.findMany({
-        where: { agentId },
-        // include: {
-        //     Visitors: {
-        //         select: {
-        //             id: true,
-        //         }
-        //     },
-        // }
-      });
-
-      const visitors = [],
-        labels = [];
-      // for(let campaign of campaignWiseData){
-      //     labels.push(campaign.title)
-      //     visitors.push(campaign.Visitors.length);
-      // }
-      return { visitors, labels };
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async getPlatformWiseVisitCount(agentId: string) {
-    try {
-      const platformWiseData = await this.prisma.visitor.groupBy({
-        where: { agentId },
-        by: ['agentId'],
-        _count: {
-          agentId: true,
-        },
-      });
-
-      const visitors = [],
-        labels = [];
-      for (let platform of platformWiseData) {
-        labels.push(platform.agentId);
-        visitors.push(platform._count.agentId);
-      }
-      return { visitors, labels };
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async getVisitCountByPlatform(orgId: string, dashbaordDto: DashbaordDto) {
-    try {
-      let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-      const platformVisitData = await this.prisma.visit.groupBy({
-        where: {
-          orgId,
-          createdAt: {
-            gte: startDate.toISOString(),
-            lte: endDate.toISOString(),
-          },
-        },
-        by: ['source'],
-        _count: {
-          source: true,
-        },
-      });
-      const formattedData = platformVisitData.map((item) => ({
-        source: item.source,
-        count: item._count.source,
-      }));
-
-      return formattedData;
     } catch (error) {
       console.log(error);
     }
@@ -284,11 +148,13 @@ export class DashboardService {
 
   async getVisitCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
     try {
+      const prisma = await this.prismaClientManager.getClient(orgId);
+
       let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
 
       const _startDate = startDate;
       const _endDate = endDate;
-      const result = await this.prisma.$queryRaw`
+      const result = await prisma.$queryRaw`
             WITH
                 DATE_RANGE AS (
                     SELECT
@@ -336,10 +202,12 @@ export class DashboardService {
 
   async getLeadCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
     try {
+      const prisma = await this.prismaClientManager.getClient(orgId);
+
       let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
       const _startDate = startDate;
       const _endDate = endDate;
-      const result = await this.prisma.$queryRaw`
+      const result = await prisma.$queryRaw`
             WITH
                 DATE_RANGE AS (
                     SELECT
@@ -388,10 +256,12 @@ export class DashboardService {
 
   async getConversationCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
     try {
+      const prisma = await this.prismaClientManager.getClient(orgId);
+
       let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
       const _startDate = startDate;
       const _endDate = endDate;
-      const result = await this.prisma.$queryRaw`
+      const result = await prisma.$queryRaw`
             WITH
                 DATE_RANGE AS (
                     SELECT
@@ -442,8 +312,9 @@ export class DashboardService {
 
   async getCampaignCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
     try {
+      const prisma = await this.prismaClientManager.getClient(orgId);
       let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-      const dateWiseConvo = await this.prisma.campaign.groupBy({
+      const dateWiseConvo = await prisma.campaign.groupBy({
         by: ['createdAt'],
         _count: {
           createdAt: true,
@@ -452,9 +323,6 @@ export class DashboardService {
           _count: {
             createdAt: 'desc',
           },
-        },
-        where: {
-          orgId,
         },
       });
 
@@ -579,34 +447,19 @@ export class DashboardService {
   }
 
   async getLeadCount(orgId: string, dashbaordDto: DashbaordDto) {
-    let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-    const leads = await this.prisma.lead.findMany({
-      where: {
-        orgId,
-        createdAt: {
-          gte: startDate.toISOString(),
-          lte: endDate.toISOString(),
-        },
-      },
-      include: {
-        conversation: {
-          include: {
-            visit: {
-              select: {
-                source: true,
-                campaignId: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    const prisma = await this.prismaClientManager.getClient(orgId);
 
+    let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
+    const leads = await this.contactsService.getContactsByDate(orgId, startDate, endDate)
     const sourceCountMap = {};
 
     for (let lead of leads) {
-      if (lead && lead.conversation) {
-        const { source } = lead.conversation.visit;
+      const conversation = await this.prisma.conversation.findFirst({
+        where: { id: lead.conversationId },
+        include: { visit: { select: { source: true, campaignId: true } } }
+      })
+      if (lead && conversation) {
+        const { source } = conversation.visit;
 
         if (!sourceCountMap[source]) {
           sourceCountMap[source] = 0;
@@ -667,11 +520,13 @@ export class DashboardService {
 
   async getTopCampaigns(orgId: string, dashbaordDto: DashbaordDto) {
     try {
+      const prisma = await this.prismaClientManager.getClient(orgId);
+
       let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
       const _startDate = startDate;
       const _endDate = endDate;
 
-      const top5Campaigns = await this.prisma.$queryRaw`
+      const top5Campaigns = await prisma.$queryRaw`
                 WITH CampaignCounts AS (
                     SELECT
                         C.ID,

@@ -29,12 +29,12 @@ import { CreateFieldDto } from './dto/create-field.dto';
 @ApiBearerAuth()
 @Controller('api/contacts')
 export class ContactsController {
-  constructor(private readonly contactsService: ContactsService) {}
+  constructor(private readonly contactsService: ContactsService) { }
 
   @ApiBody({ type: CreateContactDto })
   @Post()
   async create(@Body() createContactDto: any, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -43,7 +43,7 @@ export class ContactsController {
 
   @Get()
   async findAll(@Query() filterDto: FilterDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -52,16 +52,37 @@ export class ContactsController {
 
   @Get('fields')
   async getFields(@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
     return await this.contactsService.getContactFields(orgId);
   }
 
+
+  @Get('conversation/:id')
+  async getContactsByConversation(@Req() request: ZautoRequest, @Param('id') id: string) {
+    const orgId = request.user.orgId;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    return await this.contactsService.getContactsByConversation(orgId, id);
+  }
+
+  @Get('date-range')
+  async getContactsByDateRange(@Req() request: ZautoRequest, @Query('startDate') startDate: Date, @Query('endDate') endDate: Date) {
+    const orgId = request.user.orgId;
+    if (!orgId) {
+      throw new UnauthorizedException('Org Id not found');
+    }
+    if (startDate && endDate) {
+      return await this.contactsService.getContactsByDate(orgId, startDate, endDate);
+    }
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -75,7 +96,7 @@ export class ContactsController {
     @Body() updateContactDto: any,
     @Req() request: ZautoRequest,
   ) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -84,7 +105,7 @@ export class ContactsController {
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -92,8 +113,8 @@ export class ContactsController {
   }
 
   @Post('customfield')
-  async createCustomField(@Body() createFieldDto:CreateFieldDto, @Req() request: ZautoRequest){
-    const orgId = request.user.org.id;
+  async createCustomField(@Body() createFieldDto: CreateFieldDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }

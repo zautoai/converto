@@ -1,132 +1,84 @@
-import { Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException } from '@nestjs/common';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { SummarizerService } from 'src/assistants/services/summarizer.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ServiceParams } from 'src/common/models/service-param.model';
+import { BaseService } from 'src/common/services/base.service';
+import { ContactsService } from 'src/contacts/contacts.service';
+import { ZautoChatCompletionMessage } from 'src/llm/llms/llm.models';
+import { CreateConversationDto } from './dto/create-conversation.dto';
 import { CreateMessageDto } from './dto/crete-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
-import { ConversationFilterDto } from './dto/conversation-filter.dto';
-import { Conversation, ConversationStatus } from './entities/conversation.entity';
-import { User } from 'src/users/entities/user.entity';
+import { ConversationStatus } from './entities/conversation.entity';
 import { MessageMediaType } from './entities/conversation.enums';
-import { SummarizerService } from 'src/assistants/services/summarizer.service';
-import { ZautoChatCompletionMessage } from 'src/llm/llms/llm.models';
-import { LeadService } from 'src/lead/lead.service';
-import { UsageService } from 'src/account/usage.service';
 
 @Injectable()
-export class ConversationService {
+export class ConversationService extends BaseService {
 
-  constructor(private prisma: PrismaService,
-    private summarizer: SummarizerService,
-    private readonly usageService: UsageService) { }
+  constructor(private summarizer: SummarizerService, private contactsService: ContactsService) {
+    super();
+  }
 
-  async create(createConversationDto: CreateConversationDto, orgId: string) {
-    const currentDate = new Date().toISOString();
-    const conversationUsage = await this.usageService.getConversationCount(orgId, currentDate);
-    const remainingConversation = conversationUsage.maxCount - conversationUsage.count;
-
-    if (remainingConversation <= 0) {
-      throw new NotAcceptableException(`Remaining conversations ${remainingConversation}`);
+  async create(serviceParams: ServiceParams<CreateConversationDto>) {
+    const { orgId, data: createConversationDto } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      return await prisma.conversation.create({ data: createConversationDto });
     }
-    return await this.prisma.conversation.create({ data: { ...createConversationDto, orgId } });
-  }
-
-  async createIfNotExist(createConversationDto: CreateConversationDto, orgId: string, message?: ZautoChatCompletionMessage) {
-    const conversation = await this.prisma.conversation.findFirst({
-      where: {
-        orgId,
-        agentId: createConversationDto.agentId,
-        // visitId: createConversationDto.visitId,
-        visitorId: createConversationDto.visitorId
-      }
-    })
-    if (conversation) {
-      return conversation;
+    catch (error) {
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
-    const newConv = await this.prisma.conversation.create({ data: { ...createConversationDto, orgId } });
-    if (message) {
-      await this.createMessage({
-        orgId,
-        agentId: createConversationDto.agentId,
-        convId: newConv.id,
-        role: message.role,
-        content: message.content
-      });
-    }
-    return newConv;
   }
 
-  async findAll(paginationDto: PaginationDto) {
-    const { page, limit } = paginationDto;
-    const skip = (page - 1) * limit;
-    const roleData = await this.prisma.conversation.findMany({ skip, take: limit });
-    const total = await this.prisma.conversation.count();
-    return {
-      data: roleData,
-      page: page,
-      total: total
-    };
-  }
-
-  async findAllByagentId(agentId: string, paginationDto: PaginationDto) {
-    const { page, limit } = paginationDto;
-    const skip = (page - 1) * limit;
-    const roleData = await this.prisma.conversation.findMany({ skip, take: limit, where: { agentId }, include: { Lead: true } });
-    const total = await this.prisma.conversation.count({ where: { agentId } });
-    return {
-      data: roleData,
-      page: page,
-      total: total
-    };
-  }
-
-  async findAllByOrg(orgId: string, filterDto: ConversationFilterDto) {
-    const { page, limit } = filterDto;
-    const skip = (page - 1) * limit;
-    const roleData = await this.prisma.conversation.findMany({
-      skip,
-      take: limit,
-      orderBy: { modifiedAt: 'desc' },
-      where: {
-        orgId,
-        ...filterDto.campaign ? { campaignId: { equals: filterDto.campaign } } : {},
-        ...filterDto.fromDate ? { modifiedAt: { gte: filterDto.fromDate, lte: filterDto.toDate } } : {},
-        ...filterDto.status ? { status: { equals: ConversationStatus[filterDto.status] } } : {},
-        ...filterDto.lead ? { Lead: { isNot: null } } : {},
-        isValid: true
-      },
-      include: {
-        Lead: true,
-        visitor: true,
-        campaign: true,
-        visit: true,
-        assignee: {
-          select: {
-            id: true,
-            name: true,
-            imgUrl: true
-          }
-        },
-        messages: {
-          where: { type: 'TEXT' },
+  async createIfNotExist(serviceParams: ServiceParams<{ createConversationDto: CreateConversationDto, message?: ZautoChatCompletionMessage }>,) {
+    const { orgId, data: { createConversationDto, message } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const conversation = await prisma.conversation.findFirst({
+        where: {
+          visitorId: createConversationDto.visitorId
         }
+      })
+      if (conversation) {
+        return conversation;
       }
-    });
-    const total = await this.prisma.conversation.count({
-      where: {
-        orgId,
-        ...filterDto.campaign ? { campaignId: { equals: filterDto.campaign } } : {},
-        ...filterDto.fromDate ? { modifiedAt: { gte: filterDto.fromDate, lte: filterDto.toDate } } : {},
-        ...filterDto.status ? { status: { equals: ConversationStatus[filterDto.status] } } : {},
-        ...filterDto.lead ? { Lead: { isNot: null } } : {},
-        isValid: true
-      },
-    });
-    return {
-      data: roleData,
-      page: page,
-      total: total
-    };
+      const newConv = await prisma.conversation.create({ data: createConversationDto });
+      if (message) {
+        await this.createMessage({
+          orgId, data: {
+            convId: newConv.id,
+            role: message.role,
+            content: message.content
+          }
+        });
+      }
+      return newConv;
+    } catch (error) {
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
+    }
+  }
+
+  async findAll(serviceParams: ServiceParams<PaginationDto>) {
+    const { orgId, data: paginationDto } = serviceParams;
+    const { page, limit } = paginationDto;
+    const skip = (page - 1) * limit;
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const roleData = await prisma.conversation.findMany({ skip, take: limit });
+      const total = await prisma.conversation.count();
+      return {
+        data: roleData,
+        page: page,
+        total: total
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
+    }
   }
 
   async updateSummary(conversation: any) {
@@ -141,84 +93,102 @@ export class ConversationService {
     return conversation;
   }
 
-  async findOne(id: string) {
-    let existingConversation = await this.prisma.conversation.findUnique({
-      where: { id },
-      include: {
-        agent: true, messages: {
-          orderBy: { createdAt: 'asc' }, include: {
-            sentBy: {
-              select: {
-                id: true,
-                name: true,
-                imgUrl: true
+  async findOne(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      let existingConversation = await prisma.conversation.findUnique({
+        where: { id },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'asc' }, include: {
+              sentBy: {
+                select: {
+                  id: true,
+                  name: true,
+                  imgUrl: true
+                }
               }
             }
-          }
-        },
-        campaign: true,
-        Lead: true,
-        visitor: true,
-        visit: true
-      }
-    });
-    if (existingConversation) {
-      return existingConversation;
-    } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+          },
+          campaign: true,
+          visitor: true,
+          visit: true
+        }
+      });
+      if (existingConversation) {
+        return existingConversation;
+      } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+    } catch (error) {
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
+    }
   }
 
-  async findOneWithSummary(id: string) {
-    let existingConversation = await this.prisma.conversation.findUnique({
-      where: { id },
-      include: {
-        agent: true, messages: {
-          where: { type: 'TEXT' },
-          orderBy: { createdAt: 'asc' }, include: {
-            sentBy: {
-              select: {
-                id: true,
-                name: true,
-                imgUrl: true
+  async findOneWithSummary(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      let existingConversation = await prisma.conversation.findUnique({
+        where: { id },
+        include: {
+          messages: {
+            where: { type: 'TEXT' },
+            orderBy: { createdAt: 'asc' }, include: {
+              sentBy: {
+                select: {
+                  id: true,
+                  name: true,
+                  imgUrl: true
+                }
               }
             }
           }
-        },
-        Lead: { include: {LeadCategoryMap: { include: {category: true}}}},
-      }
-    });
-    if (existingConversation) {
-      const lastMessageOn = existingConversation.messages[existingConversation.messages.length - 1]?.modifiedAt.getTime();
-      if (!existingConversation.summaryUpdatedAt || lastMessageOn && lastMessageOn > existingConversation.summaryUpdatedAt.getTime()) {
-        existingConversation = await this.updateSummary(existingConversation);
-      }
-      return existingConversation;
-    } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+        }
+      });
+      if (existingConversation) {
+        const lastMessageOn = existingConversation.messages[existingConversation.messages.length - 1]?.modifiedAt.getTime();
+        if (!existingConversation.summaryUpdatedAt || lastMessageOn && lastMessageOn > existingConversation.summaryUpdatedAt.getTime()) {
+          existingConversation = await this.updateSummary(existingConversation);
+        }
+        return existingConversation;
+      } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+    } catch (error) {
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
+    }
   }
 
-  async findOneNoSummay(id: string) {
-    let existingConversation = await this.prisma.conversation.findUnique({
-      where: { id },
-      include: {
-        agent: true, messages: {
-          orderBy: { createdAt: 'asc' }, include: {
-            sentBy: {
-              select: {
-                id: true,
-                name: true,
-                imgUrl: true
+  async findOneNoSummay(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      let existingConversation = await prisma.conversation.findUnique({
+        where: { id },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'asc' }, include: {
+              sentBy: {
+                select: {
+                  id: true,
+                  name: true,
+                  imgUrl: true
+                }
               }
             }
-          }
-        },
-        campaign: true,
-        Lead: true,
-        visitor: true,
-        visit: true
-      }
-    });
-    if (existingConversation) {
-      return existingConversation;
-    } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+          },
+          campaign: true,
+          visitor: true,
+          visit: true
+        }
+      });
+      if (existingConversation) {
+        return existingConversation;
+      } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+    } catch (error) {
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
+    }
   }
 
   // async update(id: string, updateConversationDto: any) {
@@ -228,18 +198,27 @@ export class ConversationService {
   //   } else throw new NotFoundException(`Conversation with id ${id} not found.`);
   // }
 
-  async remove(id: string) {
-    const existingConversation = await this.prisma.conversation.findUnique({ where: { id } });
-    if (existingConversation) {
-      return await this.prisma.conversation.delete({ where: { id } })
-    } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+  async remove(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const existingConversation = await prisma.conversation.findUnique({ where: { id } });
+      if (existingConversation) {
+        return await prisma.conversation.delete({ where: { id } })
+      } else throw new NotFoundException(`Conversation with id ${id} not found.`);
+    } catch (error) {
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
+    }
   }
 
-  async updateStatusByClient(socketId: string, status: ConversationStatus) {
+  async updateStatusByClient(serviceParams: ServiceParams<{ socketId: string, status: ConversationStatus }>) {
+    const { orgId, data: { socketId, status } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const conversation = await this.prisma.conversation.findFirst({ where: { socketId } });
+      const conversation = await prisma.conversation.findFirst({ where: { socketId } });
       if (conversation) {
-        const _conversation = await this.prisma.conversation.update({
+        const _conversation = await prisma.conversation.update({
           data: {
             status
           }, where: { socketId }
@@ -252,62 +231,82 @@ export class ConversationService {
       }
       return null;
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async updateStatus(id: string, status: ConversationStatus) {
+  async updateStatus(serviceParams: ServiceParams<{ id: string, status: ConversationStatus }>) {
+    const { orgId, data: { id, status } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const _conversation = await this.prisma.conversation.update({
+      const _conversation = await prisma.conversation.update({
         data: {
           status
         }, where: { id }
       });
       return _conversation;
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async endConversation(id: string) {
+  async endConversation(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const _conversation = await this.prisma.conversation.update({
+      const _conversation = await prisma.conversation.update({
         data: {
           isEnded: true
         }, where: { id }
       });
       return _conversation;
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async updateClientId(visitId: string, socketId: string) {
+  async updateClientId(serviceParams: ServiceParams<{ visitId: string, socketId: string }>) {
+    const { orgId, data: { visitId, socketId } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const _conversation = await this.prisma.conversation.update({
+      const _conversation = await prisma.conversation.update({
         data: {
           socketId, status: ConversationStatus.ONLINE
         }, where: { visitId }
       });
       return _conversation;
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async assignConvToHumanAgent(id: string, user: any) {
+  async assignConvToHumanAgent(serviceParams: ServiceParams<{ id: string, user: any }>) {
+    const { orgId, data: { id, user } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const conversation = await this.findOneNoSummay(id)
+      const conversation = await this.findOneNoSummay(orgId, id)
       if (conversation) {
-        await this.prisma.conversation.update({ data: { aiSuspended: true, assigneeId: user.id }, where: { id } })
+        const agent = await prisma.agent.findFirst();
+        if (!agent) {
+          throw new Error("No agent found");
+        }
+        await prisma.conversation.update({ data: { aiSuspended: true, assigneeId: user.id }, where: { id } })
         const message = await this.createMessage({
-          convId: conversation.id,
-          orgId: conversation.orgId,
-          agentId: conversation.agentId,
-          role: 'assistant',
-          content: `${user.name} has joined in the chat. AI ${conversation.agent.displayName} is Off.`,
-          type: MessageMediaType.ACTIVITY,
-          sentById: user.id
+          orgId, data: {
+            convId: conversation.id,
+            role: 'assistant',
+            content: `${user.name} has joined in the chat. AI ${agent.displayName} is Off.`,
+            type: MessageMediaType.ACTIVITY,
+            sentById: user.id,
+
+          }
         })
         return {
           conversation,
@@ -318,23 +317,27 @@ export class ConversationService {
       return null;
 
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async sendByHuman(id: string, user: any, _message: any) {
+  async sendByHuman(serviceParams: ServiceParams<{ id: string, user: any, _message: any }>) {
+    const { orgId, data: { id, user, _message } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const conversation = await this.findOneNoSummay(id)
+      const conversation = await this.findOneNoSummay(orgId, id)
       if (conversation) {
-        await this.prisma.conversation.update({ data: { aiSuspended: true, assigneeId: user.id }, where: { id } })
+        await prisma.conversation.update({ data: { aiSuspended: true, assigneeId: user.id }, where: { id } })
         const message = await this.createMessage({
-          convId: conversation.id,
-          orgId: conversation.orgId,
-          agentId: conversation.agentId,
-          role: 'assistant',
-          content: _message.content,
-          type: MessageMediaType.TEXT,
-          sentById: user.id
+          orgId, data: {
+            convId: conversation.id,
+            role: 'assistant',
+            content: _message.content,
+            type: MessageMediaType.TEXT,
+            sentById: user.id
+          }
         })
         return {
           conversation,
@@ -345,23 +348,31 @@ export class ConversationService {
       return null;
 
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async resumeAIAgent(id: string, user?: any) {
+  async resumeAIAgent(serviceParams: ServiceParams<{ id: string, user?: any }>) {
+    const { orgId, data: { id, user } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const conversation = await this.findOneNoSummay(id)
+      const conversation = await this.findOneNoSummay(orgId, id)
       if (conversation) {
-        await this.prisma.conversation.update({ data: { aiSuspended: false }, where: { id } })
+        const agent = await prisma.agent.findFirst();
+        if (!agent) {
+          throw new Error("No agent found");
+        }
+        await prisma.conversation.update({ data: { aiSuspended: false }, where: { id } })
         const message = await this.createMessage({
-          convId: conversation.id,
-          orgId: conversation.orgId,
-          agentId: conversation.agentId,
-          role: 'assistant',
-          content: `AI ${conversation.agent.displayName} is online to assist you.`,
-          type: MessageMediaType.ACTIVITY,
-          sentById: user?.id
+          orgId, data: {
+            convId: conversation.id,
+            role: 'assistant',
+            content: `AI ${agent.displayName} is online to assist you.`,
+            type: MessageMediaType.ACTIVITY,
+            sentById: user?.id
+          }
         })
         return {
           conversation,
@@ -371,73 +382,90 @@ export class ConversationService {
       return null;
 
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async requestForHumanSupport(id: string, lead?: any) {
+  async requestForHumanSupport(serviceParams: ServiceParams<{ id: string, lead?: any }>) {
+    const { orgId, data: { id, lead } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const conversation = await this.findOneNoSummay(id)
+      const conversation = await this.findOneNoSummay(orgId, id)
       if (conversation) {
         await this.createMessage({
-          convId: conversation.id,
-          orgId: conversation.orgId,
-          agentId: conversation.agentId,
-          role: 'user',
-          content: 'I need Human Agent Support.',
-          type: MessageMediaType.ACTIVITY
+          orgId, data: {
+            convId: conversation.id,
+            role: 'user',
+            content: 'I need Human Agent Support.',
+            type: MessageMediaType.ACTIVITY
+          }
         })
       }
       if (lead) {
-        await this.addLead(conversation, lead);
+        await this.addLead({ orgId, data: { conversation, lead } });
       }
       return conversation;
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async addLead(conversation: any, lead: any) {
+  async addLead(serviceParams: ServiceParams<{ conversation: any, lead: any }>) {
+    const { orgId, data: { conversation, lead } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const _lead = await this.prisma.lead.findFirst({ where: { convId: conversation.id } });
-      if (_lead) {
-        return await this.prisma.lead.update({ data: { ..._lead, orgId: conversation.orgId }, where: { id: _lead.id } })
-      } else {
-        return await this.prisma.lead.create({
-          data:
-            { ...lead, orgId: conversation.orgId, convId: conversation.id, agentId: conversation.agentId }
-        });
+      const _convlead = await this.contactsService.getContactsByConversation(orgId, conversation.id);
+      if (_convlead) {
+        const _lead = await this.contactsService.update(orgId, _convlead[0].id, lead);
+      }
+      else {
+        const _lead = await this.contactsService.create(orgId, lead)
       }
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async createMessage(createMessageDto: CreateMessageDto) {
+  async createMessage(serviceParams: ServiceParams<CreateMessageDto>) {
+    const { orgId, data: createMessageDto } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const message = await this.prisma.zautoMessage.create({ data: createMessageDto });
-      const count = await this.prisma.zautoMessage.count({ where: { convId: createMessageDto.convId, type:'TEXT' } });
-      if(count > 3) {
-        await this.prisma.conversation.update({ data: { isValid: true }, where: { id: createMessageDto.convId } })
+      const message = await prisma.zautoMessage.create({ data: createMessageDto });
+      const count = await prisma.zautoMessage.count({ where: { convId: createMessageDto.convId, type: 'TEXT' } });
+      if (count > 3) {
+        await prisma.conversation.update({ data: { isValid: true }, where: { id: createMessageDto.convId } })
       }
       return message;
     } catch (error) {
       throw new InternalServerErrorException('Unalbe to create Message')
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async updateMessage(id: string, updateMessageDto: UpdateMessageDto) {
+  async updateMessage(serviceParams: ServiceParams<{ id: string, updateMessageDto: UpdateMessageDto }>) {
+    const { orgId, data: { id, updateMessageDto } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const message = this.prisma.zautoMessage.update({ data: updateMessageDto, where: { id } });
+      const message = prisma.zautoMessage.update({ data: updateMessageDto, where: { id } });
       return message;
     } catch (error) {
       throw new InternalServerErrorException('Unalbe to create Message')
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async getMessages(convId: string) {
+  async getMessages(orgId: string, convId: string) {
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const messages = await this.prisma.zautoMessage.findMany({
+      const messages = await prisma.zautoMessage.findMany({
         where: { convId },
         orderBy: { createdAt: 'asc' },
         include: {
@@ -453,17 +481,21 @@ export class ConversationService {
       return messages;
     } catch (error) {
       throw new InternalServerErrorException('Unalbe to create Message')
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async findByAssignee(assigneeId: string) {
-    return await this.prisma.conversation.findFirst({ where: { assigneeId } });
+  async findByAssignee(orgId: string, assigneeId: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    return await prisma.conversation.findFirst({ where: { assigneeId } });
   }
 
-  async getLastMessage(convId: string) {
+  async getLastMessage(orgId: string, convId: string) {
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const lastMessage = await this.prisma.zautoMessage.findFirst({
-        where: { convId , type: "TEXT"},
+      const lastMessage = await prisma.zautoMessage.findFirst({
+        where: { convId, type: "TEXT" },
         orderBy: { createdAt: 'desc' },
         include: {
           sentBy: {
@@ -475,24 +507,26 @@ export class ConversationService {
           }
         }
       });
-    return lastMessage;
+      return lastMessage;
     } catch (error) {
       throw new InternalServerErrorException('Unable to fetch last message');
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 
-  async createNavigationActivity(convId: string,url: string)
-  {
+  async createNavigationActivity(serviceParams: ServiceParams<{ convId: string, url: string }>) {
+    const { orgId, data: { convId, url } } = serviceParams;
     try {
-      const conversation = await this.findOne(convId);
+      const conversation = await this.findOne(orgId, convId);
       if (conversation) {
         const message = await this.createMessage({
-          convId: conversation.id,
-          orgId: conversation.orgId,
-          agentId: conversation.agentId,
-          role: 'user',
-          content: `Navigated to ${url}`,
-          type: MessageMediaType.NAVIGATION,
+          orgId, data: {
+            convId: conversation.id,
+            role: 'user',
+            content: `Navigated to ${url}`,
+            type: MessageMediaType.NAVIGATION,
+          }
         })
         return {
           conversation,
@@ -506,20 +540,25 @@ export class ConversationService {
     }
   }
 
-  async updateNavigationActivity(messageId: string, url: string)
-  {
+  async updateNavigationActivity(serviceParams: ServiceParams<{ messageId: string, url: string }>) {
+    const { orgId, data: { messageId, url } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const message = await this.prisma.zautoMessage.update({ data: {
-        role: 'user',
-        content: `Left from ${url}`,
-        type: MessageMediaType.ACTIVITY,
-      }, where: {id: messageId}})
+      const message = await prisma.zautoMessage.update({
+        data: {
+          role: 'user',
+          content: `Left from ${url}`,
+          type: MessageMediaType.ACTIVITY,
+        }, where: { id: messageId }
+      })
       return {
         message,
       }
 
     } catch (error) {
-      console.error(error)
+      throw error
+    } finally {
+      await this.closeConnection(orgId);
     }
   }
 }

@@ -37,7 +37,7 @@ export class CreateAccountDto {
     @ApiProperty({ required: false, enum: accountType })
     @IsEnum(accountType)
     @IsOptional()
-    accountType?: accountType = accountType.CUSTOMER;
+    accountType?: accountType = accountType.PROSPECT;
 
     @ApiProperty({ required: false })
     @IsString()

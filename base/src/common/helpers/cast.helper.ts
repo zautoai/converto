@@ -53,3 +53,9 @@ interface ToNumberOptions {
   
     return newValue;
   }
+
+  export function getSchemaName(orgId: string): string {
+    const tenantName = `org_${orgId}`;
+    const sanitizedSchemaName = tenantName.replace(/[^a-zA-Z0-9_]/g, '_');
+    return sanitizedSchemaName;
+  }

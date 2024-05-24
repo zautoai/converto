@@ -107,6 +107,11 @@ export class CreateContactDto {
   @IsString()
   status?: string;
 
+  @ApiProperty({ required: false, description: 'Conversation Id from which the contact is created' })
+  @IsOptional()
+  @IsString()
+  conversationId?: string;
+
   async validate() {
     try {
       await validateOrReject(this, { skipMissingProperties: true });

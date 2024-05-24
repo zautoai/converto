@@ -9,4 +9,4 @@ import { MicroservicesModule } from 'src/microservices/microservices.module';
   providers: [AccountsService],
   exports: [AccountsService]
 })
-export class AccountsModule {}
+export class AccountsModule { }

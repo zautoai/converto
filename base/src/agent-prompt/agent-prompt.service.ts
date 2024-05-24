@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAgentPromptDto } from './dto/create-agent-prompt.dto';
 import { UpdateAgentPromptDto } from './dto/update-agent-prompt.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ASSISTANT_PROMPT_TEMPLATE } from 'src/common/templates/agent-prompt.template';
 import { ConversationType } from 'src/common/enums/enums';
 import { LlmService } from 'src/llm/llm.service';
+import { BaseService } from 'src/common/services/base.service';
+import { ServiceParams } from 'src/common/models/service-param.model';
 
 @Injectable()
-export class AgentPromptService {
+export class AgentPromptService extends BaseService {
 
   selectQuery = {
     id: true,
@@ -20,17 +21,23 @@ export class AgentPromptService {
     modifiedAt: true
   };
 
-  constructor(private prisma: PrismaService,private readonly llmService: LlmService) { }
-
-  async create(createAgentPromptDto: CreateAgentPromptDto) {
-    return await this.prisma.agentPrompt.create({ data: createAgentPromptDto });
+  constructor(private readonly llmService: LlmService) {
+    super();
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  async create(serviceParams: ServiceParams<CreateAgentPromptDto>) {
+    const { orgId, data: createAgentPromptDto } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    return await prisma.agentPrompt.create({ data: createAgentPromptDto });
+  }
+
+  async findAll(serviceParams: ServiceParams<PaginationDto>) {
+    const { orgId, data: paginationDto } = serviceParams;
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
-    const roleData = await this.prisma.agentPrompt.findMany({ skip, take: limit, select: this.selectQuery });
-    const total = await this.prisma.agentPrompt.count();
+    const prisma = await this.getPrismaClient(orgId);
+    const roleData = await prisma.agentPrompt.findMany({ skip, take: limit, select: this.selectQuery });
+    const total = await prisma.agentPrompt.count();
     return {
       data: roleData,
       page: page,
@@ -38,8 +45,9 @@ export class AgentPromptService {
     };
   }
 
-  async findOne(id: string) {
-    const promptData = await this.prisma.agentPrompt.findFirst({
+  async findOne(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    const promptData = await prisma.agentPrompt.findFirst({
       where: {
         id,
       },
@@ -52,8 +60,9 @@ export class AgentPromptService {
     }
   }
 
-  async findByAgent(agentId: string) {
-    const promptData = await this.prisma.agentPrompt.findFirst({
+  async findByAgent(orgId: string, agentId: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    const promptData = await prisma.agentPrompt.findFirst({
       where: {
         agentId,
       }, select: this.selectQuery
@@ -65,10 +74,12 @@ export class AgentPromptService {
     }
   }
 
-  async update(id: string, updateAgentPrompt: UpdateAgentPromptDto) {
-    const existingPrompt = await this.prisma.agentPrompt.findFirst({ where: { id, } });
+  async update(serviceParams: ServiceParams<UpdateAgentPromptDto>) {
+    const { orgId, data: updateAgentPrompt, id } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    const existingPrompt = await prisma.agentPrompt.findFirst({ where: { id, } });
     if (existingPrompt) {
-      const updatedPrompt = await this.prisma.agentPrompt.update({
+      const updatedPrompt = await prisma.agentPrompt.update({
         data: updateAgentPrompt, where: {
           id,
         }
@@ -79,10 +90,12 @@ export class AgentPromptService {
     }
   }
 
-  async updateByAgent(agentId: string, updateAgentPrompt: UpdateAgentPromptDto) {
-    const existingPrompt = await this.prisma.agentPrompt.findFirst({ where: { agentId } });
+  async updateByAgent(serviceParams: ServiceParams<UpdateAgentPromptDto>) {
+    const { orgId, data: updateAgentPrompt, agentId } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    const existingPrompt = await prisma.agentPrompt.findFirst({ where: { agentId } });
     if (existingPrompt) {
-      const updatedPrompt = await this.prisma.agentPrompt.update({
+      const updatedPrompt = await prisma.agentPrompt.update({
         data: updateAgentPrompt, where: {
           id: existingPrompt.id
         }
@@ -94,21 +107,12 @@ export class AgentPromptService {
 
   }
 
-  async getPromptByOrg(orgId:string)
-  {
-    const agent = await this.prisma.agent.findFirst({where:{orgId}});
-    if(!agent)
-    {
-      throw new NotFoundException('Agent not found');
-    }
-    return await this.findByAgent(agent.id);
-  }
-
-  async remove(id: string) {
-    const existingAgentPrompt = await this.prisma.agentPrompt.findFirst({ where: { id, } });
+  async remove(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    const existingAgentPrompt = await prisma.agentPrompt.findFirst({ where: { id, } });
     console.log(existingAgentPrompt)
     if (existingAgentPrompt) {
-      const result = await this.prisma.agentPrompt.delete({
+      const result = await prisma.agentPrompt.delete({
         where: { id },
       })
     } else {
@@ -116,23 +120,23 @@ export class AgentPromptService {
     }
   }
 
-  async getAssistantPrompt(agent: any,template:string = ASSISTANT_PROMPT_TEMPLATE) {
+  async getAssistantPrompt(orgId: string, agent: any, template: string = ASSISTANT_PROMPT_TEMPLATE) {
     const convType = agent.conversationType == ConversationType.CALL ? 'Call' : 'Chat';
 
     let prospectInfo = '';
-    if(agent.leadInfo) {
+    if (agent.leadInfo) {
       prospectInfo = ''
       const feilds = agent.leadInfo.split(',')
-      for(let [index, field] of feilds.entries()) {
-        prospectInfo+=`\n ${index+1}.${field.trim()}`;
+      for (let [index, field] of feilds.entries()) {
+        prospectInfo += `\n ${index + 1}.${field.trim()}`;
       }
     } else {
-          prospectInfo += `
+      prospectInfo += `
           1. Name
           2. Email`;
     }
 
-    const stages = await this.getStagesText(agent.id, prospectInfo)
+    const stages = await this.getStagesText(orgId, agent.id, prospectInfo)
 
     let prompt = template
       .replaceAll('{{agentName}}', agent.displayName)
@@ -149,9 +153,10 @@ export class AgentPromptService {
     return prompt;
   }
 
-  async getStagesText(agentId: string, leadInfo: string) {
+  async getStagesText(orgId: string, agentId: string, leadInfo: string) {
+    const prisma = await this.getPrismaClient(orgId);
     let stagestext = "";
-    const stages = await this.prisma.stage.findMany({ where: { agentId }, orderBy: { sequence: 'asc' } });
+    const stages = await prisma.stage.findMany({ orderBy: { sequence: 'asc' } });
     for (let [index, stage] of stages.entries()) {
       stagestext += `${index + 1}.${stage.name}: ${stage.instruction}\n`;
     }
