@@ -67,9 +67,9 @@ export class StartupService implements OnModuleInit {
   }
 
   async schemaMigration() {
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     try {
       this.logger.log('Schema migration completed successfully.');
-      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
       const orgs = await prisma.info.findMany();
       for (const org of orgs) {
         try {
@@ -85,7 +85,8 @@ export class StartupService implements OnModuleInit {
     } catch (error) {
       this.logger.error(error);
       console.log(error);
-
+    } finally {
+      await this.prismaClientManager.disconnectClient(DEFAULT_SCHEMA_NAME)
     }
   }
 

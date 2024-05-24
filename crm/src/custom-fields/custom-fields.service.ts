@@ -11,92 +11,128 @@ import { CustomFieldParent } from 'src/common/enum/enums';
 
 @Injectable()
 export class CustomFieldsService {
-  constructor(private readonly prismaClientManager: PrismaClientManager) {}
+  constructor(private readonly prismaClientManager: PrismaClientManager) { }
 
   async create(orgId: string, createFieldDto: CreateFieldDto) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const key = convertToKey(createFieldDto.name);
-    await this.getByName(orgId, createFieldDto.name);
-    const newField = await prisma.customField.create({
-      data: {
-        key,
-        ...createFieldDto,
-      },
-    });
-    return newField;
+    try {
+      const key = convertToKey(createFieldDto.name);
+      await this.getByName(orgId, createFieldDto.name);
+      const newField = await prisma.customField.create({
+        data: {
+          key,
+          ...createFieldDto,
+        },
+      });
+      return newField;
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async update(orgId: string, id: string, updateFieldDto: UpdateFiledDto) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    let key = null;
-    if (updateFieldDto.name) {
-      key = convertToKey(updateFieldDto.name);
-      await this.getByName(orgId, updateFieldDto.name);
+    try {
+      let key = null;
+      if (updateFieldDto.name) {
+        key = convertToKey(updateFieldDto.name);
+        await this.getByName(orgId, updateFieldDto.name);
+      }
+      const data = {
+        ...(key ? { key } : {}),
+        ...updateFieldDto,
+      };
+      const updatedField = await prisma.customField.update({
+        where: {
+          id,
+        },
+        data: data,
+      });
+      return updatedField;
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    const data = {
-      ...(key ? { key } : {}),
-      ...updateFieldDto,
-    };
-    const updatedField = await prisma.customField.update({
-      where: {
-        id,
-      },
-      data: data,
-    });
-    return updatedField;
   }
 
   async delete(orgId: string, id: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    await this.get(orgId, id);
-    await prisma.customField.delete({
-      where: {
-        id,
-      },
-    });
-    return {
-      code: 200,
-      success: true,
-      message: 'Custom field deleted successfully',
-    };
+    try {
+      await this.get(orgId, id);
+      await prisma.customField.delete({
+        where: {
+          id,
+        },
+      });
+      return {
+        code: 200,
+        success: true,
+        message: 'Custom field deleted successfully',
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async get(orgId: string, id: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const customField = await prisma.customField.findUnique({
-      where: { id },
-    });
-    if (!customField) {
-      throw new NotFoundException('Custom field not found');
+    try {
+      const customField = await prisma.customField.findUnique({
+        where: { id },
+      });
+      if (!customField) {
+        throw new NotFoundException('Custom field not found');
+      }
+      return customField;
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    return customField;
   }
 
   async getAll(orgId: string, customFieldParent: CustomFieldParent) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const customFields = await prisma.customField.findMany({
-      where: { customFieldParent },
-    });
-    return customFields;
+    try {
+      const customFields = await prisma.customField.findMany({
+        where: { customFieldParent },
+      });
+      return customFields;
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async getByName(orgId: string, name: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const key = convertToKey(name);
-    const existingField = await prisma.customField.findFirst({
-      where: {
-        key,
-      },
-    });
-    if (existingField) {
-      throw new BadRequestException('Custom field already exists');
+    try {
+      const key = convertToKey(name);
+      const existingField = await prisma.customField.findFirst({
+        where: {
+          key,
+        },
+      });
+      if (existingField) {
+        throw new BadRequestException('Custom field already exists');
+      }
+      return existingField;
+    } catch (error) {
+      throw error
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    return existingField;
   }
 
   async getTableFields(orgId: string, tableName: string): Promise<string[]> {
+    const prisma = await this.prismaClientManager.getClient(orgId);
     try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
       const schemaName = orgId.length > 5 ? getSchemaName(orgId) : orgId;
       const tableMetadata: any[] = await prisma.$queryRaw`
         SELECT column_name
@@ -107,6 +143,8 @@ export class CustomFieldsService {
       return tableMetadata.map((column) => column.column_name);
     } catch (e) {
       return [];
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
   }
 }
