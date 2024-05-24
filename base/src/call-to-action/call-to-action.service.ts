@@ -20,66 +20,132 @@ export class CallToActionService extends BaseService {
     async create(serviceParams: ServiceParams<CreateCTADto>) {
         const { orgId, data: createCTADto } = serviceParams
         const prisma = await this.getPrismaClient(orgId);
-        if (createCTADto.type !== CTAType.CALENDAR && !createCTADto.link) {
-            throw new BadRequestException(`Link is required for ${createCTADto.type}`);
+        try
+        {
+            if (createCTADto.type !== CTAType.CALENDAR && !createCTADto.link) {
+                throw new BadRequestException(`Link is required for ${createCTADto.type}`);
+            }
+            const ctaExisting = await prisma.callToAction.findFirst({ where: { name: createCTADto.name } });
+            if (ctaExisting) {
+                throw new NotAcceptableException(`CTA already exist with name ${createCTADto.name}`);
+            }
+            return await prisma.callToAction.create({ data: createCTADto });
         }
-        const ctaExisting = await prisma.callToAction.findFirst({ where: { name: createCTADto.name } });
-        if (ctaExisting) {
-            throw new NotAcceptableException(`CTA already exist with name ${createCTADto.name}`);
+        catch(error)
+        {
+          console.log(error);
+          throw error;
         }
-        return await prisma.callToAction.create({ data: createCTADto });
+        finally {
+          await this.closeConnection(orgId);
+        }
     }
 
     async findAll(serviceParams: ServiceParams<PaginationDto>) {
         const { orgId, data: paginationDto } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
-        const { page, limit } = paginationDto;
-        const skip = (page - 1) * limit;
-        const data = await prisma.callToAction.findMany({ skip, take: limit });
-        const total = await prisma.callToAction.count();
-
-        return {
-            data,
-            page,
-            total
+        try
+        {
+            const { page, limit } = paginationDto;
+            const skip = (page - 1) * limit;
+            const data = await prisma.callToAction.findMany({ skip, take: limit });
+            const total = await prisma.callToAction.count();
+    
+            return {
+                data,
+                page,
+                total
+            }
+        }
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
         }
     }
 
     async find(serviceParams: ServiceParams<{ id: string }>) {
         const { orgId, data: { id } } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
-        const ctaExisting = await prisma.callToAction.findFirst({ where: { id } });
-        if (!ctaExisting) {
-            throw new NotFoundException(`CTA not found with id ${id}`);
+        try
+        {
+            const ctaExisting = await prisma.callToAction.findFirst({ where: { id } });
+            if (!ctaExisting) {
+                throw new NotFoundException(`CTA not found with id ${id}`);
+            }
+            return await prisma.callToAction.findUnique({ where: { id } });
         }
-        return await prisma.callToAction.findUnique({ where: { id } });
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
+        }
     }
 
     async update(serviceParams: ServiceParams<{ id: string, updateCTADto: UpdateCTADto }>) {
         const { orgId, data: { id, updateCTADto } } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
-        const ctaExisting = await prisma.callToAction.findFirst({ where: { id } });
-        if (!ctaExisting) {
-            throw new NotFoundException(`CTA not found with id ${id}`);
+        try
+        {
+            const ctaExisting = await prisma.callToAction.findFirst({ where: { id } });
+            if (!ctaExisting) {
+                throw new NotFoundException(`CTA not found with id ${id}`);
+            }
+            return await prisma.callToAction.update({ where: { id }, data: updateCTADto });
         }
-        return await prisma.callToAction.update({ where: { id }, data: updateCTADto });
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
+        }
     }
 
     async delete(serviceParams: ServiceParams<{ id: string }>) {
         const { orgId, data: { id } } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
-        const ctaExisting = await prisma.callToAction.findFirst({ where: { id } });
-        if (!ctaExisting) {
-            throw new NotFoundException(`CTA not found with id ${id}`);
+        try
+        {
+            const ctaExisting = await prisma.callToAction.findFirst({ where: { id } });
+            if (!ctaExisting) {
+                throw new NotFoundException(`CTA not found with id ${id}`);
+            }
+            return await prisma.callToAction.delete({ where: { id } });
         }
-        return await prisma.callToAction.delete({ where: { id } });
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
+        }
     }
 
     async getCTAByLink(serviceParams: ServiceParams<{ link: string }>) {
         const { orgId, data: { link } } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
-        const cta = await prisma.callToAction.findFirst({ where: { link } });
-        return cta;
+        try
+        {
+            const cta = await prisma.callToAction.findFirst({ where: { link } });
+            return cta;
+        }
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
+        }
     }
 
     async generateCTA(orgId: string) {
@@ -87,8 +153,8 @@ export class CallToActionService extends BaseService {
     }
 
     async selectCTA(serviceParams: ServiceParams<SelectCTADto[]>) {
+        const { orgId, data: selectCTADto } = serviceParams;
         try {
-            const { orgId, data: selectCTADto } = serviceParams;
             const createdCTAs = [];
             for (const cta of selectCTADto) {
                 const existingCta = await this.getCTAByLink({ orgId, data: { link: cta.link } });
@@ -115,8 +181,13 @@ export class CallToActionService extends BaseService {
             }
             return createdCTAs;
         }
-        catch (error) {
-            return error;
+        catch(error)
+        {
+          console.log(error);
+          throw error;
+        }
+        finally {
+          await this.closeConnection(orgId);
         }
     }
 }
