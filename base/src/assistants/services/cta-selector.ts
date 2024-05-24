@@ -67,19 +67,23 @@ export class CTASelectorService extends BaseService implements OnModuleInit {
     this.redisSubscriber.on('message', this.handleMessage.bind(this));
   }
 
-  async handleMessage(serviceParams: ServiceParams<{ channel: any, message: any }>) {
+  async handleMessage(channel: any, message: any) {
     try {
-      const { orgId, data: { channel, message } } = serviceParams;
+      const payload = JSON.parse(message);
+      const orgId = payload.orgId
+      if(!orgId)
+      {
+        throw new Error("OrgId is required"); 
+      }
       const prisma = await this.getPrismaClient(orgId);
       console.log(`Received message from ${channel}: ${message}`);
-      const payload = JSON.parse(message);
       if (!payload.clientId) return; // No clientId to proceed with
 
       const agent = await prisma.agent.findUnique({ where: { id: payload.agentId } });
       if (!agent) return; // No agent found
       // Perform all relevant DB queries in parallel to improve performance
       const [content, ctaList, pageList] = await Promise.all([
-        this.getContent(payload),
+        this.getContent({ orgId,  data:{payload}  }),
         this.getCtaList({ orgId, data: { types: [CTAType.CALENDAR, CTAType.CTA] } }),
         this.getCtaList({ orgId, data: { types: [CTAType.NAVIGATOR] } })
       ]);
@@ -127,8 +131,7 @@ export class CTASelectorService extends BaseService implements OnModuleInit {
 
   async processContentForCTAs(serviceParams: ServiceParams<{ content, ctaList }>) {
     const { orgId, data: { content, ctaList }, isCTA = true } = serviceParams;
-    const prisma = await this.getPrismaClient(orgId);
-    const result = isCTA ? await this.selectCTA({ orgId, data: { content, ctaList } })
+    const result = isCTA ? await this.selectCTA( content, ctaList )
       : await this.selectPage({ orgId, data: { content, pageList: ctaList } });
     console.log("selected cta ", result);
     let selectedCTAs = [];
@@ -148,18 +151,14 @@ export class CTASelectorService extends BaseService implements OnModuleInit {
       .join(' '); // Join the words with a space
   }
 
-  async selectCTA(serviceParams: ServiceParams<{ content: any, ctaList: any }>) {
-    const { orgId, data: { content, ctaList } } = serviceParams;
+  async selectCTA(content: any, ctaList: any ) {
     let prompt = CTA_SELECTOR_PROMPT;
     prompt = prompt.replaceAll('{{conversation}}', JSON.stringify(content));
     prompt = prompt.replaceAll('{{ctasList}}', JSON.stringify(ctaList));
 
-    const _content = prompt.replaceAll('<END_OF_TURN>', '');
-    console.log(prompt);
 
     const promptMesssage = [
       { role: 'system', content: prompt },
-      { role: 'user', content: _content }
     ];
     return await this.llmService.sendDirect(promptMesssage, LLMNames.COHERE, LLMModels.COHER_COMMAND_R_PLUS);
   }

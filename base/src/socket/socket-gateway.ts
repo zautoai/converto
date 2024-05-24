@@ -292,7 +292,7 @@ export class SocketGateway implements OnModuleInit, OnGatewayConnection, OnGatew
           }));
           this.redisPublisher.publish('selectcta', JSON.stringify({
             clientId: client.id,
-            convId: message.convId, agentId: message.agentId
+            convId: message.convId, agentId: message.agentId, orgId: orgId
           }));
         }
 
