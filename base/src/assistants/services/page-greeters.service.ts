@@ -1,26 +1,16 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LlmService } from 'src/llm/llm.service';
-import { LEAD_OBSORVER_PROMPT_TEMPLATE } from 'src/llm/prompts.template';
-import Redis, { Redis as RedisClient } from 'ioredis';
-import { CB_FUNCTIONS, HelperName } from 'src/helpers/entities/helpers.model';
-import { HelpersService } from 'src/helpers/helpers.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GREETER_PROPMT } from 'src/common/templates/page-greeter.template';
 import { WebScraperService } from 'src/common/services/web-scraper.service';
 
 @Injectable()
-export class PageGreeterService implements OnModuleInit {
+export class PageGreeterService {
 
     constructor(
         private prisma: PrismaService,
-        private helperService: HelpersService,
         private readonly llmService: LlmService,
         private readonly webscrapper: WebScraperService) { }
-
-    async onModuleInit() {
-        // console.log(await this.generateGreeting("61184b8b-f4f2-48b3-a5e1-81ca820077af"));
-
-    }
 
     async generateGreeting(agentId: string) {
         const agent = await this.prisma.agent.findUnique({
