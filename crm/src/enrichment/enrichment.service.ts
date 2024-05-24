@@ -109,8 +109,8 @@ export class EnrichmentService {
   }
 
   async enrichAccount(orgId: string, accountId: string, provider: string = EnrichmentProviderName.APOLLO,) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
     try {
-      const prisma = await this.prismaClientManager.getClient(orgId);
       const account = await prisma.account.findUnique({
         where: {
           id: accountId,
@@ -130,6 +130,8 @@ export class EnrichmentService {
       };
     } catch (error) {
       throw new BadRequestException(error);
+    } finally {
+      await this.prismaClientManager.disconnectClient(orgId)
     }
   }
 }
