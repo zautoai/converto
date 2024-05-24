@@ -34,10 +34,10 @@ export class CreateAccountDto {
     @IsNumber()
     annualRevenue?: number;
 
-    @ApiProperty({required:false,enum: accountType})
+    @ApiProperty({required:false,enum: accountType, default: accountType.PROSPECT})
     @IsEnum(accountType)
     @IsOptional()
-    accountType?: accountType = accountType.CUSTOMER;
+    accountType?: accountType = accountType.PROSPECT;
 
     @ApiProperty({required:false})
     @IsString()
