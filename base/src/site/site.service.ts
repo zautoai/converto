@@ -40,11 +40,19 @@ export class SiteService extends BaseService {
 
     const prisma = await this.getPrismaClient(orgId);
 
-    const site = await prisma.site.findFirst({ where: { url: createSiteDto.url } });
-    if (site) {
-      return await this.update({ orgId, data: createSiteDto, id: site.id, });
-    } else {
-      return await prisma.site.create({ data: createSiteDto });
+    try {
+      const site = await prisma.site.findFirst({ where: { url: createSiteDto.url } });
+      if (site) {
+        return await this.update({ orgId, data: createSiteDto, id: site.id, });
+      } else {
+        return await prisma.site.create({ data: createSiteDto });
+      }
+    }
+    catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -52,40 +60,55 @@ export class SiteService extends BaseService {
   async trainAvatar(serviceParams: ServiceParams<ScrapMultipleDto>) {
     const { orgId, data: scrapMultipleDto } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
-    const agent = await prisma.agent.findFirst({ include: { AgentFiles: true } });
-    if (agent) {
-      await this.trainZautoRAG({ orgId, agent, data: scrapMultipleDto });
-    } else {
-      throw new NotFoundException(`Agent not found`);
+    try {
+      const agent = await prisma.agent.findFirst({ include: { AgentFiles: true } });
+      if (agent) {
+        await this.trainZautoRAG({ orgId, agent, data: scrapMultipleDto });
+      } else {
+        throw new NotFoundException(`Agent not found`);
+      }
+    }
+    catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
     }
   }
 
   async trainZautoRAG(serviceParams: ServiceParams<ScrapMultipleDto>) {
     const { orgId, agent, data: scrapMultipleDto } = serviceParams;
-    for (let url of scrapMultipleDto.urls) {
-      try {
-        const prisma = await this.getPrismaClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      for (let url of scrapMultipleDto.urls) {
+        try {
 
-        let site = await prisma.site.findFirst({ where: { url } });
-        if (!site) {
-          console.log("SiteService: Creating new site.");
-          site = await this.create({ orgId, data: { url } });
+          let site = await prisma.site.findFirst({ where: { url } });
+          if (!site) {
+            console.log("SiteService: Creating new site.");
+            site = await this.create({ orgId, data: { url } });
+          }
+          if (site) {
+            setImmediate(async () => {
+              this.processURL({ orgId, data: { site, agent } });
+            });
+          }
+        } catch (error) {
+          throw error
         }
-        if (site) {
-          setImmediate(async () => {
-            this.processURL({ orgId, data: { site, agent } });
-          });
-        }
-      } catch (error) {
-        console.error(error);
       }
+    } catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
     }
   }
 
   async trainOnOpenAI(serviceParams: ServiceParams<ScrapMultipleDto>) {
     const { orgId, agent, data: scrapMultipleDto } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const prisma = await this.getPrismaClient(orgId);
 
       const filePath = `./${SYSTEM_CONST.TRAINING_CONTENT_PATH}/agent_${agent.id}.txt`;
 
@@ -121,17 +144,20 @@ export class SiteService extends BaseService {
         await this.updateTrainingStatus({ orgId, data: { agent, filePath } });
       }
     } catch (error) {
-      console.log(error);
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
     }
   }
 
   async updateTrainingStatus(serviceParams: ServiceParams<{ agent: Agent, filePath: string }>) {
     const { orgId, data: { agent, filePath } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
       // After extracting the content from sites
       // Upload the content file to S3
       const response = await this.s3Service.uploadTextFile(filePath);
-      const prisma = await this.getPrismaClient(orgId);
 
       await prisma.agent.update({
         data: {
@@ -142,7 +168,10 @@ export class SiteService extends BaseService {
 
       await this.fileService.deleteFile(filePath);
     } catch (error) {
-      console.log(error);
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -150,72 +179,104 @@ export class SiteService extends BaseService {
     const { orgId, data: paginationDto } = serviceParams;
 
     const prisma = await this.getPrismaClient(orgId);
-
-    const { page, limit } = paginationDto;
-    const skip = (page - 1) * limit;
-    const sites = await prisma.site.findMany({
-      skip,
-      take: limit,
-    });
-    const total = await prisma.site.count();
-    return {
-      statusCode: 200,
-      data: sites,
-      page: page,
-      total: total,
-    };
+    try {
+      const { page, limit } = paginationDto;
+      const skip = (page - 1) * limit;
+      const sites = await prisma.site.findMany({
+        skip,
+        take: limit,
+      });
+      const total = await prisma.site.count();
+      return {
+        statusCode: 200,
+        data: sites,
+        page: page,
+        total: total,
+      };
+    }
+    catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
+    }
   }
 
   async findOne(serviceParams: ServiceParams<{ id: string }>) {
     const { orgId, data: { id } } = serviceParams;
 
     const prisma = await this.getPrismaClient(orgId);
-
-    const site = await prisma.site.findFirst({ where: { id } });
-    if (site) return site;
-    else throw new NotFoundException(`Site not found with id ${id}`);
+    try {
+      const site = await prisma.site.findFirst({ where: { id } });
+      if (site) return site;
+      else throw new NotFoundException(`Site not found with id ${id}`);
+    } catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
+    }
   }
 
   async update(serviceParams: ServiceParams<UpdateSiteDto>) {
     const { orgId, id, data: updateSiteDto } = serviceParams;
 
     const prisma = await this.getPrismaClient(orgId);
-
-    const site = await prisma.site.findFirst({ where: { id } });
-    if (site) {
-      site.status = SiteProcessStatus.IN_PROGRESS;
-      return await prisma.site.update({ data: updateSiteDto, where: { id } });
-    } else throw new NotFoundException(`Site not found with id ${id}`);
+    try {
+      const site = await prisma.site.findFirst({ where: { id } });
+      if (site) {
+        site.status = SiteProcessStatus.IN_PROGRESS;
+        return await prisma.site.update({ data: updateSiteDto, where: { id } });
+      } else throw new NotFoundException(`Site not found with id ${id}`);
+    }
+    catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
+    }
   }
 
   async remove(serviceParams: ServiceParams<{ id: string }>) {
     const { orgId, data: { id } } = serviceParams;
 
     const prisma = await this.getPrismaClient(orgId);
-
-    const site = await prisma.site.findFirst({ where: { id } });
-    const agent = await prisma.agent.findFirst();
-    if (site) {
-      await this.chromaService.removeDocs(agent.name, site.url);
-      return await prisma.site.delete({ where: { id } });
-    } else throw new NotFoundException(`Site not found with id ${id}`);
+    try {
+      const site = await prisma.site.findFirst({ where: { id } });
+      const agent = await prisma.agent.findFirst();
+      if (site) {
+        await this.chromaService.removeDocs(agent.name, site.url);
+        return await prisma.site.delete({ where: { id } });
+      } else throw new NotFoundException(`Site not found with id ${id}`);
+    } catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
+    }
   }
 
   async processURL(serviceParams: ServiceParams<{ site: any, agent: any, attempt?: number }>) {
     const { orgId, data: { site, agent, attempt = 0 } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
-
-    const content = await this.getSimpleContent({ orgId, data: { url: site.url, agent } });
-    if (content) {
-      const processed = await this.chromaService.addDataTonamesapce(agent.name, content, site);
-      site.status = processed ? SiteProcessStatus.COMPLETED : SiteProcessStatus.FAILED;
-    } else {
-      site.status = SiteProcessStatus.FAILED;
+    try {
+      const content = await this.getSimpleContent({ orgId, data: { url: site.url, agent } });
+      if (content) {
+        const processed = await this.chromaService.addDataTonamesapce(agent.name, content, site);
+        site.status = processed ? SiteProcessStatus.COMPLETED : SiteProcessStatus.FAILED;
+      } else {
+        site.status = SiteProcessStatus.FAILED;
+      }
+      if (site.status == SiteProcessStatus.FAILED && attempt == 0) {
+        this.processURL({ orgId, data: { site, agent, attempt: 1 } });
+      }
+      await prisma.site.update({ data: { status: site.status }, where: { id: site.id } });
+    } catch (error) {
+      throw error
     }
-    if (site.status == SiteProcessStatus.FAILED && attempt == 0) {
-      this.processURL({ orgId, data: { site, agent, attempt: 1 } });
+    finally {
+      await prisma.$disconnect();
     }
-    await prisma.site.update({ data: { status: site.status }, where: { id: site.id } });
   }
 
   async getLinks(url: string): Promise<string[]> {
@@ -280,7 +341,7 @@ export class SiteService extends BaseService {
           }
 
         } catch (error) {
-          console.error(error);
+          throw error
         }
         return null;
       }).get();
@@ -318,6 +379,7 @@ export class SiteService extends BaseService {
   async getSimpleContent(serviceParams: ServiceParams<{ url: string, agent?: any }>) {
     const { orgId, data: { url, agent } } = serviceParams;
     console.log('Start Time: ' + new Date());
+    const prisma = await this.getPrismaClient(orgId);
     try {
       const html = await this.webClient.get(url);
       const $ = cheerio.load(html);
@@ -348,7 +410,6 @@ export class SiteService extends BaseService {
       return (pageContent.pageContent && pageContent.pageContent.length > 2) ? pageContent : null;
 
     } catch (error) {
-      const prisma = await this.getPrismaClient(orgId);
 
       console.error('Error during scraping:', error);
       if (agent) {
@@ -358,11 +419,14 @@ export class SiteService extends BaseService {
             console.log(error);
             await prisma.site.update({ data: { info: error }, where: { id: site.id } });
           } catch (error) {
-            console.error(error);
+            throw error
           }
         }
       }
       return null;
+    }
+    finally {
+      await prisma.$disconnect();
     }
   }
 
@@ -386,33 +450,47 @@ export class SiteService extends BaseService {
   async getGreetingByUrl(serviceParams: ServiceParams<{ pageUrl: string }>) {
     const { orgId, data: { pageUrl } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
-
-    const page = await prisma.site.findFirst({
-      where: {
-        url: pageUrl
+    try {
+      const page = await prisma.site.findFirst({
+        where: {
+          url: pageUrl
+        }
+      });
+      if (!page) {
+        console.log('page or greeting not found');
+        return null;
       }
-    });
-    if (!page) {
-      console.log('page or greeting not found');
-      return null;
+      return page.greeting;
     }
-    return page.greeting;
+    catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
+    }
   }
 
   async generateGreeting(orgId: string) {
     const prisma = await this.getPrismaClient(orgId);
-
-    const agent = await prisma.agent.findFirst();
-    if (!agent) {
-      throw new NotFoundException('Agent not found');
+    try {
+      const agent = await prisma.agent.findFirst();
+      if (!agent) {
+        throw new NotFoundException('Agent not found');
+      }
+      return this.pageGreeterService.generateGreeting(agent.id);
     }
-    return this.pageGreeterService.generateGreeting(agent.id);
+    catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
+    }
   }
 
   async selectGeneratedGreetings(serviceParams: ServiceParams<any>) {
     const { orgId, data: selectGreetingDto } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      const prisma = await this.getPrismaClient(orgId);
 
       const agent = await prisma.agent.findFirst();
       if (!agent) {
@@ -439,7 +517,9 @@ export class SiteService extends BaseService {
       }
       return createdGreetings;
     } catch (error) {
-      return error;
+      throw error;
+    } finally {
+      await prisma.$disconnect();
     }
   }
 }

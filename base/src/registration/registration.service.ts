@@ -11,23 +11,31 @@ import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
 
 @Injectable()
 export class RegistrationService {
-  
+
   constructor(private readonly userService: UsersService,
     private readonly emailService: EmailService,
     private readonly roleService: RolesService,
     private readonly orgService: OrganizationsService,
     private readonly prismaClientManager: PrismaClientManager
-  ) {}
+  ) { }
 
   async findOrgByEmail(email: string) {
     const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
-    return await prisma.organization.findFirst({
-      where: {
-        emails:{
-          hasSome:[email]
+    try {
+      return await prisma.organization.findFirst({
+        where: {
+          emails: {
+            hasSome: [email]
+          }
         }
-      }
-    })
+      })
+    }
+    catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
+    }
   }
 
   async create(createUserDto: CreateUserDto) {
@@ -38,7 +46,7 @@ export class RegistrationService {
     // {
     //   throw new BadRequestException(`The email address "${createUserDto.email}" is invalid or not allowed.`);
     // }
-    if(!_org) {
+    if (!_org) {
 
       //Step 3: Create Organization for the user
       const createOrgDto = {
@@ -46,15 +54,15 @@ export class RegistrationService {
         emails: [createUserDto.email]
       }
       const org = await this.orgService.create(createOrgDto);
-      if(org) {
-        createUserDto.orgId = org.id; 
+      if (org) {
+        createUserDto.orgId = org.id;
       } else {
         throw new NotFoundException('Organization not created');
       }
 
       //Step 1: Get Admin Role ID
-      const adminRole = await this.roleService.findOneByName(org.id,SYSTEM_CONST.ADMIN_ROLE);
-      if(!adminRole) {
+      const adminRole = await this.roleService.findOneByName(org.id, SYSTEM_CONST.ADMIN_ROLE);
+      if (!adminRole) {
         throw new NotFoundException('Admin role not found');
       }
       //Step 2: Assign admin role to user
@@ -79,8 +87,8 @@ export class RegistrationService {
       // }
 
       //Step 4: Create User Account
-      const user = await this.userService.create(org.id,createUserDto);
-      if(user) {
+      const user = await this.userService.create(org.id, createUserDto);
+      if (user) {
         return await this.createVerification(user);
       }
       else {
@@ -93,138 +101,156 @@ export class RegistrationService {
       throw new ConflictException('Email already registered with another account.');
     }
 
-    
+
   }
 
   async createVerification(user: any) {
     const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
-    const verification = await prisma.verification.findFirst({where:{id: user.id}})
-    if(!verification) {
-      const verifyObj = await prisma.verification.create({data:{
-        userId: user.id, token: uuidv4(), 
-        email: user.email,
-        type: VerificationType.VERIFYEMAIL}
-      });
-      
-      try
-      {
-        // send verification mail
-        await this.emailService.sendVerifucationMail({...verifyObj, user});
-      }
-      catch(error)
-      {
-        console.error(error);
-      }
+    try {
+      const verification = await prisma.verification.findFirst({ where: { id: user.id } })
+      if (!verification) {
+        const verifyObj = await prisma.verification.create({
+          data: {
+            userId: user.id, token: uuidv4(),
+            email: user.email,
+            type: VerificationType.VERIFYEMAIL
+          }
+        });
 
-      try
-      {
-        // send alert mail
-        await this.emailService.sendSignupAleartMail({user});
-      }
-      catch(error)
-      {
-        console.error(error);
-      }
-      
-      setTimeout(async () => {
         try {
-          const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
-          await prisma.verification.delete({where: {id: verifyObj.id}});
-        } catch(error) {
-          console.log(error)
+          // send verification mail
+          await this.emailService.sendVerifucationMail({ ...verifyObj, user });
         }
-        
-      }, EMAIL_VERIFICATION_EXPIRES_TIME * 60 * 60 * 1000);
+        catch (error) {
+          throw error
+        }
+
+        try {
+          // send alert mail
+          await this.emailService.sendSignupAleartMail({ user });
+        }
+        catch (error) {
+          throw error
+        }
+
+        setTimeout(async () => {
+          try {
+            const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+            await prisma.verification.delete({ where: { id: verifyObj.id } });
+          } catch (error) {
+            throw error
+          }
+
+        }, EMAIL_VERIFICATION_EXPIRES_TIME * 60 * 60 * 1000);
+      }
+    }
+    catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
     }
   }
 
   async verifyToken(token: string) {
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     try {
-      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
-      const verification = await prisma.verification.findFirst({where: {token}});
+      const verification = await prisma.verification.findFirst({ where: { token } });
       const org = await this.findOrgByEmail(verification.email);
-      if(!org) {
+      if (!org) {
         throw new NotFoundException('Organization not found');
       }
-      if(verification) {
-        await this.userService.verifyEmail(org.id,verification.userId);
-        await prisma.verification.delete({where: {id: verification.id}});
-        return {verified: true};
+      if (verification) {
+        await this.userService.verifyEmail(org.id, verification.userId);
+        await prisma.verification.delete({ where: { id: verification.id } });
+        return { verified: true };
       } else {
         throw new UnauthorizedException('Token Expired or not found.')
       }
-    } catch(error) {
+    } catch (error) {
       throw new BadRequestException('Token already verified/expired.')
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
   async sendForgotPassword(email: string) {
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     try {
       const org = await this.findOrgByEmail(email);
-      if(!org) {
+      if (!org) {
         throw new NotFoundException('Organization not found');
       }
-      const user = await this.userService.findByEmail(org.id,email);
-      if(user) {
+      const user = await this.userService.findByEmail(org.id, email);
+      if (user) {
         const token = uuidv4();
-        const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
-        const verification  = await prisma.verification.create({data: {userId: user.id, email: user.email,token, type: VerificationType.FORGOTPASSWORD}});
-        await this.emailService.sendVerifucationMail({...verification, user});
-        return {success: true};
+        const verification = await prisma.verification.create({ data: { userId: user.id, email: user.email, token, type: VerificationType.FORGOTPASSWORD } });
+        await this.emailService.sendVerifucationMail({ ...verification, user });
+        return { success: true };
       } else {
         throw new NotFoundException('User email not found');
       }
-    } catch(error) {
-      console.log(error)
+    } catch (error) {
+      throw error
+    }
+    finally {
+      await prisma.$disconnect();
     }
   }
 
-  async changePassword({password, token}) {
+  async changePassword({ password, token }) {
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     try {
-      const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
-      const verification = await prisma.verification.findFirst({where: {token}})
+      const verification = await prisma.verification.findFirst({ where: { token } })
       const org = await this.findOrgByEmail(verification.email);
-      if(!org) {
+      if (!org) {
         throw new NotFoundException('Organization not found');
       }
-      if(verification) {
-        await this.userService.changePassword(org.id,verification.userId, password);
-        await prisma.verification.delete({where: {id: verification.id}});
-        return {success: true};
+      if (verification) {
+        await this.userService.changePassword(org.id, verification.userId, password);
+        await prisma.verification.delete({ where: { id: verification.id } });
+        return { success: true };
       } else {
         throw new UnauthorizedException('Token expired or not found.')
       }
-    } catch(error) {
-      console.log(error)
+    } catch (error) {
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
-  } 
-
-  async resendVerification(email: string) {
-    
-    const org = await this.findOrgByEmail(email);
-    if(org) {
-      throw new BadRequestException('Email already registered with another account.');
-    }
-    const user = await this.userService.findByEmail(org.id,email);
-    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
-    const verification = await prisma.verification.findFirst({where:{id: user.id}})
-    if(verification){
-      await prisma.verification.delete({where: {id: verification.id}});
-    }
-
-    const verifyObj = await prisma.verification.create({data:{
-      userId: user.id, email: user.email,token: uuidv4(), type: VerificationType.VERIFYEMAIL}
-    });
-    
-    await this.emailService.sendVerifucationMail({...verifyObj, user});
-    setTimeout(async () => {
-      try {
-        await prisma.verification.delete({where: {id: verifyObj.id}});
-      } catch(error) {
-        console.log(error)
-      }
-      
-    }, EMAIL_VERIFICATION_EXPIRES_TIME * 60 * 60 * 1000);
   }
 
+  async resendVerification(email: string) {
+    const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
+    try {
+      const org = await this.findOrgByEmail(email);
+      if (org) {
+        throw new BadRequestException('Email already registered with another account.');
+      }
+      const user = await this.userService.findByEmail(org.id, email);
+      const verification = await prisma.verification.findFirst({ where: { id: user.id } })
+      if (verification) {
+        await prisma.verification.delete({ where: { id: verification.id } });
+      }
+
+      const verifyObj = await prisma.verification.create({
+        data: {
+          userId: user.id, email: user.email, token: uuidv4(), type: VerificationType.VERIFYEMAIL
+        }
+      });
+
+      await this.emailService.sendVerifucationMail({ ...verifyObj, user });
+      setTimeout(async () => {
+        try {
+          await prisma.verification.delete({ where: { id: verifyObj.id } });
+        } catch (error) {
+          throw error
+        }
+      }, EMAIL_VERIFICATION_EXPIRES_TIME * 60 * 60 * 1000);
+    } catch (error) {
+      throw error
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 }
