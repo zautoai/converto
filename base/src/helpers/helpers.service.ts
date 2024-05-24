@@ -5,12 +5,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { LlmService } from 'src/llm/llm.service';
 import { AgentConfig } from 'src/llm/llms/llm.models';
 import { ZAUTO_HELPERS } from './entities/helpers.model';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class HelpersService {
+export class HelpersService extends BaseService{
 
-  constructor(private prisma: PrismaService,
-    private llmService: LlmService) { }
+  constructor(private llmService: LlmService) {
+    super();
+  }
 
   create(createHelperDto: CreateHelperDto) {
     return 'This action adds a new helper';
@@ -30,12 +32,19 @@ export class HelpersService {
 
   async removeById(id: string) {
     try {
-      const helper = await this.prisma.openAIAssistant.findUnique({ where: { id } });
+      const prisma = await this.getPrismaMasterClient();
+      const helper = await prisma.openAIAssistant.findUnique({ where: { id } });
       const assistantId = helper.assistantId;
       await this.llmService.deleteAgent(assistantId);
-      await this.prisma.openAIAssistant.delete({ where: { id } });
-    } catch (error) {
-      console.error(error)
+      await prisma.openAIAssistant.delete({ where: { id } });
+    } 
+    catch(error)
+    {
+      console.log(error);
+      throw error;
+    }
+    finally {
+      await this.closeMasterConnection();
     }
 
   }
