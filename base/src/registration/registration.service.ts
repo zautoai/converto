@@ -252,5 +252,6 @@ export class RegistrationService {
     } finally {
       await prisma.$disconnect();
     }
+
   }
 }

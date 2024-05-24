@@ -43,7 +43,7 @@ export class PromptTemplateService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -62,7 +62,7 @@ export class PromptTemplateService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 

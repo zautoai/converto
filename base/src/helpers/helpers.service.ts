@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateHelperDto } from './dto/create-helper.dto';
 import { UpdateHelperDto } from './dto/update-helper.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { LlmService } from 'src/llm/llm.service';
 import { AgentConfig } from 'src/llm/llms/llm.models';
 import { ZAUTO_HELPERS } from './entities/helpers.model';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class HelpersService {
+export class HelpersService extends BaseService {
 
-  constructor(private prisma: PrismaService,
-    private llmService: LlmService) { }
+  constructor(private llmService: LlmService) {
+    super();
+  }
 
   create(createHelperDto: CreateHelperDto) {
     return 'This action adds a new helper';
@@ -28,73 +29,98 @@ export class HelpersService {
     return `This action updates a #${id} helper`;
   }
 
-  async removeById(id: string) {
+  async removeById(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId)
     try {
-      const helper = await this.prisma.openAIAssistant.findUnique({ where: { id } });
+      const helper = await prisma.openAIAssistant.findUnique({ where: { id } });
       const assistantId = helper.assistantId;
       await this.llmService.deleteAgent(assistantId);
-      await this.prisma.openAIAssistant.delete({ where: { id } });
+      await prisma.openAIAssistant.delete({ where: { id } });
     } catch (error) {
       console.error(error)
     }
-
+    finally {
+      await prisma.$disconnect();
+    }
   }
 
-  async remove(id: string, assistantId: string) {
+  async remove(orgId: string, id: string, assistantId: string) {
+    const prisma = await this.getPrismaClient(orgId)
     try {
-      await this.prisma.openAIAssistant.delete({ where: { id } });
+      await prisma.openAIAssistant.delete({ where: { id } });
       await this.llmService.deleteAgent(assistantId);
     } catch (error) {
       console.error(error)
     }
-  }
-
-  async removeByName(name: string) {
-    try {
-      await this.prisma.openAIAssistant.delete({ where: { name } });
-    } catch (error) {
-      console.error(error)
+    finally {
+      await prisma.$disconnect();
     }
   }
 
-  async removeByAssistant(id: string) {
-
+  async removeByName(orgId: string, name: string) {
+    const prisma = await this.getPrismaClient(orgId)
     try {
-      const helper = await this.prisma.openAIAssistant.findFirst({ where: { assistantId: id } });
+      await prisma.openAIAssistant.delete({ where: { name } });
+    } catch (error) {
+      console.error(error)
+    }
+    finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async removeByAssistant(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId)
+    try {
+      const helper = await prisma.openAIAssistant.findFirst({ where: { assistantId: id } });
       if (helper) {
         const assistantId = helper.assistantId;
         await this.llmService.deleteAgent(id);
-        await this.prisma.openAIAssistant.delete({ where: { id: helper.id } });
+        await prisma.openAIAssistant.delete({ where: { id: helper.id } });
       }
     } catch (error) {
       console.error(error)
-    }
-
-  }
-
-  async removeAll() {
-    const helpers = await this.prisma.openAIAssistant.findMany();
-    for (let helper of helpers) {
-      await this.llmService.deleteAgent(helper.assistantId);
-      await this.remove(helper.id, helper.assistantId);
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
-  async findByName(name: string) {
+  async removeAll(orgId: string) {
+    const prisma = await this.getPrismaClient(orgId);
     try {
-      return await this.prisma.openAIAssistant.findUnique({ where: { name } });
+      const helpers = await prisma.openAIAssistant.findMany();
+      for (let helper of helpers) {
+        await this.llmService.deleteAgent(helper.assistantId);
+        await this.remove(orgId, helper.id, helper.assistantId);
+      }
+    }
+    catch (error) {
+      console.error(error)
+    }
+    finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async findByName(orgId: string, name: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      return await prisma.openAIAssistant.findUnique({ where: { name } });
     } catch (error) {
       console.error(error);
+    } finally {
+      await prisma.$disconnect();
     }
   }
 
-  async createHelper(agentConf: AgentConfig) {
+  async createHelper(orgId: string, agentConf: AgentConfig) {
+    const prisma = await this.getPrismaClient(orgId);
     try {
       const envName = process.env.NAME;
       let name = agentConf.name
       agentConf.name = envName + '_' + agentConf.name;
       const _assistant = await this.llmService.createAgent(agentConf);
-      const helper = await this.prisma.openAIAssistant.create({
+      const helper = await prisma.openAIAssistant.create({
         data: {
           assistantId: _assistant.id,
           name: name,
@@ -104,12 +130,13 @@ export class HelpersService {
       });
       return helper
     } catch (error) {
-      console.error(error);
+      throw error
+    } finally {
+      await prisma.$disconnect();
     }
-    return null;
   }
 
-  async reSyncHelpers() {
+  async reSyncHelpers(orgId: string) {
     const helpers = ZAUTO_HELPERS;
     const envName = process.env.NAME;
     console.log('Env Name: ' + envName)
@@ -129,8 +156,8 @@ export class HelpersService {
       }
     }
     for (let helper of helpers) {
-      await this.removeByName(helper.name);
-      setTimeout(async () => await this.createHelper(helper), 500);
+      await this.removeByName(orgId, helper.name);
+      setTimeout(async () => await this.createHelper(orgId, helper), 500);
     }
   }
 }

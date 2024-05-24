@@ -27,7 +27,7 @@ export class ConversationService extends BaseService {
     catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -57,7 +57,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -77,7 +77,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -121,7 +121,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -155,7 +155,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -187,7 +187,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -208,7 +208,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -233,7 +233,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -250,7 +250,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -266,7 +266,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -283,7 +283,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -319,7 +319,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -350,7 +350,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -384,7 +384,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -410,7 +410,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -428,7 +428,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -445,7 +445,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw new InternalServerErrorException('Unalbe to create Message')
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -458,7 +458,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw new InternalServerErrorException('Unalbe to create Message')
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -482,7 +482,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw new InternalServerErrorException('Unalbe to create Message')
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -511,7 +511,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw new InternalServerErrorException('Unable to fetch last message');
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 
@@ -558,7 +558,7 @@ export class ConversationService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId);
     }
   }
 }
