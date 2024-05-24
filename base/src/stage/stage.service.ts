@@ -21,41 +21,65 @@ export class StageService extends BaseService {
         const { page, limit } = paginationDto;
         const skip = (page - 1) * limit;
         const prisma = await this.getPrismaClient(orgId);
-        const stageData = await prisma.stage.findMany({ skip, take: limit });
-        const total = await prisma.stage.count();
-        return {
-            data: stageData,
-            page: page,
-            total: total
-        };
+        try {
+            const stageData = await prisma.stage.findMany({ skip, take: limit });
+            const total = await prisma.stage.count();
+            return {
+                data: stageData,
+                page: page,
+                total: total
+            };
+        }
+        catch (err) {
+            throw err;
+        }
+        finally {
+            await this.closeConnection(orgId);
+        }
     }
 
     async findOne(orgId: string, id: string) {
         const prisma = await this.getPrismaClient(orgId);
-        const existingStage = await prisma.stage.findUnique({ where: { id } });
-        if (existingStage) {
-            return existingStage;
+        try {
+            const existingStage = await prisma.stage.findUnique({ where: { id } });
+            if (existingStage) {
+                return existingStage;
+            }
+            else {
+                throw new NotFoundException(`Stage not found with id ${id}`);
+            }
         }
-        else {
-            throw new NotFoundException(`Stage not found with id ${id}`);
+        catch (err) {
+            throw err;
+        }
+        finally {
+            await this.closeConnection(orgId);
         }
     }
 
     async findAllByOrg(orgId: string) {
         const prisma = await this.getPrismaClient(orgId);
-        const existingStage = await prisma.stage.findMany({ orderBy: { sequence: 'asc' } });
-        if (existingStage) {
-            return existingStage;
+        try {
+            const existingStage = await prisma.stage.findMany({ orderBy: { sequence: 'asc' } });
+            if (existingStage) {
+                return existingStage;
+            }
+            else {
+                throw new NotFoundException(`Stage not found with id ${orgId}`);
+            }
         }
-        else {
-            throw new NotFoundException(`Stage not found with id ${orgId}`);
+        catch (err) {
+            throw err;
+        }
+        finally {
+            await this.closeConnection(orgId);
         }
     }
 
     async create(serviceParams: ServiceParams<CreateStageDto>) {
         const { orgId, data: createStageDto } = serviceParams;
+        const prisma = await this.getPrismaClient(orgId);
         try {
-            const prisma = await this.getPrismaClient(orgId);
             const stageData = await prisma.stage.create({ data: createStageDto });
             const agent = await prisma.agent.findFirst();
             if (agent) {
@@ -77,96 +101,122 @@ export class StageService extends BaseService {
                 throw new BadRequestException(error);
             }
         }
+        finally {
+            await this.closeConnection(orgId);
+        }
     }
 
     async update(serviceParams: ServiceParams<UpdateStageDto>) {
         const { orgId, data: updateStageDto, id } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
-        const existingStage = await prisma.stage.findUnique({ where: { id } });
-        if (existingStage && existingStage.canEdit) {
-            const satgeData = await prisma.stage.update({ data: updateStageDto, where: { id } });
-            const agent = await prisma.agent.findFirst();
-            if (agent) {
-                const agentPrompt = await this.promptService.findByAgent(orgId, agent.id);
-                const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
-                const updatedPrompt = await this.promptService.update({ orgId, agentId: agentPrompt.id, data: { type: 'system', text: prompt } });
-                const agentFile = await prisma.agentFile.findFirst({
-                    where: {
-                        agentId: agent.id
-                    }
-                });
-                this.promptService.updateAssistent(agent, updatedPrompt, agentFile);
+        try {
+            const existingStage = await prisma.stage.findUnique({ where: { id } });
+            if (existingStage && existingStage.canEdit) {
+                const satgeData = await prisma.stage.update({ data: updateStageDto, where: { id } });
+                const agent = await prisma.agent.findFirst();
+                if (agent) {
+                    const agentPrompt = await this.promptService.findByAgent(orgId, agent.id);
+                    const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
+                    const updatedPrompt = await this.promptService.update({ orgId, agentId: agentPrompt.id, data: { type: 'system', text: prompt } });
+                    const agentFile = await prisma.agentFile.findFirst({
+                        where: {
+                            agentId: agent.id
+                        }
+                    });
+                    this.promptService.updateAssistent(agent, updatedPrompt, agentFile);
+                }
+                return satgeData;
+            } else if (!existingStage.canEdit) {
+                throw new BadRequestException(`Stage ${existingStage.name} is not editable`);
             }
-            return satgeData;
-        } else if (!existingStage.canEdit) {
-            throw new BadRequestException(`Stage ${existingStage.name} is not editable`);
+            else {
+                throw new NotFoundException(`Stage not found with id ${id}`);
+            }
         }
-        else {
-            throw new NotFoundException(`Stage not found with id ${id}`);
+        catch (err) {
+            throw err;
+        }
+        finally {
+            await this.closeConnection(orgId);
         }
     }
 
     async delete(orgId: string, id: string) {
         const prisma = await this.getPrismaClient(orgId);
-        const existingStage = await prisma.stage.findUnique({ where: { id } });
-        if (existingStage && existingStage.canEdit) {
-            const stageData = await prisma.stage.delete({ where: { id } });
+        try {
+            const existingStage = await prisma.stage.findUnique({ where: { id } });
+            if (existingStage && existingStage.canEdit) {
+                const stageData = await prisma.stage.delete({ where: { id } });
 
-            const agent = await prisma.agent.findFirst();
-            if (agent) {
-                const agentPrompt = await this.promptService.findByAgent(orgId, agent.id);
-                const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
-                await this.promptService.update({ orgId, id: agentPrompt.id, data: { type: 'system', text: prompt } });
+                const agent = await prisma.agent.findFirst();
+                if (agent) {
+                    const agentPrompt = await this.promptService.findByAgent(orgId, agent.id);
+                    const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
+                    await this.promptService.update({ orgId, id: agentPrompt.id, data: { type: 'system', text: prompt } });
+                }
+                return stageData;
+            } else if (!existingStage.canEdit) {
+                throw new BadRequestException(`Stage ${existingStage.name} is not editable`);
             }
-            return stageData;
-        } else if (!existingStage.canEdit) {
-            throw new BadRequestException(`Stage ${existingStage.name} is not editable`);
+            else {
+                throw new NotFoundException(`Stage not found with id ${id}`);
+            }
         }
-        else {
-            throw new NotFoundException(`Stage not found with id ${id}`);
+        catch (err) {
+            throw err;
+        }
+        finally {
+            await this.closeConnection(orgId);
         }
     }
 
     async updateSquence(serviceParams: ServiceParams<{ updateSquence: any }>) {
         const { orgId, data } = serviceParams;
         const { updateSquence } = data;
-        console.log(updateSquence);
         const prisma = await this.getPrismaClient(orgId);
-        const stages: any = [...updateSquence.stages];
+        try {
+            const stages: any = [...updateSquence.stages];
 
-        if (stages) {
-            //delete stages
-            const deletedStages = await prisma.stage.deleteMany();
+            if (stages) {
+                //delete stages
+                const deletedStages = await prisma.stage.deleteMany();
 
-            // const _stages = await this.prisma.stage.createMany({data: []})
+                // const _stages = await this.prisma.stage.createMany({data: []})
 
-            //create stages
-            const newStages = await prisma.stage.createMany({ data: stages });
+                //create stages
+                const newStages = await prisma.stage.createMany({ data: stages });
 
 
-            const agent = await prisma.agent.findFirst();
-            if (agent) {
-                let agentPrompt = await this.promptService.findByAgent(orgId, agent.id);
-                const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
-                let updatedPrompt = await this.promptService.update({ orgId, id: agentPrompt.id, data: { type: 'system', text: prompt } });
-                const agentFile = await prisma.agentFile.findFirst({
-                    where: {
-                        agentId: agent.id
-                    }
-                });
-                this.promptService.updateAssistent(agent, updatedPrompt, agentFile);
-            }
+                const agent = await prisma.agent.findFirst();
+                if (agent) {
+                    let agentPrompt = await this.promptService.findByAgent(orgId, agent.id);
+                    const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
+                    let updatedPrompt = await this.promptService.update({ orgId, id: agentPrompt.id, data: { type: 'system', text: prompt } });
+                    const agentFile = await prisma.agentFile.findFirst({
+                        where: {
+                            agentId: agent.id
+                        }
+                    });
+                    this.promptService.updateAssistent(agent, updatedPrompt, agentFile);
+                }
 
-            if (deletedStages.count != newStages.count) {
-                return stages;
+                if (deletedStages.count != newStages.count) {
+                    return stages;
+                }
+                else {
+                    return newStages;
+                }
+
             }
             else {
-                return newStages;
+                return null;
             }
-
         }
-        else {
-            return null;
+        catch (err) {
+            throw err;
+        }
+        finally {
+            await this.closeConnection(orgId);
         }
     }
 
@@ -188,16 +238,26 @@ export class StageService extends BaseService {
         } catch (error) {
             console.error(`Error creating stage: `, error);
             console.error(error)
+        } finally {
+            await this.closeConnection(orgId);
         }
     }
 
     async getStagesText(orgId: string, agentId: string) {
         let stagestext = "";
         const prisma = await this.getPrismaClient(orgId);
-        const stages = await prisma.stage.findMany({ orderBy: { sequence: 'asc' } });
-        for (let [index, stage] of stages.entries()) {
-            stagestext += `${index + 1}.${stage.name}: ${stage.instruction}\n`;
+        try {
+            const stages = await prisma.stage.findMany({ orderBy: { sequence: 'asc' } });
+            for (let [index, stage] of stages.entries()) {
+                stagestext += `${index + 1}.${stage.name}: ${stage.instruction}\n`;
+            }
+            return stagestext;
         }
-        return stagestext;
+        catch (err) {
+            throw err;
+        }
+        finally {
+            await this.closeConnection(orgId);
+        }
     }
 }
