@@ -2,32 +2,31 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
+import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class RolesService {
+export class RolesService extends BaseService {
 
   constructor(
-    private readonly prismaClientManager: PrismaClientManager
-  ) { }
+  ) {
+    super();
+  }
 
   async create(orgId: string, createRoleDto: CreateRoleDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     try {
       const existingRole = await prisma.role.findFirst({ where: { name: createRoleDto.name } })
       if (!existingRole) {
         const roleData = await prisma.role.create({ data: createRoleDto });
-        this.prismaClientManager.disconnectClient(orgId)
         return roleData;
       } else {
-        this.prismaClientManager.disconnectClient(orgId)
         throw new ConflictException(`Role ${createRoleDto.name} already exist`);
       }
     } catch (error) {
       throw error
     }
     finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId)
     }
   }
 
@@ -41,7 +40,7 @@ export class RolesService {
   async findAll(orgId: string, paginationDto: PaginationDto) {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     try {
       const roleData = await prisma.role.findMany({ skip, take: limit });
       const total = await prisma.role.count();
@@ -56,12 +55,12 @@ export class RolesService {
       throw error
     }
     finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId)
     }
   }
 
   async findOne(orgId: string, id: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     try {
       const roleData = await prisma.role.findFirst({
         where: {
@@ -77,12 +76,12 @@ export class RolesService {
       throw error
     }
     finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId)
     }
   }
 
   async findOneByName(orgId: string, name: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     try {
       const roleData = await prisma.role.findFirst({
         where: {
@@ -98,12 +97,12 @@ export class RolesService {
       throw error
     }
     finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId)
     }
   }
 
   async update(orgId: string, id: string, updateRoleDto: UpdateRoleDto) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     try {
       const existingRole = await prisma.role.findFirst({ where: { id, } });
       if (existingRole) {
@@ -120,13 +119,13 @@ export class RolesService {
       throw error
     }
     finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId)
     }
 
   }
 
   async remove(orgId: string, id: string) {
-    const prisma = await this.prismaClientManager.getClient(orgId);
+    const prisma = await this.getPrismaClient(orgId);
     try {
       const existingRole = await prisma.role.findFirst({ where: { id, } });
       console.log(existingRole)
@@ -141,7 +140,7 @@ export class RolesService {
       throw error
     }
     finally {
-      await prisma.$disconnect();
+      await this.closeConnection(orgId)
     }
   }
 }
