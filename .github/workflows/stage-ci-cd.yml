@@ -1,0 +1,184 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ dev ]
+    paths:
+      - 'base/**'
+      - 'crm/**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DEV_GITHUB_USER }}
+          password: ${{ secrets.DEV_GITHUB_TOKEN }}
+      - name: Build and push Docker image for base
+        if: contains(github.event.head_commit.message, 'base')
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: ./base
+          file: ./base/Dockerfile
+          tags: |
+            ghcr.io/zautoai/converto:stage-base${{ github.sha }}
+            ghcr.io/zautoai/converto:stage-base
+          build-args: |
+            APOLLO_API_KEY=${{ secrets.STAGE_APOLLO_API_KEY }}
+            AWS_ACCESS_KEY_ID=${{ secrets.STAGE_AWS_ACCESS_KEY_ID }}
+            AWS_REGION=${{ secrets.STAGE_AWS_REGION }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.STAGE_AWS_SECRET_ACCESS_KEY }}
+            CHROMA_AUTH_CREDENTIALS=${{ secrets.STAGE_CHROMA_AUTH_CREDENTIALS }}
+            CHROMA_AUTH_PROVIDER=${{ secrets.STAGE_CHROMA_AUTH_PROVIDER }}
+            CHROMA_URL=${{ secrets.STAGE_CHROMA_URL }}
+            CHUNCK_SIZE=${{ secrets.STAGE_CHUNCK_SIZE }}
+            CLAUDE_API_KEY=${{ secrets.STAGE_CLAUDE_API_KEY }}
+            COHERE_API_KEY=${{ secrets.STAGE_COHERE_API_KEY }}
+            CONVERTO_EMAIL=${{ secrets.STAGE_CONVERTO_EMAIL }}
+            CONVERTO_TRAIN_BUCKET_NAME=${{ secrets.STAGE_CONVERTO_TRAIN_BUCKET_NAME }}
+            COVERTO_PIC_BUCKET_NAME=${{ secrets.STAGE_COVERTO_PIC_BUCKET_NAME }}
+            CRYPTO_ENCRYPTION_SECRET=${{ secrets.STAGE_CRYPTO_ENCRYPTION_SECRET }}
+            DATABASE_URL=${{ secrets.STAGE_DATABASE_URL_BASE }}
+            EMBEDDING_PROVIDER=${{ secrets.STAGE_EMBEDDING_PROVIDER }}
+            GOOGLE_CLIENT_ID=${{ secrets.STAGE_GOOGLE_CLIENT_ID }}
+            HOST_PORT=${{ secrets.STAGE_HOST_PORT }}
+            HOST_URL=${{ secrets.STAGE_HOST_URL }}
+            IP_DATA_KEY=${{ secrets.STAGE_IP_DATA_KEY }}
+            JWT_SECRET=${{ secrets.STAGE_JWT_SECRET }}
+            LLM_PROVIDER=${{ secrets.STAGE_LLM_PROVIDER }}
+            MAX_SMTP_CONNECTIONS=${{ secrets.STAGE_MAX_SMTP_CONNECTIONS }}
+            MAX_TOTAL_FILE_SIZE=${{ secrets.STAGE_MAX_TOTAL_FILE_SIZE }}
+            NAME=${{ secrets.STAGE_NAME }}
+            NODE_ENV=${{ secrets.STAGE_NODE_ENV }}
+            OPENAI_API_KEY=${{ secrets.STAGE_OPENAI_API_KEY }}
+            OPENAI_ASSISTANT_DEFAULT_MODEL=${{ secrets.STAGE_OPENAI_ASSISTANT_DEFAULT_MODEL }}
+            OPEN_AI_EMBEDDING_MODEL=${{ secrets.STAGE_OPEN_AI_EMBEDDING_MODEL }}
+            OPEN_AI_MODEL=${{ secrets.STAGE_OPEN_AI_MODEL }}
+            QUICK_MAIL_VALIDATOR_API=${{ secrets.STAGE_QUICK_MAIL_VALIDATOR_API }}
+            REDIS_IP=${{ secrets.STAGE_REDIS_IP }}
+            REDIS_PASSWORD=${{ secrets.STAGE_REDIS_PASSWORD }}
+            REDIS_PORT=${{ secrets.STAGE_REDIS_PORT }}
+            SENDGRID_KEY=${{ secrets.STAGE_SENDGRID_KEY }}
+            SERVER_HOST=${{ secrets.STAGE_SERVER_HOST }}
+            SERVER_SSH_KEY=${{ secrets.STAGE_SERVER_SSH_KEY }}
+            SERVER_USER=${{ secrets.STAGE_SERVER_USER }}
+            SIGNUP_ALERT_MAIL=${{ secrets.STAGE_SIGNUP_ALERT_MAIL }}
+            SUPER_USER_EMAIL=${{ secrets.STAGE_SUPER_USER_EMAIL }}
+            SUPER_USER=${{ secrets.STAGE_SUPER_USER }}
+            SUPER_USER_PASSWORD=${{ secrets.STAGE_SUPER_USER_PASSWORD }}
+            TRAINING_CONTENT_PATH=${{ secrets.STAGE_TRAINING_CONTENT_PATH }}
+            UPLOADS_FOLDER=${{ secrets.STAGE_UPLOADS_FOLDER }}
+            VERIFICATION_EXPIRES_IN=${{ secrets.STAGE_VERIFICATION_EXPIRES_IN }}
+            ZAUTO_API_BASE_URL=${{ secrets.STAGE_ZAUTO_API_BASE_URL }}
+
+      - name: Build and push Docker image for crm
+        if: contains(github.event.head_commit.message, 'crm')
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: ./crm
+          file: ./crm/Dockerfile
+          tags: |
+            ghcr.io/zautoai/converto:stage-crm${{ github.sha }}
+            ghcr.io/zautoai/converto:stage-crm
+          build-args: |
+            REDIS_IP=${{ secrets.STAGE_REDIS_IP }}
+            REDIS_PASSWORD=${{ secrets.STAGE_REDIS_PASSWORD }}
+            REDIS_PORT=${{ secrets.STAGE_REDIS_PORT }}
+            CRM_ACCESS_TOKEN=${{ secrets.STAGE_CRM_ACCESS_TOKEN }}
+            CRM_API_PORT=${{ secrets.STAGE_CRM_API_PORT }}
+            CRM_BASE_URL=${{ secrets.STAGE_CRM_BASE_URL }}
+            CRM_DATABASE_URL=${{ secrets.STAGE_CRM_DATABASE_URL }}
+            CRM_HOST=${{ secrets.STAGE_CRM_HOST }}
+            CRM_HOST_PORT=${{ secrets.STAGE_CRM_HOST_PORT }}
+            CRM_JWT_SECRET=${{ secrets.STAGE_CRM_JWT_SECRET }}
+
+  deploy-base:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    strategy:
+      matrix:
+        update_group: [1, 2, 3]  # Define your update groups
+    steps:
+      - uses: actions/checkout@v2
+      - name: Insert Redis Password for Base
+        run: |
+          sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets.STAGE_REDIS_PASSWORD }}|g" docker-compose-base.yml
+
+      - name: Show Updated Docker Compose File for Base
+        run: cat docker-compose-base.yml
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region ${{ secrets.DEPLOY_AWS_REGION }}
+
+      - name: Deploy Base to EC2 via SSM
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Role,Values=Base" "Key=tag:UpdateGroup,Values=${{ matrix.update_group }}" \
+            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.DEV_GITHUB_USER }} -p ${{ secrets.DEV_GITHUB_TOKEN }}", "cd ./home/ubuntu/converto", "docker-compose -f docker-compose-base.yml pull", "docker-compose -f docker-compose-base.yml up -d", "docker image prune -a -f"]'
+
+      - name: Check Health of Base Application Container
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Role,Values=Base" "Key=tag:UpdateGroup,Values=${{ matrix.update_group }}" \
+            --parameters 'commands=["BASE_APP_CONTAINER=converto-base-1", "HEALTH_CHECK_URL=http://localhost:3000/health", "if curl --fail $HEALTH_CHECK_URL; then echo Container $BASE_APP_CONTAINER is healthy; else echo Container $BASE_APP_CONTAINER is not healthy😭; exit 1; fi"]'
+
+  deploy-crm:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    strategy:
+      matrix:
+        update_group: [1, 2, 3]  # Define your update groups
+    steps:
+      - uses: actions/checkout@v2
+      - name: Insert Redis Password for CRM
+        run: |
+          sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets.STAGE_REDIS_PASSWORD }}|g" docker-compose-crm.yml
+
+      - name: Show Updated Docker Compose File for CRM
+        run: cat docker-compose-crm.yml
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.STAGE_AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.STAGE_AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region ${{ secrets.STAGE_AWS_REGION }}
+
+      - name: Deploy CRM to EC2 via SSM
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Role,Values=CRM" "Key=tag:UpdateGroup,Values=${{ matrix.update_group }}" \
+            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.DEV_GITHUB_USER }} -p ${{ secrets.DEV_GITHUB_TOKEN }}", "cd /path/to/your/project", "docker-compose -f docker-compose-crm.yml pull", "docker-compose -f docker-compose-crm.yml up -d", "docker image prune -a -f"]'
+
+      - name: Check Health of CRM Application Container
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Role,Values=CRM" "Key=tag:UpdateGroup,Values=${{ matrix.update_group }}" \
+            --parameters 'commands=["CRM_APP_CONTAINER=converto-crm-1", "HEALTH_CHECK_URL=http://localhost:3001/api/v1/ping", "if curl --fail $HEALTH_CHECK_URL; then echo Container $CRM_APP_CONTAINER is healthy; else echo Container $CRM_APP_CONTAINER is not healthy😭; exit 1; fi"]'
+
+  deployment-success:
+    runs-on: ubuntu-latest
+    needs: [deploy-base, deploy-crm]
+    steps:
+      - name: Deployment Success Message
+        run: echo "Deployment completed successfully!🎉"
