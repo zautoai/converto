@@ -33,8 +33,8 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ secrets.DEV_GITHUB_USER }}
-          password: ${{ secrets.DEV_GITHUB_TOKEN }}
+          username: ${{ env.DEV_GITHUB_USER }}
+          password: ${{ env.DEV_GITHUB_TOKEN }}
 
       - name: Build and push Docker image for base
         if: contains(github.event.head_commit.message, 'base')
@@ -48,48 +48,48 @@ jobs:
             ghcr.io/zautoai/converto:demo-base${{ github.sha }}
             ghcr.io/zautoai/converto:demo-base
           build-args: |
-            APOLLO_API_KEY=${{ secrets.DEMO_APOLLO_API_KEY }}
-            AWS_ACCESS_KEY_ID=${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}
-            AWS_REGION=${{ secrets.DEMO_AWS_REGION }}
-            AWS_SECRET_ACCESS_KEY=${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}
-            CHROMA_AUTH_CREDENTIALS=${{ secrets.DEMO_CHROMA_AUTH_CREDENTIALS }}
-            CHROMA_AUTH_PROVIDER=${{ secrets.DEMO_CHROMA_AUTH_PROVIDER }}
-            CHROMA_URL=${{ secrets.DEMO_CHROMA_URL }}
-            CHUNCK_SIZE=${{ secrets.DEMO_CHUNCK_SIZE }}
-            CLAUDE_API_KEY=${{ secrets.DEMO_CLAUDE_API_KEY }}
-            CONVERTO_EMAIL=${{ secrets.DEMO_CONVERTO_EMAIL }}
-            CONVERTO_TRAIN_BUCKET_NAME=${{ secrets.DEMO_CONVERTO_TRAIN_BUCKET_NAME }}
-            COVERTO_PIC_BUCKET_NAME=${{ secrets.DEMO_COVERTO_PIC_BUCKET_NAME }}
-            CRYPTO_ENCRYPTION_SECRET=${{ secrets.DEMO_CRYPTO_ENCRYPTION_SECRET }}
-            DATABASE_URL=${{ secrets.DEMO_DATABASE_URL_BASE }}
-            EMBEDDING_PROVIDER=${{ secrets.DEMO_EMBEDDING_PROVIDER }}
-            GOOGLE_CLIENT_ID=${{ secrets.DEMO_GOOGLE_CLIENT_ID }}
-            HOST_PORT=${{ secrets.DEMO_HOST_PORT }}
-            HOST_URL=${{ secrets.DEMO_HOST_URL }}
-            IP_DATA_KEY=${{ secrets.DEMO_IP_DATA_KEY }}
-            JWT_SECRET=${{ secrets.DEMO_JWT_SECRET }}
-            LLM_PROVIDER=${{ secrets.DEMO_LLM_PROVIDER }}
-            MAX_SMTP_CONNECTIONS=${{ secrets.DEMO_MAX_SMTP_CONNECTIONS }}
-            MAX_TOTAL_FILE_SIZE=${{ secrets.DEMO_MAX_TOTAL_FILE_SIZE }}
-            NAME=${{ secrets.DEMO_NAME }}
-            NODE_ENV=${{ secrets.DEMO_NODE_ENV }}
-            OPENAI_API_KEY=${{ secrets.DEMO_OPENAI_API_KEY }}
-            OPENAI_ASSISTANT_DEFAULT_MODEL=${{ secrets.DEMO_OPENAI_ASSISTANT_DEFAULT_MODEL }}
-            OPEN_AI_EMBEDDING_MODEL=${{ secrets.DEMO_OPEN_AI_EMBEDDING_MODEL }}
-            OPEN_AI_MODEL=${{ secrets.DEMO_OPEN_AI_MODEL }}
-            QUICK_MAIL_VALIDATOR_API=${{ secrets.DEMO_QUICK_MAIL_VALIDATOR_API }}
-            REDIS_IP=${{ secrets.DEMO_REDIS_IP }}
-            REDIS_PASSWORD=${{ secrets.DEMO_REDIS_PASSWORD }}
-            REDIS_PORT=${{ secrets.DEMO_REDIS_PORT }}
-            SENDGRID_KEY=${{ secrets.DEMO_SENDGRID_KEY }}
-            SIGNUP_ALERT_MAIL=${{ secrets.DEMO_SIGNUP_ALERT_MAIL }}
-            SUPER_USER_EMAIL=${{ secrets.DEMO_SUPER_USER_EMAIL }}
-            SUPER_user=${{ secrets.DEMO_SUPER_user }}
-            SUPER_USER_PASSWORD=${{ secrets.DEMO_SUPER_USER_PASSWORD }}
-            TRAINING_CONTENT_PATH=${{ secrets.DEMO_TRAINING_CONTENT_PATH }}
-            UPLOADS_FOLDER=${{ secrets.DEMO_UPLOADS_FOLDER }}
-            VERIFICATION_EXPIRES_IN=${{ secrets.DEMO_VERIFICATION_EXPIRES_IN }}
-            ZAUTO_API_BASE_URL=${{ secrets.DEMO_ZAUTO_API_BASE_URL }}
+            APOLLO_API_KEY=${{ env.DEMO_APOLLO_API_KEY }}
+            AWS_ACCESS_KEY_ID=${{ env.DEMO_AWS_ACCESS_KEY_ID }}
+            AWS_REGION=${{ env.DEMO_AWS_REGION }}
+            AWS_SECRET_ACCESS_KEY=${{ env.DEMO_AWS_SECRET_ACCESS_KEY }}
+            CHROMA_AUTH_CREDENTIALS=${{ env.DEMO_CHROMA_AUTH_CREDENTIALS }}
+            CHROMA_AUTH_PROVIDER=${{ env.DEMO_CHROMA_AUTH_PROVIDER }}
+            CHROMA_URL=${{ env.DEMO_CHROMA_URL }}
+            CHUNCK_SIZE=${{ env.DEMO_CHUNCK_SIZE }}
+            CLAUDE_API_KEY=${{ env.DEMO_CLAUDE_API_KEY }}
+            CONVERTO_EMAIL=${{ env.DEMO_CONVERTO_EMAIL }}
+            CONVERTO_TRAIN_BUCKET_NAME=${{ env.DEMO_CONVERTO_TRAIN_BUCKET_NAME }}
+            COVERTO_PIC_BUCKET_NAME=${{ env.DEMO_COVERTO_PIC_BUCKET_NAME }}
+            CRYPTO_ENCRYPTION_SECRET=${{ env.DEMO_CRYPTO_ENCRYPTION_SECRET }}
+            DATABASE_URL=${{ env.DEMO_DATABASE_URL_BASE }}
+            EMBEDDING_PROVIDER=${{ env.DEMO_EMBEDDING_PROVIDER }}
+            GOOGLE_CLIENT_ID=${{ env.DEMO_GOOGLE_CLIENT_ID }}
+            HOST_PORT=${{ env.DEMO_HOST_PORT }}
+            HOST_URL=${{ env.DEMO_HOST_URL }}
+            IP_DATA_KEY=${{ env.DEMO_IP_DATA_KEY }}
+            JWT_SECRET=${{ env.DEMO_JWT_SECRET }}
+            LLM_PROVIDER=${{ env.DEMO_LLM_PROVIDER }}
+            MAX_SMTP_CONNECTIONS=${{ env.DEMO_MAX_SMTP_CONNECTIONS }}
+            MAX_TOTAL_FILE_SIZE=${{ env.DEMO_MAX_TOTAL_FILE_SIZE }}
+            NAME=${{ env.DEMO_NAME }}
+            NODE_ENV=${{ env.DEMO_NODE_ENV }}
+            OPENAI_API_KEY=${{ env.DEMO_OPENAI_API_KEY }}
+            OPENAI_ASSISTANT_DEFAULT_MODEL=${{ env.DEMO_OPENAI_ASSISTANT_DEFAULT_MODEL }}
+            OPEN_AI_EMBEDDING_MODEL=${{ env.DEMO_OPEN_AI_EMBEDDING_MODEL }}
+            OPEN_AI_MODEL=${{ env.DEMO_OPEN_AI_MODEL }}
+            QUICK_MAIL_VALIDATOR_API=${{ env.DEMO_QUICK_MAIL_VALIDATOR_API }}
+            REDIS_IP=${{ env.DEMO_REDIS_IP }}
+            REDIS_PASSWORD=${{ env.DEMO_REDIS_PASSWORD }}
+            REDIS_PORT=${{ env.DEMO_REDIS_PORT }}
+            SENDGRID_KEY=${{ env.DEMO_SENDGRID_KEY }}
+            SIGNUP_ALERT_MAIL=${{ env.DEMO_SIGNUP_ALERT_MAIL }}
+            SUPER_USER_EMAIL=${{ env.DEMO_SUPER_USER_EMAIL }}
+            SUPER_user=${{ env.DEMO_SUPER_user }}
+            SUPER_USER_PASSWORD=${{ env.DEMO_SUPER_USER_PASSWORD }}
+            TRAINING_CONTENT_PATH=${{ env.DEMO_TRAINING_CONTENT_PATH }}
+            UPLOADS_FOLDER=${{ env.DEMO_UPLOADS_FOLDER }}
+            VERIFICATION_EXPIRES_IN=${{ env.DEMO_VERIFICATION_EXPIRES_IN }}
+            ZAUTO_API_BASE_URL=${{ env.DEMO_ZAUTO_API_BASE_URL }}
 
       - name: Build and push Docker image for crm
         if: contains(github.event.head_commit.message, 'crm')
@@ -103,16 +103,16 @@ jobs:
             ghcr.io/zautoai/converto:demo-crm${{ github.sha }}
             ghcr.io/zautoai/converto:demo-crm
           build-args: |
-            REDIS_IP=${{ secrets.DEMO_REDIS_IP }}
-            REDIS_PASSWORD=${{ secrets.DEMO_REDIS_PASSWORD }}
-            REDIS_PORT=${{ secrets.DEMO_REDIS_PORT }}
-            CRM_ACCESS_TOKEN=${{ secrets.DEMO_CRM_ACCESS_TOKEN }}
-            CRM_API_PORT=${{ secrets.DEMO_CRM_API_PORT }}
-            CRM_BASE_URL=${{ secrets.DEMO_CRM_BASE_URL }}
-            CRM_DATABASE_URL=${{ secrets.DEMO_CRM_DATABASE_URL }}
-            CRM_HOST=${{ secrets.DEMO_CRM_HOST }}
-            CRM_HOST_PORT=${{ secrets.DEMO_CRM_HOST_PORT }}
-            CRM_JWT_SECRET=${{ secrets.DEMO_CRM_JWT_SECRET }}
+            REDIS_IP=${{ env.DEMO_REDIS_IP }}
+            REDIS_PASSWORD=${{ env.DEMO_REDIS_PASSWORD }}
+            REDIS_PORT=${{ env.DEMO_REDIS_PORT }}
+            CRM_ACCESS_TOKEN=${{ env.DEMO_CRM_ACCESS_TOKEN }}
+            CRM_API_PORT=${{ env.DEMO_CRM_API_PORT }}
+            CRM_BASE_URL=${{ env.DEMO_CRM_BASE_URL }}
+            CRM_DATABASE_URL=${{ env.DEMO_CRM_DATABASE_URL }}
+            CRM_HOST=${{ env.DEMO_CRM_HOST }}
+            CRM_HOST_PORT=${{ env.DEMO_CRM_HOST_PORT }}
+            CRM_JWT_SECRET=${{ env.DEMO_CRM_JWT_SECRET }}
 
   deploy-to-ec2:
     runs-on: ubuntu-latest
@@ -126,27 +126,27 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::319221427139:role/GITHUB_EC2
           role-session-name: GitHubActions
-          aws-region: ${{ secrets.DEMO_AWS_REGION }}
+          aws-region: ${{ env.DEMO_AWS_REGION }}
 
       - name: Insert Redis Password
         run: |
-          sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets.DEMO_REDIS_PASSWORD }}|g" docker-compose.yml
+          sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ env.DEMO_REDIS_PASSWORD }}|g" docker-compose.yml
 
       - name: Copy Updated Docker Compose File to EC2
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.DEV_EC2_HOST }}
-          username: ${{ secrets.DEV_EC2_USER }}
-          key: ${{ secrets.DEV_EC2_SSH_KEY }}
+          host: ${{ env.DEV_EC2_HOST }}
+          username: ${{ env.DEV_EC2_USER }}
+          key: ${{ env.DEV_EC2_SSH_KEY }}
           source: "docker-compose.yml"
           target: "/home/ubuntu/converto/"
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DEV_EC2_HOST }}
-          username: ${{ secrets.DEV_EC2_USER }}
-          key: ${{ secrets.DEV_EC2_SSH_KEY }}
+          host: ${{ env.DEV_EC2_HOST }}
+          username: ${{ env.DEV_EC2_USER }}
+          key: ${{ env.DEV_EC2_SSH_KEY }}
           script: |
             set -x
             docker login ghcr.io -u ${{ secrets.DEMO_GITHUB_USER }} -p ${{ secrets.DEMO_GITHUB_TOKEN }}
@@ -158,13 +158,13 @@ jobs:
       - name: Check Health of test Redis Container
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DEV_EC2_HOST }}
-          username: ${{ secrets.DEV_EC2_USER }}
-          key: ${{ secrets.DEV_EC2_SSH_KEY }}
+          host: ${{ env.DEV_EC2_HOST }}
+          username: ${{ env.DEV_EC2_USER }}
+          key: ${{ env.DEV_EC2_SSH_KEY }}
           script: |
             set -x
             REDIS_CONTAINER="converto-redis-1"
-            REDIS_PASSWORD=${{ secrets.DEMO_REDIS_PASSWORD }}
+            REDIS_PASSWORD=${{ env.DEMO_REDIS_PASSWORD }}
             REDIS_HEALTH=$(docker exec $REDIS_CONTAINER redis-cli -a $REDIS_PASSWORD PING)
             if [ "$REDIS_HEALTH" != "PONG" ]; then
               echo "Redis container $REDIS_CONTAINER is not healthy😭"
@@ -176,9 +176,9 @@ jobs:
       - name: Check Health of Base Application Container
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DEV_EC2_HOST }}
-          username: ${{ secrets.DEV_EC2_USER }}
-          key: ${{ secrets.DEV_EC2_SSH_KEY }}
+          host: ${{ env.DEV_EC2_HOST }}
+          username: ${{ env.DEV_EC2_USER }}
+          key: ${{ env.DEV_EC2_SSH_KEY }}
           script: |
             set -x
             BASE_APP_CONTAINER="converto-base-1"
@@ -193,9 +193,9 @@ jobs:
       - name: Check Health of CRM Application Container
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DEV_EC2_HOST }}
-          username: ${{ secrets.DEV_EC2_USER }}
-          key: ${{ secrets.DEV_EC2_SSH_KEY }}
+          host: ${{ env.DEV_EC2_HOST }}
+          username: ${{ env.DEV_EC2_USER }}
+          key: ${{ env.DEV_EC2_SSH_KEY }}
           script: |
             set -x
             CRM_APP_CONTAINER="converto-crm-1"
