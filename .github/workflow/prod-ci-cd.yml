@@ -101,8 +101,7 @@ jobs:
           CRM_HOST=${{ env.CRM_HOST }}
           CRM_HOST_PORT=${{ env.CRM_HOST_PORT }}
           CRM_JWT_SECRET=${{ env.CRM_JWT_SECRET }}
-
-          deploy:
+deploy:
           DEPLOY_AWS_ACCESS_KEY_ID=${{secrets.DEPLOY_AWS_ACCESS_KEY_ID}}
           DEPLOY_AWS_SECRET_ACCESS_KEY=${{secrets.DEPLOY_AWS_SECRET_ACCESS_KEY}}
           DEPLOY_AWS_REGION=${{secrets. DEPLOY_AWS_REGION}}
