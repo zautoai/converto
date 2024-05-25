@@ -137,20 +137,6 @@ CREATE TABLE "AgentFile" (
 );
 
 -- CreateTable
-CREATE TABLE "LeadConfig" (
-    "id" TEXT NOT NULL,
-    "agentId" TEXT NOT NULL,
-    "name" BOOLEAN NOT NULL DEFAULT false,
-    "email" BOOLEAN NOT NULL DEFAULT false,
-    "mobile" BOOLEAN NOT NULL DEFAULT false,
-    "whatsapp" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "LeadConfig_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Site" (
     "id" TEXT NOT NULL,
     "url" VARCHAR(500) NOT NULL,
@@ -264,6 +250,7 @@ CREATE TABLE "Campaign" (
     "status" "CampaignStatus" NOT NULL DEFAULT 'ACTIVE',
     "startDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "endDate" TIMESTAMP,
+    "accountId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
@@ -393,9 +380,6 @@ CREATE UNIQUE INDEX "Agent_name_key" ON "Agent"("name");
 CREATE INDEX "AgentId_agentFile_fkey" ON "AgentFile"("agentId");
 
 -- CreateIndex
-CREATE INDEX "AgentId_LeadConfig_fkey" ON "LeadConfig"("agentId");
-
--- CreateIndex
 CREATE INDEX "Visitor_visitorId_fkey" ON "Visit"("visitorId");
 
 -- CreateIndex
@@ -448,9 +432,6 @@ ALTER TABLE "ActiveClient" ADD CONSTRAINT "ActiveClient_userId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "AgentFile" ADD CONSTRAINT "AgentFile_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "LeadConfig" ADD CONSTRAINT "LeadConfig_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AgentPrompt" ADD CONSTRAINT "AgentPrompt_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
