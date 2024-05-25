@@ -31,6 +31,9 @@ CREATE TYPE "CampaignStatus" AS ENUM ('ACTIVE', 'INACTIVE');
 -- CreateEnum
 CREATE TYPE "CTAType" AS ENUM ('CTA', 'NAVIGATOR', 'CALENDAR');
 
+-- CreateEnum
+CREATE TYPE "ProspecActivityType" AS ENUM ('CTA_PERFORMED', 'PAGE_VIEWED', 'LINK_CLICKED', 'CHAT_INITIATED', 'OTHER');
+
 -- CreateTable
 CREATE TABLE "Role" (
     "id" TEXT NOT NULL,
@@ -134,20 +137,6 @@ CREATE TABLE "AgentFile" (
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "AgentFile_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "LeadConfig" (
-    "id" TEXT NOT NULL,
-    "agentId" TEXT NOT NULL,
-    "name" BOOLEAN NOT NULL DEFAULT false,
-    "email" BOOLEAN NOT NULL DEFAULT false,
-    "mobile" BOOLEAN NOT NULL DEFAULT false,
-    "whatsapp" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "LeadConfig_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -264,6 +253,7 @@ CREATE TABLE "Campaign" (
     "status" "CampaignStatus" NOT NULL DEFAULT 'ACTIVE',
     "startDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "endDate" TIMESTAMP,
+    "accountId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
@@ -362,6 +352,21 @@ CREATE TABLE "ExternalToolCredential" (
     CONSTRAINT "ExternalToolCredential_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "ProspecJurny" (
+    "id" TEXT NOT NULL,
+    "visitId" TEXT NOT NULL,
+    "data" TEXT,
+    "type" "ProspecActivityType" NOT NULL DEFAULT 'OTHER',
+    "timeSpend" INTEGER NOT NULL DEFAULT 0,
+    "score" DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    "scrollDepth" DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "modifiedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ProspecJurny_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Role_name_key" ON "Role"("name");
 
@@ -391,9 +396,6 @@ CREATE UNIQUE INDEX "Agent_name_key" ON "Agent"("name");
 
 -- CreateIndex
 CREATE INDEX "AgentId_agentFile_fkey" ON "AgentFile"("agentId");
-
--- CreateIndex
-CREATE INDEX "AgentId_LeadConfig_fkey" ON "LeadConfig"("agentId");
 
 -- CreateIndex
 CREATE INDEX "Visitor_visitorId_fkey" ON "Visit"("visitorId");
@@ -440,6 +442,9 @@ CREATE UNIQUE INDEX "OpenAIAssistant_name_key" ON "OpenAIAssistant"("name");
 -- CreateIndex
 CREATE UNIQUE INDEX "CallToAction_name_key" ON "CallToAction"("name");
 
+-- CreateIndex
+CREATE INDEX "ProspecJurny_visitId_type_idx" ON "ProspecJurny"("visitId", "type");
+
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -448,9 +453,6 @@ ALTER TABLE "ActiveClient" ADD CONSTRAINT "ActiveClient_userId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "AgentFile" ADD CONSTRAINT "AgentFile_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "LeadConfig" ADD CONSTRAINT "LeadConfig_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AgentPrompt" ADD CONSTRAINT "AgentPrompt_agentId_fkey" FOREIGN KEY ("agentId") REFERENCES "Agent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -481,3 +483,6 @@ ALTER TABLE "ZautoMessage" ADD CONSTRAINT "ZautoMessage_sentById_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "availableHours" ADD CONSTRAINT "availableHours_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "AvailabilitySchedule"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProspecJurny" ADD CONSTRAINT "ProspecJurny_visitId_fkey" FOREIGN KEY ("visitId") REFERENCES "Visit"("id") ON DELETE CASCADE ON UPDATE CASCADE;
