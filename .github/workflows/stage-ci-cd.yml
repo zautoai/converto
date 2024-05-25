@@ -18,8 +18,8 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ secrets.GITHUB_USER }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ env.GITHUB_USER }}
+          password: ${{ env.GITHUB_TOKEN }}
       - name: Build and push Docker image for base
         if: contains(github.event.head_commit.message, 'base')
         uses: docker/build-push-action@v2
@@ -31,52 +31,52 @@ jobs:
             ghcr.io/zautoai/converto:stage-base${{ github.sha }}
             ghcr.io/zautoai/converto:stage-base
           build-args: |
-            APOLLO_API_KEY=${{ secrets.STAGE_APOLLO_API_KEY }}
-            AWS_ACCESS_KEY_ID=${{ secrets.STAGE_AWS_ACCESS_KEY_ID }}
-            AWS_REGION=${{ secrets.STAGE_AWS_REGION }}
-            AWS_SECRET_ACCESS_KEY=${{ secrets.STAGE_AWS_SECRET_ACCESS_KEY }}
-            CHROMA_AUTH_CREDENTIALS=${{ secrets.STAGE_CHROMA_AUTH_CREDENTIALS }}
-            CHROMA_AUTH_PROVIDER=${{ secrets.STAGE_CHROMA_AUTH_PROVIDER }}
-            CHROMA_URL=${{ secrets.STAGE_CHROMA_URL }}
-            CHUNCK_SIZE=${{ secrets.STAGE_CHUNCK_SIZE }}
-            CLAUDE_API_KEY=${{ secrets.STAGE_CLAUDE_API_KEY }}
-            COHERE_API_KEY=${{ secrets.STAGE_COHERE_API_KEY }}
-            CONVERTO_EMAIL=${{ secrets.STAGE_CONVERTO_EMAIL }}
-            CONVERTO_TRAIN_BUCKET_NAME=${{ secrets.STAGE_CONVERTO_TRAIN_BUCKET_NAME }}
-            COVERTO_PIC_BUCKET_NAME=${{ secrets.STAGE_COVERTO_PIC_BUCKET_NAME }}
-            CRYPTO_ENCRYPTION_SECRET=${{ secrets.STAGE_CRYPTO_ENCRYPTION_SECRET }}
-            DATABASE_URL=${{ secrets.STAGE_DATABASE_URL_BASE }}
-            EMBEDDING_PROVIDER=${{ secrets.STAGE_EMBEDDING_PROVIDER }}
-            GOOGLE_CLIENT_ID=${{ secrets.STAGE_GOOGLE_CLIENT_ID }}
-            HOST_PORT=${{ secrets.STAGE_HOST_PORT }}
-            HOST_URL=${{ secrets.STAGE_HOST_URL }}
-            IP_DATA_KEY=${{ secrets.STAGE_IP_DATA_KEY }}
-            JWT_SECRET=${{ secrets.STAGE_JWT_SECRET }}
-            LLM_PROVIDER=${{ secrets.STAGE_LLM_PROVIDER }}
-            MAX_SMTP_CONNECTIONS=${{ secrets.STAGE_MAX_SMTP_CONNECTIONS }}
-            MAX_TOTAL_FILE_SIZE=${{ secrets.STAGE_MAX_TOTAL_FILE_SIZE }}
-            NAME=${{ secrets.STAGE_NAME }}
-            NODE_ENV=${{ secrets.STAGE_NODE_ENV }}
-            OPENAI_API_KEY=${{ secrets.STAGE_OPENAI_API_KEY }}
-            OPENAI_ASSISTANT_DEFAULT_MODEL=${{ secrets.STAGE_OPENAI_ASSISTANT_DEFAULT_MODEL }}
-            OPEN_AI_EMBEDDING_MODEL=${{ secrets.STAGE_OPEN_AI_EMBEDDING_MODEL }}
-            OPEN_AI_MODEL=${{ secrets.STAGE_OPEN_AI_MODEL }}
-            QUICK_MAIL_VALIDATOR_API=${{ secrets.STAGE_QUICK_MAIL_VALIDATOR_API }}
-            REDIS_IP=${{ secrets.STAGE_REDIS_IP }}
-            REDIS_PASSWORD=${{ secrets.STAGE_REDIS_PASSWORD }}
-            REDIS_PORT=${{ secrets.STAGE_REDIS_PORT }}
-            SENDGRID_KEY=${{ secrets.STAGE_SENDGRID_KEY }}
-            SERVER_HOST=${{ secrets.STAGE_SERVER_HOST }}
-            SERVER_SSH_KEY=${{ secrets.STAGE_SERVER_SSH_KEY }}
-            SERVER_USER=${{ secrets.STAGE_SERVER_USER }}
-            SIGNUP_ALERT_MAIL=${{ secrets.STAGE_SIGNUP_ALERT_MAIL }}
-            SUPER_USER_EMAIL=${{ secrets.STAGE_SUPER_USER_EMAIL }}
-            SUPER_USER=${{ secrets.STAGE_SUPER_USER }}
-            SUPER_USER_PASSWORD=${{ secrets.STAGE_SUPER_USER_PASSWORD }}
-            TRAINING_CONTENT_PATH=${{ secrets.STAGE_TRAINING_CONTENT_PATH }}
-            UPLOADS_FOLDER=${{ secrets.STAGE_UPLOADS_FOLDER }}
-            VERIFICATION_EXPIRES_IN=${{ secrets.STAGE_VERIFICATION_EXPIRES_IN }}
-            ZAUTO_API_BASE_URL=${{ secrets.STAGE_ZAUTO_API_BASE_URL }}
+            APOLLO_API_KEY=${{ env.STAGE_APOLLO_API_KEY }}
+            AWS_ACCESS_KEY_ID=${{ env.STAGE_AWS_ACCESS_KEY_ID }}
+            AWS_REGION=${{ env.STAGE_AWS_REGION }}
+            AWS_SECRET_ACCESS_KEY=${{ env.STAGE_AWS_SECRET_ACCESS_KEY }}
+            CHROMA_AUTH_CREDENTIALS=${{ env.STAGE_CHROMA_AUTH_CREDENTIALS }}
+            CHROMA_AUTH_PROVIDER=${{ env.STAGE_CHROMA_AUTH_PROVIDER }}
+            CHROMA_URL=${{ env.STAGE_CHROMA_URL }}
+            CHUNCK_SIZE=${{ env.STAGE_CHUNCK_SIZE }}
+            CLAUDE_API_KEY=${{ env.STAGE_CLAUDE_API_KEY }}
+            COHERE_API_KEY=${{ env.STAGE_COHERE_API_KEY }}
+            CONVERTO_EMAIL=${{ env.STAGE_CONVERTO_EMAIL }}
+            CONVERTO_TRAIN_BUCKET_NAME=${{ env.STAGE_CONVERTO_TRAIN_BUCKET_NAME }}
+            COVERTO_PIC_BUCKET_NAME=${{ env.STAGE_COVERTO_PIC_BUCKET_NAME }}
+            CRYPTO_ENCRYPTION_SECRET=${{ env.STAGE_CRYPTO_ENCRYPTION_SECRET }}
+            DATABASE_URL=${{ env.STAGE_DATABASE_URL_BASE }}
+            EMBEDDING_PROVIDER=${{ env.STAGE_EMBEDDING_PROVIDER }}
+            GOOGLE_CLIENT_ID=${{ env.STAGE_GOOGLE_CLIENT_ID }}
+            HOST_PORT=${{ env.STAGE_HOST_PORT }}
+            HOST_URL=${{ env.STAGE_HOST_URL }}
+            IP_DATA_KEY=${{ env.STAGE_IP_DATA_KEY }}
+            JWT_SECRET=${{ env.STAGE_JWT_SECRET }}
+            LLM_PROVIDER=${{ env.STAGE_LLM_PROVIDER }}
+            MAX_SMTP_CONNECTIONS=${{ env.STAGE_MAX_SMTP_CONNECTIONS }}
+            MAX_TOTAL_FILE_SIZE=${{ env.STAGE_MAX_TOTAL_FILE_SIZE }}
+            NAME=${{ env.STAGE_NAME }}
+            NODE_ENV=${{ env.STAGE_NODE_ENV }}
+            OPENAI_API_KEY=${{ env.STAGE_OPENAI_API_KEY }}
+            OPENAI_ASSISTANT_DEFAULT_MODEL=${{ env.STAGE_OPENAI_ASSISTANT_DEFAULT_MODEL }}
+            OPEN_AI_EMBEDDING_MODEL=${{ env.STAGE_OPEN_AI_EMBEDDING_MODEL }}
+            OPEN_AI_MODEL=${{ env.STAGE_OPEN_AI_MODEL }}
+            QUICK_MAIL_VALIDATOR_API=${{ env.STAGE_QUICK_MAIL_VALIDATOR_API }}
+            REDIS_IP=${{ env.STAGE_REDIS_IP }}
+            REDIS_PASSWORD=${{ env.STAGE_REDIS_PASSWORD }}
+            REDIS_PORT=${{ env.STAGE_REDIS_PORT }}
+            SENDGRID_KEY=${{ env.STAGE_SENDGRID_KEY }}
+            SERVER_HOST=${{ env.STAGE_SERVER_HOST }}
+            SERVER_SSH_KEY=${{ env.STAGE_SERVER_SSH_KEY }}
+            SERVER_USER=${{ env.STAGE_SERVER_USER }}
+            SIGNUP_ALERT_MAIL=${{ env.STAGE_SIGNUP_ALERT_MAIL }}
+            SUPER_USER_EMAIL=${{ env.STAGE_SUPER_USER_EMAIL }}
+            SUPER_USER=${{ env.STAGE_SUPER_USER }}
+            SUPER_USER_PASSWORD=${{ env.STAGE_SUPER_USER_PASSWORD }}
+            TRAINING_CONTENT_PATH=${{ env.STAGE_TRAINING_CONTENT_PATH }}
+            UPLOADS_FOLDER=${{ env.STAGE_UPLOADS_FOLDER }}
+            VERIFICATION_EXPIRES_IN=${{ env.STAGE_VERIFICATION_EXPIRES_IN }}
+            ZAUTO_API_BASE_URL=${{ env.STAGE_ZAUTO_API_BASE_URL }}
 
       - name: Build and push Docker image for crm
         if: contains(github.event.head_commit.message, 'crm')
@@ -89,16 +89,16 @@ jobs:
             ghcr.io/zautoai/converto:stage-crm${{ github.sha }}
             ghcr.io/zautoai/converto:stage-crm
           build-args: |
-            REDIS_IP=${{ secrets.STAGE_REDIS_IP }}
-            REDIS_PASSWORD=${{ secrets.STAGE_REDIS_PASSWORD }}
-            REDIS_PORT=${{ secrets.STAGE_REDIS_PORT }}
-            CRM_ACCESS_TOKEN=${{ secrets.STAGE_CRM_ACCESS_TOKEN }}
-            CRM_API_PORT=${{ secrets.STAGE_CRM_API_PORT }}
-            CRM_BASE_URL=${{ secrets.STAGE_CRM_BASE_URL }}
-            CRM_DATABASE_URL=${{ secrets.STAGE_CRM_DATABASE_URL }}
-            CRM_HOST=${{ secrets.STAGE_CRM_HOST }}
-            CRM_HOST_PORT=${{ secrets.STAGE_CRM_HOST_PORT }}
-            CRM_JWT_SECRET=${{ secrets.STAGE_CRM_JWT_SECRET }}
+            REDIS_IP=${{ env.STAGE_REDIS_IP }}
+            REDIS_PASSWORD=${{ env.STAGE_REDIS_PASSWORD }}
+            REDIS_PORT=${{ env.STAGE_REDIS_PORT }}
+            CRM_ACCESS_TOKEN=${{ env.STAGE_CRM_ACCESS_TOKEN }}
+            CRM_API_PORT=${{ env.STAGE_CRM_API_PORT }}
+            CRM_BASE_URL=${{ env.STAGE_CRM_BASE_URL }}
+            CRM_DATABASE_URL=${{ env.STAGE_CRM_DATABASE_URL }}
+            CRM_HOST=${{ env.STAGE_CRM_HOST }}
+            CRM_HOST_PORT=${{ env.STAGE_CRM_HOST_PORT }}
+            CRM_JWT_SECRET=${{ env.STAGE_CRM_JWT_SECRET }}
 
   deploy-base:
     runs-on: ubuntu-latest
@@ -110,7 +110,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Insert Redis Password for Base
         run: |
-          sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets.REDIS_PASSWORD }}|g" docker-compose-base.yml
+          sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ env.REDIS_PASSWORD }}|g" docker-compose-base.yml
 
       - name: Show Updated Docker Compose File for Base
         run: cat docker-compose-base.yml
@@ -120,9 +120,9 @@ jobs:
           sudo apt-get install -y awscli
       - name: Configure AWS CLI
         run: |
-          aws configure set aws_access_key_id ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region ${{ secrets.DEPLOY_AWS_REGION }}
+          aws configure set aws_access_key_id ${{ env.DEPLOY_AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ env.DEPLOY_AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region ${{ env.DEPLOY_AWS_REGION }}
 
       - name: Deploy Base to EC2 via SSM
         run: |
@@ -148,7 +148,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Insert Redis Password for CRM
         run: |
-          sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets.REDIS_PASSWORD }}|g" docker-compose-crm.yml
+          sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ env.REDIS_PASSWORD }}|g" docker-compose-crm.yml
 
       - name: Show Updated Docker Compose File for CRM
         run: cat docker-compose-crm.yml
@@ -158,16 +158,16 @@ jobs:
           sudo apt-get install -y awscli
       - name: Configure AWS CLI
         run: |
-          aws configure set aws_access_key_id ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region ${{ secrets.DEPLOY_AWS_REGION }}
+          aws configure set aws_access_key_id ${{ env.DEPLOY_AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ env.DEPLOY_AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region ${{ env.DEPLOY_AWS_REGION }}
 
       - name: Deploy CRM to EC2 via SSM
         run: |
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Role,Values=CRM" "Key=tag:UpdateGroup,Values=${{ matrix.update_group }}" \
-            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.GITHUB_USER }} -p ${{ secrets.GITHUB_TOKEN }}", "cd /path/to/your/project", "docker-compose -f docker-compose-crm.yml pull", "docker-compose -f docker-compose-crm.yml up -d", "docker image prune -a -f"]'
+            --parameters 'commands=["docker login ghcr.io -u ${{ env.GITHUB_USER }} -p ${{ secrets.GITHUB_TOKEN }}", "cd /path/to/your/project", "docker-compose -f docker-compose-crm.yml pull", "docker-compose -f docker-compose-crm.yml up -d", "docker image prune -a -f"]'
 
       - name: Check Health of CRM Application Container
         run: |
