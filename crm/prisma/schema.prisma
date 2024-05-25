@@ -201,3 +201,19 @@ model CrmMapping {
 
   @@unique([objectType, fieldName, externalCRMObjectType, externalCRMFieldName])
 }
+
+model SegementCategory {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  color       String
+  Segement    Segement[]
+}
+
+model Segement {
+  id                 String           @id @default(uuid())
+  name               String
+  description        String?
+  segementCategoryId String
+  segementCategory   SegementCategory @relation(fields: [segementCategoryId], references: [id])
+}

@@ -18,8 +18,8 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: ghcr.io
-        username: ${{ secrets.DEV_GITHUB_USER }}
-        password: ${{ secrets.DEV_GITHUB_TOKEN }}
+        username: ${{ env.LOGIN_GITHUB_USER }}
+        password: ${{ env.LOGIN_GITHUB_TOKEN }}
     - name: Build and push Docker image for base
       if: contains(github.event.head_commit.message, 'base')
       uses: docker/build-push-action@v2
@@ -31,54 +31,54 @@ jobs:
           ghcr.io/zautoai/converto:dev-base${{ github.sha }}
           ghcr.io/zautoai/converto:dev-base
         build-args: |
-          APOLLO_API_KEY=${{ secrets.DEV_APOLLO_API_KEY }}
-          AWS_ACCESS_KEY_ID=${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-          AWS_REGION=${{ secrets.DEV_AWS_REGION }}
-          AWS_SECRET_ACCESS_KEY=${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-          CHROMA_AUTH_CREDENTIALS=${{ secrets.DEV_CHROMA_AUTH_CREDENTIALS }}
-          CHROMA_AUTH_PROVIDER=${{ secrets.DEV_CHROMA_AUTH_PROVIDER }}
-          CHROMA_URL=${{ secrets.DEV_CHROMA_URL }}
-          CHUNCK_SIZE=${{ secrets.DEV_CHUNCK_SIZE }}
-          CLAUDE_API_KEY=${{ secrets.DEV_CLAUDE_API_KEY }}
-          COHERE_API_KEY=${{ secrets.DEV_COHERE_API_KEY }}
-          CONVERTO_EMAIL=${{ secrets.DEV_CONVERTO_EMAIL }}
-          CONVERTO_TRAIN_BUCKET_NAME=${{ secrets.DEV_CONVERTO_TRAIN_BUCKET_NAME }}
-          COVERTO_PIC_BUCKET_NAME=${{ secrets.DEV_COVERTO_PIC_BUCKET_NAME }}
-          CRYPTO_ENCRYPTION_SECRET=${{ secrets.DEV_CRYPTO_ENCRYPTION_SECRET }}
-          DATABASE_URL=${{ secrets.DEV_DATABASE_URL_BASE }}
-          EMBEDDING_PROVIDER=${{ secrets.DEV_EMBEDDING_PROVIDER }}
-          GITHUB_TOKEN=${{ secrets.DEV_GITHUB_TOKEN }}
-          GITHUB_USER=${{ secrets.DEV_GITHUB_USER }}
-          GOOGLE_CLIENT_ID=${{ secrets.DEV_GOOGLE_CLIENT_ID }}
-          HOST_PORT=${{ secrets.DEV_HOST_PORT }}
-          HOST_URL=${{ secrets.DEV_HOST_URL }}
-          IP_DATA_KEY=${{ secrets.DEV_IP_DATA_KEY }}
-          JWT_SECRET=${{ secrets.DEV_JWT_SECRET }}
-          LLM_PROVIDER=${{ secrets.DEV_LLM_PROVIDER }}
-          MAX_SMTP_CONNECTIONS=${{ secrets.DEV_MAX_SMTP_CONNECTIONS }}
-          MAX_TOTAL_FILE_SIZE=${{ secrets.DEV_MAX_TOTAL_FILE_SIZE }}
-          NAME=${{ secrets.DEV_NAME }}
-          NODE_ENV=${{ secrets.DEV_NODE_ENV }}
-          OPENAI_API_KEY=${{ secrets.DEV_OPENAI_API_KEY }}
-          OPENAI_ASSISTANT_DEFAULT_MODEL=${{ secrets.DEV_OPENAI_ASSISTANT_DEFAULT_MODEL }}
-          OPEN_AI_EMBEDDING_MODEL=${{ secrets.DEV_OPEN_AI_EMBEDDING_MODEL }}
-          OPEN_AI_MODEL=${{ secrets.DEV_OPEN_AI_MODEL }}
-          QUICK_MAIL_VALIDATOR_API=${{ secrets.DEV_QUICK_MAIL_VALIDATOR_API }}
-          REDIS_IP=${{ secrets.DEV_REDIS_IP }}
-          REDIS_PASSWORD=${{ secrets.DEV_REDIS_PASSWORD }}
-          REDIS_PORT=${{ secrets.DEV_REDIS_PORT }}
-          SENDGRID_KEY=${{ secrets.DEV_SENDGRID_KEY }}
-          SERVER_HOST=${{ secrets.DEV_SERVER_HOST }}
-          SERVER_SSH_KEY=${{ secrets.DEV_SERVER_SSH_KEY }}
-          SERVER_USER=${{ secrets.DEV_SERVER_USER }}
-          SIGNUP_ALERT_MAIL=${{ secrets.DEV_SIGNUP_ALERT_MAIL }}
-          SUPER_USER_EMAIL=${{ secrets.DEV_SUPER_USER_EMAIL }}
-          SUPER_user=${{ secrets.DEV_SUPER_user }}
-          SUPER_USER_PASSWORD=${{ secrets.DEV_SUPER_USER_PASSWORD }}
-          TRAINING_CONTENT_PATH=${{ secrets.DEV_TRAINING_CONTENT_PATH }}
-          UPLOADS_FOLDER=${{ secrets.DEV_UPLOADS_FOLDER }}
-          VERIFICATION_EXPIRES_IN=${{ secrets.DEV_VERIFICATION_EXPIRES_IN }}
-          ZAUTO_API_BASE_URL=${{ secrets.DEV_ZAUTO_API_BASE_URL }}
+          APOLLO_API_KEY=${{ env.APOLLO_API_KEY }}
+          AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_REGION=${{ env.AWS_REGION }}
+          AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
+          CHROMA_AUTH_CREDENTIALS=${{ env.CHROMA_AUTH_CREDENTIALS }}
+          CHROMA_AUTH_PROVIDER=${{ env.CHROMA_AUTH_PROVIDER }}
+          CHROMA_URL=${{ env.CHROMA_URL }}
+          CHUNCK_SIZE=${{ env.CHUNCK_SIZE }}
+          CLAUDE_API_KEY=${{ env.CLAUDE_API_KEY }}
+          COHERE_API_KEY=${{ env.COHERE_API_KEY }}
+          CONVERTO_EMAIL=${{ env.CONVERTO_EMAIL }}
+          CONVERTO_TRAIN_BUCKET_NAME=${{ env.CONVERTO_TRAIN_BUCKET_NAME }}
+          COVERTO_PIC_BUCKET_NAME=${{ env.COVERTO_PIC_BUCKET_NAME }}
+          CRYPTO_ENCRYPTION_SECRET=${{ env.CRYPTO_ENCRYPTION_SECRET }}
+          DATABASE_URL=${{ env.DATABASE_URL_BASE }}
+          EMBEDDING_PROVIDER=${{ env.EMBEDDING_PROVIDER }}
+          GITHUB_TOKEN=${{ env.LOGIN_GITHUB_TOKEN }}
+          GITHUB_USER=${{ env.LOGIN_GITHUB_USER }}
+          GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+          HOST_PORT=${{ env.HOST_PORT }}
+          HOST_URL=${{ env.HOST_URL }}
+          IP_DATA_KEY=${{ env.IP_DATA_KEY }}
+          JWT_SECRET=${{ env.JWT_SECRET }}
+          LLM_PROVIDER=${{ env.LLM_PROVIDER }}
+          MAX_SMTP_CONNECTIONS=${{ env.MAX_SMTP_CONNECTIONS }}
+          MAX_TOTAL_FILE_SIZE=${{ env.MAX_TOTAL_FILE_SIZE }}
+          NAME=${{ env.NAME }}
+          NODE_ENV=${{ env.NODE_ENV }}
+          OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
+          OPENAI_ASSISTANT_DEFAULT_MODEL=${{ env.OPENAI_ASSISTANT_DEFAULT_MODEL }}
+          OPEN_AI_EMBEDDING_MODEL=${{ env.OPEN_AI_EMBEDDING_MODEL }}
+          OPEN_AI_MODEL=${{ env.OPEN_AI_MODEL }}
+          QUICK_MAIL_VALIDATOR_API=${{ env.QUICK_MAIL_VALIDATOR_API }}
+          REDIS_IP=${{ env.REDIS_IP }}
+          REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
+          REDIS_PORT=${{ env.REDIS_PORT }}
+          SENDGRID_KEY=${{ env.SENDGRID_KEY }}
+          SERVER_HOST=${{ env.SERVER_HOST }}
+          SERVER_SSH_KEY=${{ env.SERVER_SSH_KEY }}
+          SERVER_USER=${{ env.SERVER_USER }}
+          SIGNUP_ALERT_MAIL=${{ env.SIGNUP_ALERT_MAIL }}
+          SUPER_USER_EMAIL=${{ env.SUPER_USER_EMAIL }}
+          SUPER_user=${{ env.SUPER_user }}
+          SUPER_USER_PASSWORD=${{ env.SUPER_USER_PASSWORD }}
+          TRAINING_CONTENT_PATH=${{ env.TRAINING_CONTENT_PATH }}
+          UPLOADS_FOLDER=${{ env.UPLOADS_FOLDER }}
+          VERIFICATION_EXPIRES_IN=${{ env.VERIFICATION_EXPIRES_IN }}
+          ZAUTO_API_BASE_URL=${{ env.ZAUTO_API_BASE_URL }}
 
     - name: Build and push Docker image for crm
       if: contains(github.event.head_commit.message, 'crm')
@@ -91,16 +91,16 @@ jobs:
           ghcr.io/zautoai/converto:dev-crm${{ github.sha }}
           ghcr.io/zautoai/converto:dev-crm
         build-args: |
-          REDIS_IP=${{ secrets.DEV_REDIS_IP }}
-          REDIS_PASSWORD=${{ secrets.DEV_REDIS_PASSWORD }}
-          REDIS_PORT=${{ secrets.DEV_REDIS_PORT }}
-          CRM_ACCESS_TOKEN=${{ secrets.DEV_CRM_ACCESS_TOKEN }}
-          CRM_API_PORT=${{ secrets.DEV_CRM_API_PORT }}
-          CRM_BASE_URL=${{ secrets.DEV_CRM_BASE_URL }}
-          CRM_DATABASE_URL=${{ secrets.DEV_CRM_DATABASE_URL }}
-          CRM_HOST=${{ secrets.DEV_CRM_HOST }}
-          CRM_HOST_PORT=${{ secrets.DEV_CRM_HOST_PORT }}
-          CRM_JWT_SECRET=${{ secrets.DEV_CRM_JWT_SECRET }}
+          REDIS_IP=${{ env.REDIS_IP }}
+          REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
+          REDIS_PORT=${{ env.REDIS_PORT }}
+          CRM_ACCESS_TOKEN=${{ env.CRM_ACCESS_TOKEN }}
+          CRM_API_PORT=${{ env.CRM_API_PORT }}
+          CRM_BASE_URL=${{ env.CRM_BASE_URL }}
+          CRM_DATABASE_URL=${{ env.CRM_DATABASE_URL }}
+          CRM_HOST=${{ env.CRM_HOST }}
+          CRM_HOST_PORT=${{ env.CRM_HOST_PORT }}
+          CRM_JWT_SECRET=${{ env.CRM_JWT_SECRET }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -109,27 +109,27 @@ jobs:
     - uses: actions/checkout@v2
     - name: Insert Redis Password
       run: |
-        sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets.DEV_REDIS_PASSWORD }}|g" docker-compose.yml
+        sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ env.REDIS_PASSWORD }}|g" docker-compose.yml
 
     - name: Show Updated Docker Compose File
       run: cat docker-compose.yml
     - name: Copy Updated Docker Compose File to Server
       uses: appleboy/scp-action@master
       with:
-        host: ${{ secrets.DEV_SERVER_HOST }}
-        username: ${{ secrets.DEV_SERVER_USER }}
-        key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
         source: "docker-compose.yml"
         target: "/home/dbserver/converto/"
     - name: Deploy to Local Server
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.DEV_SERVER_HOST }}
-        username: ${{ secrets.DEV_SERVER_USER }}
-        key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           set -x  # Enable debugging
-          docker login ghcr.io -u ${{ secrets.DEV_GITHUB_USER }} -p ${{ secrets.DEV_GITHUB_TOKEN }}        
+          docker login ghcr.io -u ${{ secrets.GITHUB_USER }} -p ${{ secrets.GITHUB_TOKEN }}        
           cd /home/dbserver/converto
           cat docker-compose.yml
           docker-compose pull
@@ -138,13 +138,13 @@ jobs:
     - name: Check Health of test Redis Container
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.DEV_SERVER_HOST }}
-        username: ${{ secrets.DEV_SERVER_USER }}
-        key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           set -x
           REDIS_CONTAINER="converto-redis-1"
-          REDIS_PASSWORD=${{ secrets.DEV_REDIS_PASSWORD }}
+          REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
           REDIS_HEALTH=$(docker exec $REDIS_CONTAINER redis-cli -a $REDIS_PASSWORD PING)
           if [ "$REDIS_HEALTH" != "PONG" ]; then
           echo "Redis container $REDIS_CONTAINER is not healthy😭"
@@ -156,9 +156,9 @@ jobs:
     - name: Check Health of Base Application Container
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.DEV_SERVER_HOST }}
-        username: ${{ secrets.DEV_SERVER_USER }}
-        key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           BASE_APP_CONTAINER="converto-base-1"
           HEALTH_CHECK_URL="http://localhost:3000/health"
@@ -172,9 +172,9 @@ jobs:
     - name: Check Health of CRM Application Container
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.DEV_SERVER_HOST }}
-        username: ${{ secrets.DEV_SERVER_USER }}
-        key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           CRM_APP_CONTAINER="converto-crm-1"
           HEALTH_CHECK_URL="http://localhost:3001/api/v1/ping"

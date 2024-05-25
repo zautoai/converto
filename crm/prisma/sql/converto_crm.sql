@@ -143,6 +143,12 @@ CREATE TABLE "Account" (
     "notes" TEXT,
     "source" TEXT,
     "status" TEXT,
+    "decisionMakers" TEXT[],
+    "painPoints" TEXT[],
+    "buyingStage" TEXT,
+    "campaigns" TEXT[],
+    "teamMembers" TEXT[],
+    "isabm" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
@@ -152,16 +158,6 @@ CREATE TABLE "Account" (
 -- CreateTable
 CREATE TABLE "AccountBasedMarketingTarget" (
     "id" TEXT NOT NULL,
-    "photoUrl" TEXT,
-    "targetAccountName" TEXT NOT NULL,
-    "industry" TEXT NOT NULL,
-    "accountSize" TEXT,
-    "revenuePotential" DOUBLE PRECISION,
-    "decisionMakers" TEXT[],
-    "painPoints" TEXT[],
-    "buyingStage" TEXT,
-    "campaigns" TEXT[],
-    "teamMembers" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
@@ -197,6 +193,26 @@ CREATE TABLE "CrmMapping" (
     CONSTRAINT "CrmMapping_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "SegementCategory" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "color" TEXT NOT NULL,
+
+    CONSTRAINT "SegementCategory_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Segement" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "segementCategoryId" TEXT NOT NULL,
+
+    CONSTRAINT "Segement_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Info_orgId_key" ON "Info"("orgId");
 
@@ -215,6 +231,9 @@ CREATE UNIQUE INDEX "LeadFormField_leadFormId_contactField_key" ON "LeadFormFiel
 -- CreateIndex
 CREATE UNIQUE INDEX "CrmMapping_objectType_fieldName_externalCRMObjectType_exter_key" ON "CrmMapping"("objectType", "fieldName", "externalCRMObjectType", "externalCRMFieldName");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "SegementCategory_name_key" ON "SegementCategory"("name");
+
 -- AddForeignKey
 ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -232,3 +251,6 @@ ALTER TABLE "LeadFormField" ADD CONSTRAINT "LeadFormField_leadFormId_fkey" FOREI
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_parentAccountId_fkey" FOREIGN KEY ("parentAccountId") REFERENCES "Account"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Segement" ADD CONSTRAINT "Segement_segementCategoryId_fkey" FOREIGN KEY ("segementCategoryId") REFERENCES "SegementCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
