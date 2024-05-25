@@ -18,8 +18,8 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: ghcr.io
-        username: ${{ env.LOGIN_GITHUB_USER }}
-        password: ${{ env.LOGIN_GITHUB_TOKEN }}
+        username: ${{ secrets.LOGIN_GITHUB_USER }}
+        password: ${{ secrets.LOGIN_GITHUB_TOKEN }}
     - name: Build and push Docker image for base
       if: contains(github.event.head_commit.message, 'base')
       uses: docker/build-push-action@v2
@@ -47,8 +47,6 @@ jobs:
           CRYPTO_ENCRYPTION_SECRET=${{ env.CRYPTO_ENCRYPTION_SECRET }}
           DATABASE_URL=${{ env.DATABASE_URL_BASE }}
           EMBEDDING_PROVIDER=${{ env.EMBEDDING_PROVIDER }}
-          GITHUB_TOKEN=${{ env.LOGIN_GITHUB_TOKEN }}
-          GITHUB_USER=${{ env.LOGIN_GITHUB_USER }}
           GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
           HOST_PORT=${{ env.HOST_PORT }}
           HOST_URL=${{ env.HOST_URL }}
