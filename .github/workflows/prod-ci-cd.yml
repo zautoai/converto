@@ -47,8 +47,6 @@ jobs:
           CRYPTO_ENCRYPTION_SECRET=${{ env.CRYPTO_ENCRYPTION_SECRET }}
           DATABASE_URL=${{ env.DATABASE_URL_BASE }}
           EMBEDDING_PROVIDER=${{ env.EMBEDDING_PROVIDER }}
-          GITHUB_TOKEN=${{ env.LOGIN_GITHUB_TOKEN }}
-          GITHUB_USER=${{ env.LOGIN_GITHUB_TOKEN }}
           GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
           HOST_PORT=${{ env.HOST_PORT }}
           HOST_URL=${{ env.HOST_URL }}
@@ -57,7 +55,6 @@ jobs:
           LLM_PROVIDER=${{ env.LLM_PROVIDER }}
           MAX_SMTP_CONNECTIONS=${{ env.MAX_SMTP_CONNECTIONS }}
           MAX_TOTAL_FILE_SIZE=${{ env.MAX_TOTAL_FILE_SIZE }}
-          NAME=${{ env.NAME }}
           NODE_ENV=${{ env.NODE_ENV }}
           OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
           OPENAI_ASSISTANT_DEFAULT_MODEL=${{ env.OPENAI_ASSISTANT_DEFAULT_MODEL }}
@@ -68,17 +65,14 @@ jobs:
           REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
           REDIS_PORT=${{ env.REDIS_PORT }}
           SENDGRID_KEY=${{ env.SENDGRID_KEY }}
-          SERVER_HOST=${{ env.SERVER_HOST }}
-          SERVER_SSH_KEY=${{ env.SERVER_SSH_KEY }}
-          SERVER_USER=${{ env.SERVER_USER }}
           SIGNUP_ALERT_MAIL=${{ env.SIGNUP_ALERT_MAIL }}
           SUPER_USER_EMAIL=${{ env.SUPER_USER_EMAIL }}
-          SUPER_user=${{ env.SUPER_user }}
+          SUPER_USER=${{ env.SUPER_USER }}
           SUPER_USER_PASSWORD=${{ env.SUPER_USER_PASSWORD }}
           TRAINING_CONTENT_PATH=${{ env.TRAINING_CONTENT_PATH }}
           UPLOADS_FOLDER=${{ env.UPLOADS_FOLDER }}
           VERIFICATION_EXPIRES_IN=${{ env.VERIFICATION_EXPIRES_IN }}
-          ZAUTO_API_BASE_URL=${{ env.ZAUTO_API_BASE_URL }}
+
 
     - name: Build and push Docker image for crm
       if: contains(github.event.head_commit.message, 'crm')
