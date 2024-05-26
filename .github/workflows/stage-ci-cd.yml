@@ -31,52 +31,48 @@ jobs:
             ghcr.io/zautoai/converto:stage-base${{ github.sha }}
             ghcr.io/zautoai/converto:stage-base
           build-args: |
-            APOLLO_API_KEY=${{ env.STAGE_APOLLO_API_KEY }}
-            AWS_ACCESS_KEY_ID=${{ env.STAGE_AWS_ACCESS_KEY_ID }}
-            AWS_REGION=${{ env.STAGE_AWS_REGION }}
-            AWS_SECRET_ACCESS_KEY=${{ env.STAGE_AWS_SECRET_ACCESS_KEY }}
-            CHROMA_AUTH_CREDENTIALS=${{ env.STAGE_CHROMA_AUTH_CREDENTIALS }}
-            CHROMA_AUTH_PROVIDER=${{ env.STAGE_CHROMA_AUTH_PROVIDER }}
-            CHROMA_URL=${{ env.STAGE_CHROMA_URL }}
-            CHUNCK_SIZE=${{ env.STAGE_CHUNCK_SIZE }}
-            CLAUDE_API_KEY=${{ env.STAGE_CLAUDE_API_KEY }}
-            COHERE_API_KEY=${{ env.STAGE_COHERE_API_KEY }}
-            CONVERTO_EMAIL=${{ env.STAGE_CONVERTO_EMAIL }}
-            CONVERTO_TRAIN_BUCKET_NAME=${{ env.STAGE_CONVERTO_TRAIN_BUCKET_NAME }}
-            COVERTO_PIC_BUCKET_NAME=${{ env.STAGE_COVERTO_PIC_BUCKET_NAME }}
-            CRYPTO_ENCRYPTION_SECRET=${{ env.STAGE_CRYPTO_ENCRYPTION_SECRET }}
-            DATABASE_URL=${{ env.STAGE_DATABASE_URL_BASE }}
-            EMBEDDING_PROVIDER=${{ env.STAGE_EMBEDDING_PROVIDER }}
-            GOOGLE_CLIENT_ID=${{ env.STAGE_GOOGLE_CLIENT_ID }}
-            HOST_PORT=${{ env.STAGE_HOST_PORT }}
-            HOST_URL=${{ env.STAGE_HOST_URL }}
-            IP_DATA_KEY=${{ env.STAGE_IP_DATA_KEY }}
-            JWT_SECRET=${{ env.STAGE_JWT_SECRET }}
-            LLM_PROVIDER=${{ env.STAGE_LLM_PROVIDER }}
-            MAX_SMTP_CONNECTIONS=${{ env.STAGE_MAX_SMTP_CONNECTIONS }}
-            MAX_TOTAL_FILE_SIZE=${{ env.STAGE_MAX_TOTAL_FILE_SIZE }}
-            NAME=${{ env.STAGE_NAME }}
-            NODE_ENV=${{ env.STAGE_NODE_ENV }}
-            OPENAI_API_KEY=${{ env.STAGE_OPENAI_API_KEY }}
-            OPENAI_ASSISTANT_DEFAULT_MODEL=${{ env.STAGE_OPENAI_ASSISTANT_DEFAULT_MODEL }}
-            OPEN_AI_EMBEDDING_MODEL=${{ env.STAGE_OPEN_AI_EMBEDDING_MODEL }}
-            OPEN_AI_MODEL=${{ env.STAGE_OPEN_AI_MODEL }}
-            QUICK_MAIL_VALIDATOR_API=${{ env.STAGE_QUICK_MAIL_VALIDATOR_API }}
-            REDIS_IP=${{ env.STAGE_REDIS_IP }}
-            REDIS_PASSWORD=${{ env.STAGE_REDIS_PASSWORD }}
-            REDIS_PORT=${{ env.STAGE_REDIS_PORT }}
-            SENDGRID_KEY=${{ env.STAGE_SENDGRID_KEY }}
-            SERVER_HOST=${{ env.STAGE_SERVER_HOST }}
-            SERVER_SSH_KEY=${{ env.STAGE_SERVER_SSH_KEY }}
-            SERVER_USER=${{ env.STAGE_SERVER_USER }}
-            SIGNUP_ALERT_MAIL=${{ env.STAGE_SIGNUP_ALERT_MAIL }}
-            SUPER_USER_EMAIL=${{ env.STAGE_SUPER_USER_EMAIL }}
-            SUPER_USER=${{ env.STAGE_SUPER_USER }}
-            SUPER_USER_PASSWORD=${{ env.STAGE_SUPER_USER_PASSWORD }}
-            TRAINING_CONTENT_PATH=${{ env.STAGE_TRAINING_CONTENT_PATH }}
-            UPLOADS_FOLDER=${{ env.STAGE_UPLOADS_FOLDER }}
-            VERIFICATION_EXPIRES_IN=${{ env.STAGE_VERIFICATION_EXPIRES_IN }}
-            ZAUTO_API_BASE_URL=${{ env.STAGE_ZAUTO_API_BASE_URL }}
+            APOLLO_API_KEY=${{ env.APOLLO_API_KEY }}
+            AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
+            AWS_REGION=${{ env.AWS_REGION }}
+            AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
+            CHROMA_AUTH_CREDENTIALS=${{ env.CHROMA_AUTH_CREDENTIALS }}
+            CHROMA_AUTH_PROVIDER=${{ env.CHROMA_AUTH_PROVIDER }}
+            CHROMA_URL=${{ env.CHROMA_URL }}
+            CHUNCK_SIZE=${{ env.CHUNCK_SIZE }}
+            CLAUDE_API_KEY=${{ env.CLAUDE_API_KEY }}
+            COHERE_API_KEY=${{ env.COHERE_API_KEY }}
+            CONVERTO_EMAIL=${{ env.CONVERTO_EMAIL }}
+            CONVERTO_TRAIN_BUCKET_NAME=${{ env.CONVERTO_TRAIN_BUCKET_NAME }}
+            COVERTO_PIC_BUCKET_NAME=${{ env.COVERTO_PIC_BUCKET_NAME }}
+            CRYPTO_ENCRYPTION_SECRET=${{ env.CRYPTO_ENCRYPTION_SECRET }}
+            DATABASE_URL=${{ env.DATABASE_URL_BASE }}
+            EMBEDDING_PROVIDER=${{ env.EMBEDDING_PROVIDER }}
+            GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+            HOST_PORT=${{ env.HOST_PORT }}
+            HOST_URL=${{ env.HOST_URL }}
+            IP_DATA_KEY=${{ env.IP_DATA_KEY }}
+            JWT_SECRET=${{ env.JWT_SECRET }}
+            LLM_PROVIDER=${{ env.LLM_PROVIDER }}
+            MAX_SMTP_CONNECTIONS=${{ env.MAX_SMTP_CONNECTIONS }}
+            MAX_TOTAL_FILE_SIZE=${{ env.MAX_TOTAL_FILE_SIZE }}
+            NODE_ENV=${{ env.NODE_ENV }}
+            OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
+            OPENAI_ASSISTANT_DEFAULT_MODEL=${{ env.OPENAI_ASSISTANT_DEFAULT_MODEL }}
+            OPEN_AI_EMBEDDING_MODEL=${{ env.OPEN_AI_EMBEDDING_MODEL }}
+            OPEN_AI_MODEL=${{ env.OPEN_AI_MODEL }}
+            QUICK_MAIL_VALIDATOR_API=${{ env.QUICK_MAIL_VALIDATOR_API }}
+            REDIS_IP=${{ env.REDIS_IP }}
+            REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
+            REDIS_PORT=${{ env.REDIS_PORT }}
+            SENDGRID_KEY=${{ env.SENDGRID_KEY }}
+            SIGNUP_ALERT_MAIL=${{ env.SIGNUP_ALERT_MAIL }}
+            SUPER_USER_EMAIL=${{ env.SUPER_USER_EMAIL }}
+            SUPER_USER=${{ env.SUPER_USER }}
+            SUPER_USER_PASSWORD=${{ env.SUPER_USER_PASSWORD }}
+            TRAINING_CONTENT_PATH=${{ env.TRAINING_CONTENT_PATH }}
+            UPLOADS_FOLDER=${{ env.UPLOADS_FOLDER }}
+            VERIFICATION_EXPIRES_IN=${{ env.VERIFICATION_EXPIRES_IN }}
+
 
       - name: Build and push Docker image for crm
         if: contains(github.event.head_commit.message, 'crm')
@@ -89,16 +85,16 @@ jobs:
             ghcr.io/zautoai/converto:stage-crm${{ github.sha }}
             ghcr.io/zautoai/converto:stage-crm
           build-args: |
-            REDIS_IP=${{ env.STAGE_REDIS_IP }}
-            REDIS_PASSWORD=${{ env.STAGE_REDIS_PASSWORD }}
-            REDIS_PORT=${{ env.STAGE_REDIS_PORT }}
-            CRM_ACCESS_TOKEN=${{ env.STAGE_CRM_ACCESS_TOKEN }}
-            CRM_API_PORT=${{ env.STAGE_CRM_API_PORT }}
-            CRM_BASE_URL=${{ env.STAGE_CRM_BASE_URL }}
-            CRM_DATABASE_URL=${{ env.STAGE_CRM_DATABASE_URL }}
-            CRM_HOST=${{ env.STAGE_CRM_HOST }}
-            CRM_HOST_PORT=${{ env.STAGE_CRM_HOST_PORT }}
-            CRM_JWT_SECRET=${{ env.STAGE_CRM_JWT_SECRET }}
+            REDIS_IP=${{ env.REDIS_IP }}
+            REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
+            REDIS_PORT=${{ env.REDIS_PORT }}
+            CRM_ACCESS_TOKEN=${{ env.CRM_ACCESS_TOKEN }}
+            CRM_API_PORT=${{ env.CRM_API_PORT }}
+            CRM_BASE_URL=${{ env.CRM_BASE_URL }}
+            CRM_DATABASE_URL=${{ env.CRM_DATABASE_URL }}
+            CRM_HOST=${{ env.CRM_HOST }}
+            CRM_HOST_PORT=${{ env.CRM_HOST_PORT }}
+            CRM_JWT_SECRET=${{ env.CRM_JWT_SECRET }}
 
   deploy-base:
     runs-on: ubuntu-latest
