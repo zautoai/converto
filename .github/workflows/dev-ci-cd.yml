@@ -103,7 +103,6 @@ jobs:
           CRM_HOST_PORT=${{ secrets[format('{0}_CRM_HOST_PORT', matrix.environment)] }}
           CRM_JWT_SECRET=${{ secrets[format('{0}_CRM_JWT_SECRET', matrix.environment)] }}
 
-jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
