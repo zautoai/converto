@@ -1,4 +1,4 @@
-name: Deploy to AWS EC2
+name: Build and Deploy Docker Images
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [COMMON, Dev]
+        environment: [Dev]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Docker Buildx
@@ -34,52 +34,52 @@ jobs:
           ghcr.io/zautoai/converto:dev-base${{ github.sha }}
           ghcr.io/zautoai/converto:dev-base
         build-args: |
-          APOLLO_API_KEY=${{ secrets[format('{0}_APOLLO_API_KEY', matrix.environment)] }}
-          AWS_ACCESS_KEY_ID=${{ secrets[format('{0}_AWS_ACCESS_KEY_ID', matrix.environment)] }}
-          AWS_REGION=${{ secrets[format('{0}_AWS_REGION', matrix.environment)] }}
-          AWS_SECRET_ACCESS_KEY=${{ secrets[format('{0}_AWS_SECRET_ACCESS_KEY', matrix.environment)] }}
-          CHROMA_AUTH_CREDENTIALS=${{ secrets[format('{0}_CHROMA_AUTH_CREDENTIALS', matrix.environment)] }}
-          CHROMA_AUTH_PROVIDER=${{ secrets[format('{0}_CHROMA_AUTH_PROVIDER', matrix.environment)] }}
-          CHROMA_URL=${{ secrets[format('{0}_CHROMA_URL', matrix.environment)] }}
-          CHUNCK_SIZE=${{ secrets[format('{0}_CHUNCK_SIZE', matrix.environment)] }}
-          CLAUDE_API_KEY=${{ secrets[format('{0}_CLAUDE_API_KEY', matrix.environment)] }}
-          COHERE_API_KEY=${{ secrets[format('{0}_COHERE_API_KEY', matrix.environment)] }}
-          CONVERTO_EMAIL=${{ secrets[format('{0}_CONVERTO_EMAIL', matrix.environment)] }}
-          CONVERTO_TRAIN_BUCKET_NAME=${{ secrets[format('{0}_CONVERTO_TRAIN_BUCKET_NAME', matrix.environment)] }}
-          COVERTO_PIC_BUCKET_NAME=${{ secrets[format('{0}_COVERTO_PIC_BUCKET_NAME', matrix.environment)] }}
-          CRYPTO_ENCRYPTION_SECRET=${{ secrets[format('{0}_CRYPTO_ENCRYPTION_SECRET', matrix.environment)] }}
-          DATABASE_URL=${{ secrets[format('{0}_DATABASE_URL_BASE', matrix.environment)] }}
-          EMBEDDING_PROVIDER=${{ secrets[format('{0}_EMBEDDING_PROVIDER', matrix.environment)] }}
-          GOOGLE_CLIENT_ID=${{ secrets[format('{0}_GOOGLE_CLIENT_ID', matrix.environment)] }}
-          HOST_PORT=${{ secrets[format('{0}_HOST_PORT', matrix.environment)] }}
-          HOST_URL=${{ secrets[format('{0}_HOST_URL', matrix.environment)] }}
-          IP_DATA_KEY=${{ secrets[format('{0}_IP_DATA_KEY', matrix.environment)] }}
-          JWT_SECRET=${{ secrets[format('{0}_JWT_SECRET', matrix.environment)] }}
-          LLM_PROVIDER=${{ secrets[format('{0}_LLM_PROVIDER', matrix.environment)] }}
-          MAX_SMTP_CONNECTIONS=${{ secrets[format('{0}_MAX_SMTP_CONNECTIONS', matrix.environment)] }}
-          MAX_TOTAL_FILE_SIZE=${{ secrets[format('{0}_MAX_TOTAL_FILE_SIZE', matrix.environment)] }}
-          NAME=${{ secrets[format('{0}_NAME', matrix.environment)] }}
-          NODE_ENV=${{ secrets[format('{0}_NODE_ENV', matrix.environment)] }}
-          OPENAI_API_KEY=${{ secrets[format('{0}_OPENAI_API_KEY', matrix.environment)] }}
-          OPENAI_ASSISTANT_DEFAULT_MODEL=${{ secrets[format('{0}_OPENAI_ASSISTANT_DEFAULT_MODEL', matrix.environment)] }}
-          OPEN_AI_EMBEDDING_MODEL=${{ secrets[format('{0}_OPEN_AI_EMBEDDING_MODEL', matrix.environment)] }}
-          OPEN_AI_MODEL=${{ secrets[format('{0}_OPEN_AI_MODEL', matrix.environment)] }}
-          QUICK_MAIL_VALIDATOR_API=${{ secrets[format('{0}_QUICK_MAIL_VALIDATOR_API', matrix.environment)] }}
-          REDIS_IP=${{ secrets[format('{0}_REDIS_IP', matrix.environment)] }}
-          REDIS_PASSWORD=${{ secrets[format('{0}_REDIS_PASSWORD', matrix.environment)] }}
-          REDIS_PORT=${{ secrets[format('{0}_REDIS_PORT', matrix.environment)] }}
-          SENDGRID_KEY=${{ secrets[format('{0}_SENDGRID_KEY', matrix.environment)] }}
-          SERVER_HOST=${{ secrets[format('{0}_SERVER_HOST', matrix.environment)] }}
-          SERVER_SSH_KEY=${{ secrets[format('{0}_SERVER_SSH_KEY', matrix.environment)] }}
-          SERVER_USER=${{ secrets[format('{0}_SERVER_USER', matrix.environment)] }}
-          SIGNUP_ALERT_MAIL=${{ secrets[format('{0}_SIGNUP_ALERT_MAIL', matrix.environment)] }}
-          SUPER_USER_EMAIL=${{ secrets[format('{0}_SUPER_USER_EMAIL', matrix.environment)] }}
-          SUPER_USER=${{ secrets[format('{0}_SUPER_USER', matrix.environment)] }}
-          SUPER_USER_PASSWORD=${{ secrets[format('{0}_SUPER_USER_PASSWORD', matrix.environment)] }}
-          TRAINING_CONTENT_PATH=${{ secrets[format('{0}_TRAINING_CONTENT_PATH', matrix.environment)] }}
-          UPLOADS_FOLDER=${{ secrets[format('{0}_UPLOADS_FOLDER', matrix.environment)] }}
-          VERIFICATION_EXPIRES_IN=${{ secrets[format('{0}_VERIFICATION_EXPIRES_IN', matrix.environment)] }}
-          ZAUTO_API_BASE_URL=${{ secrets[format('{0}_ZAUTO_API_BASE_URL', matrix.environment)] }}
+          APOLLO_API_KEY=${{ secrets.APOLLO_API_KEY }}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_REGION=${{ secrets.AWS_REGION }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          CHROMA_AUTH_CREDENTIALS=${{ secrets.CHROMA_AUTH_CREDENTIALS }}
+          CHROMA_AUTH_PROVIDER=${{ secrets.CHROMA_AUTH_PROVIDER }}
+          CHROMA_URL=${{ secrets.CHROMA_URL }}
+          CHUNCK_SIZE=${{ secrets.CHUNCK_SIZE }}
+          CLAUDE_API_KEY=${{ secrets.CLAUDE_API_KEY }}
+          COHERE_API_KEY=${{ secrets.COHERE_API_KEY }}
+          CONVERTO_EMAIL=${{ secrets.CONVERTO_EMAIL }}
+          CONVERTO_TRAIN_BUCKET_NAME=${{ secrets.CONVERTO_TRAIN_BUCKET_NAME }}
+          COVERTO_PIC_BUCKET_NAME=${{ secrets.COVERTO_PIC_BUCKET_NAME }}
+          CRYPTO_ENCRYPTION_SECRET=${{ secrets.CRYPTO_ENCRYPTION_SECRET }}
+          DATABASE_URL=${{ secrets.DATABASE_URL_BASE }}
+          EMBEDDING_PROVIDER=${{ secrets.EMBEDDING_PROVIDER }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          HOST_PORT=${{ secrets.HOST_PORT }}
+          HOST_URL=${{ secrets.HOST_URL }}
+          IP_DATA_KEY=${{ secrets.IP_DATA_KEY }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          LLM_PROVIDER=${{ secrets.LLM_PROVIDER }}
+          MAX_SMTP_CONNECTIONS=${{ secrets.MAX_SMTP_CONNECTIONS }}
+          MAX_TOTAL_FILE_SIZE=${{ secrets.MAX_TOTAL_FILE_SIZE }}
+          NAME=${{ secrets.NAME }}
+          NODE_ENV=${{ secrets.NODE_ENV }}
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ASSISTANT_DEFAULT_MODEL=${{ secrets.OPENAI_ASSISTANT_DEFAULT_MODEL }}
+          OPEN_AI_EMBEDDING_MODEL=${{ secrets.OPEN_AI_EMBEDDING_MODEL }}
+          OPEN_AI_MODEL=${{ secrets.OPEN_AI_MODEL }}
+          QUICK_MAIL_VALIDATOR_API=${{ secrets.QUICK_MAIL_VALIDATOR_API }}
+          REDIS_IP=${{ secrets.REDIS_IP }}
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          REDIS_PORT=${{ secrets.REDIS_PORT }}
+          SENDGRID_KEY=${{ secrets.SENDGRID_KEY }}
+          SERVER_HOST=${{ secrets.SERVER_HOST }}
+          SERVER_SSH_KEY=${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER=${{ secrets.SERVER_USER }}
+          SIGNUP_ALERT_MAIL=${{ secrets.SIGNUP_ALERT_MAIL }}
+          SUPER_USER_EMAIL=${{ secrets.SUPER_USER_EMAIL }}
+          SUPER_user=${{ secrets.SUPER_user }}
+          SUPER_USER_PASSWORD=${{ secrets.SUPER_USER_PASSWORD }}
+          TRAINING_CONTENT_PATH=${{ secrets.TRAINING_CONTENT_PATH }}
+          UPLOADS_FOLDER=${{ secrets.UPLOADS_FOLDER }}
+          VERIFICATION_EXPIRES_IN=${{ secrets.VERIFICATION_EXPIRES_IN }}
+          ZAUTO_API_BASE_URL=${{ secrets.ZAUTO_API_BASE_URL }}
 
     - name: Build and push Docker image for crm
       if: contains(github.event.head_commit.message, 'crm')
@@ -92,16 +92,16 @@ jobs:
           ghcr.io/zautoai/converto:dev-crm${{ github.sha }}
           ghcr.io/zautoai/converto:dev-crm
         build-args: |
-          REDIS_IP=${{ secrets[format('{0}_REDIS_IP', matrix.environment)] }}
-          REDIS_PASSWORD=${{ secrets[format('{0}_REDIS_PASSWORD', matrix.environment)] }}
-          REDIS_PORT=${{ secrets[format('{0}_REDIS_PORT', matrix.environment)] }}
-          CRM_ACCESS_TOKEN=${{ secrets[format('{0}_CRM_ACCESS_TOKEN', matrix.environment)] }}
-          CRM_API_PORT=${{ secrets[format('{0}_CRM_API_PORT', matrix.environment)] }}
-          CRM_BASE_URL=${{ secrets[format('{0}_CRM_BASE_URL', matrix.environment)] }}
-          CRM_DATABASE_URL=${{ secrets[format('{0}_CRM_DATABASE_URL', matrix.environment)] }}
-          CRM_HOST=${{ secrets[format('{0}_CRM_HOST', matrix.environment)] }}
-          CRM_HOST_PORT=${{ secrets[format('{0}_CRM_HOST_PORT', matrix.environment)] }}
-          CRM_JWT_SECRET=${{ secrets[format('{0}_CRM_JWT_SECRET', matrix.environment)] }}
+          REDIS_IP=${{ secrets.REDIS_IP }}
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          REDIS_PORT=${{ secrets.REDIS_PORT }}
+          CRM_ACCESS_TOKEN=${{ secrets.CRM_ACCESS_TOKEN }}
+          CRM_API_PORT=${{ secrets.CRM_API_PORT }}
+          CRM_BASE_URL=${{ secrets.CRM_BASE_URL }}
+          CRM_DATABASE_URL=${{ secrets.CRM_DATABASE_URL }}
+          CRM_HOST=${{ secrets.CRM_HOST }}
+          CRM_HOST_PORT=${{ secrets.CRM_HOST_PORT }}
+          CRM_JWT_SECRET=${{ secrets.CRM_JWT_SECRET }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -113,43 +113,42 @@ jobs:
     - uses: actions/checkout@v2
     - name: Insert Redis Password
       run: |
-        sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets[format('{0}_REDIS_PASSWORD', matrix.environment)] }}|g" docker-compose.yml
+        sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets.REDIS_PASSWORD }}|g" docker-compose.yml
 
     - name: Show Updated Docker Compose File
       run: cat docker-compose.yml
     - name: Copy Updated Docker Compose File to Server
       uses: appleboy/scp-action@master
       with:
-        host: ${{ secrets[format('{0}_SERVER_HOST', matrix.environment)] }}
-        username: ${{ secrets[format('{0}_SERVER_USER', matrix.environment)] }}
-        key: ${{ secrets[format('{0}_SERVER_SSH_KEY', matrix.environment)] }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
         source: "docker-compose.yml"
         target: "/home/dbserver/converto/"
     - name: Deploy to Local Server
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets[format('{0}_SERVER_HOST', matrix.environment)] }}
-        username: ${{ secrets[format('{0}_SERVER_USER', matrix.environment)] }}
-        key: ${{ secrets[format('{0}_SERVER_SSH_KEY', matrix.environment)] }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           set -x  # Enable debugging
-          docker login ghcr.io -u ${{ secrets.LOGIN_GITHUB_USER }} -p ${{ secrets.LOGIN_GITHUB_TOKEN }}
+          docker login ghcr.io -u ${{ secrets.LOGIN_GITHUB_USER }} -p ${{ secrets.LOGIN_GITHUB_TOKEN }}        
           cd /home/dbserver/converto
           cat docker-compose.yml
           docker-compose pull
           docker-compose up -d
           docker image prune -a -f
-
     - name: Check Health of test Redis Container
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets[format('{0}_SERVER_HOST', matrix.environment)] }}
-        username: ${{ secrets[format('{0}_SERVER_USER', matrix.environment)] }}
-        key: ${{ secrets[format('{0}_SERVER_SSH_KEY', matrix.environment)] }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           set -x
           REDIS_CONTAINER="converto-redis-1"
-          REDIS_PASSWORD=${{ secrets[format('{0}_REDIS_PASSWORD', matrix.environment)] }}
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
           REDIS_HEALTH=$(docker exec $REDIS_CONTAINER redis-cli -a $REDIS_PASSWORD PING)
           if [ "$REDIS_HEALTH" != "PONG" ]; then
           echo "Redis container $REDIS_CONTAINER is not healthy😭"
@@ -161,9 +160,9 @@ jobs:
     - name: Check Health of Base Application Container
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets[format('{0}_SERVER_HOST', matrix.environment)] }}
-        username: ${{ secrets[format('{0}_SERVER_USER', matrix.environment)] }}
-        key: ${{ secrets[format('{0}_SERVER_SSH_KEY', matrix.environment)] }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           BASE_APP_CONTAINER="converto-base-1"
           HEALTH_CHECK_URL="http://localhost:3000/health"
@@ -177,9 +176,9 @@ jobs:
     - name: Check Health of CRM Application Container
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets[format('{0}_SERVER_HOST', matrix.environment)] }}
-        username: ${{ secrets[format('{0}_SERVER_USER', matrix.environment)] }}
-        key: ${{ secrets[format('{0}_SERVER_SSH_KEY', matrix.environment)] }}
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           CRM_APP_CONTAINER="converto-crm-1"
           HEALTH_CHECK_URL="http://localhost:3001/api/v1/ping"
