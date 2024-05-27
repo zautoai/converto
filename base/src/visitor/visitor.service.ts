@@ -1,17 +1,69 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVisitorDto } from './dto/create-visitor.dto';
 import { UpdateVisitorDto } from './dto/update-visitor.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateVisitDto } from './dto/create-visit.dto';
 import { ServiceParams } from 'src/common/models/service-param.model';
 import { BaseService } from 'src/common/services/base.service';
+import { CreateSessionDto } from './dto/create-session.dto';
+import { IPTrackingService } from 'src/common/services/iptracking.service';
 
 @Injectable()
 export class VisitorService extends BaseService {
 
-  constructor() {
+  constructor(private readonly iptrackingService: IPTrackingService) {
     super();
+  }
+
+  async createSession(serviceParams: ServiceParams<{createSessionDto:CreateSessionDto , request: Request}>)
+  {
+    const { orgId, data: { createSessionDto, request } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    try 
+    {
+      const ipAddress = request.headers['x-forwarded-for'] as string;
+      const ipData = await this.iptrackingService.getIPData(ipAddress);
+      const headers = request.headers;
+      delete headers['Authorization']
+      delete headers['Proxy-Authorization']
+      const visitorObj = {
+        infoJson: JSON.stringify(headers),
+        userAgent: headers['user-agent'],
+        ipAddress: ipAddress,
+        trackingInfo: JSON.stringify(ipData)
+      };
+      if(!createSessionDto.visitorId)
+      {
+        const newVisitor = await this.create({orgId,data:visitorObj});
+        const newVisit = await this.createOrUpdateVisit({orgId, data: { 
+          visitorId: newVisitor.id, 
+          source: createSessionDto.source,
+          campaignId: createSessionDto.campaignId
+        }});
+        return {
+          visitorId: newVisitor.id,
+          visitId: newVisit.id
+        }
+      }
+      else
+      {
+        const visit = await this.createOrUpdateVisit({orgId, data: { 
+          visitorId: createSessionDto.visitorId, 
+          source: createSessionDto.source,
+          campaignId: createSessionDto.campaignId
+        }});
+        return {
+          visitorId: createSessionDto.visitorId,
+          visitId: visit.id
+        };
+      }
+    } 
+    catch (err) {
+      throw err;
+    } 
+    finally {
+      await this.closeConnection(orgId);
+    }
   }
 
   async create(serviceParams: ServiceParams<CreateVisitorDto>): Promise<any> {

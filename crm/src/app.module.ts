@@ -20,6 +20,8 @@ import { CustomFieldsModule } from './custom-fields/custom-fields.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MicroservicesModule } from './microservices/microservices.module';
 import { ExternalCrmModule } from './external-crm/external-crm.module';
+import { SegmentsModule } from './segments/segments.module';
+import { SegmentCategoryModule } from './segment-category/segment-category.module';
 
 @Module({
   imports: [
@@ -45,6 +47,8 @@ import { ExternalCrmModule } from './external-crm/external-crm.module';
     CustomFieldsModule,
     MicroservicesModule,
     ExternalCrmModule,
+    SegmentsModule,
+    SegmentCategoryModule
   ],
   controllers: [AppController],
   providers: [AppService],

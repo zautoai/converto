@@ -194,23 +194,23 @@ CREATE TABLE "CrmMapping" (
 );
 
 -- CreateTable
-CREATE TABLE "SegementCategory" (
+CREATE TABLE "SegmentCategory" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
-    "color" TEXT NOT NULL,
+    "color" TEXT DEFAULT '#ffffff',
 
-    CONSTRAINT "SegementCategory_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "SegmentCategory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Segement" (
+CREATE TABLE "Segment" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
-    "segementCategoryId" TEXT NOT NULL,
+    "segmentCategoryId" TEXT NOT NULL,
 
-    CONSTRAINT "Segement_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Segment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -232,7 +232,7 @@ CREATE UNIQUE INDEX "LeadFormField_leadFormId_contactField_key" ON "LeadFormFiel
 CREATE UNIQUE INDEX "CrmMapping_objectType_fieldName_externalCRMObjectType_exter_key" ON "CrmMapping"("objectType", "fieldName", "externalCRMObjectType", "externalCRMFieldName");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SegementCategory_name_key" ON "SegementCategory"("name");
+CREATE UNIQUE INDEX "SegmentCategory_name_key" ON "SegmentCategory"("name");
 
 -- AddForeignKey
 ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -253,4 +253,4 @@ ALTER TABLE "LeadFormField" ADD CONSTRAINT "LeadFormField_leadFormId_fkey" FOREI
 ALTER TABLE "Account" ADD CONSTRAINT "Account_parentAccountId_fkey" FOREIGN KEY ("parentAccountId") REFERENCES "Account"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Segement" ADD CONSTRAINT "Segement_segementCategoryId_fkey" FOREIGN KEY ("segementCategoryId") REFERENCES "SegementCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Segment" ADD CONSTRAINT "Segment_segmentCategoryId_fkey" FOREIGN KEY ("segmentCategoryId") REFERENCES "SegmentCategory"("id") ON DELETE CASCADE ON UPDATE CASCADE;
