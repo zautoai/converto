@@ -23,6 +23,7 @@ import { error } from 'console';
   styleUrl: './account.component.scss',
 })
 export class AccountsComponent implements OnInit {
+isHovered: any;
   
 onMouseEnter(data: any) {
 this.hoveredData=data;

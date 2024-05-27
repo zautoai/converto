@@ -40,6 +40,7 @@
             <ng-container>
               <tr
                 *ngFor="let data of submittedData"
+                [style.z-index]="isHovered ? 10 : 1"
                 (mouseenter)="onMouseEnter(data)"
               >
                 <td>
@@ -670,8 +671,9 @@
 <ng-template #popTitle>
   <!-- <h5 class="card-title">Account Overview</h5> -->
 </ng-template>
+
 <ng-template #popContent>
-  <div class="card mb-3" style="max-width: 1800px">
+  <div class="card mb-3">
     <div class="card-body text-primary">
       <p class="card-text">
         <strong>Account Name:</strong> {{ hoveredData.accountName }}<br />
@@ -718,10 +720,17 @@
       </div>
 
       <div class="badge-group mt-3">
-        <span class="badge badge-light text-dark mr-1 mx-3">Mid Market</span>
-        <span class="badge badge-light text-dark mr-1">High Potential</span>
+        <span class="badge badge-light text-dark mr-1 mx-3">Lead Scoring</span>
+        <span class="badge badge-light text-dark mr-1">Intent Scoring</span>
         <!-- Add more labels here -->
       </div>
+      <br />
+      <p class="card-text">
+        <strong>Company Size:</strong> {{ hoveredData.accountName }}<br />
+        <strong>Location:</strong> {{ hoveredData.industry }}<br />
+        <strong>Company Size:</strong> {{ hoveredData.accountName }}<br />
+        <strong>Location:</strong> {{ hoveredData.industry }}<br />
+      </p>
     </div>
   </div>
 </ng-template>
