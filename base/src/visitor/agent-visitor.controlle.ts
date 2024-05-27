@@ -9,6 +9,8 @@ import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Visitor } from './entities/visitor.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ZautoRequest } from 'src/common/models/request.model';
+import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
+import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
 
 
 @ApiTags('Visitors')
@@ -18,24 +20,25 @@ export class AgentVisitorController {
 
 
 
-  @Get()
-  @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @ApiBearerAuth()
-  @ApiQuery({ name: 'page', description: 'Page number.', required: false })
-  @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
-  @ApiResponse({
-    type: ResponseDTO<Visitor>
-  })
-  async findAll(@Param('agentId') agentId: string, @Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
-    if(request.user && request.user.orgId)
-    {
-      const orgId = request.user.orgId;
-      return await this.visitorService.findAllByAgent({orgId,agentId,data:paginationDto});
-    }
-    else
-    {
-      throw new UnauthorizedException("Unauthorised access.")
-    }
-  }
+  // @Get()
+  // @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @ApiBearerAuth()
+  // @ApiQuery({ name: 'page', description: 'Page number.', required: false })
+  // @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
+  // @ApiResponse({
+  //   type: ResponseDTO<Visitor>
+  // })
+  // async findAll(@Param('agentId') agentId: string, @Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
+  //   if(request.user && request.user.orgId)
+  //   {
+  //     const orgId = request.user.orgId;
+  //     return await this.visitorService.findAllByAgent({orgId,agentId,data:paginationDto});
+  //   }
+  //   else
+  //   {
+  //     throw new UnauthorizedException("Unauthorised access.")
+  //   }
+  // }
+
 }

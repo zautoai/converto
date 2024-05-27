@@ -13,6 +13,8 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
 import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
+import { CreateVisitDto } from './dto/create-visit.dto';
+import { CreateSessionDto } from './dto/create-session.dto';
 
 
 @ApiTags('Visitors')
@@ -22,10 +24,11 @@ export class VisitorController {
 
   @Post()
   @UseGuards(SubdomainGuard)
-  async create(@Body() createVisitorDto: CreateVisitorDto, @Req() request: SubdomainRequest) {
-    const orgId = request.orgId;
+  @ApiBearerAuth("x-tenant-id")
+  async create(@Query() createSessionDto: CreateSessionDto,@Req() request: Request) {
+    const orgId = request["orgId"];
     if(orgId) {
-      return await this.visitorService.create({ orgId, data: createVisitorDto});
+      return await this.visitorService.createSession({orgId, data:{ createSessionDto, request}});
     } else {
       throw new UnauthorizedException('Org info not found.')
     }
