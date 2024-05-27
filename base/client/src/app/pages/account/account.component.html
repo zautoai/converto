@@ -40,44 +40,47 @@
             <ng-container>
               <tr
                 *ngFor="let data of submittedData"
+                [style.z-index]="isHovered ? 10 : 1"
                 (mouseenter)="onMouseEnter(data)"
               >
                 <td>
-                  <button [ngbPopover]="popContent" [popoverTitle]="popTitle">
-                    {{ data.accountName }}
+                  <button type="button" (mouseenter)="openModal(data)">
+                    {{ data?.accountName }}
                   </button>
                 </td>
                 <td>
-                  <button>
-                    {{ data.industry }}
+                  <button type="button" (mouseenter)="openModal(data)">
+                    {{ data?.industry }}
                   </button>
                 </td>
                 <td>
-                  <button>
-                    {{ data.companySize }}
+                  <button type="button" (mouseenter)="openModal(data)">
+                    {{ data?.companySize }}
                   </button>
                 </td>
                 <td>
-                  <button>
+                  <button type="button" (mouseenter)="openModal(data)">
                     {{ data.city }}
                   </button>
                 </td>
 
                 <td>
-                  <button>{{ data.annualRevenue }}</button>
+                  <button type="button" (mouseenter)="openModal(data)">
+                    {{ data.annualRevenue }}
+                  </button>
                 </td>
                 <td>
-                  <button>
+                  <button type="button" (mouseenter)="openModal(data)">
                     {{ data.status }}
                   </button>
                 </td>
                 <td>
-                  <button>
+                  <button type="button" (mouseenter)="openModal(data)">
                     {{ data.Score }}
                   </button>
                 </td>
                 <td>
-                  <button>
+                  <button type="button" (mouseenter)="openModal(data)">
                     {{ data.Engagement }}
                   </button>
                 </td>
@@ -670,8 +673,9 @@
 <ng-template #popTitle>
   <!-- <h5 class="card-title">Account Overview</h5> -->
 </ng-template>
-<ng-template #popContent>
-  <div class="card mb-3" style="max-width: 1800px">
+
+<!-- <ng-template #popContent>
+  <div class="card mb-3 mt-4" style="max-width: 100%">
     <div class="card-body text-primary">
       <p class="card-text">
         <strong>Account Name:</strong> {{ hoveredData.accountName }}<br />
@@ -718,10 +722,100 @@
       </div>
 
       <div class="badge-group mt-3">
-        <span class="badge badge-light text-dark mr-1 mx-3">Mid Market</span>
-        <span class="badge badge-light text-dark mr-1">High Potential</span>
-        <!-- Add more labels here -->
-      </div>
+        <span class="badge badge-light text-dark mr-1 mx-3">Lead Scoring</span>
+        <span class="badge badge-light text-dark mr-1">Intent Scoring</span>
+      Add more labels here -->
+<!-- </div>
+      <br />
+      <p class="card-text">
+        <strong>Company Size:</strong> {{ hoveredData.accountName }}<br />
+        <strong>Location:</strong> {{ hoveredData.industry }}<br />
+        <strong>Company Size:</strong> {{ hoveredData.accountName }}<br />
+        <strong>Location:</strong> {{ hoveredData.industry }}<br />
+        <strong>Company Size:</strong> {{ hoveredData.accountName }}<br />
+        <strong>Location:</strong> {{ hoveredData.industry }}<br />
+      </p>
     </div>
   </div>
+</ng-template> -->
+<ng-template #modalContent let-modal let-data="hoveredData">
+  <div class="modal-header">
+    <h4 class="modal-title">Overview</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" style="padding: 20px">
+    <p class="card-text">
+      <strong>Account Name:</strong> {{ hoveredData.accountName }}<br />
+      <strong>Industry:</strong> {{ hoveredData.industry }}<br />
+    </p>
+    <div class="d-flex">
+      <div class="col-6 mt-3">
+        <div class="single-chart">
+          <svg viewBox="0 0 36 36" class="circular-chart blue">
+            <path
+              class="circle-bg"
+              d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9045 0 0 1 0 -31.831"
+            />
+            <path
+              class="circle"
+              stroke-dasharray="70, 100"
+              d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <text x="18" y="20.35" class="percentage">90%</text>
+          </svg>
+          <span class="badge badge-light text-dark mr-1 mx-3"
+            >Lead Scoring</span
+          >
+        </div>
+      </div>
+
+      <div class="col-6 mt-3">
+        <div class="single-chart">
+          <svg viewBox="0 0 36 36" class="circular-chart green">
+            <path
+              class="circle-bg"
+              d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9045 0 0 1 0 -31.831"
+            />
+            <path
+              class="circle"
+              stroke-dasharray="70, 100"
+              d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <text x="18" y="20.35" class="percentage">75%</text>
+          </svg>
+          <span class="badge badge-light text-dark">Intent Scoring</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="badge-group mt-3">
+      <!-- Add more labels here -->
+    </div>
+    <br />
+    <p class="card-text">
+      <strong>Company Size:</strong> {{ hoveredData.companySize }}<br />
+      <strong>Location:</strong> {{ hoveredData.location }}<br />
+      <strong>Company Size:</strong> {{ hoveredData.companySize }}<br />
+      <strong>Company Size:</strong> {{ hoveredData.companySize }}<br />
+      <strong>Company Size:</strong> {{ hoveredData.companySize }}<br />
+      <strong>Location:</strong> {{ hoveredData.location }}<br />
+      <strong>Location:</strong> {{ hoveredData.location }}<br />
+      <strong>Location:</strong> {{ hoveredData.location }}<br />
+    </p>
+  </div>
 </ng-template>
+<ng-template
+  [ngbModalContent]="modalContent"
+  [ngbModalClose]="'Close click'"
+></ng-template>
