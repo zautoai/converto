@@ -1,3 +1,5 @@
+name: Build and Deploy
+
 on:
   push:
     branches: [ dev ]
@@ -5,11 +7,10 @@ on:
       - 'base/**'
       - 'crm/**'
 
-
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    environment: Dev
     steps:
     - uses: actions/checkout@v2
     - name: Set up Docker Buildx
@@ -18,8 +19,8 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: ghcr.io
-        username: ${{ env.LOGIN_GITHUB_USER }}
-        password: ${{ env.LOGIN_GITHUB_TOKEN }}
+        username: ${{ secrets.LOGIN_GITHUB_USER }}
+        password: ${{ secrets.LOGIN_GITHUB_TOKEN }}
     - name: Build and push Docker image for base
       if: contains(github.event.head_commit.message, 'base')
       uses: docker/build-push-action@v2
@@ -31,54 +32,52 @@ jobs:
           ghcr.io/zautoai/converto:dev-base${{ github.sha }}
           ghcr.io/zautoai/converto:dev-base
         build-args: |
-          APOLLO_API_KEY=${{ env.APOLLO_API_KEY }}
-          AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
-          AWS_REGION=${{ env.AWS_REGION }}
-          AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
-          CHROMA_AUTH_CREDENTIALS=${{ env.CHROMA_AUTH_CREDENTIALS }}
-          CHROMA_AUTH_PROVIDER=${{ env.CHROMA_AUTH_PROVIDER }}
-          CHROMA_URL=${{ env.CHROMA_URL }}
-          CHUNCK_SIZE=${{ env.CHUNCK_SIZE }}
-          CLAUDE_API_KEY=${{ env.CLAUDE_API_KEY }}
-          COHERE_API_KEY=${{ env.COHERE_API_KEY }}
-          CONVERTO_EMAIL=${{ env.CONVERTO_EMAIL }}
-          CONVERTO_TRAIN_BUCKET_NAME=${{ env.CONVERTO_TRAIN_BUCKET_NAME }}
-          COVERTO_PIC_BUCKET_NAME=${{ env.COVERTO_PIC_BUCKET_NAME }}
-          CRYPTO_ENCRYPTION_SECRET=${{ env.CRYPTO_ENCRYPTION_SECRET }}
-          DATABASE_URL=${{ env.DATABASE_URL_BASE }}
-          EMBEDDING_PROVIDER=${{ env.EMBEDDING_PROVIDER }}
-          GITHUB_TOKEN=${{ env.LOGIN_GITHUB_TOKEN }}
-          GITHUB_USER=${{ env.LOGIN_GITHUB_USER }}
-          GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
-          HOST_PORT=${{ env.HOST_PORT }}
-          HOST_URL=${{ env.HOST_URL }}
-          IP_DATA_KEY=${{ env.IP_DATA_KEY }}
-          JWT_SECRET=${{ env.JWT_SECRET }}
-          LLM_PROVIDER=${{ env.LLM_PROVIDER }}
-          MAX_SMTP_CONNECTIONS=${{ env.MAX_SMTP_CONNECTIONS }}
-          MAX_TOTAL_FILE_SIZE=${{ env.MAX_TOTAL_FILE_SIZE }}
-          NAME=${{ env.NAME }}
-          NODE_ENV=${{ env.NODE_ENV }}
-          OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
-          OPENAI_ASSISTANT_DEFAULT_MODEL=${{ env.OPENAI_ASSISTANT_DEFAULT_MODEL }}
-          OPEN_AI_EMBEDDING_MODEL=${{ env.OPEN_AI_EMBEDDING_MODEL }}
-          OPEN_AI_MODEL=${{ env.OPEN_AI_MODEL }}
-          QUICK_MAIL_VALIDATOR_API=${{ env.QUICK_MAIL_VALIDATOR_API }}
-          REDIS_IP=${{ env.REDIS_IP }}
-          REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
-          REDIS_PORT=${{ env.REDIS_PORT }}
-          SENDGRID_KEY=${{ env.SENDGRID_KEY }}
-          SERVER_HOST=${{ env.SERVER_HOST }}
-          SERVER_SSH_KEY=${{ env.SERVER_SSH_KEY }}
-          SERVER_USER=${{ env.SERVER_USER }}
-          SIGNUP_ALERT_MAIL=${{ env.SIGNUP_ALERT_MAIL }}
-          SUPER_USER_EMAIL=${{ env.SUPER_USER_EMAIL }}
-          SUPER_user=${{ env.SUPER_user }}
-          SUPER_USER_PASSWORD=${{ env.SUPER_USER_PASSWORD }}
-          TRAINING_CONTENT_PATH=${{ env.TRAINING_CONTENT_PATH }}
-          UPLOADS_FOLDER=${{ env.UPLOADS_FOLDER }}
-          VERIFICATION_EXPIRES_IN=${{ env.VERIFICATION_EXPIRES_IN }}
-          ZAUTO_API_BASE_URL=${{ env.ZAUTO_API_BASE_URL }}
+          APOLLO_API_KEY=${{ secrets.APOLLO_API_KEY }}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_REGION=${{ secrets.AWS_REGION }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          CHROMA_AUTH_CREDENTIALS=${{ secrets.CHROMA_AUTH_CREDENTIALS }}
+          CHROMA_AUTH_PROVIDER=${{ secrets.CHROMA_AUTH_PROVIDER }}
+          CHROMA_URL=${{ secrets.CHROMA_URL }}
+          CHUNCK_SIZE=${{ secrets.CHUNCK_SIZE }}
+          CLAUDE_API_KEY=${{ secrets.CLAUDE_API_KEY }}
+          COHERE_API_KEY=${{ secrets.COHERE_API_KEY }}
+          CONVERTO_EMAIL=${{ secrets.CONVERTO_EMAIL }}
+          CONVERTO_TRAIN_BUCKET_NAME=${{ secrets.CONVERTO_TRAIN_BUCKET_NAME }}
+          COVERTO_PIC_BUCKET_NAME=${{ secrets.COVERTO_PIC_BUCKET_NAME }}
+          CRYPTO_ENCRYPTION_SECRET=${{ secrets.CRYPTO_ENCRYPTION_SECRET }}
+          DATABASE_URL=${{ secrets.DATABASE_URL_BASE }}
+          EMBEDDING_PROVIDER=${{ secrets.EMBEDDING_PROVIDER }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          HOST_PORT=${{ secrets.HOST_PORT }}
+          HOST_URL=${{ secrets.HOST_URL }}
+          IP_DATA_KEY=${{ secrets.IP_DATA_KEY }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          LLM_PROVIDER=${{ secrets.LLM_PROVIDER }}
+          MAX_SMTP_CONNECTIONS=${{ secrets.MAX_SMTP_CONNECTIONS }}
+          MAX_TOTAL_FILE_SIZE=${{ secrets.MAX_TOTAL_FILE_SIZE }}
+          NAME=${{ secrets.NAME }}
+          NODE_ENV=${{ secrets.NODE_ENV }}
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          OPENAI_ASSISTANT_DEFAULT_MODEL=${{ secrets.OPENAI_ASSISTANT_DEFAULT_MODEL }}
+          OPEN_AI_EMBEDDING_MODEL=${{ secrets.OPEN_AI_EMBEDDING_MODEL }}
+          OPEN_AI_MODEL=${{ secrets.OPEN_AI_MODEL }}
+          QUICK_MAIL_VALIDATOR_API=${{ secrets.QUICK_MAIL_VALIDATOR_API }}
+          REDIS_IP=${{ secrets.REDIS_IP }}
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          REDIS_PORT=${{ secrets.REDIS_PORT }}
+          SENDGRID_KEY=${{ secrets.SENDGRID_KEY }}
+          SERVER_HOST=${{ secrets.SERVER_HOST }}
+          SERVER_SSH_KEY=${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER=${{ secrets.SERVER_USER }}
+          SIGNUP_ALERT_MAIL=${{ secrets.SIGNUP_ALERT_MAIL }}
+          SUPER_USER_EMAIL=${{ secrets.SUPER_USER_EMAIL }}
+          SUPER_user=${{ secrets.SUPER_user }}
+          SUPER_USER_PASSWORD=${{ secrets.SUPER_USER_PASSWORD }}
+          TRAINING_CONTENT_PATH=${{ secrets.TRAINING_CONTENT_PATH }}
+          UPLOADS_FOLDER=${{ secrets.UPLOADS_FOLDER }}
+          VERIFICATION_EXPIRES_IN=${{ secrets.VERIFICATION_EXPIRES_IN }}
+          ZAUTO_API_BASE_URL=${{ secrets.ZAUTO_API_BASE_URL }}
 
     - name: Build and push Docker image for crm
       if: contains(github.event.head_commit.message, 'crm')
@@ -91,25 +90,26 @@ jobs:
           ghcr.io/zautoai/converto:dev-crm${{ github.sha }}
           ghcr.io/zautoai/converto:dev-crm
         build-args: |
-          REDIS_IP=${{ env.REDIS_IP }}
-          REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
-          REDIS_PORT=${{ env.REDIS_PORT }}
-          CRM_ACCESS_TOKEN=${{ env.CRM_ACCESS_TOKEN }}
-          CRM_API_PORT=${{ env.CRM_API_PORT }}
-          CRM_BASE_URL=${{ env.CRM_BASE_URL }}
-          CRM_DATABASE_URL=${{ env.CRM_DATABASE_URL }}
-          CRM_HOST=${{ env.CRM_HOST }}
-          CRM_HOST_PORT=${{ env.CRM_HOST_PORT }}
-          CRM_JWT_SECRET=${{ env.CRM_JWT_SECRET }}
+          REDIS_IP=${{ secrets.REDIS_IP }}
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          REDIS_PORT=${{ secrets.REDIS_PORT }}
+          CRM_ACCESS_TOKEN=${{ secrets.CRM_ACCESS_TOKEN }}
+          CRM_API_PORT=${{ secrets.CRM_API_PORT }}
+          CRM_BASE_URL=${{ secrets.CRM_BASE_URL }}
+          CRM_DATABASE_URL=${{ secrets.CRM_DATABASE_URL }}
+          CRM_HOST=${{ secrets.CRM_HOST }}
+          CRM_HOST_PORT=${{ secrets.CRM_HOST_PORT }}
+          CRM_JWT_SECRET=${{ secrets.CRM_JWT_SECRET }}
 
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
+    environment: Dev
     steps:
     - uses: actions/checkout@v2
     - name: Insert Redis Password
       run: |
-        sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ env.REDIS_PASSWORD }}|g" docker-compose.yml
+        sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets.REDIS_PASSWORD }}|g" docker-compose.yml
 
     - name: Show Updated Docker Compose File
       run: cat docker-compose.yml
@@ -135,7 +135,7 @@ jobs:
           docker-compose pull
           docker-compose up -d
           docker image prune -a -f
-    - name: Check Health of test Redis Container
+    - name: Check Health of Redis Container
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SERVER_HOST }}
@@ -144,13 +144,13 @@ jobs:
         script: |
           set -x
           REDIS_CONTAINER="converto-redis-1"
-          REDIS_PASSWORD=${{ env.REDIS_PASSWORD }}
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
           REDIS_HEALTH=$(docker exec $REDIS_CONTAINER redis-cli -a $REDIS_PASSWORD PING)
           if [ "$REDIS_HEALTH" != "PONG" ]; then
-          echo "Redis container $REDIS_CONTAINER is not healthy😭"
-          exit 1
+            echo "Redis container $REDIS_CONTAINER is not healthy😭"
+            exit 1
           else
-          echo "Redis container $REDIS_CONTAINER is healthy😂"
+            echo "Redis container $REDIS_CONTAINER is healthy😂"
           fi
 
     - name: Check Health of Base Application Container
@@ -163,10 +163,10 @@ jobs:
           BASE_APP_CONTAINER="converto-base-1"
           HEALTH_CHECK_URL="http://localhost:3000/health"
           if curl --fail $HEALTH_CHECK_URL; then
-          echo "Container $BASE_APP_CONTAINER is healthy"
+            echo "Container $BASE_APP_CONTAINER is healthy"
           else
-          echo "Container $BASE_APP_CONTAINER is not healthy😭"
-          exit 1
+            echo "Container $BASE_APP_CONTAINER is not healthy😭"
+            exit 1
           fi
 
     - name: Check Health of CRM Application Container
@@ -179,10 +179,11 @@ jobs:
           CRM_APP_CONTAINER="converto-crm-1"
           HEALTH_CHECK_URL="http://localhost:3001/api/v1/ping"
           if curl --fail $HEALTH_CHECK_URL; then
-          echo "Container $CRM_APP_CONTAINER is healthy"
+            echo "Container $CRM_APP_CONTAINER is healthy"
           else
-          echo "Container $CRM_APP_CONTAINER is not healthy😭"
-          exit 1
+            echo "Container $CRM_APP_CONTAINER is not healthy😭"
+            exit 1
           fi
+
     - name: Deployment Success Message
-      run: echo "Deployment completed successfully!🎉😂
+      run: echo "Deployment completed successfully!🎉😂"
