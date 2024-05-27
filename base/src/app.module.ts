@@ -45,6 +45,8 @@ import { EnrichmentModule } from './enrichment/enrichment.module';
 import { ExternalCrmModule } from './external-crm/external-crm.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { SchemaManagerModule } from './schema-manager/schema-manager.module';
+import { SegmentsModule } from './segments/segments.module';
+import { SegmentCategoryModule } from './segment-category/segment-category.module';
 
 @Module({
   imports: [
@@ -107,6 +109,8 @@ import { SchemaManagerModule } from './schema-manager/schema-manager.module';
     EnrichmentModule,
     ExternalCrmModule,
     CalendarModule,
+    SegmentsModule,
+    SegmentCategoryModule,
 
   ],
   controllers: [AppController],
