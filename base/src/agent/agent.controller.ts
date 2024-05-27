@@ -355,9 +355,9 @@ export class AgentController {
   }
 
   @Post(':agentId/track/:convId')
-  async websiteTracking(@Param('agentId') agentId: string,@Param('convId') convId: string,@Body() trackingDto:TrackingDto, @Req() request: Request)
+  async websiteTracking(@Param('agentId') agentId: string,@Param('convId') convId: string,@Body() trackingDto:TrackingDto, @Req() request: ZautoRequest)
   {
-    const orgId = request.headers['org-id']; 
+    const orgId = request.orgId;
     return await this.trackingService.addTracking({ orgId ,data:{convId, trackingDto}});
   }
 }

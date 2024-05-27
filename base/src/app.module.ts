@@ -45,6 +45,7 @@ import { EnrichmentModule } from './enrichment/enrichment.module';
 import { ExternalCrmModule } from './external-crm/external-crm.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { SchemaManagerModule } from './schema-manager/schema-manager.module';
+import { ProspectjourneyModule } from './prospect-journey/prospect-journey.module';
 import { SegmentsModule } from './segments/segments.module';
 import { SegmentCategoryModule } from './segment-category/segment-category.module';
 
@@ -109,6 +110,7 @@ import { SegmentCategoryModule } from './segment-category/segment-category.modul
     EnrichmentModule,
     ExternalCrmModule,
     CalendarModule,
+    ProspectjourneyModule,
     SegmentsModule,
     SegmentCategoryModule,
 
