@@ -41,4 +41,9 @@ export class CreateProspectjourneyDto {
     @IsOptional()
     @IsNumber()
     scrollDepth:number = 0;
+
+    @ApiProperty({description:'scroll depth'})
+    @IsNotEmpty()
+    @IsString()
+    url:string;
 }

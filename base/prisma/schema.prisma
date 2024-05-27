@@ -411,6 +411,7 @@ model ProspecJourney {
   id          String              @id @default(uuid())
   visitId     String
   data        String?
+  url         String
   type        ProspecActivityType @default(OTHER)
   timeSpend   Int                 @default(0)
   score       Float               @default(0.0)
