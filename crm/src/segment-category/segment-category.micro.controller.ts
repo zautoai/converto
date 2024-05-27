@@ -9,28 +9,49 @@ export class SegmentCategoryMicroController {
         private readonly segmentCategoryService: SegmentCategoryService
     ) { }
 
-    @MessagePattern('CREATE_SEGMENT_CATEGORY')
+    @MessagePattern({ cmd: 'CREATE_SEGMENT_CATEGORY' })
     async createSegmentCategory(data: any) {
-        return await this.segmentCategoryService.create(data.orgId, data.segmentCategory);
+        try {
+            return await this.segmentCategoryService.create(data.orgId, data.segmentCategory);
+        }
+        catch (error) {
+            return error.response || error
+        }
     }
 
-    @MessagePattern('GET_SEGMENT_CATEGORIES')
+    @MessagePattern({ cmd: 'GET_SEGMENT_CATEGORIES' })
     async getSegmentCategories(data: any) {
-        return await this.segmentCategoryService.findAll(data.orgId);
+        try {
+            return await this.segmentCategoryService.findAll(data.orgId);
+        } catch (error) {
+            return error.response || error
+        }
     }
 
-    @MessagePattern('GET_SEGMENT_CATEGORY')
+    @MessagePattern({ cmd: 'GET_SEGMENT_CATEGORY' })
     async getSegmentCategory(data: any) {
-        return await this.segmentCategoryService.findOne(data.orgId, data.id);
+        try {
+            return await this.segmentCategoryService.findOne(data.orgId, data.id);
+        } catch (error) {
+            return error.response || error
+        }
     }
 
-    @MessagePattern('UPDATE_SEGMENT_CATEGORY')
+    @MessagePattern({ cmd: 'UPDATE_SEGMENT_CATEGORY' })
     async updateSegmentCategory(data: any) {
-        return await this.segmentCategoryService.update(data.orgId, data.id, data.segmentCategory);
+        try {
+            return await this.segmentCategoryService.update(data.orgId, data.id, data.segmentCategory);
+        } catch (error) {
+            return error.response || error
+        }
     }
 
-    @MessagePattern('DELETE_SEGMENT_CATEGORY')
+    @MessagePattern({ cmd: 'DELETE_SEGMENT_CATEGORY' })
     async deleteSegmentCategory(data: any) {
-        return await this.segmentCategoryService.remove(data.orgId, data.id);
+        try {
+            return await this.segmentCategoryService.remove(data.orgId, data.id);
+        } catch (error) {
+            return error.response || error
+        }
     }
 }

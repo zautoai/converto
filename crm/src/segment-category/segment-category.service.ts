@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { CreateSegmentCategoryDto } from './dto/create-segment-category.dto';
 import { UpdateSegmentCategoryDto } from './dto/update-segment-category.dto';
@@ -20,7 +20,7 @@ export class SegmentCategoryService {
         }
       });
       if (existingSegmentCategory) {
-        throw new ConflictException('Segment category with the same name already exists');
+        throw new BadRequestException('Segment category with the same name already exists');
       }
 
       await prisma.segmentCategory.create({

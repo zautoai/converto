@@ -11,28 +11,48 @@ export class SegmentMicroController {
     ) { }
 
 
-    @MessagePattern('CREATE_SEGMENT')
+    @MessagePattern({ cmd: 'CREATE_SEGMENT' })
     async createSegment(data: any) {
-        return await this.segmentsService.create(data.orgId, data.segment);
+        try {
+            return await this.segmentsService.create(data.orgId, data.segment);
+        } catch (error) {
+            return error.response || error
+        }
     }
 
-    @MessagePattern('GET_SEGMENTS')
+    @MessagePattern({ cmd: 'GET_SEGMENTS' })
     async getSegments(data: any) {
-        return await this.segmentsService.findAll(data.orgId);
+        try {
+            return await this.segmentsService.findAll(data.orgId);
+        } catch (error) {
+            return error.response || error
+        }
     }
 
-    @MessagePattern('GET_SEGMENT')
+    @MessagePattern({ cmd: 'GET_SEGMENT' })
     async getSegment(data: any) {
-        return await this.segmentsService.findOne(data.orgId, data.id);
+        try {
+            return await this.segmentsService.findOne(data.orgId, data.id);
+        } catch (error) {
+            return error.response || error
+        }
     }
 
-    @MessagePattern('UPDATE_SEGMENT')
+    @MessagePattern({ cmd: 'UPDATE_SEGMENT' })
     async updateSegment(data: any) {
-        return await this.segmentsService.update(data.orgId, data.id, data.segment);
+        try {
+            return await this.segmentsService.update(data.orgId, data.id, data.segment);
+        } catch (error) {
+            return error.response || error
+        }
     }
 
-    @MessagePattern('DELETE_SEGMENT')
+    @MessagePattern({ cmd: 'DELETE_SEGMENT' })
     async deleteSegment(data: any) {
-        return await this.segmentsService.remove(data.orgId, data.id);
+        try {
+            return await this.segmentsService.remove(data.orgId, data.id);
+        } catch (error) {
+            return error.response || error
+        }
     }
 }
