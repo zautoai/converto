@@ -48,6 +48,7 @@ import { SchemaManagerModule } from './schema-manager/schema-manager.module';
 import { ProspectjourneyModule } from './prospect-journey/prospect-journey.module';
 import { SegmentsModule } from './segments/segments.module';
 import { SegmentCategoryModule } from './segment-category/segment-category.module';
+import { IcpModule } from './icp/icp.module';
 
 @Module({
   imports: [
@@ -113,7 +114,7 @@ import { SegmentCategoryModule } from './segment-category/segment-category.modul
     ProspectjourneyModule,
     SegmentsModule,
     SegmentCategoryModule,
-
+    IcpModule
   ],
   controllers: [AppController],
   providers: [AppService],
