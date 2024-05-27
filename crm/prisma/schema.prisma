@@ -216,4 +216,21 @@ model Segment {
   description       String?
   segmentCategory   SegmentCategory @relation(fields: [segmentCategoryId], references: [id], onDelete: Cascade)
   segmentCategoryId String
+  IcpMap            IcpMap[]
+}
+
+model Icp {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  startValue  Int
+  IcpMap      IcpMap[]
+}
+
+model IcpMap {
+  id        String  @id @default(uuid())
+  icpId     String
+  icp       Icp     @relation(fields: [icpId], references: [id], onDelete: Cascade)
+  segmentId String
+  segment   Segment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
 }

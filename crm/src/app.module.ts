@@ -22,6 +22,7 @@ import { MicroservicesModule } from './microservices/microservices.module';
 import { ExternalCrmModule } from './external-crm/external-crm.module';
 import { SegmentsModule } from './segments/segments.module';
 import { SegmentCategoryModule } from './segment-category/segment-category.module';
+import { IcpModule } from './icp/icp.module';
 
 @Module({
   imports: [
@@ -48,7 +49,8 @@ import { SegmentCategoryModule } from './segment-category/segment-category.modul
     MicroservicesModule,
     ExternalCrmModule,
     SegmentsModule,
-    SegmentCategoryModule
+    SegmentCategoryModule,
+    IcpModule
   ],
   controllers: [AppController],
   providers: [AppService],

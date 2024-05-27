@@ -101,16 +101,17 @@ export class SegmentsService {
         throw new NotFoundException(`Segment not found`);
       }
 
-      const existingSegmentWithSameName = await prisma.segment.findFirst({
-        where: {
-          name
+      if (name) {
+        const existingSegmentWithSameName = await prisma.segment.findFirst({
+          where: {
+            name
+          }
+        });
+
+        if (existingSegmentWithSameName && existingSegmentWithSameName.id !== id) {
+          throw new ConflictException('Segment with the same name already exists');
         }
-      });
-
-      if (existingSegmentWithSameName && existingSegmentWithSameName.id !== id) {
-        throw new ConflictException('Segment with the same name already exists');
       }
-
       const updatedSegment = await prisma.segment.update({
         where: {
           id
