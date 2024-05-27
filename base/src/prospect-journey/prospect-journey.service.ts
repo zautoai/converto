@@ -21,7 +21,7 @@ export class ProspectjourneyService extends BaseService{
       {
         throw new BadRequestException('Invalid session');
       }
-      const prospectjourney = await prisma.prospecjourney.create({data});
+      const prospectjourney = await prisma.prospecJourney.create({data});
       return prospectjourney;
     }
     catch (error)
@@ -37,7 +37,7 @@ export class ProspectjourneyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectJurnies = await prisma.prospecjourney.findMany();
+      const prospectJurnies = await prisma.prospecJourney.findMany();
       return prospectJurnies;
     }
     catch (error)
@@ -53,7 +53,7 @@ export class ProspectjourneyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectjourney = await prisma.prospecjourney.findUnique({where:{id}});
+      const prospectjourney = await prisma.prospecJourney.findUnique({where:{id}});
       return prospectjourney;
     }
     catch (error)
@@ -70,7 +70,7 @@ export class ProspectjourneyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectjourney = await prisma.prospecjourney.update({where:{id:id},data:updateProspectjourneyDto});
+      const prospectjourney = await prisma.prospecJourney.update({where:{id:id},data:updateProspectjourneyDto});
       return prospectjourney;
     }
     catch (error)
@@ -86,7 +86,7 @@ export class ProspectjourneyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectjourney = await prisma.prospecjourney.delete({where:{id:id}});
+      const prospectjourney = await prisma.prospecJourney.delete({where:{id:id}});
       return prospectjourney;
     }
     catch (error)
