@@ -17,7 +17,7 @@ export class IcpController {
   async create(@Req() request: IRequest, @Body() createIcpDto: CreateIcpDto) {
     if (request.orgId) {
       const orgId = request.orgId;
-      return this.icpService.create(orgId, createIcpDto);
+      return await this.icpService.create(orgId, createIcpDto);
     } else {
       throw new UnauthorizedException("Unauthorised access.")
     }
@@ -27,17 +27,17 @@ export class IcpController {
   async findAll(@Req() request: IRequest) {
     if (request.orgId) {
       const orgId = request.orgId;
-      return this.icpService.findAll(orgId);
+      return await this.icpService.findAll(orgId);
     } else {
       throw new UnauthorizedException("Unauthorised access.")
     }
   }
 
   @Get(':id')
-  findOne(@Req() request: IRequest, @Param('id') id: string) {
+  async findOne(@Req() request: IRequest, @Param('id') id: string) {
     if (request.orgId) {
       const orgId = request.orgId;
-      return this.icpService.findOne(orgId, id);
+      return await this.icpService.findOne(orgId, id);
     } else {
       throw new UnauthorizedException("Unauthorised access.")
     }
@@ -47,7 +47,7 @@ export class IcpController {
   async update(@Req() request: IRequest, @Param('id') id: string, @Body() updateIcpDto: UpdateIcpDto) {
     if (request.orgId) {
       const orgId = request.orgId;
-      return this.icpService.update(orgId, id, updateIcpDto);
+      return await this.icpService.update(orgId, id, updateIcpDto);
     } else {
       throw new UnauthorizedException("Unauthorised access.")
     }

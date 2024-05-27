@@ -169,19 +169,21 @@ export class IcpService {
         data: updateIcpDto
       })
 
-      await prisma.icpMap.deleteMany({
-        where: {
-          icpId: id
-        }
-      })
-
-      for (let segmentId of segmentIds) {
-        await prisma.icpMap.create({
-          data: {
-            icpId: id,
-            segmentId
+      if (segmentIds) {
+        await prisma.icpMap.deleteMany({
+          where: {
+            icpId: id
           }
         })
+
+        for (let segmentId of segmentIds) {
+          await prisma.icpMap.create({
+            data: {
+              icpId: id,
+              segmentId
+            }
+          })
+        }
       }
       return {
         code: 200,
