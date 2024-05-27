@@ -20,13 +20,7 @@ export class ProspectjourneyService extends BaseService{
         throw new BadRequestException('Invalid session');
       }
 
-      let prospectjourney = await prisma.prospecJourney.findFirst({
-        where: {
-          visitId: data.visitId,
-          url: data.url,
-          type: ProspecActivityType.PAGE_VIEWED
-        }
-      });
+      let prospectjourney = (data.type == ProspecActivityType.PAGE_VIEWED ) ? await prisma.prospecJourney.findFirst({where: {visitId: data.visitId,url: data.url,type: data.type}}) : null;
       if (prospectjourney) {
         prospectjourney = await prisma.prospecJourney.update({ where:{id:prospectjourney.id},data });
       }
