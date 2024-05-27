@@ -11,6 +11,8 @@ RUN npm install
 # Copy the rest of your source code
 COPY . .
 
+RUN npx prisma generate
+
 # Build your application.
 RUN npm run build:dev
 RUN npm install -g npx --force
