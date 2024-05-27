@@ -2,7 +2,7 @@
 FROM node:20 AS builder
 WORKDIR /usr/src/app 
 
-# Copy the package.json and package-lock.json (if available)
+# Copy the package.json and package-lock.json (if available).
 COPY package*.json ./
 
 # Install all dependencies
@@ -10,6 +10,8 @@ RUN npm install
 
 # Copy the rest of your source code
 COPY . .
+
+RUN npx prisma generate
 
 # Build your application.
 RUN npm run build:dev
