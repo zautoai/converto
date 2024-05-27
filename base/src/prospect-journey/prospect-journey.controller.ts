@@ -9,7 +9,7 @@ import { CreateProspectjourneyDto } from './dto/create-prospect-journey.dto';
 import { UpdateProspectjourneyDto } from './dto/update-prospect-journey.dto';
 
 @ApiTags('Prospect journey')
-@Controller('prospect-journey')
+@Controller('api/prospect-journey')
 export class ProspectjourneyController {
   constructor(private readonly prospectjourneyService: ProspectjourneyService) {}
 
