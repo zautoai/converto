@@ -4,6 +4,7 @@ import {
   ElementRef,
   Input,
   OnInit,
+  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -15,6 +16,7 @@ import { RestService } from '../../shared/services/rest.service';
 import { SweetAlertService } from '../../shared/services/sweet-alart.service';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
+
 import { response } from 'express';
 import { error } from 'console';
 @Component({
@@ -25,15 +27,12 @@ import { error } from 'console';
 export class AccountsComponent implements OnInit {
 isHovered: any;
   
-onMouseEnter(data: any) {
-this.hoveredData=data;
-console.log("hovereddata",this.hoveredData)
 
-}
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
+  @ViewChild('modalContent') modalContent!: TemplateRef<any>;
 
   user: any = {};
   userList: any = [];
@@ -47,7 +46,10 @@ console.log("hovereddata",this.hoveredData)
   selectedData: any = null;
   totalItems: number = 0;
   accountcontact: Object="";
-  hoveredData: any;
+  hoveredData: any=null;
+
+  data = this.hoveredData
+
 
   constructor(
     private avatarService: AvatarService,
@@ -377,5 +379,23 @@ console.log(error)
   }
 )
 }
+onMouseEnter(data: any) {
+  if(data){
+  this.hoveredData=data;
+  console.log("hovereddata",this.hoveredData)
+  }
+  }
 
-}
+/* modal */
+openModal(data:any ) {
+  if (this.hoveredData) {
+    const modalRef = this.modalService.open(this.modalContent, {
+      ariaLabelledBy: 'modal-title',
+      ariaDescribedBy: 'modal-body'
+    });
+
+    modalRef.componentInstance.hoveredData = this.hoveredData;
+
+  } 
+}}
+
