@@ -96,7 +96,7 @@ export class SchemaManager {
             await prisma.$executeRaw(query);
           }
           catch (error) {
-            this.logger.error('Error executing migration statement:', error.message);
+            // this.logger.error('Error executing migration statement:', error.message);
           }
           finally
           {

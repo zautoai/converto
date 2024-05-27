@@ -7,6 +7,7 @@ import { HelpersModule } from 'src/helpers/helpers.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { CommonModule } from 'src/common/common.module';
 import { MicroservicesModule } from 'src/microservices/microservices.module';
+import { SchemaManagerModule } from 'src/schema-manager/schema-manager.module';
 
 
 
@@ -18,7 +19,8 @@ import { MicroservicesModule } from 'src/microservices/microservices.module';
     OrganizationsModule,
     HelpersModule,
     CommonModule,
-    MicroservicesModule
+    MicroservicesModule,
+    SchemaManagerModule
   ],
   providers: [StartupService]
 })
