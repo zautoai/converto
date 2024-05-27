@@ -1,17 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateProspectJurnyDto } from './dto/create-prospect-jurny.dto';
-import { UpdateProspectJurnyDto } from './dto/update-prospect-jurny.dto';
+import { CreateProspectjourneyDto } from './dto/create-prospect-journey.dto';
+import { UpdateProspectjourneyDto } from './dto/update-prospect-journey.dto';
 import { BaseService } from 'src/common/services/base.service';
 import { ServiceParams } from 'src/common/models/service-param.model';
 
 @Injectable()
-export class ProspectJurnyService extends BaseService{
+export class ProspectjourneyService extends BaseService{
 
   constructor(){
     super();
   }
 
-  async create(serviceParams: ServiceParams<CreateProspectJurnyDto>) {
+  async create(serviceParams: ServiceParams<CreateProspectjourneyDto>) {
     const { orgId, data } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try
@@ -21,8 +21,8 @@ export class ProspectJurnyService extends BaseService{
       {
         throw new BadRequestException('Invalid session');
       }
-      const prospectJurny = await prisma.prospecJurny.create({data});
-      return prospectJurny;
+      const prospectjourney = await prisma.prospecjourney.create({data});
+      return prospectjourney;
     }
     catch (error)
     {
@@ -37,7 +37,7 @@ export class ProspectJurnyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectJurnies = await prisma.prospecJurny.findMany();
+      const prospectJurnies = await prisma.prospecjourney.findMany();
       return prospectJurnies;
     }
     catch (error)
@@ -53,8 +53,8 @@ export class ProspectJurnyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectJurny = await prisma.prospecJurny.findUnique({where:{id}});
-      return prospectJurny;
+      const prospectjourney = await prisma.prospecjourney.findUnique({where:{id}});
+      return prospectjourney;
     }
     catch (error)
     {
@@ -65,13 +65,13 @@ export class ProspectJurnyService extends BaseService{
     }
   }
 
-  async update(serviceParams:ServiceParams<{id: string, updateProspectJurnyDto: UpdateProspectJurnyDto}>) {
-    const { orgId, data: {id, updateProspectJurnyDto} } = serviceParams;
+  async update(serviceParams:ServiceParams<{id: string, updateProspectjourneyDto: UpdateProspectjourneyDto}>) {
+    const { orgId, data: {id, updateProspectjourneyDto} } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectJurny = await prisma.prospecJurny.update({where:{id:id},data:updateProspectJurnyDto});
-      return prospectJurny;
+      const prospectjourney = await prisma.prospecjourney.update({where:{id:id},data:updateProspectjourneyDto});
+      return prospectjourney;
     }
     catch (error)
     {
@@ -86,8 +86,8 @@ export class ProspectJurnyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectJurny = await prisma.prospecJurny.delete({where:{id:id}});
-      return prospectJurny;
+      const prospectjourney = await prisma.prospecjourney.delete({where:{id:id}});
+      return prospectjourney;
     }
     catch (error)
     {

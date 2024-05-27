@@ -1,24 +1,24 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
-import { ProspectJurnyService } from './prospect-jurny.service';
-import { CreateProspectJurnyDto } from './dto/create-prospect-jurny.dto';
-import { UpdateProspectJurnyDto } from './dto/update-prospect-jurny.dto';
+import { ProspectjourneyService } from './prospect-journey.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
 import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ZautoRequest } from 'src/common/models/request.model';
+import { CreateProspectjourneyDto } from './dto/create-prospect-journey.dto';
+import { UpdateProspectjourneyDto } from './dto/update-prospect-journey.dto';
 
-@ApiTags('Prospect Jurny')
-@Controller('prospect-jurny')
-export class ProspectJurnyController {
-  constructor(private readonly prospectJurnyService: ProspectJurnyService) {}
+@ApiTags('Prospect journey')
+@Controller('prospect-journey')
+export class ProspectjourneyController {
+  constructor(private readonly prospectjourneyService: ProspectjourneyService) {}
 
   @Post()
   @UseGuards(SubdomainGuard)
   @ApiBearerAuth("x-tenant-id")
-  create(@Body() createProspectJurnyDto: CreateProspectJurnyDto, @Req() request: SubdomainRequest) {
+  create(@Body() createProspectjourneyDto: CreateProspectjourneyDto, @Req() request: SubdomainRequest) {
     const orgId = request.orgId;
-    return this.prospectJurnyService.create({orgId,data: createProspectJurnyDto});
+    return this.prospectjourneyService.create({orgId,data: createProspectjourneyDto});
   }
 
   @Get()
@@ -26,7 +26,7 @@ export class ProspectJurnyController {
   @ApiBearerAuth()
   findAll(@Req() request: ZautoRequest) {
     const orgId = request.user.orgId;
-    return this.prospectJurnyService.findAll(orgId);
+    return this.prospectjourneyService.findAll(orgId);
   }
   
   @Get(':id')
@@ -34,15 +34,15 @@ export class ProspectJurnyController {
   @ApiBearerAuth()
   findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
     const orgId = request.user.orgId;
-    return this.prospectJurnyService.findOne(orgId,id);
+    return this.prospectjourneyService.findOne(orgId,id);
   }
   
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  update(@Param('id') id: string, @Body() updateProspectJurnyDto: UpdateProspectJurnyDto, @Req() request: ZautoRequest) {
+  update(@Param('id') id: string, @Body() updateProspectjourneyDto: UpdateProspectjourneyDto, @Req() request: ZautoRequest) {
     const orgId = request.user.orgId;
-    return this.prospectJurnyService.update({orgId,data:{id, updateProspectJurnyDto}});
+    return this.prospectjourneyService.update({orgId,data:{id, updateProspectjourneyDto}});
   }
   
   @Delete(':id')
@@ -50,6 +50,6 @@ export class ProspectJurnyController {
   @ApiBearerAuth()
   remove(@Param('id') id: string, @Req() request: ZautoRequest) {
     const orgId = request.user.orgId;
-    return this.prospectJurnyService.remove(orgId,id);
+    return this.prospectjourneyService.remove(orgId,id);
   }
 }

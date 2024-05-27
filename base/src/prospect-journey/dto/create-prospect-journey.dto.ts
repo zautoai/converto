@@ -9,7 +9,7 @@ export enum ProspecActivityType {
     OTHER = 'OTHER',
 }
 
-export class CreateProspectJurnyDto {
+export class CreateProspectjourneyDto {
 
     @ApiProperty({description:'id of visitor(session)'})
     @IsString()

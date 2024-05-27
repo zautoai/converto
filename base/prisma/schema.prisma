@@ -200,7 +200,7 @@ model Visit {
   modifiedAt DateTime @updatedAt
 
   conversation          Conversation?
-  prospecJurnyActivitys ProspecJurny[]
+  prospecJourneyActivitys ProspecJourney[]
 
   @@index([visitorId], map: "Visitor_visitorId_fkey")
   @@index([campaignId], map: "Visitor_campaignId_fkey")
@@ -407,7 +407,7 @@ enum ProspecActivityType {
   OTHER
 }
 
-model ProspecJurny {
+model ProspecJourney {
   id          String              @id @default(uuid())
   visitId     String
   data        String?

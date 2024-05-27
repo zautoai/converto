@@ -45,7 +45,7 @@ import { EnrichmentModule } from './enrichment/enrichment.module';
 import { ExternalCrmModule } from './external-crm/external-crm.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { SchemaManagerModule } from './schema-manager/schema-manager.module';
-import { ProspectJurnyModule } from './prospect-jurny/prospect-jurny.module';
+import { ProspectjourneyModule } from './prospect-journey/prospect-journey.module';
 
 @Module({
   imports: [
@@ -108,7 +108,7 @@ import { ProspectJurnyModule } from './prospect-jurny/prospect-jurny.module';
     EnrichmentModule,
     ExternalCrmModule,
     CalendarModule,
-    ProspectJurnyModule,
+    ProspectjourneyModule,
 
   ],
   controllers: [AppController],
