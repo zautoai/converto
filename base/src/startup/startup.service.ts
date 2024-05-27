@@ -11,6 +11,8 @@ import { join } from 'path';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BaseService } from 'src/common/services/base.service';
 import { StartupMicroService } from './../microservices/crm_service/startup.service';
+import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
+import { SchemaManager } from 'src/schema-manager/schema-manager.service';
 
 @Injectable()
 export class StartupService extends BaseService implements OnModuleInit {
@@ -18,7 +20,7 @@ export class StartupService extends BaseService implements OnModuleInit {
     private readonly foldersToCreate = ['uploads', 'public', 'public/images'];
 
     constructor(
-        private prisma: PrismaService,
+        private schemaManager: SchemaManager,
         private roleService: RolesService,
         private userService: UsersService,
         private orgService: OrganizationsService,
@@ -33,11 +35,32 @@ export class StartupService extends BaseService implements OnModuleInit {
     }
 
     async executeOnStartup() {
+        await this.applieMigration();
         await this.createZautoOrg()
         // await this.createDefaultRoles();
         //await this.resyncHelpers();
         await this.createFolders();
         await this.handleException(await this.startupMicroService.syncOrganizations())
+    }
+
+    async applieMigration()
+    {
+        try
+        {
+            const prisma = await this.getPrismaMasterClient(); 
+            const organizations = await prisma.organization.findMany();
+            for (const org of organizations) {
+                await this.schemaManager.applyMigration(org.id, null);
+            }
+        }
+        catch(err)
+        {
+            console.log(err);
+        }
+        finally
+        {
+            this.closeMasterConnection();
+        }
     }
 
     async createDefaultRoles(orgId: string) {
