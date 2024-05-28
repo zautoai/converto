@@ -199,7 +199,7 @@ model Visit {
   createdAt  DateTime @default(now())
   modifiedAt DateTime @updatedAt
 
-  conversation          Conversation?
+  conversation            Conversation?
   prospecJourneyActivitys ProspecJourney[]
 
   @@index([visitorId], map: "Visitor_visitorId_fkey")
@@ -402,23 +402,28 @@ model ExternalToolCredential {
 enum ProspecActivityType {
   CTA_PERFORMED
   PAGE_VIEWED
+  PAGE_CLOSED
   LINK_CLICKED
   CHAT_INITIATED
   OTHER
 }
 
 model ProspecJourney {
-  id          String              @id @default(uuid())
-  visitId     String
-  data        String?
-  url         String
-  type        ProspecActivityType @default(OTHER)
-  timeSpend   Int                 @default(0)
-  score       Float               @default(0.0)
-  scrollDepth Float               @default(0.0)
-  createdAt   DateTime            @default(now())
-  modifiedAt  DateTime            @updatedAt
-  visit       Visit               @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  id             String              @id @default(uuid())
+  visitId        String
+  data           String?
+  url            String
+  type           ProspecActivityType @default(OTHER)
+  timeSpend      Int                 @default(0)
+  score          Float               @default(0.0)
+  scrollDepth    Float               @default(0.0)
+  previousPageId String?
+  previousPage   ProspecJourney?     @relation("PreviousPageRelation", fields: [previousPageId], references: [id])
+  nextPages      ProspecJourney[]    @relation("PreviousPageRelation")
+  createdAt      DateTime            @default(now())
+  modifiedAt     DateTime            @updatedAt
+  visit          Visit               @relation(fields: [visitId], references: [id], onDelete: Cascade)
 
   @@index([visitId, type])
+  @@index([previousPageId])
 }

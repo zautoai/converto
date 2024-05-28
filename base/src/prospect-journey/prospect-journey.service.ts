@@ -21,17 +21,45 @@ export class ProspectjourneyService extends BaseService{
       }
 
       let prospectjourney = (data.type == ProspecActivityType.PAGE_VIEWED ) ? await prisma.prospecJourney.findFirst({where: {visitId: data.visitId,url: data.url,type: data.type}}) : null;
-      if (prospectjourney) {
+      if (prospectjourney) {   
+        if(data.scrollDepth <= prospectjourney.scrollDepth)
+        {
+          delete data.scrollDepth;
+        }     
         prospectjourney = await prisma.prospecJourney.update({ where:{id:prospectjourney.id},data });
       }
       else {
         prospectjourney = await prisma.prospecJourney.create({ data });
       }
+      await this.updateTimeSpend(orgId, data.visitId,prospectjourney.url);
 
       return prospectjourney;
     }
     catch (error) {
       throw new BadRequestException(error.message);
+    }
+    finally {
+      await this.closeConnection(orgId);
+    }
+  }
+
+  async updateTimeSpend(orgId:string, visitId:string, url:string)
+  {
+    try
+    {
+      const prisma = await this.getPrismaClient(orgId);
+      const firstActvity = await prisma.prospecJourney.findFirst({where: {visitId: visitId, url: url},orderBy: { modifiedAt: 'asc' }});
+      const lastActvity = await prisma.prospecJourney.findFirst({where: {visitId: visitId, url: url},orderBy: { modifiedAt: 'desc' }});
+      const timeSpend = lastActvity.modifiedAt.getTime() - firstActvity.modifiedAt.getTime();
+      const existing = await prisma.prospecJourney.findFirst({where: {visitId: visitId,url: url,type: ProspecActivityType.PAGE_VIEWED}});
+      if(existing)
+      {
+        await prisma.prospecJourney.update({where:{id:existing.id},data:{timeSpend}});
+      }
+    }
+    catch(err)
+    {
+      throw new BadRequestException(err.message);
     }
     finally {
       await this.closeConnection(orgId);
