@@ -78,7 +78,7 @@ export class IcpService {
       return {
         code: 200,
         success: true,
-        formattedData
+        data: formattedData
       }
     }
     catch (error) {
@@ -123,7 +123,7 @@ export class IcpService {
       return {
         code: 200,
         success: true,
-        formattedData
+        data: formattedData
       }
     }
     catch (error) {

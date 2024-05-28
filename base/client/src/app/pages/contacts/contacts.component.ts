@@ -1,6 +1,6 @@
-import { Component, ElementRef, Input, OnInit, ViewChild , ChangeDetectorRef,} from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild , ChangeDetectorRef, TemplateRef,} from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { FormBuilder, FormControl, FormGroup, Validators,ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from '../../shared/services/notification.service';
@@ -25,6 +25,8 @@ export class ContactsComponent implements OnInit {
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
   @Input() chatBotWidget!: ChatBotWidgetsComponent;
+  @ViewChild('modalContent') modalContent!: TemplateRef<any>;
+
 
   user: any = {};
   userList: any = [];
@@ -37,11 +39,13 @@ export class ContactsComponent implements OnInit {
   showScript: boolean = false;
   currentPage: number = 1;
   totalPages: number = 1;
+  hoveredData: any=null;
+  isHovered: any;
   itemPerPage: number = 10;
   submittedData: any[] = [];
   selectedData: any = '';
   limit = 5;
-  
+
 
 
   constructor(
@@ -50,30 +54,29 @@ export class ContactsComponent implements OnInit {
     private notifService: NotificationService,
     private restService: RestService,
     private offcanvasService: NgbOffcanvas,
-    private formBuilder: FormBuilder,
     private changeDetectorRef: ChangeDetectorRef,
     private sweetAlertService: SweetAlertService,
     private route: ActivatedRoute,
     private router: Router,
   ) {
     this.Form = new FormGroup({
-      photoURL:new FormControl(''),
+      photoURL: new FormControl(''),
       fullName: new FormControl(''),
-  firstName: new FormControl(''),
-  lastName: new FormControl(''),
-  jobTitle: new FormControl(''),
-  organizationName: new FormControl(''),
-  email: new FormControl('', [Validators.required, Validators.email]),
-  phone: new FormControl(''),
-  address: new FormControl(''),
-  city: new FormControl(''),
-  state: new FormControl(''),
-  zip: new FormControl(''),
-  country: new FormControl(''),
-  website: new FormControl(''),
-  notes: new FormControl(''),
-  leadSource: new FormControl(''),
-  status: new FormControl(''),
+      firstName: new FormControl(''),
+      lastName: new FormControl(''),
+      jobTitle: new FormControl(''),
+      organizationName: new FormControl(''),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      phone: new FormControl(''),
+      address: new FormControl(''),
+      city: new FormControl(''),
+      state: new FormControl(''),
+      zip: new FormControl(''),
+      country: new FormControl(''),
+      website: new FormControl(''),
+      notes: new FormControl(''),
+      leadSource: new FormControl(''),
+      status: new FormControl(''),
     });
   }
 
@@ -205,7 +208,7 @@ export class ContactsComponent implements OnInit {
 
     this.restService.post(API.main.contact, data).subscribe({
       next: (response: any) => {
-        console.log("response" ,response);
+        console.log("response", response);
         this.offcanvasService.dismiss();
         this.notifService.showSuccess('User Added Successfully.');
         this.getContacts();
@@ -219,7 +222,7 @@ export class ContactsComponent implements OnInit {
   }
 
 
-  onUpdateuserSubmit():void {
+  onUpdateuserSubmit(): void {
     const updateContactFields: any[] = [];
     if (this.Form.get('photoUrl')?.value) {
       updateContactFields.push({
@@ -233,7 +236,7 @@ export class ContactsComponent implements OnInit {
         value: this.Form.value.fullname,
       });
     }
-  
+
     if (this.Form.get('lastName')?.value) {
       updateContactFields.push({
         label: 'Last Name',
@@ -331,7 +334,7 @@ export class ContactsComponent implements OnInit {
         .subscribe(
           (response: any) => {
             this.notifService.showSuccess('Account Updated Successfully.');
-            console.log("lastname",updatedContactData)
+            console.log("lastname", updatedContactData)
             this.getContacts();
           },
           (error) => {
@@ -352,7 +355,7 @@ export class ContactsComponent implements OnInit {
   openUpdateUser(user: any) {
     this.user = user; // Store the selected user data
     this.Form.reset();
-    console.log("test",user)
+    console.log("test", user)
     this.Form.patchValue(user)
 
     // this.Form.get('parentAccountId')?.setValue(user?.parentAccountId);
@@ -483,7 +486,22 @@ export class ContactsComponent implements OnInit {
 
     Validators.required,
   ]);
+  onMouseEnter(data: any) {
+    if(data){
+    this.hoveredData=data;
+    console.log("hovereddata",this.hoveredData)
+    }
+    }
 
+    openModal(data:any ) {
+      if (this.hoveredData) {
+        const modalRef = this.modalService.open(this.modalContent, {
+          ariaLabelledBy: 'modal-title',
+          ariaDescribedBy: 'modal-body'
+        });
+    
+        modalRef.componentInstance.hoveredData = this.hoveredData;
+    
+      } 
+    }}
 
-
-}

@@ -739,82 +739,98 @@
   </div>
 </ng-template> -->
 <ng-template #modalContent let-modal let-data="hoveredData">
-  <div class="modal-header">
-    <h4 class="modal-title">Overview</h4>
-    <button
-      type="button"
-      class="close"
-      aria-label="Close"
-      (click)="modal.dismiss('Cross click')"
-    >
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body" style="padding: 20px">
-    <p class="card-text">
-      <strong>Account Name:</strong> {{ hoveredData.accountName }}<br />
-      <strong>Industry:</strong> {{ hoveredData.industry }}<br />
-    </p>
-    <div class="d-flex">
-      <div class="col-6 mt-3">
-        <div class="single-chart">
-          <svg viewBox="0 0 36 36" class="circular-chart blue">
-            <path
-              class="circle-bg"
-              d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9045 0 0 1 0 -31.831"
-            />
-            <path
-              class="circle"
-              stroke-dasharray="70, 100"
-              d="M18 2.0845
-                a 15.9155 15.9155 0 0 1 0 31.831
-                a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-            <text x="18" y="20.35" class="percentage">90%</text>
-          </svg>
-          <span class="badge badge-light text-dark mr-1 mx-3"
-            >Lead Scoring</span
-          >
+  <div class="profile-card" style="width: 1400px !important">
+    <div class="profile-card-header row">
+      <!-- Profile Image Section -->
+      <div class="col-md-3">
+        <div class="profile-image-container">
+          <img
+            src="https://imgs.search.brave.com/b20GAw5dHFdFadqg6JqUsOdDmk9-lmNFm_E7cKm3mD8/rs:fit:500:0:0/g:ce/aHR0cHM6Ly93d3cu/bG9nby53aW5lL2Ev/bG9nby9HaXRIdWIv/R2l0SHViLUljb24t/V2hpdGUtRGFyay1C/YWNrZ3JvdW5kLUxv/Z28ud2luZS5zdmc.svg"
+            alt="Profile"
+            class="profile-image mx-3"
+          />
+          <div class="profile-badges mt-5">
+            <span class="badge badge-danger" style="min-width: 100px"
+              >Ideal persona</span
+            >
+          </div>
+          <div class="profile-badges mt-0">
+            <span class="badge badge-danger mt-3" style="min-width: 100px"
+              >ICP Fit</span
+            >
+          </div>
+          <div class="" style="margin-top: 10px">
+            <i class="fas fa-globe"></i>
+            {{ hoveredData.website }}
+          </div>
         </div>
       </div>
 
-      <div class="col-6 mt-3">
-        <div class="single-chart">
-          <svg viewBox="0 0 36 36" class="circular-chart green">
-            <path
-              class="circle-bg"
-              d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9045 0 0 1 0 -31.831"
-            />
-            <path
-              class="circle"
-              stroke-dasharray="70, 100"
-              d="M18 2.0845
-                a 15.9155 15.9155 0 0 1 0 31.831
-                a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-            <text x="18" y="20.35" class="percentage">75%</text>
-          </svg>
-          <span class="badge badge-light text-dark">Intent Scoring</span>
+      <!-- Profile Information Section -->
+      <div class="col-md-6 d-flex align-items-center">
+        <div class="profile-user-info text-center">
+          <h5 class="profile-user-name">
+            {{ hoveredData.accountName | titlecase }}
+          </h5>
+          <p class="profile-user-title">
+            <i class="fas fa-building"></i>
+            {{ hoveredData.companySize }} Employees
+            <i class="fe fe-dollar-sign"></i>
+            {{ hoveredData.annualRevenue }}
+          </p>
+          <p class="profile-user-since">
+            Since May 2020 • {{ hoveredData.country }}
+          </p>
+          <div class="profile-badges mt-3">
+            <span class="badge badge-success" style="min-width: 100px"
+              >Economic buyer</span
+            >
+          </div>
+          <div class="profile-badges mt-3">
+            <span class="badge badge-success" style="min-width: 100px"
+              >Ideal persona</span
+            >
+          </div>
+          <div class="profile-contact-info mt-3">
+            <span class="">
+              <i class="fas fa-envelope"></i> {{ hoveredData.email }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scoring Section -->
+      <div class="col-md-3">
+        <div class="row mt-3">
+          <div class="lead-scoring d-flex flex-column align-items-center">
+            <div class="progress-circle" data-score="40">
+              <span
+                class="fs-12"
+                style="align-items: center; color: #6c757d; font-size: 12px"
+                >80</span
+              >
+            </div>
+            <span class="mt-4" style="color: #6c757d; font-size: 12px">
+              Lead Scoring</span
+            >
+          </div>
+
+          <div class="Intent mt-5 d-flex flex-column align-items-center">
+            <div class="progress-circle" data-score="40">
+              <span class="fs-12" style="color: #6c757d; font-size: 12px"
+                >80</span
+              >
+            </div>
+            <span class="mt-4" style="color: #6c757d; font-size: 12px"
+              >Intent Scoring</span
+            >
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="badge-group mt-3">
-      <!-- Add more labels here -->
-    </div>
-    <br />
-    <p class="card-text">
-      <strong>Company Size:</strong> {{ hoveredData.companySize }}<br />
-      <strong>Location:</strong> {{ hoveredData.location }}<br />
-      <strong>Company Size:</strong> {{ hoveredData.companySize }}<br />
-      <strong>Company Size:</strong> {{ hoveredData.companySize }}<br />
-      <strong>Company Size:</strong> {{ hoveredData.companySize }}<br />
-      <strong>Location:</strong> {{ hoveredData.location }}<br />
-      <strong>Location:</strong> {{ hoveredData.location }}<br />
-      <strong>Location:</strong> {{ hoveredData.location }}<br />
-    </p>
   </div>
 </ng-template>
+
 <ng-template
   [ngbModalContent]="modalContent"
   [ngbModalClose]="'Close click'"

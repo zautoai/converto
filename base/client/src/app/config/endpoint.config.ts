@@ -55,10 +55,11 @@ export const API = {
     formbuilder: 'api/form-builder',
     account: 'api/crm-accounts',
     external_crm: 'api/external-crm',
-    contact:'api/contacts',
-    segment:'segment-group',
-    segments:'segments',
-    abm:'api/crm-accounts/abm'
+    contact: 'api/contacts',
+    segmentCategory: 'api/segment-category',
+    segment: 'api/segments',
+    abm: 'api/crm-accounts/abm',
+    icp: 'api/icp'
   },
   dev: {},
 };
