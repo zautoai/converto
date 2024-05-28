@@ -65,6 +65,7 @@ import { PlatformLinkModule } from './platform-link/platform-link.module';
 import { IcpComponent } from './icp/icp.component';
 import { IcpCreatorComponent } from './icp-creator/icp-creator.component';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { IcpviewComponent } from './icpview/icpview.component';
 
 @NgModule({
   declarations: [
@@ -116,7 +117,8 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
     ContactviewComponent,
     SegmentComponent,
     IcpComponent,
-    IcpCreatorComponent
+    IcpCreatorComponent,
+    IcpviewComponent
   ],
   imports: [
     PlatformLinkModule,

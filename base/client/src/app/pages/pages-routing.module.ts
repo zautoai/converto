@@ -36,8 +36,12 @@ import { ContactviewComponent } from './contactview/contactview.component';
 import { SegmentComponent } from './segment/segment.component';
 import { IcpComponent } from './icp/icp.component';
 import { IcpCreatorComponent } from './icp-creator/icp-creator.component';
+import { IcpviewComponent } from './icpview/icpview.component';
 
 const routes: Routes = [
+
+
+
   {
     path: 'setup',
     title: "Setup",
@@ -189,6 +193,12 @@ const routes: Routes = [
     path: 'icp/create',
     title: "ICP",
     component: IcpCreatorComponent,
+    canActivate: [SetupGuard]
+  },
+  {
+    path: 'icp/create/view',
+    title: "ICP",
+    component: IcpviewComponent,
     canActivate: [SetupGuard]
   },
   {

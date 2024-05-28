@@ -57,7 +57,8 @@ export class SegmentComponent implements OnInit {
     this.Form = this.formBuilder.group({
       name: [''],
       description: [''],
-      id: ['']
+      id: [''],
+      color: [''],
     });
 
     this.avatarStyle = defaultAvatarStyle;
@@ -68,7 +69,7 @@ export class SegmentComponent implements OnInit {
       name: [''],
       description: [''],
       groupname: [''],
-      color: [''],
+    
 
     });
   }
@@ -91,10 +92,13 @@ export class SegmentComponent implements OnInit {
   onCreatesegmantfrpformSubmit() {
     const name = this.Form.value.name || '';
     const description = this.Form.value.description || '';
+    const color = this.Form.value.color || '';
+    console.log(color);
     if (this.Form.valid) {
       const data = {
         name: name,
         description: description,
+        color:color
       };
       this.restService.post(API.main.segmentCategory, data).subscribe({
         next: (response: any) => {
