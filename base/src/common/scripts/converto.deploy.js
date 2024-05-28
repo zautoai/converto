@@ -10,7 +10,7 @@
             const widgetContainer = document.getElementById('converto-chat-widget');
             const iframe = document.createElement('iframe');
             iframe.setAttribute('id', 'converto-bot-ui');
-            iframe.src = 'http://localhost:3001/';
+            iframe.src = '{{API_ROOT_URL}}';
             iframe.style.border = 'none';
             iframe.style.display = 'none';
             iframe.onload = function () {
@@ -39,7 +39,7 @@
                 const toggleButton = document.createElement('button');
                 toggleButton.setAttribute('id', 'converto-chat-icon');
                 toggleButton.style.overflow = 'hidden';
-                toggleButton.innerHTML = '<img src="http://localhost:3000/assets/images/brand/fav_black_png.png" style="width: 64px; height: 64px;" alt="" />';
+                toggleButton.innerHTML = '<img src="{{API_ROOT_URL}}/assets/images/brand/fav_black_png.png" style="width: 64px; height: 64px;" alt="" />';
                 toggleButton.style.padding = '0';
                 toggleButton.style.backgroundColor = 'var(--chat-color)';
                 toggleButton.style.color = 'var(--chat-text-color)';
@@ -64,7 +64,7 @@
                         iframe.contentWindow.postMessage({ openChat: true }, '*');
                         iframe.style.display = 'block';
                         tooltip.style.display = 'none';
-                        toggleButton.innerHTML = '<img src="http://localhost:3000/assets/images/brand/fav_black_png.png" style="width: 40px; height: 40px;" alt="" />';
+                        toggleButton.innerHTML = '<img src="{{API_ROOT_URL}}/assets/images/brand/fav_black_png.png" style="width: 40px; height: 40px;" alt="" />';
                         toggleButton.style.width = '48px';
                         toggleButton.style.height = '48px';
                     }
@@ -76,14 +76,14 @@
                         iframe.contentWindow.postMessage({ openChat: true }, '*');
                         iframe.style.display = 'block';
                         tooltip.style.display = 'none';
-                        toggleButton.innerHTML = '<img src="http://localhost:3000/assets/images/brand/fav_black_png.png" style="width: 40px; height: 40px;" alt="" />';
+                        toggleButton.innerHTML = '<img src="{{API_ROOT_URL}}/assets/images/brand/fav_black_png.png" style="width: 40px; height: 40px;" alt="" />';
                         toggleButton.style.width = '48px';
                         toggleButton.style.height = '48px';
                     } else {
                         iframe.contentWindow.postMessage({ closeChat: true }, '*');
                         iframe.style.display = 'none';
                         // tooltip.style.display = 'block';
-                        toggleButton.innerHTML = '<img src="http://localhost:3000/assets/images/brand/fav_black_png.png" style="width: 64px; height: 64px;" alt="" />';
+                        toggleButton.innerHTML = '<img src="{{API_ROOT_URL}}/assets/images/brand/fav_black_png.png" style="width: 64px; height: 64px;" alt="" />';
                         toggleButton.style.width = '64px';
                         toggleButton.style.height = '64px';
                     }

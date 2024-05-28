@@ -612,8 +612,8 @@ export class AgentService extends BaseService{
       }
       const filePath = `./src/common/scripts/converto.deploy.js`;
       let content = await readFile(filePath, 'utf-8');
-      content = content.replace('{{API_ROOT_URL}}', process.env.HOST_URL);
-      content = content.replace('{{ORG_ID}}', orgId);
+      content = content.replaceAll('{{API_ROOT_URL}}', process.env.HOST_URL);
+      content = content.replaceAll('{{ORG_ID}}', orgId);
       return content;
     }
     catch(error)

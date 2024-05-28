@@ -48,13 +48,24 @@ export class ProspectjourneyService extends BaseService{
     try
     {
       const prisma = await this.getPrismaClient(orgId);
-      const firstActvity = await prisma.prospecJourney.findFirst({where: {visitId: visitId, url: url},orderBy: { modifiedAt: 'asc' }});
-      const lastActvity = await prisma.prospecJourney.findFirst({where: {visitId: visitId, url: url},orderBy: { modifiedAt: 'desc' }});
-      const timeSpend = lastActvity.modifiedAt.getTime() - firstActvity.modifiedAt.getTime();
-      const existing = await prisma.prospecJourney.findFirst({where: {visitId: visitId,url: url,type: ProspecActivityType.PAGE_VIEWED}});
-      if(existing)
+      // Fetch the latest PAGE_VIEWED event
+      const pageViewed = await prisma.prospecJourney.findFirst({
+          where: { visitId: visitId, url: url, type: ProspecActivityType.PAGE_VIEWED },
+          orderBy: { createdAt: 'desc' }
+      });
+      
+      // Fetch the latest PAGE_CLOSED event
+      const pageClosed = await prisma.prospecJourney.findFirst({
+          where: { visitId: visitId, url: url, type: ProspecActivityType.PAGE_CLOSED },
+          orderBy: { createdAt: 'desc' }
+      });
+      if (pageViewed && pageClosed)
       {
-        await prisma.prospecJourney.update({where:{id:existing.id},data:{timeSpend}});
+        const timeSpend = (pageClosed.createdAt.getTime() - pageViewed.createdAt.getTime());
+        await prisma.prospecJourney.update({
+          where: { id: pageViewed.id, url: url },
+          data: { timeSpend }
+      });
       }
     }
     catch(err)
