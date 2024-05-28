@@ -27,7 +27,7 @@
                   >
                     <i class="fe fe-plus"></i
                     ><span class="d-lg-block d-none">
-                      Create  Segment Group</span
+                      Create Segment Group</span
                     >
                   </div>
                 </button>
@@ -177,7 +177,9 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Create Segment Group</h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Create Segment Group
+        </h1>
         <button
           type="button"
           class="btn-close"
@@ -209,6 +211,15 @@
                 id=""
               ></textarea>
             </div>
+            <div class="mb-3 color-picker-container">
+              <label for="color" class="form-label">Color:</label>
+              <input
+                id="color"
+                class="form-control color-input"
+                type="color"
+                formControlName="color"
+              />
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -237,9 +248,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">
-          Create Segment
-        </h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Create Segment</h1>
         <button
           type="button"
           class="btn-close"
@@ -259,15 +268,7 @@
                 formControlName="name"
               />
             </div>
-            <div>
-              <label for="" class="form-label">Color : </label>
-              <input
-                placeholder="Enter Segment"
-                class="form-color"
-                type="color"
-                formControlName="color"
-              />
-            </div>
+
             <div>
               <label for="" class="form-label">Description</label>
               <textarea
@@ -324,9 +325,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">
-          Update Segment
-        </h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Update Segment</h1>
         <button
           type="button"
           class="btn-close"
@@ -348,12 +347,7 @@
             </div>
             <div>
               <label for="" class="form-label">Color : </label>
-              <input
-            
-                class="form-color"
-                type="color"
-                formControlName="color"
-              />
+              <input class="form-color" type="color" formControlName="color" />
             </div>
             <div>
               <label for="" class="form-label">Description</label>
@@ -411,7 +405,9 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Update Segment Group</h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">
+          Update Segment Group
+        </h1>
         <button
           type="button"
           class="btn-close"
