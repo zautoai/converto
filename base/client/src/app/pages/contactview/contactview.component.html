@@ -15,17 +15,19 @@
         <a href="{{ selectedData.website }}">
           <h5>
             {{ selectedData.fullName }}
+            <span class="text-muted" style="font-size: 12px">
+              {{ selectedData.jobTitle }}</span
+            >
           </h5>
-          {{ selectedData.jobtitle }}
         </a>
         <p class="text-muted">{{ selectedData.industry }}</p>
         <div class="info-item">
-          <i class="fas fa-building"></i>
-          <span>Company Name : {{ selectedData.organizationName }}</span>
+          <i class="fe fe-map-pin"></i>
+          <span>Location: {{ selectedData.country }}</span>
         </div>
         <div class="info-item">
           <i class="fas fa-dollar"></i>
-          <span>Revenue:{{ selectedData.annualRevenue }}</span>
+          <span>Revenue: {{ selectedData.annualRevenue }}</span>
         </div>
         <div class="info-item">
           <i class="fas fa-building"></i>
@@ -88,10 +90,8 @@
             <text x="18" y="20.35" class="percentage">90%</text>
           </svg>
         </div>
+        <h4 class="mt-4 ms-4">Predictive Lead Scoring</h4>
       </div>
-      <h4 class="mt-4 ms-4" style="margin-left: 300px">
-        Predictive Lead Scoring
-      </h4>
 
       <div class="col-6 mt-3">
         <div class="single-chart">

@@ -51,11 +51,15 @@
           </thead>
           <tbody>
             <ng-container>
-              <tr *ngFor="let data of submittedData">
+              <tr
+                *ngFor="let data of submittedData"
+                [style.z-index]="isHovered ? 10 : 1"
+                (mouseenter)="onMouseEnter(data)"
+              >
                 <!-- <td>
                   {{ data.photoUrl }}
                 </td> -->
-                <td>
+                <td (mouseenter)="openModal(data)">
                   {{ data.fullName }}
                 </td>
                 <!-- <td>
@@ -604,3 +608,106 @@
     </div>
   </div>
 </ng-template>
+<!--modal-->
+
+<ng-template #modalContent let-modal let-data="hoveredData">
+  <div class="profile-card" style="width: 1400px !important">
+    <div class="profile-card-header row">
+      <!-- Profile Image Section -->
+      <div class="col-md-3">
+        <div class="profile-image-container">
+          <img
+            src="https://imgs.search.brave.com/b20GAw5dHFdFadqg6JqUsOdDmk9-lmNFm_E7cKm3mD8/rs:fit:500:0:0/g:ce/aHR0cHM6Ly93d3cu/bG9nby53aW5lL2Ev/bG9nby9HaXRIdWIv/R2l0SHViLUljb24t/V2hpdGUtRGFyay1C/YWNrZ3JvdW5kLUxv/Z28ud2luZS5zdmc.svg"
+            alt="Profile"
+            class="profile-image mx-3"
+          />
+          <div class="profile-badges mt-5">
+            <span class="badge badge-danger" style="min-width: 100px"
+              >Ideal persona</span
+            >
+          </div>
+          <div class="profile-badges mt-0">
+            <span class="badge badge-danger mt-3" style="min-width: 100px"
+              >ICP Fit</span
+            >
+          </div>
+          <div class="" style="margin-top: 10px">
+            <i class="fas fa-globe"></i>
+            {{ hoveredData.website }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Information Section -->
+      <div class="col-md-6 d-flex align-items-center">
+        <div class="profile-user-info text-center">
+          <h5 class="profile-user-name">
+            {{ hoveredData.fullName | titlecase
+            }}<span class="text-muted mx-1" style="font-size: 12px"
+              >{{ hoveredData.jobTitle }}
+            </span>
+          </h5>
+          <p class="profile-user-title">
+            <i class="fas fa-building"></i>
+            {{ hoveredData.organizationName }}
+            <!-- <i class="fe fe-map-pin"></i> -->
+            <!-- {{ hoveredData.country }} -->
+          </p>
+          <p class="profile-user-since">
+            Since May 2020 <i class="fe fe-map-pin"></i>
+            {{ hoveredData.country }}
+          </p>
+          <div class="profile-badges mt-3">
+            <span class="badge badge-success" style="min-width: 100px"
+              >Economic buyer</span
+            >
+          </div>
+          <div class="profile-badges mt-3">
+            <span class="badge badge-success" style="min-width: 100px"
+              >Ideal persona</span
+            >
+          </div>
+          <div class="profile-contact-info mt-3">
+            <span class="">
+              <i class="fas fa-envelope"></i> {{ hoveredData.email }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scoring Section -->
+      <div class="col-md-3">
+        <div class="row mt-3">
+          <div class="lead-scoring d-flex flex-column align-items-center">
+            <div class="progress-circle" data-score="40">
+              <span
+                class="fs-12"
+                style="align-items: center; color: #6c757d; font-size: 12px"
+                >80</span
+              >
+            </div>
+            <span class="mt-4" style="color: #6c757d; font-size: 12px">
+              Lead Scoring</span
+            >
+          </div>
+
+          <div class="Intent mt-5 d-flex flex-column align-items-center">
+            <div class="progress-circle" data-score="40">
+              <span class="fs-12" style="color: #6c757d; font-size: 12px"
+                >80</span
+              >
+            </div>
+            <span class="mt-4" style="color: #6c757d; font-size: 12px"
+              >Intent Scoring</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template
+  [ngbModalContent]="modalContent"
+  [ngbModalClose]="'Close click'"
+></ng-template>

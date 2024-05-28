@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild , ChangeDetectorRef,} from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild , ChangeDetectorRef, TemplateRef,} from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
 import { FormBuilder, FormControl, FormGroup, Validators,ReactiveFormsModule } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
@@ -25,6 +25,8 @@ export class ContactsComponent implements OnInit {
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
   @Input() chatBotWidget!: ChatBotWidgetsComponent;
+  @ViewChild('modalContent') modalContent!: TemplateRef<any>;
+
 
   user: any = {};
   userList: any = [];
@@ -37,6 +39,8 @@ export class ContactsComponent implements OnInit {
   showScript: boolean = false;
   currentPage: number = 1;
   totalPages: number = 1;
+  hoveredData: any=null;
+  isHovered: any;
   itemPerPage: number = 10;
   submittedData: any[] = [];
   selectedData: any = '';
@@ -483,7 +487,22 @@ export class ContactsComponent implements OnInit {
 
     Validators.required,
   ]);
+  onMouseEnter(data: any) {
+    if(data){
+    this.hoveredData=data;
+    console.log("hovereddata",this.hoveredData)
+    }
+    }
 
+    openModal(data:any ) {
+      if (this.hoveredData) {
+        const modalRef = this.modalService.open(this.modalContent, {
+          ariaLabelledBy: 'modal-title',
+          ariaDescribedBy: 'modal-body'
+        });
+    
+        modalRef.componentInstance.hoveredData = this.hoveredData;
+    
+      } 
+    }}
 
-
-}
