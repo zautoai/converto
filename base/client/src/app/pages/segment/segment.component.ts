@@ -37,14 +37,14 @@ export class SegmentComponent implements OnInit {
   avatarStyles = {
     primaryColor: 'green',
   };
-  
+
   Form: FormGroup;
   segments: FormGroup;
   selectedSegment: any = null;
   selectedSegmentgrp: any = null;
   segment: any;
-  
- 
+
+
 
 
   constructor(
@@ -57,19 +57,19 @@ export class SegmentComponent implements OnInit {
     this.Form = this.formBuilder.group({
       name: [''],
       description: [''],
-      id:['']
+      id: ['']
     });
 
     this.avatarStyle = defaultAvatarStyle;
     console.log(avatarService);
-    
+
 
     this.segments = this.formBuilder.group({
       name: [''],
       description: [''],
       groupname: [''],
       color: [''],
-  
+
     });
   }
   ngOnInit(): void {
@@ -78,7 +78,7 @@ export class SegmentComponent implements OnInit {
     this.getSegmentgroup();
   }
 
- 
+
   selectSegment(segment: any) {
     this.selectedSegment = segment;
   }
@@ -96,7 +96,7 @@ export class SegmentComponent implements OnInit {
         name: name,
         description: description,
       };
-      this.restService.post(API.main.segment, data).subscribe({
+      this.restService.post(API.main.segmentCategory, data).subscribe({
         next: (response: any) => {
           this.Form.reset();
           this.notifService.showSuccess('Segment Created Successfully.');
@@ -110,10 +110,10 @@ export class SegmentComponent implements OnInit {
   }
 
   getSegmentgroup(): void {
-    this.restService.getAll(API.main.segment).subscribe({
+    this.restService.getAll(API.main.segmentCategory).subscribe({
       next: (response: any) => {
         this.submittedData = response.data;
-       
+
       },
       error: (error) => {
         console.error(error);
@@ -125,7 +125,7 @@ export class SegmentComponent implements OnInit {
 
   deletesegmentgroup = (segment: any) => {
     this.segment = segment;
-    
+
     this.sweetAlertService.warning(
       'Delete form',
       'Are you sure you want to delete ?',
@@ -141,11 +141,11 @@ export class SegmentComponent implements OnInit {
 
 
   confirmsegmentgrpDelete = () => {
-    this.restService.delete(API.main.segment, this.segment.id).subscribe(
+    this.restService.delete(API.main.segmentCategory, this.segment.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Form Deleted Successfully.');
         this.getSegmentgroup();
-        
+
       },
       (error) => {
         console.error(error);
@@ -172,7 +172,7 @@ export class SegmentComponent implements OnInit {
 
     if (this.selectedSegmentIDgrp) {
       this.restService
-        .patch(API.main.segment, this.selectedSegmentIDgrp, updatedData)
+        .patch(API.main.segmentCategory, this.selectedSegmentIDgrp, updatedData)
         .subscribe(
           (response: any) => {
             this.notifService.showSuccess(
@@ -205,7 +205,7 @@ export class SegmentComponent implements OnInit {
         segmentGroupId: segmentGroupId,
       };
 
-      this.restService.post(API.main.segments, data).subscribe({
+      this.restService.post(API.main.segment, data).subscribe({
         next: (response: any) => {
 
           this.notifService.showSuccess('Segment Created Successfully.');
@@ -220,11 +220,11 @@ export class SegmentComponent implements OnInit {
   }
 
   getsegments(): void {
-    this.restService.getAll(API.main.segments).subscribe({
+    this.restService.getAll(API.main.segment).subscribe({
       next: (response: any) => {
         this.submittedDatasegments = response.data;
         console.log(this.submittedDatasegments);
-       
+
       },
       error: (error) => {
         console.error(error);
@@ -233,7 +233,7 @@ export class SegmentComponent implements OnInit {
   }
 
   findSegmentById(segmentId: '0e3337f4-8e98-4a27-b3ae-7301c26fcbc9'): void {
-    this.restService.get(API.main.segments, segmentId).subscribe({
+    this.restService.get(API.main.segment, segmentId).subscribe({
       next: (response: any) => {
         const segment = response.data;
         console.log(segment);
@@ -251,7 +251,7 @@ export class SegmentComponent implements OnInit {
 
   deletedeletesegment = (segment: any) => {
     this.segment = segment;
-    
+
     this.sweetAlertService.warning(
       'Delete form',
       'Are you sure you want to delete ?',
@@ -267,11 +267,11 @@ export class SegmentComponent implements OnInit {
 
 
   confirmDelete = () => {
-    this.restService.delete(API.main.segments, this.segment.id).subscribe(
+    this.restService.delete(API.main.segment, this.segment.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Form Deleted Successfully.');
         this.getsegments();
-        
+
       },
       (error) => {
         console.error(error);
@@ -299,7 +299,7 @@ export class SegmentComponent implements OnInit {
     console.log(updatedData);
 
     this.restService
-      .patch(API.main.segments, this.selectedSegmentID, updatedData)
+      .patch(API.main.segment, this.selectedSegmentID, updatedData)
       .subscribe(
         (response: any) => {
           this.notifService.showSuccess('Segment Group Updated Successfully.');

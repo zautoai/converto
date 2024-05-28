@@ -62,6 +62,10 @@ import { AccountviewComponent } from './accountview/accountview.component';
 import { ContactviewComponent } from './contactview/contactview.component';
 import { SegmentComponent } from './segment/segment.component';
 import { PlatformLinkModule } from './platform-link/platform-link.module';
+import { IcpComponent } from './icp/icp.component';
+import { IcpCreatorComponent } from './icp-creator/icp-creator.component';
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+
 @NgModule({
   declarations: [
     ZautoDashboardComponent,
@@ -110,7 +114,9 @@ import { PlatformLinkModule } from './platform-link/platform-link.module';
     CalendarScheduleComponent,
     AccountviewComponent,
     ContactviewComponent,
-    SegmentComponent
+    SegmentComponent,
+    IcpComponent,
+    IcpCreatorComponent
   ],
   imports: [
     PlatformLinkModule,
@@ -134,7 +140,8 @@ import { PlatformLinkModule } from './platform-link/platform-link.module';
     NgxColorsModule,
     NgApexchartsModule,
     NgbProgressbarModule,
-    NgbNavModule
+    NgbNavModule,
+    NgbAccordionModule
   ],
 })
-export class PagesModule {}
+export class PagesModule { }
