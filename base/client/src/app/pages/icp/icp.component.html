@@ -1,0 +1,58 @@
+<div class="col-lg-12 mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                IPC
+            </h3>
+            <div class="card-options">
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addIcp"
+                    (click)="handleCreate()">
+                    <i class="fa fa-plus"></i>
+                    Create IPC
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive mb-3">
+                <table class="table border card-table table-vcenter text-nowrap align-items-center">
+                    <thead class="bg-primary text-white">
+                        <!-- <th class="text-white">Photo Url</th> -->
+                        <th class="text-white">Name</th>
+
+                        <th class="text-white">Description</th>
+                        <th class="text-white">Start Value</th>
+                        <th class="text-white">Actions</th>
+                    </thead>
+                    <tbody>
+                        <ng-container>
+                            <tr *ngFor="let data of icpdata">
+                                <td>
+                                    {{ data.name }}
+                                </td>
+                                <td>
+                                    {{ data.description }}
+                                </td>
+                                <td>
+                                    {{data.startValue}}
+                                </td>
+                                <td class="icon w-1">
+                                    <button>
+                                        <i class="fa fa-eye text-secondary view"></i>
+                                    </button>
+
+                                    <button>
+                                        <i class="fa fa-edit text-success update"></i>
+                                    </button>
+
+                                    <button>
+                                        <i class="fa fa-trash-o text-danger delete"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
