@@ -321,15 +321,14 @@ export class AgentController {
     } else throw new UnauthorizedException('Unauthorised access.')
   }
 
-  @Get('widget/:agentId')
+  @Get('widget/:orgId')
   @Header('Content-Type', 'application/javascript')
-  async embedding(@Param('agentId') agentId: string, @Req() request: Request)
+  async embedding(@Param('orgId') orgId: string, @Req() request: SubdomainRequest)
   {
-    const org = request.headers['org-id'];
-    if(agentId.includes('.js'))
+    if(orgId.includes('.js'))
     {
-      agentId = agentId.replace('.js','');
-      return await this.agentsService.getEmbedding(org,agentId);
+      orgId = orgId.replace('.js','');
+      return await this.agentsService.getEmbedding(orgId);
     }
     else
     {
@@ -346,7 +345,6 @@ export class AgentController {
     if(agentId.includes('.js'))
     {
       agentId = agentId.replace('.js','');
-      return await this.agentsService.getEmbedding(orgId,agentId,true);
     }
     else
     {

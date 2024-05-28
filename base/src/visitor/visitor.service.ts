@@ -21,19 +21,19 @@ export class VisitorService extends BaseService {
     const prisma = await this.getPrismaClient(orgId);
     try 
     {
-      const ipAddress = request.headers['x-forwarded-for'] as string;
-      const ipData = await this.iptrackingService.getIPData(ipAddress);
-      const headers = request.headers;
-      delete headers['Authorization']
-      delete headers['Proxy-Authorization']
-      const visitorObj = {
-        infoJson: JSON.stringify(headers),
-        userAgent: headers['user-agent'],
-        ipAddress: ipAddress,
-        trackingInfo: JSON.stringify(ipData)
-      };
       if(!createSessionDto.visitorId)
-      {
+        {
+        const ipAddress = request.headers['x-forwarded-for'] as string;
+        const ipData = await this.iptrackingService.getIPData(ipAddress);
+        const headers = request.headers;
+        delete headers['Authorization']
+        delete headers['Proxy-Authorization']
+        const visitorObj = {
+          infoJson: JSON.stringify(headers),
+          userAgent: headers['user-agent'],
+          ipAddress: ipAddress,
+          trackingInfo: JSON.stringify(ipData)
+        };
         const newVisitor = await this.create({orgId,data:visitorObj});
         const newVisit = await this.createOrUpdateVisit({orgId, data: { 
           visitorId: newVisitor.id, 

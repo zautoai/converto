@@ -114,7 +114,7 @@ import { IcpModule } from './icp/icp.module';
     ProspectjourneyModule,
     SegmentsModule,
     SegmentCategoryModule,
-    IcpModule
+    IcpModule,
   ],
   controllers: [AppController],
   providers: [AppService],
