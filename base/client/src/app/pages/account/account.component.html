@@ -739,57 +739,92 @@
   </div>
 </ng-template> -->
 <ng-template #modalContent let-modal let-data="hoveredData">
-  <div class="profile-card">
-    <div class="profile-card-header">
-      <div class="profile-image-container">
-        <img
-          src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600"
-          alt="Profile"
-          class="profile-image"
-        />
-      </div>
-      <div class="profile-user-info ml-3">
-        <h5 class="profile-user-name">
-          {{ hoveredData.accountName | titlecase }}
-        </h5>
-        <p class="profile-user-title">
-          <i class="fas fa-building"></i>
-          {{ hoveredData.companySize }} Employees
-          <i class="fe fe-dollar-sign"></i>
-          {{ hoveredData.annualRevenue }}
-        </p>
-        <p class="profile-user-since">
-          Since May 2020 • {{ hoveredData.country }}
-        </p>
-        <div class="row mt-3">
-          <div class="col-md-6">
-            <div class="lead-scoring">
-              <div class="progress-circle" data-score="40">
-                <span class="fs-12">80</span>
-              </div>
-              <span class="mt-3"> lead Scoring </span>
-            </div>
+  <div class="profile-card" style="width: 1400px !important">
+    <div class="profile-card-header row">
+      <!-- Profile Image Section -->
+      <div class="col-md-3">
+        <div class="profile-image-container">
+          <img
+            src="https://imgs.search.brave.com/b20GAw5dHFdFadqg6JqUsOdDmk9-lmNFm_E7cKm3mD8/rs:fit:500:0:0/g:ce/aHR0cHM6Ly93d3cu/bG9nby53aW5lL2Ev/bG9nby9HaXRIdWIv/R2l0SHViLUljb24t/V2hpdGUtRGFyay1C/YWNrZ3JvdW5kLUxv/Z28ud2luZS5zdmc.svg"
+            alt="Profile"
+            class="profile-image mx-3"
+          />
+          <div class="profile-badges mt-5">
+            <span class="badge badge-danger" style="min-width: 100px"
+              >Ideal persona</span
+            >
           </div>
-          <div class="col-md-6">
-            <div class="Intent">
-              <div class="progress-circle" data-score="40">
-                <span class="fs-12">80</span>
-              </div>
-              <span class="mt-4"> Intent Scoring</span>
-            </div>
+          <div class="profile-badges mt-0">
+            <span class="badge badge-danger mt-3" style="min-width: 100px"
+              >ICP Fit</span
+            >
           </div>
-        </div>
-        <div class="profile-badges mt-3">
-          <span class="badge badge-success">Economic buyer</span>
-          <span class="badge badge-danger">Ideal persona</span>
-          <span class="badge badge-info">Beta tester</span>
-        </div>
-        <div class="profile-contact-info mt-3">
-          <span> <i class="fas fa-envelope"></i> {{ hoveredData.email }} </span>
-          <span class="mx-3">
+          <div class="" style="margin-top: 10px">
             <i class="fas fa-globe"></i>
             {{ hoveredData.website }}
-          </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Information Section -->
+      <div class="col-md-6 d-flex align-items-center">
+        <div class="profile-user-info text-center">
+          <h5 class="profile-user-name">
+            {{ hoveredData.accountName | titlecase }}
+          </h5>
+          <p class="profile-user-title">
+            <i class="fas fa-building"></i>
+            {{ hoveredData.companySize }} Employees
+            <i class="fe fe-dollar-sign"></i>
+            {{ hoveredData.annualRevenue }}
+          </p>
+          <p class="profile-user-since">
+            Since May 2020 • {{ hoveredData.country }}
+          </p>
+          <div class="profile-badges mt-3">
+            <span class="badge badge-success" style="min-width: 100px"
+              >Economic buyer</span
+            >
+          </div>
+          <div class="profile-badges mt-3">
+            <span class="badge badge-success" style="min-width: 100px"
+              >Ideal persona</span
+            >
+          </div>
+          <div class="profile-contact-info mt-3">
+            <span class="">
+              <i class="fas fa-envelope"></i> {{ hoveredData.email }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scoring Section -->
+      <div class="col-md-3">
+        <div class="row mt-3">
+          <div class="lead-scoring d-flex flex-column align-items-center">
+            <div class="progress-circle" data-score="40">
+              <span
+                class="fs-12"
+                style="align-items: center; color: #6c757d; font-size: 12px"
+                >80</span
+              >
+            </div>
+            <span class="mt-4" style="color: #6c757d; font-size: 12px">
+              Lead Scoring</span
+            >
+          </div>
+
+          <div class="Intent mt-5 d-flex flex-column align-items-center">
+            <div class="progress-circle" data-score="40">
+              <span class="fs-12" style="color: #6c757d; font-size: 12px"
+                >80</span
+              >
+            </div>
+            <span class="mt-4" style="color: #6c757d; font-size: 12px"
+              >Intent Scoring</span
+            >
+          </div>
         </div>
       </div>
     </div>
