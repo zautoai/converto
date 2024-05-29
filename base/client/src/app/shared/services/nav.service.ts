@@ -218,6 +218,9 @@ export class NavService implements OnDestroy {
 			title: 'ICP', icon: 'fa-solid fa-user-check', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/icp', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
 		},
 		{
+			title: 'Intent scoring', icon: 'fa-solid fa-object-ungroup', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/intent-scoring', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
+		},
+		{
 			headTitle: 'Deployment',
 			show: false,
 			roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]

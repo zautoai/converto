@@ -3,711 +3,419 @@
     <div class="card-header">
       <h3 class="card-title"><i class="fa-solid fa-user"></i> Contacts</h3>
       <div class="card-options">
-        <button
-          type="button"
-          class="btn btn-outline-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#addUser"
-          (click)="openCreateUser()"
-        >
+        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addUser"
+          (click)="openCreateUser()">
           <i class="fa fa-plus"></i>
           Create Contacts
         </button>
       </div>
     </div>
 
-    <div class="card-body">
-      <div class="table-responsive mb-3">
-        <table
-          class="table border card-table table-vcenter text-nowrap align-items-center"
-        >
-          <thead class="bg-primary text-white">
-            <!-- <th class="text-white">Photo Url</th> -->
-            <th class="text-white">Full Name</th>
-            <!-- <th class="text-white">First Name</th>
-            <th class="text-white">Last Name</th> -->
-            <th class="text-white">Job Title</th>
-            <th class="text-white">Organization Name</th>
 
-            <!-- <th class="text-white">Phone</th> -->
-            <!-- <th class="text-white">Address</th>
-            <th class="text-white">City</th>
-            <th class="text-white">State</th>
-            <th class="text-white">Zip</th>
-            <th class="text-white">Country</th>
-            <th class="text-white">Website</th>
-            <th class="text-white">Notes</th>  -->
-            <th class="text-white">Email</th>
-            <th class="text-white">Lead Source</th>
-            <th class="text-white">Lead Status</th>
-            <th class="text-white">Lead Score</th>
-            <th class="text-white">Engagement</th>
-            <th class="text-white">Priority</th>
+    <table>
+      <thead>
+        <tr>
+          <th class="px-4">Contact</th>
+          <th>Email</th>
+          <th>Country</th>
+          <th>Lead Scoring</th>
+          <th>Intent Scoring</th>
+          <th>ICP Matching</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of submittedData">
+          <td class=" contact-info" (click)="openViewUser(data)">
+            <img [src]="photo1" alt="{{ data.name }}" class="avatar" />
+            <div class="data-details">
+              <div class="data-name">{{ data.fullName | uppercase }}</div>
 
-            <!--
-            <th class="text-white">createdAt</th>
-            <th class="text-white">modifiedAt</th>-->
-            <th class="text-white">Actions</th>
-          </thead>
-          <tbody>
-            <ng-container>
-              <tr
-                *ngFor="let data of submittedData"
-                [style.z-index]="isHovered ? 10 : 1"
-                (mouseenter)="onMouseEnter(data)"
-              >
-                <!-- <td>
-                  {{ data.photoUrl }}
-                </td> -->
-                <td (mouseenter)="openModal(data)">
-                  {{ data.fullName }}
-                </td>
-                <!-- <td>
-                  {{ data.firstName }}
-                </td>
-                <td>
-                  {{ data.lastName }}
-                </td> -->
-                <td>
-                  {{ data.jobTitle }}
-                </td>
-                <td>
+              <div class="data-gender-age">
+                <span class="text-muted">{{ data.jobTitle | titlecase }},</span>
+                <span>
                   {{ data.organizationName }}
-                </td>
-                <td>
-                  {{ data.email }}
-                </td>
+                </span>
+              </div>
+            </div>
+          </td>
+          <td class="table-data" (click)="openViewUser(data) ">{{ data.email }}</td>
+          <td>
+            <span class="flag-icon flag-icon-{{ getCountryFlagClass(data?.country) }}"></span>
+            <!-- {{ data.country | titlecase }} -->
+          </td>
+          <td (click)="openViewUser(data)"> <i class="fas fa-star"></i> 98</td>
+          <td (click)="openViewUser(data)"> <i class="fas fa-chart-line"></i> 100</td>
+          <td class="labeldiv" (click)="openViewUser(data)">
+            <span class="badge badge-success label mt-3" style="padding: 4px;">ICP Matched</span>
+          </td>
+          <td class="dropdown-cell">
+            <div ngbDropdown class="dropdown option-dropdown">
+              <button ngbDropdownToggle class="btn btn-link text-secondary p-0">
+                <i class="fa fa-ellipsis-v"></i>
+              </button>
+              <div ngbDropdownMenu class="dropdown-menu dropdown-menu-right" style="max-width: 10px;">
+                <button class="dropdown-item" (click)="openViewUser(data)">
+                  <i class="fa fa-eye text-secondary"></i> View
+                </button>
+                <button class="dropdown-item" (click)="openUpdateUser(data)">
+                  <i class="fa fa-edit text-success"></i> Update
+                </button>
+                <button class="dropdown-item" (click)="delete(data)">
+                  <i class="fa fa-trash-o text-danger"></i> Delete
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
 
-                <td>
-                  {{ data.leadSource }}
-                </td>
-                <td>
-                  {{ data.status }}
-                </td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <!-- <td>  {{ data.phone }}</td> -->
+    </table>
+    <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
 
-                <!--
-                <td>
-                  {{ data.address }}
-                </td>
-                <td>
-                  {{ data.city }}
-                </td>
-                <td>
-                  {{ data.state }}
-                </td>
-                <td>
-                  {{ data.zip }}
-                </td>
-                <td>
-                  {{ data.country }}
-                </td> -->
-                <!-- <td>
-                  {{ data.website }}
-                </td>
-                <td>
-                  {{ data.notes }}
-                </td> -->
-
-                <!--
-                <td>
-                  {{ data.createdAt }}
-                </td>
-                <td>
-                  {{ data.modifiedAt }}
-                </td> -->
-                <td class="icon w-1">
-                  <button (click)="openViewUser(data)">
-                    <i class="fa fa-eye text-secondary view"></i>
-                  </button>
-
-                  <button (click)="openUpdateUser(data)">
-                    <i class="fa fa-edit text-success update"></i>
-                  </button>
-
-                  <button (click)="delete(data)">
-                    <i class="fa fa-trash-o text-danger delete"></i>
-                  </button>
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
+    <ng-template #deleteModal let-modal>
+      <!--  SMALL MODAL -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4><i class="fa fa-exclamation-triangle"></i> Delete Form</h4>
+          <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete ?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-primary" (click)="closeModal()">
+            Cancel
+          </button>
+          <button class="btn btn-danger" type="button">Yes</button>
+        </div>
       </div>
-      <div class="p-2">
-        <app-pagination
-          [totalPages]="totalPages"
-          [limit]="limit"
-          (pageChanged)="onPageChange($event)"
-        ></app-pagination>
+    </ng-template>
+
+    <ng-template #createUserOffcanvas let-offcanvas>
+      <div class="offcanvas-header">
+        <h4 class="offcanvas-title">
+          <i class="fe fe-cube"></i> Create Contacts
+        </h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
       </div>
-    </div>
+      <hr class="m-0" />
+      <div class="offcanvas-body">
+        <form [formGroup]="Form" (ngSubmit)="onCreateuserSubmit()">
+          <div class="form-group">
+            <label class="form-label">Photo URL</label>
+            <input type="text" class="form-control" formControlName="photoUrl" name="title" placeholder="photoUrl"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" formControlName="fullName" placeholder="fullName"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-control" formControlName="firstName" placeholder="firstName"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-control" formControlName="lastName" placeholder="lastName"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Job Title</label>
+            <input type="text" class="form-control" formControlName="jobTitle" placeholder="jobTitle"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Organization Name</label>
+            <input type="text" class="form-control" formControlName="organizationName" placeholder="organizationName"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" placeholder="Email" formControlName="email" class="form-control"
+              (keydown)="preventDefault($event)" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" class="form-control" formControlName="phone" placeholder="phone"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-control" formControlName="address" placeholder="address"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" class="form-control" formControlName="city" placeholder="city"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">State</label>
+            <input type="text" class="form-control" formControlName="state" placeholder="state"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Zip</label>
+            <input type="text" class="form-control" formControlName="zip" placeholder="zip"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Country</label>
+            <input type="text" class="form-control" formControlName="country" placeholder="country"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Website</label>
+            <input type="text" class="form-control" formControlName="website" placeholder="website"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <input type="text" class="form-control" formControlName="notes" placeholder="notes"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Source</label>
+            <input type="text" class="form-control" formControlName="leadSource" placeholder="leadSource"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <input type="text" class="form-control" formControlName="status" placeholder="status"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="d-flex justify-content-end mt-4">
+            <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()">
+              <i class="fa fa-times"></i>Close
+            </button>
+            <button class="btn btn-primary" type="submit">
+              <i class="fa fa-save"></i> Create
+            </button>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+
+    <ng-template #updateUserOffcanvas let-offcanvas>
+      <div class="offcanvas-header">
+        <h4 class="offcanvas-title"><i class="fe fe-user"></i>Edit Contacts</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+      </div>
+      <hr class="m-0" />
+      <div class="offcanvas-body">
+        <form [formGroup]="Form" (ngSubmit)="onUpdateuserSubmit()">
+          <div class="form-group">
+            <label class="form-label">Photo Url</label>
+            <input type="title" class="form-control" formControlName="photoUrl" name="Title" placeholder="photoUrl" />
+            <div class="invalid-feedback">{{ errorFeedback.email }}</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="title" class="form-control" formControlName="fullName" name="Title" placeholder="fullName"
+              [class.is-invalid]="errorFeedback?.photoUrl?.length > 0" />
+            <div class="invalid-feedback">{{ errorFeedback.email }}</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="title" class="form-control" formControlName="lastName" name="Title" placeholder="lastName"
+              [class.is-invalid]="errorFeedback?.lastName?.length > 0" />
+            <div class="invalid-feedback">{{ errorFeedback.email }}</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Job Title</label>
+            <input type="text" class="form-control" formControlName="jobTitle" placeholder="jobTitle"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <!---->
+          <div class="form-group">
+            <label class="form-label">Organization Name</label>
+            <input type="text" class="form-control" formControlName="organizationName" placeholder="organizationName"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" placeholder="Email" formControlName="email" class="form-control"
+              (keydown)="preventDefault($event)" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" class="form-control" formControlName="phone" placeholder="phone"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-control" formControlName="address" placeholder="address"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" class="form-control" formControlName="city" placeholder="city"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">State</label>
+            <input type="text" class="form-control" formControlName="state" placeholder="state"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Zip</label>
+            <input type="text" class="form-control" formControlName="zip" placeholder="zip"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Country</label>
+            <input type="text" class="form-control" formControlName="country" placeholder="country"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Website</label>
+            <input type="text" class="form-control" formControlName="website" placeholder="website"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <input type="text" class="form-control" formControlName="notes" placeholder="notes"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Source</label>
+            <input type="text" class="form-control" formControlName="leadSource" placeholder="leadSource"
+              (keydown)="preventDefault($event)" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <input type="text" class="form-control" formControlName="status" placeholder="status"
+              (keydown)="preventDefault($event)" />
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()">
+              <i class="fa fa-times"></i> Close
+            </button>
+            <button class="btn btn-primary" type="submit">
+              <i class="fa fa-save"></i> Update
+            </button>
+          </div>
+        </form>
+      </div>
+    </ng-template>
+
+    <ng-template #viewUserOffcanvas let-offcanvas>
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">
+          <i class="fe fe-cube"></i> View Contacts
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+      </div>
+      <hr class="m-0" />
+      <div class="offcanvas-body">
+        <div *ngIf="selectedData">
+          <p><strong>PhotoURL:</strong> {{ selectedData.photoUrl }}</p>
+          <p><strong>First Name:</strong> {{ selectedData.fullName }}</p>
+          <p><strong>Last Name:</strong> {{ selectedData.lastName }}</p>
+          <p><strong>Job Title:</strong> {{ selectedData.jobTitle }}</p>
+          <p>
+            <strong>Organization Name:</strong>
+            {{ selectedData.organizationName }}
+          </p>
+          <p><strong>Email:</strong> {{ selectedData.email }}</p>
+          <p><strong>Phone:</strong> {{ selectedData.phone }}</p>
+          <p><strong>Address:</strong> {{ selectedData.address }}</p>
+          <p><strong>City:</strong> {{ selectedData.city }}</p>
+          <p><strong>State:</strong> {{ selectedData.state }}</p>
+          <p><strong>Zip:</strong> {{ selectedData.zip }}</p>
+          <p><strong>Country:</strong> {{ selectedData.country }}</p>
+          <p><strong>Website:</strong> {{ selectedData.website }}</p>
+          <p><strong>Notes:</strong> {{ selectedData.notes }}</p>
+          <p><strong>Source:</strong> {{ selectedData.leadSource }}</p>
+          <p><strong>Status:</strong> {{ selectedData.status }}</p>
+        </div>
+      </div>
+    </ng-template>
+    <!--modal-->
+
+    <ng-template #modalContent let-modal let-data="hoveredData">
+      <div class="profile-card" style="width: 1400px !important">
+        <div class="profile-card-header row">
+          <!-- Profile Image Section -->
+          <div class="col-md-3">
+            <div class="profile-image-container">
+              <img
+                src="https://imgs.search.brave.com/b20GAw5dHFdFadqg6JqUsOdDmk9-lmNFm_E7cKm3mD8/rs:fit:500:0:0/g:ce/aHR0cHM6Ly93d3cu/bG9nby53aW5lL2Ev/bG9nby9HaXRIdWIv/R2l0SHViLUljb24t/V2hpdGUtRGFyay1C/YWNrZ3JvdW5kLUxv/Z28ud2luZS5zdmc.svg"
+                alt="Profile" class="profile-image mx-3" />
+              <div class="profile-badges mt-5">
+                <span class="badge badge-danger" style="min-width: 100px">Ideal persona</span>
+              </div>
+              <div class="profile-badges mt-0">
+                <span class="badge badge-danger mt-3" style="min-width: 100px">ICP Fit</span>
+              </div>
+              <div class="" style="margin-top: 10px" *ngIf="hoveredData.website">
+                <i class="fas fa-globe"></i>
+                {{ hoveredData.website }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Information Section -->
+          <div class="col-md-6 d-flex align-items-center">
+            <div class="profile-user-info text-center">
+              <h5 class="profile-user-name">
+                {{ hoveredData.fullName | titlecase
+                }}<span class="text-muted mx-1" style="font-size: 12px">{{ hoveredData.jobTitle }}
+                </span>
+              </h5>
+              <p class="profile-user-title">
+                <i class="fas fa-building"></i>
+                {{ hoveredData.organizationName }}
+                <!-- <i class="fe fe-map-pin"></i> -->
+                <!-- {{ hoveredData.country }} -->
+              </p>
+              <p class="profile-user-since">
+                Since May 2020 <i class="fe fe-map-pin"></i>
+                {{ hoveredData.country }}
+              </p>
+              <div class="profile-badges mt-3">
+                <span class="badge badge-success" style="min-width: 100px">Economic buyer</span>
+              </div>
+              <div class="profile-badges mt-3">
+                <span class="badge badge-success" style="min-width: 100px">Ideal persona</span>
+              </div>
+              <div class="profile-contact-info mt-3" *ngIf="hoveredData.email">
+                <span class="">
+                  <i class=" fas fa-envelope"></i> {{ hoveredData.email }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scoring Section -->
+          <div class="col-md-3">
+            <div class="row mt-5">
+              <div class="lead-scoring d-flex flex-column align-items-center">
+                <div class="progress-circle" data-score="40">
+                  <span class="fs-12" style="align-items: center; color: #6c757d; font-size: 12px">80</span>
+                </div>
+                <span class="mt-4" style="color: #6c757d; font-size: 12px">
+                  Lead Scoring</span>
+              </div>
+
+              <div class="Intent mt-4 d-flex flex-column align-items-center">
+                <div class="progress-circle" data-score="40">
+                  <span class="fs-12" style="color: #6c757d; font-size: 12px">80</span>
+                </div>
+                <span class="mt-4" style="color: #6c757d; font-size: 12px">Intent Scoring</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template [ngbModalContent]="modalContent" [ngbModalClose]="'Close click'"></ng-template>
   </div>
 </div>
-
-<ng-template #deleteModal let-modal>
-  <!--  SMALL MODAL -->
-  <div class="modal-content">
-    <div class="modal-header">
-      <h4><i class="fa fa-exclamation-triangle"></i> Delete Form</h4>
-      <button
-        type="button"
-        class="btn-close"
-        aria-label="Close"
-        (click)="modal.dismiss('Cross click')"
-      ></button>
-    </div>
-    <div class="modal-body">
-      <p>Are you sure you want to delete ?</p>
-    </div>
-    <div class="modal-footer">
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        (click)="closeModal()"
-      >
-        Cancel
-      </button>
-      <button class="btn btn-danger" type="button">Yes</button>
-    </div>
-  </div>
-</ng-template>
-
-<ng-template #createUserOffcanvas let-offcanvas>
-  <div class="offcanvas-header">
-    <h4 class="offcanvas-title"><i class="fe fe-cube"></i> Create Contacts</h4>
-    <button
-      type="button"
-      class="btn-close"
-      aria-label="Close"
-      (click)="offcanvas.dismiss()"
-    ></button>
-  </div>
-  <hr class="m-0" />
-  <div class="offcanvas-body">
-    <form [formGroup]="Form" (ngSubmit)="onCreateuserSubmit()">
-      <div class="form-group">
-        <label class="form-label">Photo URL</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="photoUrl"
-          name="title"
-          placeholder="photoUrl"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Full Name</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="fullName"
-          placeholder="fullName"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">First Name</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="firstName"
-          placeholder="firstName"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Last Name</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="lastName"
-          placeholder="lastName"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Job Title</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="jobTitle"
-          placeholder="jobTitle"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Organization Name</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="organizationName"
-          placeholder="organizationName"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input
-          type="email"
-          placeholder="Email"
-          formControlName="email"
-          class="form-control"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Phone</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="phone"
-          placeholder="phone"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Address</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="address"
-          placeholder="address"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">City</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="city"
-          placeholder="city"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">State</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="state"
-          placeholder="state"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Zip</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="zip"
-          placeholder="zip"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Country</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="country"
-          placeholder="country"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Website</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="website"
-          placeholder="website"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Notes</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="notes"
-          placeholder="notes"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Source</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="leadSource"
-          placeholder="leadSource"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Status</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="status"
-          placeholder="status"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="d-flex justify-content-end mt-4">
-        <button
-          class="btn btn-outline-primary me-3"
-          type="button"
-          (click)="offcanvas.dismiss()"
-        >
-          <i class="fa fa-times"></i>Close
-        </button>
-        <button class="btn btn-primary" type="submit">
-          <i class="fa fa-save"></i> Create
-        </button>
-      </div>
-    </form>
-  </div>
-</ng-template>
-
-<ng-template #updateUserOffcanvas let-offcanvas>
-  <div class="offcanvas-header">
-    <h4 class="offcanvas-title"><i class="fe fe-user"></i>Edit Contacts</h4>
-    <button
-      type="button"
-      class="btn-close"
-      aria-label="Close"
-      (click)="offcanvas.dismiss()"
-    ></button>
-  </div>
-  <hr class="m-0" />
-  <div class="offcanvas-body">
-    <form [formGroup]="Form" (ngSubmit)="onUpdateuserSubmit()">
-      <div class="form-group">
-        <label class="form-label">Photo Url</label>
-        <input
-          type="title"
-          class="form-control"
-          formControlName="photoUrl"
-          name="Title"
-          placeholder="photoUrl"
-        />
-        <div class="invalid-feedback">{{ errorFeedback.email }}</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Full Name</label>
-        <input
-          type="title"
-          class="form-control"
-          formControlName="fullName"
-          name="Title"
-          placeholder="fullName"
-          [class.is-invalid]="errorFeedback?.photoUrl?.length > 0"
-        />
-        <div class="invalid-feedback">{{ errorFeedback.email }}</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Last Name</label>
-        <input
-          type="title"
-          class="form-control"
-          formControlName="lastName"
-          name="Title"
-          placeholder="lastName"
-          [class.is-invalid]="errorFeedback?.lastName?.length > 0"
-        />
-        <div class="invalid-feedback">{{ errorFeedback.email }}</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Job Title</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="jobTitle"
-          placeholder="jobTitle"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <!---->
-      <div class="form-group">
-        <label class="form-label">Organization Name</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="organizationName"
-          placeholder="organizationName"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input
-          type="email"
-          placeholder="Email"
-          formControlName="email"
-          class="form-control"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Phone</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="phone"
-          placeholder="phone"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Address</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="address"
-          placeholder="address"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">City</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="city"
-          placeholder="city"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">State</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="state"
-          placeholder="state"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Zip</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="zip"
-          placeholder="zip"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Country</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="country"
-          placeholder="country"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Website</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="website"
-          placeholder="website"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Notes</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="notes"
-          placeholder="notes"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Source</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="leadSource"
-          placeholder="leadSource"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Status</label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="status"
-          placeholder="status"
-          (keydown)="preventDefault($event)"
-        />
-      </div>
-
-      <div class="d-flex justify-content-end">
-        <button
-          class="btn btn-outline-primary me-3"
-          type="button"
-          (click)="offcanvas.dismiss()"
-        >
-          <i class="fa fa-times"></i> Close
-        </button>
-        <button class="btn btn-primary" type="submit">
-          <i class="fa fa-save"></i> Update
-        </button>
-      </div>
-    </form>
-  </div>
-</ng-template>
-
-<ng-template #viewUserOffcanvas let-offcanvas>
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title"><i class="fe fe-cube"></i> View Contacts</h5>
-    <button
-      type="button"
-      class="btn-close"
-      aria-label="Close"
-      (click)="offcanvas.dismiss()"
-    ></button>
-  </div>
-  <hr class="m-0" />
-  <div class="offcanvas-body">
-    <div *ngIf="selectedData">
-      <p><strong>PhotoURL:</strong> {{ selectedData.photoUrl }}</p>
-      <p><strong>First Name:</strong> {{ selectedData.fullName }}</p>
-      <p><strong>Last Name:</strong> {{ selectedData.lastName }}</p>
-      <p><strong>Job Title:</strong> {{ selectedData.jobTitle }}</p>
-      <p>
-        <strong>Organization Name:</strong> {{ selectedData.organizationName }}
-      </p>
-      <p><strong>Email:</strong> {{ selectedData.email }}</p>
-      <p><strong>Phone:</strong> {{ selectedData.phone }}</p>
-      <p><strong>Address:</strong> {{ selectedData.address }}</p>
-      <p><strong>City:</strong> {{ selectedData.city }}</p>
-      <p><strong>State:</strong> {{ selectedData.state }}</p>
-      <p><strong>Zip:</strong> {{ selectedData.zip }}</p>
-      <p><strong>Country:</strong> {{ selectedData.country }}</p>
-      <p><strong>Website:</strong> {{ selectedData.website }}</p>
-      <p><strong>Notes:</strong> {{ selectedData.notes }}</p>
-      <p><strong>Source:</strong> {{ selectedData.leadSource }}</p>
-      <p><strong>Status:</strong> {{ selectedData.status }}</p>
-    </div>
-  </div>
-</ng-template>
-<!--modal-->
-
-<ng-template #modalContent let-modal let-data="hoveredData">
-  <div class="profile-card" style="width: 1400px !important">
-    <div class="profile-card-header row">
-      <!-- Profile Image Section -->
-      <div class="col-md-3">
-        <div class="profile-image-container">
-          <img
-            src="https://imgs.search.brave.com/b20GAw5dHFdFadqg6JqUsOdDmk9-lmNFm_E7cKm3mD8/rs:fit:500:0:0/g:ce/aHR0cHM6Ly93d3cu/bG9nby53aW5lL2Ev/bG9nby9HaXRIdWIv/R2l0SHViLUljb24t/V2hpdGUtRGFyay1C/YWNrZ3JvdW5kLUxv/Z28ud2luZS5zdmc.svg"
-            alt="Profile"
-            class="profile-image mx-3"
-          />
-          <div class="profile-badges mt-5">
-            <span class="badge badge-danger" style="min-width: 100px"
-              >Ideal persona</span
-            >
-          </div>
-          <div class="profile-badges mt-0">
-            <span class="badge badge-danger mt-3" style="min-width: 100px"
-              >ICP Fit</span
-            >
-          </div>
-          <div class="" style="margin-top: 10px">
-            <i class="fas fa-globe"></i>
-            {{ hoveredData.website }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Profile Information Section -->
-      <div class="col-md-6 d-flex align-items-center">
-        <div class="profile-user-info text-center">
-          <h5 class="profile-user-name">
-            {{ hoveredData.fullName | titlecase
-            }}<span class="text-muted mx-1" style="font-size: 12px"
-              >{{ hoveredData.jobTitle }}
-            </span>
-          </h5>
-          <p class="profile-user-title">
-            <i class="fas fa-building"></i>
-            {{ hoveredData.organizationName }}
-            <!-- <i class="fe fe-map-pin"></i> -->
-            <!-- {{ hoveredData.country }} -->
-          </p>
-          <p class="profile-user-since">
-            Since May 2020 <i class="fe fe-map-pin"></i>
-            {{ hoveredData.country }}
-          </p>
-          <div class="profile-badges mt-3">
-            <span class="badge badge-success" style="min-width: 100px"
-              >Economic buyer</span
-            >
-          </div>
-          <div class="profile-badges mt-3">
-            <span class="badge badge-success" style="min-width: 100px"
-              >Ideal persona</span
-            >
-          </div>
-          <div class="profile-contact-info mt-3">
-            <span class="">
-              <i class="fas fa-envelope"></i> {{ hoveredData.email }}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Scoring Section -->
-      <div class="col-md-3">
-        <div class="row mt-5">
-          <div class="lead-scoring d-flex flex-column align-items-center">
-            <div class="progress-circle" data-score="40">
-              <span
-                class="fs-12"
-                style="align-items: center; color: #6c757d; font-size: 12px"
-                >80</span
-              >
-            </div>
-            <span class="mt-4" style="color: #6c757d; font-size: 12px">
-              Lead Scoring</span
-            >
-          </div>
-
-          <div class="Intent mt-4 d-flex flex-column align-items-center">
-            <div class="progress-circle" data-score="40">
-              <span class="fs-12" style="color: #6c757d; font-size: 12px"
-                >80</span
-              >
-            </div>
-            <span class="mt-4" style="color: #6c757d; font-size: 12px"
-              >Intent Scoring</span
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</ng-template>
-
-<ng-template
-  [ngbModalContent]="modalContent"
-  [ngbModalClose]="'Close click'"
-></ng-template>

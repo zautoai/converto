@@ -238,7 +238,7 @@ export class HubspotService extends BaseExternalCrm {
         const accessToken = await this.getAccessToken(orgId);
         if(!accessToken) return null;
         const hubspotClient = new Client({ accessToken:  accessToken});
-        const contacts = await hubspotClient.crm.contacts.getAll();
+        const contacts = await hubspotClient.crm.contacts.getAll()
         const _contacts = contacts.map(contact => {
             return contact.properties;
         });

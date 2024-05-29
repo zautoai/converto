@@ -66,6 +66,7 @@ import { IcpComponent } from './icp/icp.component';
 import { IcpCreatorComponent } from './icp-creator/icp-creator.component';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { IcpviewComponent } from './icpview/icpview.component';
+import { IntentScoringComponent } from './intent-scoring/intent-scoring.component';
 
 @NgModule({
   declarations: [
@@ -118,7 +119,8 @@ import { IcpviewComponent } from './icpview/icpview.component';
     SegmentComponent,
     IcpComponent,
     IcpCreatorComponent,
-    IcpviewComponent
+    IcpviewComponent,
+    IntentScoringComponent
   ],
   imports: [
     PlatformLinkModule,

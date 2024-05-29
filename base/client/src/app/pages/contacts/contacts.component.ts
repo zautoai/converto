@@ -2,7 +2,8 @@ import { Component, ElementRef, Input, OnInit, ViewChild , ChangeDetectorRef, Te
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
 import { FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
-import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownConfig,NgbDropdownModule, NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+ 
 import { NotificationService } from '../../shared/services/notification.service';
 import { RestService } from '../../shared/services/rest.service';
 import { SweetAlertService } from '../../shared/services/sweet-alart.service';
@@ -11,13 +12,14 @@ import { API } from '../../config/endpoint.config';
 import { error } from 'console';
 import { PaginationData } from 'src/app/common/intefaces';
 import { ActivatedRoute, Router } from '@angular/router';
-
-
+  
 
 @Component({
   selector: 'app-contacts',
   templateUrl: './contacts.component.html',
   styleUrls: ['./contacts.component.scss'],
+  
+
 })
 export class ContactsComponent implements OnInit {
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
@@ -31,7 +33,9 @@ export class ContactsComponent implements OnInit {
   user: any = {};
   userList: any = [];
   selectedUser: any = undefined;
+  showActionMenu = false;
   isEdit: boolean = false;
+  photo1:any="https://imgs.search.brave.com/Mvm4VXGBy83NyhAuuehkrHYV0s4BvjtY6ZwR2dXCGro/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9ncGNh/dGFseXNpcy5ibG9i/LmNvcmUud2luZG93/cy5uZXQvZ3Bob3N0/ZWRjb250ZW50LXBy/b2Qvd1pVNzFpND1f/S2FtYXRoX05pa2hp/bF81MDB4NTAwLmpw/Zw" 
   Form: FormGroup;
   errorFeedback: any = { title: '', describe: '' };
   showDescription: boolean = true;
@@ -45,6 +49,10 @@ export class ContactsComponent implements OnInit {
   submittedData: any[] = [];
   selectedData: any = '';
   limit = 5;
+  totalItems: number = 0;
+https: any;
+isLeadScore: any=80;
+  clickedData: any;
 
 
 
@@ -84,8 +92,9 @@ export class ContactsComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.currentPage = +params['page'] || 1;
       this.limit = +params['limit'] || this.limit;
-      this.getContacts(this.currentPage, this.limit);
+      this.getContacts();
       this.onPageChange({ page: this.currentPage })
+      console.log("test",this.submittedData)
     });
   }
 
@@ -94,22 +103,20 @@ export class ContactsComponent implements OnInit {
       this.chatBotWidget.getAgent(this.avatarService.getAvatarId());
     }
   }
-
-  getContacts(page: number = 1, limit: number = this.limit): void {
+  getContacts(): void {
     this.restService
-      .getAll(API.main.contact + `?page=${page}&limit=${limit}`) // Pass pagination parameters to the service
+      .get(API.main.contact, `?limit=${this.limit}&page=${this.currentPage}`)
       .subscribe(
         (response: any) => {
           this.submittedData = response.data;
-          this.totalPages = response.total; // Update data with response from API
-          // Update any other pagination-related properties if necessary
+          this.totalItems = response.total
+          console.log("accountdata",this.submittedData)
         },
         (error) => {
           console.error(error);
           this.notifService.showError(error.error.message);
         },
       );
-    console.log(this.submittedData);
   }
 
   deleteSubmittedData(data: any): void {
@@ -465,9 +472,32 @@ export class ContactsComponent implements OnInit {
 
   onPageChange(event: any) {
     this.currentPage = event.page;
-    this.getContacts(this.currentPage, this.limit)
-
+    this.getContacts()
+    
   }
+  toggleActionMenu() {
+    this.showActionMenu = !this.showActionMenu;
+  }
+
+
+  getCountryFlagClass(countryCode: string): string {
+    
+    if (countryCode) {
+      // const countrysCode = countryCode.trim()
+      const countryCodes: { [key: string]: string } = {
+        unitedstates: 'us',
+        india: 'in',
+        australia: 'au'
+        // Add more country codes as needed
+      };
+  
+      return countryCodes[countryCode.toLowerCase()] || '';
+    } else {
+      return ''; // Return an empty string if countryCode is falsy
+    }
+  }
+  
+
 
   resetErrorFeedback() {
     let keys = Object.keys(this.errorFeedback);
@@ -488,8 +518,8 @@ export class ContactsComponent implements OnInit {
   ]);
   onMouseEnter(data: any) {
     if(data){
-    this.hoveredData=data;
-    console.log("hovereddata",this.hoveredData)
+    this.clickedData=data;
+    console.log("hovereddata",this.clickedData)
     }
     }
 
@@ -505,3 +535,4 @@ export class ContactsComponent implements OnInit {
       } 
     }}
 
+    
