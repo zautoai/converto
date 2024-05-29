@@ -2,7 +2,8 @@ import { Component, ElementRef, Input, OnInit, ViewChild , ChangeDetectorRef, Te
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
 import { FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
-import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownConfig,NgbDropdownModule, NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+ 
 import { NotificationService } from '../../shared/services/notification.service';
 import { RestService } from '../../shared/services/rest.service';
 import { SweetAlertService } from '../../shared/services/sweet-alart.service';
@@ -18,6 +19,8 @@ import { ActivatedRoute, Router } from '@angular/router';
   selector: 'app-contacts',
   templateUrl: './contacts.component.html',
   styleUrls: ['./contacts.component.scss'],
+  
+
 })
 export class ContactsComponent implements OnInit {
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
@@ -31,7 +34,9 @@ export class ContactsComponent implements OnInit {
   user: any = {};
   userList: any = [];
   selectedUser: any = undefined;
+  showActionMenu = false;
   isEdit: boolean = false;
+  photo1:any="https://imgs.search.brave.com/Mvm4VXGBy83NyhAuuehkrHYV0s4BvjtY6ZwR2dXCGro/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9ncGNh/dGFseXNpcy5ibG9i/LmNvcmUud2luZG93/cy5uZXQvZ3Bob3N0/ZWRjb250ZW50LXBy/b2Qvd1pVNzFpND1f/S2FtYXRoX05pa2hp/bF81MDB4NTAwLmpw/Zw" 
   Form: FormGroup;
   errorFeedback: any = { title: '', describe: '' };
   showDescription: boolean = true;
@@ -45,6 +50,7 @@ export class ContactsComponent implements OnInit {
   submittedData: any[] = [];
   selectedData: any = '';
   limit = 5;
+https: any;
 
 
 
@@ -86,6 +92,7 @@ export class ContactsComponent implements OnInit {
       this.limit = +params['limit'] || this.limit;
       this.getContacts(this.currentPage, this.limit);
       this.onPageChange({ page: this.currentPage })
+      console.log("test",this.submittedData)
     });
   }
 
@@ -103,13 +110,14 @@ export class ContactsComponent implements OnInit {
           this.submittedData = response.data;
           this.totalPages = response.total; // Update data with response from API
           // Update any other pagination-related properties if necessary
+          console.log(this.submittedData);
         },
         (error) => {
           console.error(error);
           this.notifService.showError(error.error.message);
         },
       );
-    console.log(this.submittedData);
+
   }
 
   deleteSubmittedData(data: any): void {
@@ -468,6 +476,10 @@ export class ContactsComponent implements OnInit {
     this.getContacts(this.currentPage, this.limit)
 
   }
+  toggleActionMenu() {
+    this.showActionMenu = !this.showActionMenu;
+  }
+
 
   resetErrorFeedback() {
     let keys = Object.keys(this.errorFeedback);
@@ -505,3 +517,4 @@ export class ContactsComponent implements OnInit {
       } 
     }}
 
+    
