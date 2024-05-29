@@ -11,9 +11,9 @@
       </div>
     </div>
 
-    <div class="table-container">
-      <table>
-        <!-- <thead>
+
+    <table>
+      <!-- <thead>
           <tr>
             <th class="px-4">Contact</th>
             <th>Email</th>
@@ -21,52 +21,51 @@
             <th>Action</th>
           </tr>
         </thead> -->
-        <tbody>
-          <tr *ngFor="let data of submittedData">
-            <td class="contact-info">
-              <img [src]="photo1" alt="{{ data.name }}" class="avatar" />
-              <div class="data-details">
-                <div class="data-name">{{ data.fullName | uppercase }}</div>
+      <tbody>
+        <tr *ngFor="let data of submittedData" (mouseenter)="onMouseEnter(data)">
 
-                <div class="data-gender-age">
-                  <span class="text-muted">{{ data.jobTitle | titlecase }},</span>
+          <td class="contact-info" (mouseenter)="openModal(data)">
+            <img [src]="photo1" alt="{{ data.name }}" class="avatar" />
+            <div class="data-details">
+              <div class="data-name">{{ data.fullName | uppercase }}</div>
 
-                  <span>
-                    {{ data.organizationName }}
-                  </span>
-                </div>
+              <div class="data-gender-age">
+                <span class="text-muted">{{ data.jobTitle | titlecase }},</span>
+                <span>
+                  {{ data.organizationName }}
+                </span>
               </div>
-            </td>
-            <td class="table-data">{{ data.email }}</td>
-            <td>{{ data.country | titlecase }}</td>
-            <td>98</td>
-            <td>100</td>
+            </div>
+          </td>
 
-            <td>
-              <span class="badge badge-success" style="min-width: 100px">ICP Matched</span>
-            </td>
-
-            <td class="icon w-1">
-              <button (click)="toggleActionMenu()">
-                <i class="fa fa-ellipsis-v text-secondary"></i>
+          <td class="table-data" (mouseenter)="openModal(data)">{{ data.email }}</td>
+          <td>{{ data.country | titlecase }}</td>
+          <td>98</td>
+          <td>100</td>
+          <td class="labeldiv">
+            <span class="badge badge-success label" style=" min-width: 80px">ICP Matched</span>
+          </td>
+          <td class="dropdown-cell">
+            <div ngbDropdown class="dropdown option-dropdown">
+              <button ngbDropdownToggle class="btn btn-link text-secondary p-0">
+                <i class="fa fa-ellipsis-v"></i>
               </button>
-              <div *ngIf="showActionMenu">
-
-                <button (click)="openViewUser(data)">
-                  <i class="fa fa-eye text-secondary view"></i>
+              <div ngbDropdownMenu class="dropdown-menu dropdown-menu-right" style="max-width: 10px;">
+                <button class="dropdown-item" (click)="openViewUser(data)">
+                  <i class="fa fa-eye text-secondary"></i> View
                 </button>
-                <button (click)="openUpdateUser(data)">
-                  <i class="fa fa-edit text-success update"></i>
+                <button class="dropdown-item" (click)="openUpdateUser(data)">
+                  <i class="fa fa-edit text-success"></i> Update
                 </button>
-                <button (click)="delete(data)">
-                  <i class="fa fa-trash-o text-danger delete"></i>
+                <button class="dropdown-item" (click)="delete(data)">
+                  <i class="fa fa-trash-o text-danger"></i> Delete
                 </button>
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <ng-template #deleteModal let-modal>
       <!--  SMALL MODAL -->
