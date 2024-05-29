@@ -49,6 +49,7 @@ import { ProspectjourneyModule } from './prospect-journey/prospect-journey.modul
 import { SegmentsModule } from './segments/segments.module';
 import { SegmentCategoryModule } from './segment-category/segment-category.module';
 import { IcpModule } from './icp/icp.module';
+import { IntentScoringModule } from './intent-scoring/intent-scoring.module';
 
 @Module({
   imports: [
@@ -115,6 +116,7 @@ import { IcpModule } from './icp/icp.module';
     SegmentsModule,
     SegmentCategoryModule,
     IcpModule,
+    IntentScoringModule,
   ],
   controllers: [AppController],
   providers: [AppService],

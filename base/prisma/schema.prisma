@@ -199,7 +199,7 @@ model Visit {
   createdAt  DateTime @default(now())
   modifiedAt DateTime @updatedAt
 
-  conversation            Conversation?
+  conversation             Conversation?
   prospectJourneyActivitys ProspectJourney[]
 
   @@index([visitorId], map: "Visitor_visitorId_fkey")
@@ -409,21 +409,35 @@ enum ProspectActivityType {
 }
 
 model ProspectJourney {
-  id             String              @id @default(uuid())
+  id             String               @id @default(uuid())
   visitId        String
   data           String?
   url            String
   type           ProspectActivityType @default(OTHER)
-  timeSpend      Int                 @default(0)
-  score          Float               @default(0.0)
-  scrollDepth    Float               @default(0.0)
+  timeSpend      Int                  @default(0)
+  scrollDepth    Float                @default(0.0)
   previousPageId String?
   previousPage   ProspectJourney?     @relation("PreviousPageRelation", fields: [previousPageId], references: [id])
   nextPages      ProspectJourney[]    @relation("PreviousPageRelation")
-  createdAt      DateTime            @default(now())
-  modifiedAt     DateTime            @updatedAt
-  visit          Visit               @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  createdAt      DateTime             @default(now())
+  modifiedAt     DateTime             @updatedAt
+  visit          Visit                @relation(fields: [visitId], references: [id], onDelete: Cascade)
 
   @@index([visitId, type])
   @@index([previousPageId])
+}
+
+enum IntentType {
+  POSITIVE
+  NEGATIVE
+}
+
+model IntentScoring {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  value       Float      @default(0.0)
+  type        IntentType
+  createdAt   DateTime   @default(now())
+  modifiedAt  DateTime   @updatedAt
 }
