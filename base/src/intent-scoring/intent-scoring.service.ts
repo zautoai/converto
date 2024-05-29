@@ -72,7 +72,11 @@ export class IntentScoringService extends BaseService{
     {
       const prisma = await this.getPrismaClient(orgId);
       await this.findOne(orgId,id);
-      const existingIntentScoring = await prisma.intentScoring.findFirst({where:{name:updateIntentScoringDto.name}});
+      const existingIntentScoring = await prisma.intentScoring.findFirst({where:{
+        name:updateIntentScoringDto.name,
+        id:{not:id}
+      }
+      });
       if(existingIntentScoring)
       {
         throw new BadRequestException("Intent Scoring already exists");

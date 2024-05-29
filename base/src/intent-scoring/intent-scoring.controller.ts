@@ -7,7 +7,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ZautoRequest } from 'src/common/models/request.model';
 
 @ApiTags('Intent Scoring')
-@Controller('intent-scoring')
+@Controller('api/intent-scoring')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class IntentScoringController {

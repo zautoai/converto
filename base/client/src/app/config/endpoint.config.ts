@@ -59,7 +59,8 @@ export const API = {
     segmentCategory: 'api/segment-category',
     segment: 'api/segments',
     abm: 'api/crm-accounts/abm',
-    icp: 'api/icp'
+    icp: 'api/icp',
+    intentScoring: 'api/intent-scoring',
   },
   dev: {},
 };
