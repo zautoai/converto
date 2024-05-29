@@ -3,6 +3,7 @@ import { CreateIntentScoringDto } from './dto/create-intent-scoring.dto';
 import { UpdateIntentScoringDto } from './dto/update-intent-scoring.dto';
 import { BaseService } from 'src/common/services/base.service';
 import { ServiceParams } from 'src/common/models/service-param.model';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 
 @Injectable()
@@ -34,12 +35,20 @@ export class IntentScoringService extends BaseService{
     }
   }
 
-  async findAll(orgId:string) {
+  async findAll(serviceParams: ServiceParams<PaginationDto>) {
+    const { orgId, data:paginationDto } = serviceParams;
+    const { page, limit } = paginationDto;
+      const skip = (page - 1) * limit;
     try
     {
       const prisma = await this.getPrismaClient(orgId);
-      const intentScorings = await prisma.intentScoring.findMany();
-      return intentScorings;
+      const intentScorings = await prisma.intentScoring.findMany({ skip, take: limit });
+      const total = await prisma.intentScoring.count();
+      return {
+        data: intentScorings,
+        page: page,
+        total: total
+      }
     }
     catch (error)
     {
