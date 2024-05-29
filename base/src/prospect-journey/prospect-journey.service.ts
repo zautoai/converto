@@ -20,16 +20,16 @@ export class ProspectjourneyService extends BaseService{
         throw new BadRequestException('Invalid session');
       }
 
-      let prospectjourney = (data.type == ProspecActivityType.PAGE_VIEWED ) ? await prisma.prospecJourney.findFirst({where: {visitId: data.visitId,url: data.url,type: data.type}}) : null;
+      let prospectjourney = (data.type == ProspecActivityType.PAGE_VIEWED ) ? await prisma.prospectJourney.findFirst({where: {visitId: data.visitId,url: data.url,type: data.type}}) : null;
       if (prospectjourney) {   
         if(data.scrollDepth <= prospectjourney.scrollDepth)
         {
           delete data.scrollDepth;
         }     
-        prospectjourney = await prisma.prospecJourney.update({ where:{id:prospectjourney.id},data });
+        prospectjourney = await prisma.prospectJourney.update({ where:{id:prospectjourney.id},data });
       }
       else {
-        prospectjourney = await prisma.prospecJourney.create({ data });
+        prospectjourney = await prisma.prospectJourney.create({ data });
       }
       await this.updateTimeSpend(orgId, data.visitId,prospectjourney.url);
 
@@ -49,20 +49,20 @@ export class ProspectjourneyService extends BaseService{
     {
       const prisma = await this.getPrismaClient(orgId);
       // Fetch the latest PAGE_VIEWED event
-      const pageViewed = await prisma.prospecJourney.findFirst({
+      const pageViewed = await prisma.prospectJourney.findFirst({
           where: { visitId: visitId, url: url, type: ProspecActivityType.PAGE_VIEWED },
           orderBy: { createdAt: 'desc' }
       });
       
       // Fetch the latest PAGE_CLOSED event
-      const pageClosed = await prisma.prospecJourney.findFirst({
+      const pageClosed = await prisma.prospectJourney.findFirst({
           where: { visitId: visitId, url: url, type: ProspecActivityType.PAGE_CLOSED },
           orderBy: { createdAt: 'desc' }
       });
       if (pageViewed && pageClosed)
       {
         const timeSpend = (pageClosed.createdAt.getTime() - pageViewed.createdAt.getTime());
-        await prisma.prospecJourney.update({
+        await prisma.prospectJourney.update({
           where: { id: pageViewed.id, url: url },
           data: { timeSpend }
       });
@@ -81,7 +81,7 @@ export class ProspectjourneyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectJurnies = await prisma.prospecJourney.findMany();
+      const prospectJurnies = await prisma.prospectJourney.findMany();
       return prospectJurnies;
     }
     catch (error)
@@ -97,7 +97,7 @@ export class ProspectjourneyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectjourney = await prisma.prospecJourney.findUnique({where:{id}});
+      const prospectjourney = await prisma.prospectJourney.findUnique({where:{id}});
       return prospectjourney;
     }
     catch (error)
@@ -114,7 +114,7 @@ export class ProspectjourneyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectjourney = await prisma.prospecJourney.update({where:{id:id},data:updateProspectjourneyDto});
+      const prospectjourney = await prisma.prospectJourney.update({where:{id:id},data:updateProspectjourneyDto});
       return prospectjourney;
     }
     catch (error)
@@ -130,7 +130,7 @@ export class ProspectjourneyService extends BaseService{
     const prisma = await this.getPrismaClient(orgId);
     try
     {
-      const prospectjourney = await prisma.prospecJourney.delete({where:{id:id}});
+      const prospectjourney = await prisma.prospectJourney.delete({where:{id:id}});
       return prospectjourney;
     }
     catch (error)
