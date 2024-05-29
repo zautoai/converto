@@ -65,7 +65,7 @@ export class IcpService {
         id: icp.id,
         name: icp.name,
         description: icp.description,
-        startValue: icp.startValue,
+        score: icp.score,
         segment: icp.IcpMap.map(icpMap => ({
           id: icpMap.segment.id,
           name: icpMap.segment.name,
@@ -111,7 +111,7 @@ export class IcpService {
         id: data.id,
         name: data.name,
         description: data.description,
-        startValue: data.startValue,
+        score: data.score,
         segment: data.IcpMap.map(icpMap => ({
           id: icpMap.segment.id,
           name: icpMap.segment.name,

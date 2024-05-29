@@ -13,9 +13,10 @@
                                     <img src="./assets/images/files/{{getFileExtension(file.fileName)}}.png" alt="">
                                 </a>
                                 <ul class="icons">
-                                    <li><a role="button" class="bg-danger" (click)="onDeleteFile(file)"><i class="fe fe-trash"></i></a></li>
+                                    <li><a role="button" class="bg-danger" (click)="onDeleteFile(file)"><i
+                                                class="fe fe-trash"></i></a></li>
                                 </ul>
-                            </div ><span class="file-name-1 text-truncate">{{file?.fileName}}</span>
+                            </div><span class="file-name-1 text-truncate">{{file?.fileName}}</span>
                         </div>
                     </ng-container>
                 </ng-container>
@@ -28,15 +29,18 @@
                 <h6 class="card-title"><i class="fa-solid fa-upload"></i> Upload</h6>
             </div>
             <div class="card-boy fixed-vh p-3">
-                <ngx-dropzone (change)="onFileSelect($event)" [accept]="'.pdf,.doc,.docx,.txt'" class="dragzone" [disabled]="isUploading">
-                    <ngx-dropzone-label>Drop and drop files here!</ngx-dropzone-label>
-                    <ngx-dropzone-preview ngProjectAs="ngx-dropzone-preview" *ngFor="let f of files" [file]="f" (removed)="onFileRemove(f)">
+                <ngx-dropzone (change)="onFileSelect($event)" [accept]="'.pdf,.doc,.docx,.txt'" class="dragzone"
+                    [disabled]="isUploading">
+                    <ngx-dropzone-label>Drag and drop files here!</ngx-dropzone-label>
+                    <ngx-dropzone-preview ngProjectAs="ngx-dropzone-preview" *ngFor="let f of files" [file]="f"
+                        (removed)="onFileRemove(f)">
                         <ngx-dropzone-label>
                             {{ f.name }}
                         </ngx-dropzone-label>
                     </ngx-dropzone-preview>
                 </ngx-dropzone>
-                <button class="btn btn-primary w-100 mt-2" (click)="onUploadSubmit()" [disabled]="files.length === 0 || isUploading">
+                <button class="btn btn-primary w-100 mt-2" (click)="onUploadSubmit()"
+                    [disabled]="files.length === 0 || isUploading">
                     <ng-container *ngIf="!isUploading; else spinner">
                         <i class="fa-solid fa-upload"></i> Upload
                     </ng-container>
@@ -49,6 +53,6 @@
 
 <ng-template #spinner>
     <div class="spinner-border text-light" role="status">
-      <span class="visually-hidden" role="status">Loading...</span>
+        <span class="visually-hidden" role="status">Loading...</span>
     </div>
 </ng-template>

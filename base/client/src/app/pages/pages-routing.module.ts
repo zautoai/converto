@@ -197,9 +197,15 @@ const routes: Routes = [
     canActivate: [SetupGuard]
   },
   {
-    path: 'icp/create/view',
+    path: 'icp/view',
     title: "ICP",
     component: IcpviewComponent,
+    canActivate: [SetupGuard]
+  },
+  {
+    path: 'icp/edit/:id',
+    title: "ICP",
+    component: IcpCreatorComponent,
     canActivate: [SetupGuard]
   },
   {

@@ -7,6 +7,12 @@ import { RolesService } from 'src/roles/roles.service';
 import { SchemaManager } from 'src/schema-manager/schema-manager.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { SegmentsService } from 'src/segments/segments.service';
+import { SegmentCategoryService } from 'src/segment-category/segment-category.service';
+import { SEGMENT, SEGMENT_CATEGORY } from 'src/common/constants/segments.constant';
+import { StartupMicroService } from 'src/microservices/crm_service/startup.service';
+import { IcpMicroService } from 'src/microservices/crm_service/icp.service';
+import { INBOUND, OUTBOUND } from 'src/common/constants/icp.constant';
 
 
 @Injectable()
@@ -16,7 +22,11 @@ export class OrganizationsService extends BaseService {
   constructor(
     private readonly schemaManagerService: SchemaManagerService,
     private readonly schemaManager: SchemaManager,
-    private readonly roleService: RolesService
+    private readonly roleService: RolesService,
+    private segmentService: SegmentsService,
+    private segmentCategoryService: SegmentCategoryService,
+    private startupMicroService: StartupMicroService,
+    private icpMicroService: IcpMicroService
   ) {
     super();
   }
@@ -48,6 +58,9 @@ export class OrganizationsService extends BaseService {
         try {
           await this.schemaManager.create(organization.id, null);
           await this.createDefaultRoles(organization.id);
+          await this.startupMicroService.syncSingleOrganization(organization.id)
+          await this.createDefaultSegment(organization.id);
+          await this.createDefaultIcp(organization.id);
           // await this.schemaManagerService.create(organization.id, organization.name);
         }
         catch (e) {
@@ -174,4 +187,33 @@ export class OrganizationsService extends BaseService {
       console.error('Defailt role not created, mybe it got created already.')
     }
   }
+
+  async createDefaultSegment(orgId: string) {
+    const segmentCategory = SEGMENT_CATEGORY;
+    let segmentCategoryIds = {}
+    for (let category of segmentCategory) {
+      let createdSegmentCategory = await this.segmentCategoryService.create(orgId, category);
+      segmentCategoryIds[category.name] = createdSegmentCategory.data.id;
+    }
+    console.log(segmentCategoryIds);
+
+    const segments = SEGMENT;
+    for (let segmentType in segments) {
+      const segmentArray = segments[segmentType];
+      for (let segment of segmentArray) {
+        const createSegmentDto = {
+          name: segment.name,
+          description: segment.description,
+          segmentCategoryId: segmentCategoryIds[segmentType]
+        };
+        await this.segmentService.create(orgId, createSegmentDto);
+      }
+    }
+  }
+
+  async createDefaultIcp(orgId: string) {
+    await this.icpMicroService.createIcp(orgId, INBOUND);
+    await this.icpMicroService.createIcp(orgId, OUTBOUND);
+  }
+
 }

@@ -114,7 +114,7 @@ export class NavService implements OnDestroy {
 			roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
 		},
 		{
-			title: 'Conversations', icon: 'fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/conversations', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
+			title: 'Conversations', icon: 'fa-solid fa-comments', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/conversations', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
 		},
 
 
@@ -130,7 +130,7 @@ export class NavService implements OnDestroy {
 			roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
 		},
 		{
-			title: 'ABM', icon: 'fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/abm', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
+			title: 'ABM', icon: 'fa-solid fa-bullseye', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/abm', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
 		},
 		{
 			title: 'FormBuilder', icon: 'fa-solid fa-cube', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/form-builder', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
@@ -215,7 +215,7 @@ export class NavService implements OnDestroy {
 			title: 'Segment', icon: 'fa-solid fa-object-ungroup', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/segment', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
 		},
 		{
-			title: 'ICP', icon: 'fa-solid fa-object-ungroup', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/icp', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
+			title: 'ICP', icon: 'fa-solid fa-user-check', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/icp', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
 		},
 		{
 			title: 'Intent scoring', icon: 'fa-solid fa-object-ungroup', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/intent-scoring', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]

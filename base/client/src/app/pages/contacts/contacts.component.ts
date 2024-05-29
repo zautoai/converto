@@ -49,8 +49,10 @@ export class ContactsComponent implements OnInit {
   submittedData: any[] = [];
   selectedData: any = '';
   limit = 5;
+  totalItems: number = 0;
 https: any;
 isLeadScore: any=80;
+  clickedData: any;
 
 
 
@@ -90,7 +92,7 @@ isLeadScore: any=80;
     this.route.queryParams.subscribe(params => {
       this.currentPage = +params['page'] || 1;
       this.limit = +params['limit'] || this.limit;
-      this.getContacts(this.currentPage, this.limit);
+      this.getContacts();
       this.onPageChange({ page: this.currentPage })
       console.log("test",this.submittedData)
     });
@@ -101,23 +103,20 @@ isLeadScore: any=80;
       this.chatBotWidget.getAgent(this.avatarService.getAvatarId());
     }
   }
-
-  getContacts(page: number = 1, limit: number = this.limit): void {
+  getContacts(): void {
     this.restService
-      .getAll(API.main.contact + `?page=${page}&limit=${limit}`) // Pass pagination parameters to the service
+      .get(API.main.contact, `?limit=${this.limit}&page=${this.currentPage}`)
       .subscribe(
         (response: any) => {
           this.submittedData = response.data;
-          this.totalPages = response.total; // Update data with response from API
-          // Update any other pagination-related properties if necessary
-          console.log(this.submittedData);
+          this.totalItems = response.total
+          console.log("accountdata",this.submittedData)
         },
         (error) => {
           console.error(error);
           this.notifService.showError(error.error.message);
         },
       );
-
   }
 
   deleteSubmittedData(data: any): void {
@@ -473,21 +472,31 @@ isLeadScore: any=80;
 
   onPageChange(event: any) {
     this.currentPage = event.page;
-    this.getContacts(this.currentPage, this.limit)
-
+    this.getContacts()
+    
   }
   toggleActionMenu() {
     this.showActionMenu = !this.showActionMenu;
   }
-    getCountryFlagClass(countryCode: string): string {
+
+
+  getCountryFlagClass(countryCode: string): string {
+    
+    if (countryCode) {
+      // const countrysCode = countryCode.trim()
       const countryCodes: { [key: string]: string } = {
         unitedstates: 'us',
         india: 'in',
-        
+        australia: 'au'
+        // Add more country codes as needed
       };
-      return countryCodes[countryCode.toLowerCase()] || 'hi';
+  
+      return countryCodes[countryCode.toLowerCase()] || '';
+    } else {
+      return ''; // Return an empty string if countryCode is falsy
     }
-    
+  }
+  
 
 
   resetErrorFeedback() {
@@ -509,8 +518,8 @@ isLeadScore: any=80;
   ]);
   onMouseEnter(data: any) {
     if(data){
-    this.hoveredData=data;
-    console.log("hovereddata",this.hoveredData)
+    this.clickedData=data;
+    console.log("hovereddata",this.clickedData)
     }
     }
 

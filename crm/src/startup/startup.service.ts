@@ -65,6 +65,26 @@ export class StartupService implements OnModuleInit {
       }
     }
   }
+  async syncSingleOrganization(orgId: string) {
+    try {
+      this.logger.log(`Syncing organization ${orgId}...`);
+      const rollback = () => { };
+      await this.schemaManager.create(
+        orgId,
+        rollback,
+      );
+      this.logger.log(`Organization ${orgId} synced successfully.`);
+      await this.syncDataFromCRM(orgId);
+      return {
+        statusCode: 200
+      }
+    } catch (error) {
+      this.logger.error(`Organization sync failed: ${error}`);
+      return {
+        statusCode: 500
+      }
+    }
+  }
 
   async schemaMigration() {
     const prisma = await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);

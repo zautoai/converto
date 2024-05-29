@@ -10,72 +10,42 @@
         <div class="row justify-content-md-center p-4">
           <div class="col-6">
             <div style="border-radius: 5px; height: 70vh" class="border p-4">
-              <div
-                class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100"
-              >
+              <div class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100">
                 <h4 class="fs-md-6">
-                  <i class="fa-regular fa-object-group"></i> Segment Group
+                  <i class="fa-regular fa-object-group"></i> Segment Category
                 </h4>
-                <button
-                  type="button"
-                  class="btn btn-outline-primary mt-3 mt-md-0"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                >
-                  <div
-                    class="d-flex align-items-center justify-content-between"
-                  >
-                    <i class="fe fe-plus"></i
-                    ><span class="d-lg-block d-none">
-                      Create Segment Group</span
-                    >
+                <button type="button" class="btn btn-outline-primary mt-3 mt-md-0" data-bs-toggle="modal"
+                  data-bs-target="#exampleModal">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <i class="fe fe-plus"></i><span class="d-lg-block d-none">
+                      Create Segment Category</span>
                   </div>
                 </button>
               </div>
-
               <div style="overflow-x: auto; height: 60vh" class="mt-3">
-                <div
-                  *ngFor="let segment of submittedData"
-                  (click)="selectSegment(segment)"
-                  style="border-radius: 5px; cursor: pointer"
-                  class="mt-2 border p-2 mt-4"
-                >
-                  <div>
-                    <span class="fw-4 w-100 d-flex justify-content-between">
-                      <strong>{{ segment.name }}</strong>
-                      <div *ngIf="selectedSegment === segment">
-                        <button
-                          type="button"
-                          (click)="deletesegmentgroup(segment)"
-                        >
-                          <i
-                            style="color: rgb(183, 183, 183)"
-                            class="fa fa-trash-o delete"
-                          ></i>
-                        </button>
-                        <button
-                          (click)="populateselect(segment)"
-                          type="button"
-                          data-bs-toggle="modal"
-                          data-bs-target="#exampleModal4"
-                        >
-                          <i
-                            style="color: rgb(183, 183, 183)"
-                            class="fa fa-edit update"
-                          ></i>
-                        </button>
-                      </div>
-                    </span>
-                  </div>
-                  <div class="mt-2">
-                    <span
-                      class="truncate"
-                      data-toggle="tooltip"
-                      data-placement="top"
-                      [title]="segment.description"
-                    >
-                      {{ segment.description }}
-                    </span>
+                <div *ngFor="let segment of submittedData" (click)="selectSegment(segment)">
+                  <div style="border-radius: 5px; cursor: pointer" class="mt-2 border p-2 mt-4">
+                    <div>
+                      <span class="fw-4 w-100 d-flex justify-content-between">
+                        <strong>{{ segment.name }}</strong>
+                        <div>
+                          <button type="button" (click)="deletesegmentgroup(segment)">
+                            <i style="color: rgb(183, 183, 183)" class="fa fa-trash-o delete"></i>
+                          </button>
+                          <button (click)="populateselect(segment)" type="button" data-bs-toggle="modal"
+                            data-bs-target="#exampleModal4">
+                            <i style="color: rgb(183, 183, 183)" class="fa fa-edit update"></i>
+                          </button>
+                        </div>
+                      </span>
+                    </div>
+                    <div class="d-flex w-100 justify-content-between mt-2">
+                      <span class="truncate" data-toggle="tooltip" data-placement="top" [title]="segment.description">
+                        {{ segment.description }}
+                      </span>
+                      <div style="height: 20px; width: 20px; border-radius: 50%"
+                        [ngStyle]="{ 'background-color': segment.color }" class="color-circle border"></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -83,52 +53,34 @@
           </div>
           <div class="col-6">
             <div style="border-radius: 5px; height: 70vh" class="border p-4">
-              <div
-                class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100"
-              >
+              <div class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100">
                 <h4><i class="fa-regular fa-object-ungroup"></i> Segment</h4>
-                <button
-                  type="button"
-                  class="btn btn-outline-primary"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal1"
-                >
-                  <div
-                    class="d-flex align-items-center justify-content-between"
-                  >
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                  data-bs-target="#exampleModal1">
+                  <div class="d-flex align-items-center justify-content-between">
                     <i class="fe fe-plus"></i>
                     <span class="d-lg-block d-none">Create Segment</span>
                   </div>
                 </button>
               </div>
               <div style="overflow-x: auto; height: 60vh" class="mt-3">
-                <div
-                  *ngFor="let segment of submittedDatasegments"
-                  class="mt-2 border p-2 mt-2"
-                  style="border-radius: 5px; cursor: pointer"
-                  (click)="selectgrpSegment(segment)"
-                >
+                <div *ngIf="!displaySegment" class="p-2 mt-2">
+                  <h4 class="text-danger">No Segment Category Selected</h4>
+                  <p>Please select a Segment Category to display the Segments within that category.</p>
+                </div>
+                <div *ngFor="let segment of displaySegment" class="mt-2 border p-2 mt-2"
+                  style="border-radius: 5px; cursor: pointer">
                   <div class="fw-4 w-100 d-flex justify-content-between">
                     <h6 class="fw-4">
                       <strong>{{ segment.name }}</strong>
                     </h6>
-                    <div *ngIf="selectedSegmentgrp === segment">
+                    <div>
                       <button (click)="deletedeletesegment(segment)">
-                        <i
-                          style="color: rgb(183, 183, 183)"
-                          class="fa fa-trash-o delete"
-                        ></i>
+                        <i style="color: rgb(183, 183, 183)" class="fa fa-trash-o delete"></i>
                       </button>
-                      <button
-                        (click)="populateFormForUpdate(segment)"
-                        type="button"
-                        data-bs-toggle="modal"
-                        data-bs-target="#exampleModal3"
-                      >
-                        <i
-                          style="color: rgb(183, 183, 183)"
-                          class="fa fa-edit update"
-                        ></i>
+                      <button (click)="populateFormForUpdate(segment)" type="button" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal3">
+                        <i style="color: rgb(183, 183, 183)" class="fa fa-edit update"></i>
                       </button>
                     </div>
                   </div>
@@ -137,23 +89,6 @@
                     <span class="truncate" [attr.title]="segment.description">
                       {{ segment.description }}
                     </span>
-                  </div>
-                  <div class="mt-2">
-                    <strong
-                      ><span>{{ segment.segmentGroup.name }}</span></strong
-                    >
-                  </div>
-                  <div class="mt-2">
-                    <div class="d-flex w-100 justify-content-between">
-                      <strong
-                        ><span>{{ segment.color }}</span></strong
-                      >
-                      <div
-                        style="height: 20px; width: 20px; border-radius: 50%"
-                        [ngStyle]="{ 'background-color': segment.color }"
-                        class="color-circle border"
-                      ></div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -167,66 +102,34 @@
 <!-- Button trigger modal -->
 
 <!-- Modal -->
-<div
-  class="modal fade"
-  id="exampleModal"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="exampleModalLabel">
-          Create Segment Group
+          Create Segment Category
         </h1>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form [formGroup]="Form" (ngSubmit)="onCreatesegmantfrpformSubmit()">
+      <form [formGroup]="segmentGroup" (ngSubmit)="onCreateSegmentCategory()">
         <div class="modal-body">
           <div>
             <div>
               <label for="" class="form-label">Name : </label>
-              <input
-                placeholder="Enter Segment Group"
-                class="form-control"
-                type="text"
-                formControlName="name"
-              />
+              <input placeholder="Enter Segment Category" class="form-control" type="text" formControlName="name" />
             </div>
             <div>
               <label for="" class="form-label">Description</label>
-              <textarea
-                cols="3"
-                rows="4"
-                placeholder="Enter Description"
-                class="form-control"
-                name=""
-                formControlName="description"
-                id=""
-              ></textarea>
+              <textarea cols="3" rows="4" placeholder="Enter Description" class="form-control" name=""
+                formControlName="description" id=""></textarea>
             </div>
             <div class="mb-3 color-picker-container">
               <label for="color" class="form-label">Color:</label>
-              <input
-                id="color"
-                class="form-control color-input"
-                type="color"
-                formControlName="color"
-              />
+              <input id="color" class="form-control color-input" type="color" formControlName="color" />
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              data-bs-dismiss="modal"
-            >
+            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
               Save changes
             </button>
           </div>
@@ -238,58 +141,31 @@
 
 <!-- -------------model2 ---------------- -->
 
-<div
-  class="modal fade"
-  id="exampleModal1"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="exampleModalLabel">Create Segment</h1>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form action="" [formGroup]="segments" (ngSubmit)="oncreatesegmente()">
         <div class="modal-body">
           <div>
             <div>
               <label for="" class="form-label">Name : </label>
-              <input
-                placeholder="Enter Segment"
-                class="form-control"
-                type="text"
-                formControlName="name"
-              />
+              <input placeholder="Enter Segment" class="form-control" type="text" formControlName="name" />
             </div>
 
             <div>
               <label for="" class="form-label">Description</label>
-              <textarea
-                cols="3"
-                rows="4"
-                placeholder="Enter Description."
-                class="form-control"
-                name=""
-                id=""
-                formControlName="description"
-              ></textarea>
+              <textarea cols="3" rows="4" placeholder="Enter Description." class="form-control" name="" id=""
+                formControlName="description"></textarea>
             </div>
           </div>
 
           <div>
             <label for="dynamicSelect">Select an option:</label>
-            <select
-              formControlName="groupname"
-              class="form-select"
-              id="dynamicSelect"
-            >
+            <select formControlName="segmentCategoryId" class="form-select" id="dynamicSelect">
               <option value="" selected>-select-</option>
               <option *ngFor="let option of submittedData" [value]="option.id">
                 {{ option.name }}
@@ -315,61 +191,30 @@
 
 <!-- ==========modal3update----------------------------- -->
 
-<div
-  class="modal fade"
-  id="exampleModal3"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="exampleModal3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="exampleModalLabel">Update Segment</h1>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form action="" [formGroup]="segments" (ngSubmit)="updatesegment()">
         <div class="modal-body">
           <div>
             <div>
               <label for="" class="form-label">Name : </label>
-              <input
-                placeholder="Enter Segment"
-                class="form-control"
-                type="text"
-                formControlName="name"
-              />
-            </div>
-            <div>
-              <label for="" class="form-label">Color : </label>
-              <input class="form-color" type="color" formControlName="color" />
+              <input placeholder="Enter Segment" class="form-control" type="text" formControlName="name" />
             </div>
             <div>
               <label for="" class="form-label">Description</label>
-              <textarea
-                cols="3"
-                rows="4"
-                placeholder="Enter Description"
-                class="form-control"
-                name=""
-                id=""
-                formControlName="description"
-              ></textarea>
+              <textarea cols="3" rows="4" placeholder="Enter Description" class="form-control" name="" id=""
+                formControlName="description"></textarea>
             </div>
           </div>
 
           <div>
             <label for="dynamicSelect">Select an option:</label>
-            <select
-              formControlName="groupname"
-              class="form-select"
-              id="dynamicSelect"
-            >
+            <select formControlName="segmentCategoryId" class="form-select" id="dynamicSelect">
               <option value="" selected>-select-</option>
               <option *ngFor="let option of submittedData" [value]="option.id">
                 {{ option.name }}
@@ -395,57 +240,34 @@
 </div>
 
 <!-- -------------------modal4 update------------------>
-<div
-  class="modal fade"
-  id="exampleModal4"
-  tabindex="-1"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="exampleModal4" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="exampleModalLabel">
-          Update Segment Group
+          Update Segment Category
         </h1>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form [formGroup]="Form" (ngSubmit)="updatesegmentgrp()">
+      <form [formGroup]="segmentGroup" (ngSubmit)="updatesegmentgrp()">
         <div class="modal-body">
           <div>
             <div>
               <label for="" class="form-label">Name : </label>
-              <input
-                placeholder="Enter Segment Group"
-                class="form-control"
-                type="text"
-                formControlName="name"
-              />
+              <input placeholder="Enter Segment Category" class="form-control" type="text" formControlName="name" />
             </div>
             <div>
               <label for="" class="form-label">Description</label>
-              <textarea
-                cols="3"
-                rows="4"
-                placeholder="Enter Description"
-                class="form-control"
-                name=""
-                formControlName="description"
-                id=""
-              ></textarea>
+              <textarea cols="3" rows="4" placeholder="Enter Description" class="form-control" name=""
+                formControlName="description" id=""></textarea>
+            </div>
+            <div class="mb-3 color-picker-container">
+              <label for="color" class="form-label">Color:</label>
+              <input id="color" class="form-control color-input" type="color" formControlName="color" />
             </div>
           </div>
           <div class="modal-footer">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              data-bs-dismiss="modal"
-            >
+            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
               Save changes
             </button>
           </div>

@@ -41,7 +41,7 @@ isHovered: any;
   Form: FormGroup;
   errorFeedback: any = { title: '', describe: '' };
   currentPage: number = 0;
-  limit: number = 5;
+  limit: number = 2;
   submittedData: any[] = [];
   selectedData: any = null;
   totalItems: number = 0;

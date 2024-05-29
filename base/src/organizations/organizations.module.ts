@@ -5,16 +5,20 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { MicroservicesModule } from 'src/microservices/microservices.module';
 import { SchemaManagerModule } from 'src/schema-manager/schema-manager.module';
 import { RolesModule } from 'src/roles/roles.module';
+import { SegmentsModule } from 'src/segments/segments.module';
+import { SegmentCategoryModule } from 'src/segment-category/segment-category.module';
 
 @Module({
   imports: [
     PrismaModule,
     MicroservicesModule,
     SchemaManagerModule,
-    RolesModule
+    RolesModule,
+    SegmentsModule,
+    SegmentCategoryModule
   ],
   controllers: [OrganizationsController],
   providers: [OrganizationsService],
   exports: [OrganizationsService],
 })
-export class OrganizationsModule {}
+export class OrganizationsModule { }

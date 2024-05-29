@@ -7,5 +7,6 @@ import { MicroservicesModule } from 'src/microservices/microservices.module';
   imports: [MicroservicesModule],
   controllers: [SegmentsController],
   providers: [SegmentsService],
+  exports: [SegmentsService]
 })
 export class SegmentsModule { }

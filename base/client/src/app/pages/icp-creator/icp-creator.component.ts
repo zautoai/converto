@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
+import { forkJoin } from 'rxjs';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 
 @Component({
@@ -17,46 +18,80 @@ export class IcpCreatorComponent implements OnInit {
   selectedSegments: any = [];
   displaySegments: any = [];
   icpForm: FormGroup;
+  isEdit: boolean = false;
+  icpId: string = '';
 
   constructor(
     private restService: RestService,
     private notifService: NotificationService,
     private sweetAlertService: SweetAlertService,
     private router: Router,
+    private route: ActivatedRoute,
     private fb: FormBuilder
   ) {
     this.icpForm = this.fb.group({
       name: ['', Validators.required],
-      description: ['', Validators.required],
-      startValue: [0, Validators.required], // Added startValue field
-      segmentIds: [[]] // Empty array to store selected segment IDs
+      description: [''],
+      score: [0, [Validators.required, this.rangeValidator(0, 100)]],
+      segmentIds: [[], Validators.required]
     });
   }
 
   ngOnInit(): void {
-    this.getSegments();
-    this.getSegmentCategory();
+    this.loadData();
   }
 
-  getSegments(): void {
-    this.restService.getAll(API.main.segment).subscribe({
-      next: (response: any) => {
-        this.segmentData = response.data;
+  loadData(): void {
+    forkJoin({
+      segments: this.restService.getAll(API.main.segment),
+      segmentCategories: this.restService.getAll(API.main.segmentCategory)
+    }).subscribe({
+      next: ({ segments, segmentCategories }) => {
+        this.segmentData = (segments as any).data;
+        this.segmentCategoryData = (segmentCategories as any).data;
+        this.checkForEdit();
       },
       error: (error) => {
         console.error(error);
-      },
+      }
     });
   }
 
-  getSegmentCategory(): void {
-    this.restService.getAll(API.main.segmentCategory).subscribe({
-      next: (response: any) => {
-        this.segmentCategoryData = response.data;
-      },
-      error: (error) => {
-        console.error(error);
-      },
+  checkForEdit(): void {
+    this.route.paramMap.subscribe(params => {
+      this.icpId = params.get('id') || ""; // Retrieve the 'id' parameter
+    });
+    if (this.icpId !== "") {
+      this.isEdit = true
+      this.restService.get(API.main.icp, this.icpId).subscribe({
+        next: (response: any) => {
+          const icp = response.data;
+          const segmentIds = icp.segment.map((m: any) => m.id)
+          this.icpForm.patchValue({
+            name: icp.name,
+            description: icp.description,
+            score: icp.score,
+            segmentIds
+          });
+          this.populateSegments(segmentIds);
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
+    }
+  }
+
+  populateSegments(segmentIds: any[]): void {
+    this.selectedSegments = this.segmentData.filter((segment: any) => segmentIds.includes(segment.id));
+    this.displaySegments = [];
+
+    this.segmentCategoryData.forEach((category: any) => {
+      const categorySegments = this.segmentData.filter((segment: any) => segment.segmentCategoryId === category.id && segmentIds.includes(segment.id)).map((segment: any) => segment.name);
+
+      if (categorySegments.length > 0) {
+        this.displaySegments.push({ name: category.name, segments: categorySegments });
+      }
     });
   }
 
@@ -71,12 +106,10 @@ export class IcpCreatorComponent implements OnInit {
       this.selectedSegments = this.selectedSegments.filter((s: any) => s.id !== segment.id);
     }
 
-    // Update segmentIds in the form control
     this.icpForm.patchValue({
       segmentIds: this.selectedSegments.map((segment: any) => segment.id)
     });
 
-    // Update displaySegments
     this.updateDisplaySegments(segmentCategory, segment, event.target.checked);
   }
 
@@ -108,10 +141,54 @@ export class IcpCreatorComponent implements OnInit {
   onSubmit(): void {
     if (this.icpForm.valid) {
       const formData = this.icpForm.value;
-      console.log('Form Data:', formData);
-      // Submit the form data to the server or perform other actions here.
+      if (this.isEdit && this.icpId) {
+        this.updateIcp(formData);
+      } else {
+        this.createIcp(formData);
+      }
     } else {
       console.error('Form is invalid');
     }
+  }
+
+  createIcp(formData: any): void {
+    this.restService.post(API.main.icp, formData).subscribe({
+      next: (response: any) => {
+        this.notifService.showSuccess('ICP created successfully.');
+        this.icpForm.reset();
+        this.router.navigate(['/icp']);
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
+  }
+
+  updateIcp(formData: any): void {
+    this.restService.patch(API.main.icp, this.icpId, formData).subscribe({
+      next: (response: any) => {
+        this.notifService.showSuccess('ICP updated successfully.');
+        this.icpForm.reset();
+        this.router.navigate(['/icp']);
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
+  }
+
+  handleDiscard() {
+    this.icpForm.reset();
+    this.router.navigate(['/icp']);
+  }
+
+  rangeValidator(min: number, max: number) {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      if (value < min || value > max) {
+        return { rangeError: `Value must be between ${min} and ${max}` };
+      }
+      return null;
+    };
   }
 }

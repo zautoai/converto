@@ -25,9 +25,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let data of submittedData" (mouseenter)="onMouseEnter(data)">
-
-          <td class="contact-info" (mouseenter)="openModal(data)">
+        <tr *ngFor="let data of submittedData">
+          <td class=" contact-info" (click)="openViewUser(data)">
             <img [src]="photo1" alt="{{ data.name }}" class="avatar" />
             <div class="data-details">
               <div class="data-name">{{ data.fullName | uppercase }}</div>
@@ -40,17 +39,14 @@
               </div>
             </div>
           </td>
-
-          <td class="table-data" (mouseenter)="openModal(data)">{{ data.email }}</td>
+          <td class="table-data" (click)="openViewUser(data) ">{{ data.email }}</td>
           <td>
-            <span class="flag-icon flag-icon-{{ getCountryFlagClass(data.country) }}"></span>
-            {{ data.country | titlecase }}
+            <span class="flag-icon flag-icon-{{ getCountryFlagClass(data?.country) }}"></span>
+            <!-- {{ data.country | titlecase }} -->
           </td>
-
-
-          <td> <i class="fas fa-star"></i> 98</td>
-          <td> <i class="fas fa-chart-line"></i> 100</td>
-          <td class="labeldiv">
+          <td (click)="openViewUser(data)"> <i class="fas fa-star"></i> 98</td>
+          <td (click)="openViewUser(data)"> <i class="fas fa-chart-line"></i> 100</td>
+          <td class="labeldiv" (click)="openViewUser(data)">
             <span class="badge badge-success label mt-3" style="padding: 4px;">ICP Matched</span>
           </td>
           <td class="dropdown-cell">
@@ -73,7 +69,9 @@
           </td>
         </tr>
       </tbody>
+
     </table>
+    <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
 
     <ng-template #deleteModal let-modal>
       <!--  SMALL MODAL -->

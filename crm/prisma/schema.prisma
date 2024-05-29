@@ -207,6 +207,8 @@ model SegmentCategory {
   name        String    @unique
   description String?
   color       String?   @default("#ffffff")
+  createdAt   DateTime  @default(now())
+  modifiedAt  DateTime  @updatedAt
   Segement    Segment[]
 }
 
@@ -216,6 +218,8 @@ model Segment {
   description       String?
   segmentCategory   SegmentCategory @relation(fields: [segmentCategoryId], references: [id], onDelete: Cascade)
   segmentCategoryId String
+  createdAt         DateTime        @default(now())
+  modifiedAt        DateTime        @updatedAt
   IcpMap            IcpMap[]
 }
 
@@ -223,14 +227,18 @@ model Icp {
   id          String   @id @default(uuid())
   name        String
   description String?
-  startValue  Int
+  score       Int
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @updatedAt
   IcpMap      IcpMap[]
 }
 
 model IcpMap {
-  id        String  @id @default(uuid())
-  icpId     String
-  icp       Icp     @relation(fields: [icpId], references: [id], onDelete: Cascade)
-  segmentId String
-  segment   Segment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  icpId      String
+  icp        Icp      @relation(fields: [icpId], references: [id], onDelete: Cascade)
+  segmentId  String
+  segment    Segment  @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
 }
