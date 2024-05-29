@@ -12,8 +12,7 @@ import { API } from '../../config/endpoint.config';
 import { error } from 'console';
 import { PaginationData } from 'src/app/common/intefaces';
 import { ActivatedRoute, Router } from '@angular/router';
-
-
+  
 
 @Component({
   selector: 'app-contacts',
@@ -51,6 +50,7 @@ export class ContactsComponent implements OnInit {
   selectedData: any = '';
   limit = 5;
 https: any;
+isLeadScore: any=80;
 
 
 
@@ -479,6 +479,15 @@ https: any;
   toggleActionMenu() {
     this.showActionMenu = !this.showActionMenu;
   }
+    getCountryFlagClass(countryCode: string): string {
+      const countryCodes: { [key: string]: string } = {
+        unitedstates: 'us',
+        india: 'in',
+        
+      };
+      return countryCodes[countryCode.toLowerCase()] || 'hi';
+    }
+    
 
 
   resetErrorFeedback() {

@@ -13,14 +13,17 @@
 
 
     <table>
-      <!-- <thead>
-          <tr>
-            <th class="px-4">Contact</th>
-            <th>Email</th>
-            <th>Country</th>
-            <th>Action</th>
-          </tr>
-        </thead> -->
+      <thead>
+        <tr>
+          <th class="px-4">Contact</th>
+          <th>Email</th>
+          <th>Country</th>
+          <th>Lead Scoring</th>
+          <th>Intent Scoring</th>
+          <th>ICP Matching</th>
+          <th>Action</th>
+        </tr>
+      </thead>
       <tbody>
         <tr *ngFor="let data of submittedData" (mouseenter)="onMouseEnter(data)">
 
@@ -39,11 +42,16 @@
           </td>
 
           <td class="table-data" (mouseenter)="openModal(data)">{{ data.email }}</td>
-          <td>{{ data.country | titlecase }}</td>
-          <td>98</td>
-          <td>100</td>
+          <td>
+            <span class="flag-icon flag-icon-{{ getCountryFlagClass(data.country) }}"></span>
+            {{ data.country | titlecase }}
+          </td>
+
+
+          <td> <i class="fas fa-star"></i> 98</td>
+          <td> <i class="fas fa-chart-line"></i> 100</td>
           <td class="labeldiv">
-            <span class="badge badge-success label" style=" min-width: 80px">ICP Matched</span>
+            <span class="badge badge-success label mt-3" style="padding: 4px;">ICP Matched</span>
           </td>
           <td class="dropdown-cell">
             <div ngbDropdown class="dropdown option-dropdown">
@@ -348,7 +356,7 @@
               <div class="profile-badges mt-0">
                 <span class="badge badge-danger mt-3" style="min-width: 100px">ICP Fit</span>
               </div>
-              <div class="" style="margin-top: 10px">
+              <div class="" style="margin-top: 10px" *ngIf="hoveredData.website">
                 <i class="fas fa-globe"></i>
                 {{ hoveredData.website }}
               </div>
@@ -379,9 +387,9 @@
               <div class="profile-badges mt-3">
                 <span class="badge badge-success" style="min-width: 100px">Ideal persona</span>
               </div>
-              <div class="profile-contact-info mt-3">
+              <div class="profile-contact-info mt-3" *ngIf="hoveredData.email">
                 <span class="">
-                  <i class="fas fa-envelope"></i> {{ hoveredData.email }}
+                  <i class=" fas fa-envelope"></i> {{ hoveredData.email }}
                 </span>
               </div>
             </div>
