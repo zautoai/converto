@@ -20,6 +20,9 @@ export class IntentScoringComponent implements OnInit{
   isEditing:boolean = false;
   private selectedEntity:any = null;
   intentScoringList: any = null;
+  currentPage: number = 0;
+  limit: number = 10;
+  totalItems: number = 0;
 
   @ViewChild('createOrEditOffcanvas') createOrEditOffcanvas!: ElementRef;
   IntentType = IntentType;
@@ -43,9 +46,10 @@ export class IntentScoringComponent implements OnInit{
 
   getAll()
   {
-    this.restService.getAll(API.main.intentScoring).subscribe({
-      next: (data) => {
+    this.restService.getAll(API.main.intentScoring + `?limit=${this.limit}&page=${this.currentPage}`).subscribe({
+      next: (data:any) => {
         this.intentScoringList = data;
+        this.totalItems = data.total || 0;
       },
       error: (error) => {
         console.log(error);
@@ -147,4 +151,9 @@ export class IntentScoringComponent implements OnInit{
     this.selectedEntity = null;
     this.isEditing = false;
   };
+
+  onPageChange(event: any) {
+    this.currentPage = event.page;
+    this.getAll();
+  }
 }
