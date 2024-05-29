@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { forkJoin } from 'rxjs';
 import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
@@ -10,17 +10,18 @@ import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 @Component({
   selector: 'app-icp',
   templateUrl: './icp.component.html',
-  styleUrl: './icp.component.scss'
+  styleUrls: ['./icp.component.scss']
 })
 export class IcpComponent {
+  @ViewChild('viewIcpOffcanvas') viewIcpOffcanvas: ElementRef | undefined;
 
-  @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
-
-
-errorFeedback: any = { title: '', describe: '' };
-  icpdata: any = []
+  errorFeedback: any = { title: '', describe: '' };
+  icpdata: any = [];
+  segmentData: any = [];
+  segmentCategoryData: any = [];
   user: any = {};
-  
+  selectedData: any = {};
+
   isEdit: boolean = false;
 
   constructor(
@@ -30,19 +31,18 @@ errorFeedback: any = { title: '', describe: '' };
     private sweetAlertService: SweetAlertService,
     private router: Router,
     private offcanvasService: NgbOffcanvas,
-  ) {
-
-  }
+  ) { }
 
   ngOnInit(): void {
     this.getIcps();
   }
 
+
+
   getIcps(): void {
     this.restService.getAll(API.main.icp).subscribe({
       next: (response: any) => {
         this.icpdata = response.data;
-        console.log("test", this.icpdata)
       },
       error: (error) => {
         console.error(error);
@@ -53,18 +53,17 @@ errorFeedback: any = { title: '', describe: '' };
   handleCreate(): void {
     this.router.navigate(['/icp/create']);
   }
-  
-  
-  /**resterror */
 
-
+  handleEdit(data: any): void {
+    this.router.navigate(['/icp/edit', data.id]);
+  }
 
   delete = (data: any) => {
     this.user = data;
 
     this.sweetAlertService.warning(
-      'Delete user',
-      'Are you sure you want to delete ?',
+      'Delete ICP',
+      'Are you sure you want to delete?',
       ['Delete', 'Cancel'],
       (confirm: any) => {
         if (confirm.isConfirmed) {
@@ -75,12 +74,11 @@ errorFeedback: any = { title: '', describe: '' };
   };
 
   confirmDelete = (data: any) => {
-    this.restService.delete(API.main.contact, data.id).subscribe(
+    this.restService.delete(API.main.icp, data.id).subscribe(
       (response: any) => {
-        this.notifService.showSuccess('Accounts Deleted Successfully.');
+        this.notifService.showSuccess('ICP Deleted Successfully.');
         this.closeModal();
-        console.log(this.user);
-        this.getIcps()
+        this.getIcps();
       },
       (error) => {
         console.error(error);
@@ -88,11 +86,22 @@ errorFeedback: any = { title: '', describe: '' };
       },
     );
   };
+
   closeModal = () => {
     this.user = {};
     this.isEdit = false;
     this.modalService.dismissAll();
   };
+
+  handleView(data: any): void {
+    this.selectedData = data;
+    this.offcanvasService.open(this.viewIcpOffcanvas, {
+      position: 'end',
+      backdrop: 'static',
+      panelClass: 'visible',
+      animation: true,
+    });
+  }
 
 }
 

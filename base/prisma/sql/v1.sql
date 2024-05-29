@@ -357,6 +357,7 @@ CREATE TABLE "ProspecJourney" (
     "id" TEXT NOT NULL,
     "visitId" TEXT NOT NULL,
     "data" TEXT,
+    "url" TEXT NOT NULL,
     "type" "ProspecActivityType" NOT NULL DEFAULT 'OTHER',
     "timeSpend" INTEGER NOT NULL DEFAULT 0,
     "score" DOUBLE PRECISION NOT NULL DEFAULT 0.0,

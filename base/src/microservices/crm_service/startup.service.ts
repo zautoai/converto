@@ -18,4 +18,15 @@ export class StartupMicroService {
             throw error
         }
     }
+
+    async syncSingleOrganization(orgId: string) {
+        try {
+            this.logger.log('Syncing Single Organization')
+            return this.CRMClient.send({ cmd: 'SYNC_SINGLE_ORGANIZATION' }, {orgId}).toPromise()
+        }
+        catch (error) {
+            this.logger.error('Error in syncing single organization')
+            throw error
+        }
+    }
 }

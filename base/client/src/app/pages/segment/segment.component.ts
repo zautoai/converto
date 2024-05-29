@@ -4,13 +4,7 @@ import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
-import { defaultAvatarStyle } from 'src/app/common/avatarStyle';
-import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { AvatarStyle } from '../customise-avatar/customise-avatar/customise-avatar.component';
-import { NgxColorsColor } from 'ngx-colors';
-
-
-
 
 export interface avatarStyle {
   primaryColor: string;
@@ -32,77 +26,56 @@ export class SegmentComponent implements OnInit {
   selectedSegmentID: any;
   selectedSegmentIDgrp: any;
 
-  avatarStyle: AvatarStyle;
-
-  avatarStyles = {
-    primaryColor: 'green',
-  };
-
-  Form: FormGroup;
+  segmentGroup: FormGroup;
   segments: FormGroup;
-  selectedSegment: any = null;
-  selectedSegmentgrp: any = null;
   segment: any;
-
-
-
+  displaySegment: any = null
+  displaySegmentCategory: any = null
 
   constructor(
     private formBuilder: FormBuilder,
     private restService: RestService,
     private notifService: NotificationService,
-    private avatarService: AvatarService,
     private sweetAlertService: SweetAlertService,
   ) {
-    this.Form = this.formBuilder.group({
+    this.segmentGroup = this.formBuilder.group({
       name: [''],
       description: [''],
       id: [''],
       color: [''],
     });
 
-    this.avatarStyle = defaultAvatarStyle;
-    console.log(avatarService);
-
-
     this.segments = this.formBuilder.group({
       name: [''],
       description: [''],
-      groupname: [''],
-    
-
+      segmentCategoryId: [''],
     });
   }
   ngOnInit(): void {
     this.getsegments();
     this.getSegmentgroup();
-    this.getSegmentgroup();
   }
 
 
   selectSegment(segment: any) {
-    this.selectedSegment = segment;
-  }
-  selectgrpSegment(segment: any) {
-    this.selectedSegmentgrp = segment;
+    this.displaySegmentCategory = segment
+    this.handleDisplaySegment(segment)
   }
 
-
-
-  onCreatesegmantfrpformSubmit() {
-    const name = this.Form.value.name || '';
-    const description = this.Form.value.description || '';
-    const color = this.Form.value.color || '';
+  onCreateSegmentCategory() {
+    const name = this.segmentGroup.value.name || '';
+    const description = this.segmentGroup.value.description || '';
+    const color = this.segmentGroup.value.color || '';
     console.log(color);
-    if (this.Form.valid) {
+    if (this.segmentGroup.valid) {
       const data = {
         name: name,
         description: description,
-        color:color
+        color: color
       };
       this.restService.post(API.main.segmentCategory, data).subscribe({
         next: (response: any) => {
-          this.Form.reset();
+          this.segmentGroup.reset();
           this.notifService.showSuccess('Segment Created Successfully.');
           this.getSegmentgroup();
         },
@@ -131,7 +104,7 @@ export class SegmentComponent implements OnInit {
     this.segment = segment;
 
     this.sweetAlertService.warning(
-      'Delete form',
+      'Delete Segment Category',
       'Are you sure you want to delete ?',
       ['Delete', 'Cancel'],
       (confirm: any) => {
@@ -162,18 +135,16 @@ export class SegmentComponent implements OnInit {
 
 
   populateselect(segment: any) {
-    this.Form.patchValue({
+    this.segmentGroup.patchValue({
       id: segment.id,
       name: segment.name,
       description: segment.description,
+      color: segment.color
     });
     this.selectedSegmentIDgrp = segment.id;
   }
   updatesegmentgrp() {
-    const updatedData = this.Form.value;
-
-    console.log(updatedData);
-
+    const updatedData = this.segmentGroup.value;
     if (this.selectedSegmentIDgrp) {
       this.restService
         .patch(API.main.segmentCategory, this.selectedSegmentIDgrp, updatedData)
@@ -182,7 +153,8 @@ export class SegmentComponent implements OnInit {
             this.notifService.showSuccess(
               'Segment Group Updated Successfully.',
             );
-            this.getsegments();
+            this.getSegmentgroup();
+            this.segmentGroup.reset();
           },
           (error) => {
             console.error(error);
@@ -197,16 +169,12 @@ export class SegmentComponent implements OnInit {
   oncreatesegmente() {
     const name = this.segments.value.name || '';
     const description = this.segments.value.description || '';
-    const segmentGroupId = this.segments.value.groupname || '';
-    const color = this.segments.value.color || '';
-    console.log(color);
-
+    const segmentCategoryId = this.segments.value.segmentCategoryId || '';
     if (this.segments.valid) {
       const data = {
-        name: name,
-        description: description,
-        color: color,
-        segmentGroupId: segmentGroupId,
+        name,
+        description,
+        segmentCategoryId
       };
 
       this.restService.post(API.main.segment, data).subscribe({
@@ -227,37 +195,21 @@ export class SegmentComponent implements OnInit {
     this.restService.getAll(API.main.segment).subscribe({
       next: (response: any) => {
         this.submittedDatasegments = response.data;
-        console.log(this.submittedDatasegments);
-
+        if (this.displaySegmentCategory) {
+          this.handleDisplaySegment(this.displaySegmentCategory)
+        }
       },
       error: (error) => {
         console.error(error);
       },
     });
   }
-
-  findSegmentById(segmentId: '0e3337f4-8e98-4a27-b3ae-7301c26fcbc9'): void {
-    this.restService.get(API.main.segment, segmentId).subscribe({
-      next: (response: any) => {
-        const segment = response.data;
-        console.log(segment);
-        this.populateFormForUpdate(segment);
-      },
-      error: (error) => {
-        console.error(error);
-        this.notifService.showError('Segment not found.');
-      },
-    });
-  }
-
-
-
 
   deletedeletesegment = (segment: any) => {
     this.segment = segment;
 
     this.sweetAlertService.warning(
-      'Delete form',
+      'Delete Segment',
       'Are you sure you want to delete ?',
       ['Delete', 'Cancel'],
       (confirm: any) => {
@@ -291,7 +243,7 @@ export class SegmentComponent implements OnInit {
       name: segment.name,
       description: segment.description,
       color: segment.color,
-      groupname: segment.groupname,
+      segmentCategoryId: segment.segmentCategoryId,
       id: segment.id,
     });
     this.selectedSegmentID = segment.id;
@@ -299,9 +251,7 @@ export class SegmentComponent implements OnInit {
 
   updatesegment() {
     const updatedData = this.segments.value;
-
-    console.log(updatedData);
-
+    this.segments.reset();
     this.restService
       .patch(API.main.segment, this.selectedSegmentID, updatedData)
       .subscribe(
@@ -314,5 +264,9 @@ export class SegmentComponent implements OnInit {
           this.notifService.showError(error.error.message);
         },
       );
+  }
+
+  handleDisplaySegment(segmentCategory: any) {
+    this.displaySegment = this.submittedDatasegments.filter(m => m.segmentCategoryId === segmentCategory.id);
   }
 }

@@ -16,7 +16,7 @@ export class CreateIcpDto {
     @ApiProperty({ required: true })
     @IsInt()
     @IsNotEmpty()
-    startValue: number
+    score: number
 
     @ApiProperty({ required: true })
     @IsArray()

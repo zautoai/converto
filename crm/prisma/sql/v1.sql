@@ -199,6 +199,8 @@ CREATE TABLE "SegmentCategory" (
     "name" TEXT NOT NULL,
     "description" TEXT,
     "color" TEXT DEFAULT '#ffffff',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "modifiedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "SegmentCategory_pkey" PRIMARY KEY ("id")
 );
@@ -209,8 +211,33 @@ CREATE TABLE "Segment" (
     "name" TEXT NOT NULL,
     "description" TEXT,
     "segmentCategoryId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "modifiedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Segment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Icp" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "score" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "modifiedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Icp_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "IcpMap" (
+    "id" TEXT NOT NULL,
+    "icpId" TEXT NOT NULL,
+    "segmentId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "modifiedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "IcpMap_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -254,3 +281,9 @@ ALTER TABLE "Account" ADD CONSTRAINT "Account_parentAccountId_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "Segment" ADD CONSTRAINT "Segment_segmentCategoryId_fkey" FOREIGN KEY ("segmentCategoryId") REFERENCES "SegmentCategory"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "IcpMap" ADD CONSTRAINT "IcpMap_icpId_fkey" FOREIGN KEY ("icpId") REFERENCES "Icp"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "IcpMap" ADD CONSTRAINT "IcpMap_segmentId_fkey" FOREIGN KEY ("segmentId") REFERENCES "Segment"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -23,13 +23,14 @@ export class SegmentCategoryService {
         throw new BadRequestException('Segment category with the same name already exists');
       }
 
-      await prisma.segmentCategory.create({
+      const data = await prisma.segmentCategory.create({
         data: createSegmentCategoryDto,
       });
       return {
         code: 201,
         success: true,
-        message: 'Create segment category success'
+        message: 'Create segment category success',
+        data
       };
     } catch (error) {
       throw error
