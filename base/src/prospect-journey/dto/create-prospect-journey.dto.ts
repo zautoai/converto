@@ -4,6 +4,7 @@ import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from "clas
 export enum ProspecActivityType {
     CTA_PERFORMED = 'CTA_PERFORMED',
     PAGE_VIEWED = 'PAGE_VIEWED',
+    PAGE_CLOSED = 'PAGE_CLOSED',
     LINK_CLICKED = 'LINK_CLICKED',
     CHAT_INITIATED = 'CHAT_INITIATED',
     OTHER = 'OTHER',
@@ -46,4 +47,9 @@ export class CreateProspectjourneyDto {
     @IsNotEmpty()
     @IsString()
     url:string;
+
+    @ApiProperty({description:''})
+    @IsOptional()
+    @IsString()
+    previousPageId?:string;
 }

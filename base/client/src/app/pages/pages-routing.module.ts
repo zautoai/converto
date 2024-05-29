@@ -37,6 +37,7 @@ import { SegmentComponent } from './segment/segment.component';
 import { IcpComponent } from './icp/icp.component';
 import { IcpCreatorComponent } from './icp-creator/icp-creator.component';
 import { IcpviewComponent } from './icpview/icpview.component';
+import { IntentScoringComponent } from './intent-scoring/intent-scoring.component';
 
 const routes: Routes = [
 
@@ -290,6 +291,12 @@ const routes: Routes = [
     component: PluginsComponent,
     canActivate: [SetupGuard]
   },
+  {
+    path: 'intent-scoring',
+    title: 'Intent Scoring',
+    component: IntentScoringComponent,
+    canActivate: [SetupGuard]
+  }
 ];
 
 @NgModule({

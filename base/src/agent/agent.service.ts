@@ -16,6 +16,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { ServiceParams } from 'src/common/models/service-param.model';
 import { BaseService } from 'src/common/services/base.service';
+import { readFile } from 'fs/promises';
 
 @Injectable() 
 export class AgentService extends BaseService{
@@ -600,40 +601,23 @@ export class AgentService extends BaseService{
   }
 
   // Generate embedding script for bot
-  async getEmbedding(orgId:string,agentId :string,standalone: boolean = false)
+  async getEmbedding(orgId:string)
   {
-    const host = process.env.HOST_URL;
-    const prisma = await this.getPrismaClient(orgId);
     try
     {
-
+      const prisma = await this.getPrismaClient(orgId);
       const agent = await prisma.agent.findFirst();
-      if(!agent)
-      {
-        throw new NotFoundException();
+      if(!agent) {
+        throw new NotFoundException('Agent not found');
       }
-  
-      try {
-        const filePath = path.resolve(__dirname, '../../', 'public', 'assets', 'bot', 'js', 'zautobot_v2.js');
-        let jsCode = fs.readFileSync(filePath, 'utf8')
-          .replaceAll("{{avatarId}}", agentId)
-          .replaceAll("{{ApiUrl}}", host + "/")
-          .replaceAll("{{BaseUrl}}", host + "/")
-          .replaceAll("'{{standAloneFlag}}'", `${standalone}`)
-  
-        const options = { toplevel: true, };
-        const uglifiedCode = minify(jsCode, options).code;
-  
-        return uglifiedCode;
-      }
-      catch (error) {
-        console.log(error);
-        throw error;
-      }
+      const filePath = `./src/common/scripts/converto.deploy.js`;
+      let content = await readFile(filePath, 'utf-8');
+      content = content.replaceAll('{{API_ROOT_URL}}', process.env.HOST_URL);
+      content = content.replaceAll('{{ORG_ID}}', orgId);
+      return content;
     }
     catch(error)
     {
-      console.log(error);
       throw error;
     }
     finally {

@@ -1,21 +1,10 @@
 /*
   Warnings:
 
-  - Added the required column `url` to the `ProspecJourney` table without a default value. This is not possible if the table is not empty.
+  - You are about to drop the `ProspecJourney` table. If the table is not empty, all the data it contains will be lost.
 
 */
--- AlterTable
-ALTER TABLE "ProspecJourney" ADD COLUMN     "url" TEXT NOT NULL;
-ALTER TYPE "ProspecActivityType" ADD VALUE 'PAGE_CLOSED';
--- AlterTable
-ALTER TABLE "ProspecJourney" ADD COLUMN     "previousPageId" TEXT;
-
--- CreateIndex
-CREATE INDEX "ProspecJourney_previousPageId_idx" ON "ProspecJourney"("previousPageId");
-
--- AddForeignKey
-ALTER TABLE "ProspecJourney" ADD CONSTRAINT "ProspecJourney_previousPageId_fkey" FOREIGN KEY ("previousPageId") REFERENCES "ProspecJourney"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
+-- CreateEnum
 CREATE TYPE "ProspectActivityType" AS ENUM ('CTA_PERFORMED', 'PAGE_VIEWED', 'PAGE_CLOSED', 'LINK_CLICKED', 'CHAT_INITIATED', 'OTHER');
 
 -- CreateEnum
