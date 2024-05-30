@@ -88,7 +88,10 @@ jobs:
           CRM_HOST=${{ secrets.CRM_HOST }}
           CRM_HOST_PORT=${{ secrets.CRM_HOST_PORT }}
           CRM_JWT_SECRET=${{ secrets.CRM_JWT_SECRET }}
-
+          CRM_HUBSPOT_CLIENT_ID=${{ secrets.CRM_HUBSPOT_CLIENT_ID }}
+          CRM_HUBSPOT_CLIENT_SECRET=${{ secrets.CRM_HUBSPOT_CLIENT_SECRET }}
+          CRM_HUBSPOT_REDIRECT_URI=${{ CRM_HUBSPOT_REDIRECT_URI }}
+          
   deploy-base:
     runs-on: ubuntu-latest
     needs: build-and-push
