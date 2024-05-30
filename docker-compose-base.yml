@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  base:
+    image: ghcr.io/zautoai/converto:dev-base
+    networks:
+      - converto-network
+    volumes:
+      - app_uploads:/usr/src/uploads
+      - app_images:/usr/src/public/images
+    ports:
+      - "3030:3000"
+    restart: always  # Restart policy for the Node app.
+
+
+volumes:
+  app_uploads:
+    driver: local
+  app_images:
+    driver: local
