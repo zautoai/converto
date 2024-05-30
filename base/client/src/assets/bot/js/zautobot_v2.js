@@ -1355,6 +1355,7 @@ class ChatBotLogic {
         this.history = [];
         this.eventEmitter = eventEmitter;
         this.restClient = new RestClient(this.apiUrl);
+
         this.headers = {
             'Content-Type': 'application/json',
         };
@@ -1364,12 +1365,14 @@ class ChatBotLogic {
                 "visitId": this.getVisit()
             }
         });
+
         this.socket.on('connect', () => {
             console.log('Connected to socket server');
             if(this.isLoaded) return;
             this.isLoaded = true;
             this.getAvatar(avatarId);
         });
+
         this.socket.on('disconnect', () => {
             console.log('Disconnected from socket server');
         });
@@ -1379,6 +1382,8 @@ class ChatBotLogic {
             this.setVisit(data.visitId);
             this.getChatHistory(data.id);
         });
+        
+        
         this.socket.on('replyMessage', (data) => {
             this.eventEmitter.emit("messageReceived",data);
         });
@@ -1574,6 +1579,7 @@ class ChatBotLogic {
             throw Error('avatarId missing');
         }
     }
+
 
     getChatHistory(convoId)
     {

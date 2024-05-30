@@ -6,7 +6,7 @@ import ChatsConversion from "./ChatsConversion";
 
 const Chat = ({handleClick}) => {
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Hi there, welcome to Intercom 👋" },
+    { sender: "bot", text: "Hi there, welcome to Zauto 👋" },
   ]);
   const [userInput, setUserInput] = useState("");
 
