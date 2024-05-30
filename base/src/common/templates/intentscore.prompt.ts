@@ -9,17 +9,22 @@ Steps:
 4.Normalize the total score to a range of 1 to 100.
 
 Normalization:
-Total points are bounded within the range of -50 to 100. This range is then normalized to 1 to 100.
+Total points are bounded within the range of -100 to 100. This range is then normalized to 1 to 100.
 
 Example:
 90 (positive) + (-20) (negative) = 70
-Normalize 70 within the range of -50 to 100, resulting in a score of 85. 
+Normalize 70 within the range of -100 to 100, resulting in a score of 85. 
 
 Here is the rules:
 {{rules}}
 
 your output should be in the json format:
 {
-  "score": 0
+  "positiveScore": 'positive score in number',
+  "negativeScore": 'negative score in number',
+  "score": 'final score'
 }
-`;
+
+Here is the prospect activies:
+{{activities}}
+`; 

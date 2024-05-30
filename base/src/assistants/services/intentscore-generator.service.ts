@@ -29,13 +29,12 @@ export class IntentScoreGeneratorService implements OnModuleInit{
     }
 
     private async generateIntentScore(rules: string,activities:string) {
-        const content = INTENT_SCORE_PROMPT.replaceAll("{{rules}}",rules)
+        const content = INTENT_SCORE_PROMPT.replaceAll("{{rules}}",rules).replaceAll("{{activities}}", activities);
         const promptMessage = [
             { role: 'system', content: content },
-            { role: 'user', content: activities }
         ]; 
          
-        return await this.llmService.sendDirect(promptMessage,LLMNames.COHERE,LLMModels.COHER_COMMAND_R_PLUS);
+        return await this.llmService.sendDirect(promptMessage,LLMNames.OPENAI,LLMModels.GPT_3_5_TURBO);  
     }
 
 }

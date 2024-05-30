@@ -21,13 +21,12 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
 
   async onModuleInit() {
     // const orgId = '5eb02fe4-b2c9-4d32-823a-87c2f248dea1';   
-    // const visitId = '9304a7c5-1b0e-42f0-b749-35bcbb75da61'; 
+    // const visitId = 'e198128c-49ec-4f98-b7ee-e584d0d1c698'; 
     // const result =  await this.generateIntentScore(orgId, visitId);
     // console.log(result); 
-    
   }
 
-  async generateIntentScore(orgId:string,visitId:string):Promise<{score:number}>
+  async generateIntentScore(orgId:string,visitId:string):Promise<{positiveScore:number,negativeScore:number,score:number}>
   {
     let _rules = await this.getAll(orgId);
     const rules = _rules.map((rule:any)=> {
@@ -53,7 +52,11 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
       try
       {
         const result = await this.intentScoreGeneratorService.getIntentScore(JSON.stringify(rules),JSON.stringify(activities));
-        return { score: result.score };        
+        return { 
+          positiveScore: result.positiveScore,
+          negativeScore: result.negativeScore,
+          score: result.score 
+        };        
       }
       catch(error)
       {
@@ -62,7 +65,11 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
     }
     else
     {
-      return { score: 0 };
+      return { 
+        positiveScore: 0,
+        negativeScore: 0,
+        score: 0 
+      };
     }
   }
 
@@ -113,7 +120,11 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
   {
     const prisma = await this.getPrismaClient(orgId);
     try {
-      const intentScorings = await prisma.intentScoring.findMany();
+      const intentScorings = await prisma.intentScoring.findMany({
+        orderBy: {
+          value: 'asc'
+        }
+      });
       return intentScorings;
     }
     catch (error) {
