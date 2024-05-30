@@ -54,6 +54,7 @@ export class UsersService extends BaseService {
       throw err
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -86,6 +87,7 @@ export class UsersService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -124,6 +126,7 @@ export class UsersService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -160,6 +163,7 @@ export class UsersService extends BaseService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -193,6 +197,7 @@ export class UsersService extends BaseService {
       throw err
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -215,6 +220,7 @@ export class UsersService extends BaseService {
       throw err
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -235,6 +241,7 @@ export class UsersService extends BaseService {
       throw err
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -254,6 +261,7 @@ export class UsersService extends BaseService {
       throw err
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -281,6 +289,7 @@ export class UsersService extends BaseService {
       throw err;
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -294,6 +303,7 @@ export class UsersService extends BaseService {
       throw err;
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -312,6 +322,7 @@ export class UsersService extends BaseService {
       throw err;
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }

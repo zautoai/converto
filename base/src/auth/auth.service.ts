@@ -28,25 +28,24 @@ export class AuthService extends BaseService {
       throw new NotFoundException(`No organization found for email: ${email}`);
     }
     const prisma = await this.getPrismaClient(orgId);
-    try
-    {
+    try {
 
       // Step 1: Fetch a user with the given email
       const user = await prisma.user.findUnique({ where: { email: email } });
-  
+
       // If no user is found, throw an error
       if (!user) {
         throw new NotFoundException(`No user found for email: ${email}`);
       }
-  
+
       // Step 2: Check if the password is correct
       const isPasswordValid = await bcrypt.compare(password, user.password);
-  
+
       // If password does not match, throw an error
       if (!isPasswordValid) {
         throw new UnauthorizedException('Invalid password');
       }
-  
+
       //Step 3: If Account not verified then return unauthorised
       if (user && !user.verified) {
         //await this.regService.createVerification(user)
@@ -59,12 +58,12 @@ export class AuthService extends BaseService {
         avatar: await prisma.agent.findFirst()
       };
     }
-    catch(error)
-    {
+    catch (error) {
       console.log(error);
       throw error;
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -72,19 +71,18 @@ export class AuthService extends BaseService {
   async getUserInfo(user: any) {
     const orgId = user.orgId;
     const prisma = await this.getPrismaClient(orgId);
-    try
-    {
+    try {
       return {
         user: await this.userService.findOne(orgId, user.id),
         avatar: await prisma.agent.findFirst()
       };
     }
-    catch(error)
-    {
+    catch (error) {
       console.log(error);
       throw error;
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -92,16 +90,14 @@ export class AuthService extends BaseService {
   async verifyToken(token: string) {
     const decoded = await this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
     const prisma = await this.getPrismaClient(decoded.orgId);
-    try
-    {
+    try {
       const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
       if (!user) {
         throw new NotFoundException(`No user found for id: ${decoded.userId}`);
       }
       return user;
     }
-    catch(error)
-    {
+    catch (error) {
       console.log(error);
       throw error;
     }

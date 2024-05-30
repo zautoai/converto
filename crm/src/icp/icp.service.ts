@@ -45,6 +45,7 @@ export class IcpService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -65,7 +66,7 @@ export class IcpService {
         id: icp.id,
         name: icp.name,
         description: icp.description,
-        startValue: icp.startValue,
+        score: icp.score,
         segment: icp.IcpMap.map(icpMap => ({
           id: icpMap.segment.id,
           name: icpMap.segment.name,
@@ -78,13 +79,14 @@ export class IcpService {
       return {
         code: 200,
         success: true,
-        formattedData
+        data: formattedData
       }
     }
     catch (error) {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -111,7 +113,7 @@ export class IcpService {
         id: data.id,
         name: data.name,
         description: data.description,
-        startValue: data.startValue,
+        score: data.score,
         segment: data.IcpMap.map(icpMap => ({
           id: icpMap.segment.id,
           name: icpMap.segment.name,
@@ -123,13 +125,14 @@ export class IcpService {
       return {
         code: 200,
         success: true,
-        formattedData
+        data: formattedData
       }
     }
     catch (error) {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -195,6 +198,7 @@ export class IcpService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -225,6 +229,7 @@ export class IcpService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }

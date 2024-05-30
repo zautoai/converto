@@ -65,7 +65,7 @@ export class GoogleCalendarService extends BaseCalendar {
             return {
                 statusCode: 200,
                 message: 'Access token fetched successfully',
-                
+
                 data: null
             };
         } catch (error) {
@@ -99,39 +99,47 @@ export class GoogleCalendarService extends BaseCalendar {
     async handleToken(serviceParams: ServiceParams<{ tokenData: Token }>): Promise<void> {
         const { orgId, data: { tokenData } } = serviceParams
         const prisma = await this.prismaClientManager.getClient(orgId)
-        const googleCalendar = await prisma.externalToolCredential.findFirst({
-            where: {
-                toolName: this.calendarName
-            }
-        })
-        if (googleCalendar) {
-            await prisma.externalToolCredential.update({
+        try {
+            const googleCalendar = await prisma.externalToolCredential.findFirst({
                 where: {
-                    id: googleCalendar.id
-                },
-                data: {
-                    ...tokenData.access_token ? { accessToken: tokenData.access_token } : {},
-                    ...tokenData.refresh_token ? { refreshToken: tokenData.refresh_token } : {},
-                    ...tokenData.expires_in ? { expiresIn: tokenData.expires_in } : {},
-                    ...tokenData.token_type ? { tokeType: tokenData.token_type } : {}
+                    toolName: this.calendarName
                 }
-            });
-        } else {
-            await prisma.externalToolCredential.create({
-                data: {
-                    toolName: this.calendarName,
-                    accessToken: tokenData.access_token,
-                    refreshToken: tokenData.refresh_token,
-                    expiresIn: tokenData.expires_in,
-                    ...tokenData.token_type ? { tokeType: tokenData.token_type } : {}
-                }
-            });
+            })
+            if (googleCalendar) {
+                await prisma.externalToolCredential.update({
+                    where: {
+                        id: googleCalendar.id
+                    },
+                    data: {
+                        ...tokenData.access_token ? { accessToken: tokenData.access_token } : {},
+                        ...tokenData.refresh_token ? { refreshToken: tokenData.refresh_token } : {},
+                        ...tokenData.expires_in ? { expiresIn: tokenData.expires_in } : {},
+                        ...tokenData.token_type ? { tokeType: tokenData.token_type } : {}
+                    }
+                });
+            } else {
+                await prisma.externalToolCredential.create({
+                    data: {
+                        toolName: this.calendarName,
+                        accessToken: tokenData.access_token,
+                        refreshToken: tokenData.refresh_token,
+                        expiresIn: tokenData.expires_in,
+                        ...tokenData.token_type ? { tokeType: tokenData.token_type } : {}
+                    }
+                });
+            }
+        } catch (error) {
+            throw error
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId)
         }
     }
 
     async getAccessToken(orgId: string): Promise<any> {
+        const prisma = await this.prismaClientManager.getClient(orgId)
         try {
-            const prisma = await this.prismaClientManager.getClient(orgId)
             const googleCalendarToken = await prisma.externalToolCredential.findFirst({
                 where: {
                     toolName: this.calendarName
@@ -148,10 +156,14 @@ export class GoogleCalendarService extends BaseCalendar {
             this.logger.error(e.message);
             throw new Error(e);
         }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId)
+        }
     }
     async revokeAccess(orgId: string): Promise<any> {
+        const prisma = await this.prismaClientManager.getClient(orgId)
         try {
-            const prisma = await this.prismaClientManager.getClient(orgId)
             const existingCredential = await prisma.externalToolCredential.findFirst({ where: { toolName: this.calendarName } });
             if (existingCredential) {
                 let tokenEndpoint = 'https://accounts.google.com/o/oauth2/revoke?token={{token}}';
@@ -177,6 +189,10 @@ export class GoogleCalendarService extends BaseCalendar {
             this.logger.error(err);
             throw new Error(err);
         }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId)
+        }
     }
 
     async getProfile(orgId: string): Promise<any> {
@@ -200,14 +216,17 @@ export class GoogleCalendarService extends BaseCalendar {
     }
 
     async handleRovokeAccess(serviceParams: ServiceParams<{ id: string }>): Promise<void> {
+        const { orgId, data: { id } } = serviceParams
+        const prisma = await this.prismaClientManager.getClient(orgId)
         try {
-            const { orgId, data: { id } } = serviceParams
-            const prisma = await this.prismaClientManager.getClient(orgId)
-
             await prisma.externalToolCredential.delete({ where: { id } });
         }
         catch (err) {
             this.logger.error(err);
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId)
         }
     }
 

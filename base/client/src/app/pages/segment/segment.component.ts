@@ -4,13 +4,7 @@ import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
-import { defaultAvatarStyle } from 'src/app/common/avatarStyle';
-import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { AvatarStyle } from '../customise-avatar/customise-avatar/customise-avatar.component';
-import { NgxColorsColor } from 'ngx-colors';
-
-
-
 
 export interface avatarStyle {
   primaryColor: string;
@@ -32,73 +26,56 @@ export class SegmentComponent implements OnInit {
   selectedSegmentID: any;
   selectedSegmentIDgrp: any;
 
-  avatarStyle: AvatarStyle;
-
-  avatarStyles = {
-    primaryColor: 'green',
-  };
-  
-  Form: FormGroup;
+  segmentGroup: FormGroup;
   segments: FormGroup;
-  selectedSegment: any = null;
-  selectedSegmentgrp: any = null;
   segment: any;
-  
- 
-
+  displaySegment: any = null
+  displaySegmentCategory: any = null
 
   constructor(
     private formBuilder: FormBuilder,
     private restService: RestService,
     private notifService: NotificationService,
-    private avatarService: AvatarService,
     private sweetAlertService: SweetAlertService,
   ) {
-    this.Form = this.formBuilder.group({
+    this.segmentGroup = this.formBuilder.group({
       name: [''],
       description: [''],
-      id:['']
+      id: [''],
+      color: [''],
     });
-
-    this.avatarStyle = defaultAvatarStyle;
-    console.log(avatarService);
-    
 
     this.segments = this.formBuilder.group({
       name: [''],
       description: [''],
-      groupname: [''],
-      color: [''],
-  
+      segmentCategoryId: [''],
     });
   }
   ngOnInit(): void {
     this.getsegments();
     this.getSegmentgroup();
-    this.getSegmentgroup();
   }
 
- 
+
   selectSegment(segment: any) {
-    this.selectedSegment = segment;
-  }
-  selectgrpSegment(segment: any) {
-    this.selectedSegmentgrp = segment;
+    this.displaySegmentCategory = segment
+    this.handleDisplaySegment(segment)
   }
 
-
-
-  onCreatesegmantfrpformSubmit() {
-    const name = this.Form.value.name || '';
-    const description = this.Form.value.description || '';
-    if (this.Form.valid) {
+  onCreateSegmentCategory() {
+    const name = this.segmentGroup.value.name || '';
+    const description = this.segmentGroup.value.description || '';
+    const color = this.segmentGroup.value.color || '';
+    console.log(color);
+    if (this.segmentGroup.valid) {
       const data = {
         name: name,
         description: description,
+        color: color
       };
-      this.restService.post(API.main.segment, data).subscribe({
+      this.restService.post(API.main.segmentCategory, data).subscribe({
         next: (response: any) => {
-          this.Form.reset();
+          this.segmentGroup.reset();
           this.notifService.showSuccess('Segment Created Successfully.');
           this.getSegmentgroup();
         },
@@ -110,10 +87,10 @@ export class SegmentComponent implements OnInit {
   }
 
   getSegmentgroup(): void {
-    this.restService.getAll(API.main.segment).subscribe({
+    this.restService.getAll(API.main.segmentCategory).subscribe({
       next: (response: any) => {
         this.submittedData = response.data;
-       
+
       },
       error: (error) => {
         console.error(error);
@@ -125,9 +102,9 @@ export class SegmentComponent implements OnInit {
 
   deletesegmentgroup = (segment: any) => {
     this.segment = segment;
-    
+
     this.sweetAlertService.warning(
-      'Delete form',
+      'Delete Segment Category',
       'Are you sure you want to delete ?',
       ['Delete', 'Cancel'],
       (confirm: any) => {
@@ -141,11 +118,11 @@ export class SegmentComponent implements OnInit {
 
 
   confirmsegmentgrpDelete = () => {
-    this.restService.delete(API.main.segment, this.segment.id).subscribe(
+    this.restService.delete(API.main.segmentCategory, this.segment.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Form Deleted Successfully.');
         this.getSegmentgroup();
-        
+
       },
       (error) => {
         console.error(error);
@@ -158,27 +135,26 @@ export class SegmentComponent implements OnInit {
 
 
   populateselect(segment: any) {
-    this.Form.patchValue({
+    this.segmentGroup.patchValue({
       id: segment.id,
       name: segment.name,
       description: segment.description,
+      color: segment.color
     });
     this.selectedSegmentIDgrp = segment.id;
   }
   updatesegmentgrp() {
-    const updatedData = this.Form.value;
-
-    console.log(updatedData);
-
+    const updatedData = this.segmentGroup.value;
     if (this.selectedSegmentIDgrp) {
       this.restService
-        .patch(API.main.segment, this.selectedSegmentIDgrp, updatedData)
+        .patch(API.main.segmentCategory, this.selectedSegmentIDgrp, updatedData)
         .subscribe(
           (response: any) => {
             this.notifService.showSuccess(
               'Segment Group Updated Successfully.',
             );
-            this.getsegments();
+            this.getSegmentgroup();
+            this.segmentGroup.reset();
           },
           (error) => {
             console.error(error);
@@ -193,19 +169,15 @@ export class SegmentComponent implements OnInit {
   oncreatesegmente() {
     const name = this.segments.value.name || '';
     const description = this.segments.value.description || '';
-    const segmentGroupId = this.segments.value.groupname || '';
-    const color = this.segments.value.color || '';
-    console.log(color);
-
+    const segmentCategoryId = this.segments.value.segmentCategoryId || '';
     if (this.segments.valid) {
       const data = {
-        name: name,
-        description: description,
-        color: color,
-        segmentGroupId: segmentGroupId,
+        name,
+        description,
+        segmentCategoryId
       };
 
-      this.restService.post(API.main.segments, data).subscribe({
+      this.restService.post(API.main.segment, data).subscribe({
         next: (response: any) => {
 
           this.notifService.showSuccess('Segment Created Successfully.');
@@ -220,40 +192,24 @@ export class SegmentComponent implements OnInit {
   }
 
   getsegments(): void {
-    this.restService.getAll(API.main.segments).subscribe({
+    this.restService.getAll(API.main.segment).subscribe({
       next: (response: any) => {
         this.submittedDatasegments = response.data;
-        console.log(this.submittedDatasegments);
-       
+        if (this.displaySegmentCategory) {
+          this.handleDisplaySegment(this.displaySegmentCategory)
+        }
       },
       error: (error) => {
         console.error(error);
       },
     });
   }
-
-  findSegmentById(segmentId: '0e3337f4-8e98-4a27-b3ae-7301c26fcbc9'): void {
-    this.restService.get(API.main.segments, segmentId).subscribe({
-      next: (response: any) => {
-        const segment = response.data;
-        console.log(segment);
-        this.populateFormForUpdate(segment);
-      },
-      error: (error) => {
-        console.error(error);
-        this.notifService.showError('Segment not found.');
-      },
-    });
-  }
-
-
-
 
   deletedeletesegment = (segment: any) => {
     this.segment = segment;
-    
+
     this.sweetAlertService.warning(
-      'Delete form',
+      'Delete Segment',
       'Are you sure you want to delete ?',
       ['Delete', 'Cancel'],
       (confirm: any) => {
@@ -267,11 +223,11 @@ export class SegmentComponent implements OnInit {
 
 
   confirmDelete = () => {
-    this.restService.delete(API.main.segments, this.segment.id).subscribe(
+    this.restService.delete(API.main.segment, this.segment.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Form Deleted Successfully.');
         this.getsegments();
-        
+
       },
       (error) => {
         console.error(error);
@@ -287,7 +243,7 @@ export class SegmentComponent implements OnInit {
       name: segment.name,
       description: segment.description,
       color: segment.color,
-      groupname: segment.groupname,
+      segmentCategoryId: segment.segmentCategoryId,
       id: segment.id,
     });
     this.selectedSegmentID = segment.id;
@@ -295,11 +251,9 @@ export class SegmentComponent implements OnInit {
 
   updatesegment() {
     const updatedData = this.segments.value;
-
-    console.log(updatedData);
-
+    this.segments.reset();
     this.restService
-      .patch(API.main.segments, this.selectedSegmentID, updatedData)
+      .patch(API.main.segment, this.selectedSegmentID, updatedData)
       .subscribe(
         (response: any) => {
           this.notifService.showSuccess('Segment Group Updated Successfully.');
@@ -310,5 +264,9 @@ export class SegmentComponent implements OnInit {
           this.notifService.showError(error.error.message);
         },
       );
+  }
+
+  handleDisplaySegment(segmentCategory: any) {
+    this.displaySegment = this.submittedDatasegments.filter(m => m.segmentCategoryId === segmentCategory.id);
   }
 }

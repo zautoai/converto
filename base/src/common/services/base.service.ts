@@ -9,41 +9,33 @@ export class BaseService {
     protected readonly logger: Logger;
     private readonly prismaClientManager: PrismaClientManager;
 
-    constructor()
-    {
+    constructor() {
         this.logger = new Logger(this.constructor.name);
         this.prismaClientManager = new PrismaClientManager();
     }
 
-    protected async getPrismaClient(OrgId:string):Promise<PrismaClient>
-    {
+    protected async getPrismaClient(OrgId: string): Promise<PrismaClient> {
         return await this.prismaClientManager.getClient(OrgId);
     }
 
-    protected async getPrismaMasterClient():Promise<PrismaClient>
-    {
+    protected async getPrismaMasterClient(): Promise<PrismaClient> {
         return await this.prismaClientManager.getClient(DEFAULT_SCHEMA_NAME);
     }
 
-    protected async closeConnection(orgId:string)
-    {
+    protected async closeConnection(orgId: string) {
         await this.prismaClientManager.disconnectClient(orgId);
     }
 
-    protected async closeMasterConnection()
-    {
+    protected async closeMasterConnection() {
         await this.prismaClientManager.disconnectClient(DEFAULT_SCHEMA_NAME);
     }
 
-    protected handleException(data: any)
-    {
-        if(data?.statusCode && data?.statusCode >= 400)
-        {
+    protected handleException(data: any) {
+        if (data?.statusCode && data?.statusCode >= 400) {
             const status = data.statusCode;
             throw new HttpException({ message: data.message, error: data.error }, status);
         }
-        else
-        {
+        else {
             return data;
         }
     }

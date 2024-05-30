@@ -25,7 +25,6 @@ export class RolesGuard implements CanActivate {
       return false; // User not found or not an instance of User
     }
 
-
     return requiredRoles.some((role) => {
       if (user.role && user.role.name == role) {
         return true;
@@ -33,7 +32,5 @@ export class RolesGuard implements CanActivate {
         return false
       };
     });
-
-
   }
 }

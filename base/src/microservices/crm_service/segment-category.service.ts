@@ -22,8 +22,6 @@ export class SegmentCategoryMicroService extends BaseService {
 
     async getSegmentCategories(orgId: string) {
         try {
-            console.log("send from Micro");
-
             return this.CRMClient.send({ cmd: 'GET_SEGMENT_CATEGORIES' }, { orgId }).toPromise();
         }
         catch (error) {

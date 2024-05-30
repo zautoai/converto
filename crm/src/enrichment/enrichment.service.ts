@@ -104,6 +104,7 @@ export class EnrichmentService {
     } catch (error) {
       throw new BadRequestException(error);
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -131,6 +132,7 @@ export class EnrichmentService {
     } catch (error) {
       throw new BadRequestException(error);
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }

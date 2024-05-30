@@ -31,9 +31,9 @@ export class IcpMicroService extends BaseService {
         }
     }
 
-    async getIcp(orgId: string, icpId: string) {
+    async getIcp(orgId: string, id: string) {
         try {
-            return this.CRMClient.send({ cmd: 'GET_ICP' }, { orgId, icpId }).toPromise();
+            return this.CRMClient.send({ cmd: 'GET_ICP' }, { orgId, id }).toPromise();
         }
         catch (error) {
             this.logger.error(`Error while fetching icp: ${error.message}`);

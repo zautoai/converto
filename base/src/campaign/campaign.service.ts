@@ -18,11 +18,11 @@ export class CampaignService extends BaseService {
 
     async create(serviceParams: ServiceParams<CreateCampaignDto>) {
         const { orgId, data } = serviceParams;
+        const prisma = await this.getPrismaClient(orgId);
         try {
             const endDate = new Date();
             endDate.setDate(endDate.getDate() + 30);
             data.endDate = endDate;
-            const prisma = await this.getPrismaClient(orgId);
             const campaign = await prisma.campaign.create({
                 data: {
                     title: data.title,
@@ -42,6 +42,7 @@ export class CampaignService extends BaseService {
             throw error;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -65,6 +66,7 @@ export class CampaignService extends BaseService {
             throw error;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -117,6 +119,7 @@ export class CampaignService extends BaseService {
             throw error;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -137,6 +140,7 @@ export class CampaignService extends BaseService {
             throw error;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -181,6 +185,7 @@ export class CampaignService extends BaseService {
             throw error;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -202,6 +207,7 @@ export class CampaignService extends BaseService {
             throw error;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -220,8 +226,8 @@ export class CampaignService extends BaseService {
     };
 
     async getVisitsCountByDate(orgId: string, id: string) {
+        const prisma = await this.getPrismaClient(orgId);
         try {
-            const prisma = await this.getPrismaClient(orgId);
             const dateWiseVisit = await prisma.visit.groupBy({
                 by: ['createdAt'],
                 _count: {
@@ -258,6 +264,7 @@ export class CampaignService extends BaseService {
             throw error;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -301,6 +308,7 @@ export class CampaignService extends BaseService {
             throw error;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
 
@@ -340,6 +348,7 @@ export class CampaignService extends BaseService {
             throw error;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }

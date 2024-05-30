@@ -10,7 +10,6 @@ import { BullModule } from '@nestjs/bull';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { EnrichmentMicroserviceController } from './enrichment-provider.micro.controller';
 import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
-import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -36,4 +35,4 @@ import { RedisModule } from 'src/redis/redis.module';
   ],
   exports: [EnrichmentService, ClearBitService, ZoomInfoService],
 })
-export class EnrichmentModule {}
+export class EnrichmentModule { }

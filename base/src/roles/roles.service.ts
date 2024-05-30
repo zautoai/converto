@@ -26,6 +26,7 @@ export class RolesService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -55,6 +56,7 @@ export class RolesService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -76,6 +78,7 @@ export class RolesService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -97,6 +100,7 @@ export class RolesService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -119,6 +123,7 @@ export class RolesService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
 
@@ -140,6 +145,7 @@ export class RolesService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }

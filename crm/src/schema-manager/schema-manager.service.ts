@@ -37,6 +37,8 @@ export class SchemaManagerService {
       rollback();
       throw error;
     } finally {
+      prisma.$disconnect();
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId);
     }
   }
@@ -55,6 +57,7 @@ export class SchemaManagerService {
       console.error('Error migrating tenant schema:', error);
       throw error;
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId);
     }
   }
@@ -70,6 +73,7 @@ export class SchemaManagerService {
       console.error('Error deleting tenant schema:', error);
       throw error;
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId);
     }
   }
@@ -112,6 +116,7 @@ export class SchemaManagerService {
       console.error('Error applying migrations for tenant:', error);
       throw error;
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId);
     }
   }

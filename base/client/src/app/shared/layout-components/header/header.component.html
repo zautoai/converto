@@ -2,12 +2,7 @@
   <div class="container-fluid main-container">
     <div class="d-flex">
       <div class="dropdown side-nav">
-        <a
-          aria-label="Hide Sidebar"
-          class="app-sidebar__toggle"
-          data-bs-toggle="sidebar"
-          (click)="toggleSidebar()"
-        >
+        <a aria-label="Hide Sidebar" class="app-sidebar__toggle" data-bs-toggle="sidebar" (click)="toggleSidebar()">
           <a class="open-toggle" href="javascript:void(0)">
             <i class="bx bx-menu-alt-left header-icon"></i>
           </a>
@@ -17,11 +12,7 @@
         </a>
       </div>
       <a class="header-brand" routerLink="/dashboard">
-        <img
-          src="./assets/images/brand/black_full_png.png"
-          class="header-brand-img desktop-lgo"
-          alt="Slica logo"
-        />
+        <img src="./assets/images/brand/black_full_png.png" class="header-brand-img desktop-lgo" alt="Slica logo" />
         <!-- <img src="./assets/images/zauto/zautoaidt.png" class="header-brand-img dark-logo" alt="Slica logo"> -->
         <!-- <img src="./assets/images/zauto/zautoaiwt.png" class="header-brand-img mobile-logo" alt="Slica logo"> -->
         <!-- <img src="./assets/images/zauto/zautoaidt.png" class="header-brand-img darkmobile-logo"
@@ -63,23 +54,13 @@
                     </div> -->
 
       <div class="d-flex order-lg-2 ms-lg-auto">
-        <button
-          class="navbar-toggler navresponsive-toggler d-lg-none ms-auto"
-          type="button"
-          (click)="collapse.toggle()"
-          [attr.aria-expanded]="!isCollapsed"
-        >
+        <button class="navbar-toggler navresponsive-toggler d-lg-none ms-auto" type="button" (click)="collapse.toggle()"
+          [attr.aria-expanded]="!isCollapsed">
           <span class="navbar-toggler-icon fe fe-more-vertical"></span>
         </button>
-        <div
-          class="navbar navbar-expand-lg navbar-nav-right responsive-navbar navbar-dark p-0"
-        >
-          <div
-            class="collapse navbar-collapse"
-            id="navbarSupportedContent-4"
-            #collapse="ngbCollapse"
-            [(ngbCollapse)]="isCollapsed"
-          >
+        <div class="navbar navbar-expand-lg navbar-nav-right responsive-navbar navbar-dark p-0">
+          <div class="collapse navbar-collapse" id="navbarSupportedContent-4" #collapse="ngbCollapse"
+            [(ngbCollapse)]="isCollapsed">
             <div class="d-flex order-lg-2">
               <!-- <div ngbDropdown  class="dropdown d-lg-none d-flex">
                             <a ngbDropdownToggle
@@ -109,20 +90,14 @@
                                 <i class="bx bx-search header-icon search-icon"></i>
                             </a> -->
               <div ngbDropdown class="d-flex">
-                <a
-                  href="{{ getAvatarUrl() }}"
-                  target="_blank"
-                  class="nav-link icon theme-layout nav-link-bg layout-setting"
-                >
+                <a href="{{ getAvatarUrl() }}" target="_blank"
+                  class="nav-link icon theme-layout nav-link-bg layout-setting">
                   <span class="btn btn-outline-primary btn-sm">
                     <i class="fe fe-gitlab"></i> Preview
                     <i class="fe fe-external-link"></i>
                   </span>
                 </a>
-                <a
-                  class="nav-link icon theme-layout nav-link-bg layout-setting"
-                  routerLink="/dashboard"
-                >
+                <a class="nav-link icon theme-layout nav-link-bg layout-setting" routerLink="/dashboard">
                   <span>
                     <i class="bx bx-home header-icon"></i>
                   </span>
@@ -137,67 +112,30 @@
                                 </a> -->
               </div>
               <div class="dropdown header-fullscreen">
-                <a
-                  class="nav-link icon full-screen-link"
-                  id="fullscreen-button"
-                  appFullscreen
-                >
+                <a class="nav-link icon full-screen-link" id="fullscreen-button" appFullscreen>
                   <i class="bx bx-fullscreen header-icon"></i>
                 </a>
               </div>
 
-              <div
-                ngbDropdown
-                class="dropdown profile-dropdown"
-                *ngIf="userData"
-              >
-                <a
-                  ngbDropdownToggle
-                  href="javascript:void(0)"
-                  class="nav-link icon px-1"
-                  data-bs-toggle="dropdown"
-                >
-                  <img
-                    src="{{ userData.imgUrl || GLOBAL_IMAGES.default_user }}"
-                    alt="img"
-                    class="avatar brround"
-                  />
+              <div ngbDropdown class="dropdown profile-dropdown" *ngIf="userData">
+                <a ngbDropdownToggle href="javascript:void(0)" class="nav-link icon px-1" data-bs-toggle="dropdown">
+                  <img src="{{ userData.imgUrl || GLOBAL_IMAGES.default_user }}" alt="img" class="avatar brround" />
                 </a>
-                <div
-                  ngbDropdownMenu
-                  class="dropdown-menu dropdown-menu-end dropdown-menu-arrow animated"
-                >
-                  <div
-                    class="dropdown-header noti-title text-center border-bottom p-3"
-                  >
+                <div ngbDropdownMenu class="dropdown-menu dropdown-menu-end dropdown-menu-arrow animated">
+                  <div class="dropdown-header noti-title text-center border-bottom p-3">
                     <div ngbDropdownItem class="header-usertext">
                       <h5 class="mb-1">{{ userData.name }}</h5>
                       <p class="mb-0">{{ userData.role.name }}</p>
                     </div>
                   </div>
-                  <a
-                    ngbDropdownItem
-                    class="dropdown-item"
-                    href="javascript:void(0)"
-                    (click)="changeProfile()"
-                  >
+                  <a ngbDropdownItem class="dropdown-item" href="javascript:void(0)" (click)="changeProfile()">
                     <i class="fe fe-user me-2"></i> <span>Change profile</span>
                   </a>
-                  <a
-                    ngbDropdownItem
-                    class="dropdown-item"
-                    href="javascript:void(0)"
-                    (click)="changePassword()"
-                  >
+                  <a ngbDropdownItem class="dropdown-item" href="javascript:void(0)" (click)="changePassword()">
                     <i class="fe fe-lock me-2"></i> <span>Change password</span>
                   </a>
 
-                  <a
-                    ngbDropdownItem
-                    class="dropdown-item"
-                    href="javascript:void(0)"
-                    (click)="signout()"
-                  >
+                  <a ngbDropdownItem class="dropdown-item" href="javascript:void(0)" (click)="signout()">
                     <i class="fe fe-log-out me-2"></i> <span>Logout</span>
                   </a>
                 </div>
@@ -216,39 +154,26 @@
 <!-- change profile pic modal -->
 <ng-template #changeProfileModal let-modal>
   <div class="modal-header">
-    <h4><i class="zmdi zmdi-image"></i> Change profile pic</h4>
+    <h4><i class="zmdi zmdi-image"></i> Change profiles pic</h4>
   </div>
   <form #profileForm="ngForm" (ngSubmit)="onChangeProfileSubmit()">
     <div class="modal-body">
       <div class="row">
         <div class="col-6">
           <div class="profile-pic-cover">
-            <img
-              src="{{ previewUrl || './assets/images/users/default-user.png' }}"
-              alt=""
-            />
+            <img src="{{ previewUrl || './assets/images/users/default-user.png' }}" alt="" />
           </div>
         </div>
         <div class="col-6 my-auto">
-          <label for="selectImg" class="btn btn-primary btn-block"
-            ><i class="fa fa-upload" aria-hidden="true"></i> Select Image</label
-          >
-          <input
-            type="file"
-            id="selectImg"
-            accept="image/png, image/jpg, image/jpeg"
-            (change)="onImageSelected($event)"
-            required
-          />
+          <label for="selectImg" class="btn btn-primary btn-block"><i class="fa fa-upload" aria-hidden="true"></i>
+            Select Image</label>
+          <input type="file" id="selectImg" accept="image/png, image/jpg, image/jpeg" (change)="onImageSelected($event)"
+            required />
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button
-        class="btn btn-outline-primary"
-        type="button"
-        (click)="closeModal()"
-      >
+      <button class="btn btn-outline-primary" type="button" (click)="closeModal()">
         Cancel
       </button>
       <button class="btn btn-primary" type="submit" [disabled]="!selectedImage">
@@ -266,45 +191,24 @@
     <div class="modal-body">
       <div class="form-group mb-3">
         <label for="">Password</label>
-        <input
-          type="password"
-          class="form-control"
-          placeholder="Password"
-          name="newPassword"
-          autocomplete="off"
-          [(ngModel)]="newPassword"
-        />
+        <input type="password" class="form-control" placeholder="Password" name="newPassword" autocomplete="off"
+          [(ngModel)]="newPassword" />
       </div>
       <div class="form-group mb-3">
         <label for="">Confirm password</label>
-        <input
-          type="password"
-          class="form-control"
-          [ngClass]="{ 'is-invalid': passwordErrorText.length > 0 }"
-          placeholder="Confirm password"
-          autocomplete="off"
-          name="confirmPassword"
-          [(ngModel)]="confirmPassword"
-        />
+        <input type="password" class="form-control" [ngClass]="{ 'is-invalid': passwordErrorText.length > 0 }"
+          placeholder="Confirm password" autocomplete="off" name="confirmPassword" [(ngModel)]="confirmPassword" />
         <div class="invalid-feedback">
           {{ passwordErrorText }}
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button
-        class="btn btn-outline-primary"
-        type="button"
-        (click)="closeModal()"
-      >
+      <button class="btn btn-outline-primary" type="button" (click)="closeModal()">
         Cancel
       </button>
-      <button
-        class="btn btn-primary"
-        type="submit"
-        (click)="onChangePassword()"
-        [disabled]="newPassword.length <= 0 || confirmPassword.length <= 0"
-      >
+      <button class="btn btn-primary" type="submit" (click)="onChangePassword()"
+        [disabled]="newPassword.length <= 0 || confirmPassword.length <= 0">
         Save
       </button>
     </div>

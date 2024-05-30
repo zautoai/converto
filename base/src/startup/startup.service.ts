@@ -1,18 +1,16 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 import { DEFALT_ROLES, ZAUTO_ORG } from 'src/common/constants/system.constants';
+import { BaseService } from 'src/common/services/base.service';
+import { HelpersService } from 'src/helpers/helpers.service';
 import { Organization } from 'src/organizations/entities/organization.entity';
 import { OrganizationsService } from 'src/organizations/organizations.service';
 import { RolesService } from 'src/roles/roles.service';
+import { SchemaManager } from 'src/schema-manager/schema-manager.service';
 import { UsersService } from 'src/users/users.service';
 import { ZAUTO_HELPERS } from '../helpers/entities/helpers.model';
-import { HelpersService } from 'src/helpers/helpers.service';
-import { existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { BaseService } from 'src/common/services/base.service';
 import { StartupMicroService } from './../microservices/crm_service/startup.service';
-import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
-import { SchemaManager } from 'src/schema-manager/schema-manager.service';
 
 @Injectable()
 export class StartupService extends BaseService implements OnModuleInit {
@@ -25,7 +23,8 @@ export class StartupService extends BaseService implements OnModuleInit {
         private userService: UsersService,
         private orgService: OrganizationsService,
         private helperService: HelpersService,
-        private startupMicroService: StartupMicroService
+        private startupMicroService: StartupMicroService,
+
     ) {
         super();
     }
@@ -43,22 +42,18 @@ export class StartupService extends BaseService implements OnModuleInit {
         await this.handleException(await this.startupMicroService.syncOrganizations())
     }
 
-    async applieMigration()
-    {
-        try
-        {
-            const prisma = await this.getPrismaMasterClient(); 
+    async applieMigration() {
+        try {
+            const prisma = await this.getPrismaMasterClient();
             const organizations = await prisma.organization.findMany();
             for (const org of organizations) {
                 await this.schemaManager.applyMigration(org.id, null);
             }
         }
-        catch(err)
-        {
+        catch (err) {
             console.log(err);
         }
-        finally
-        {
+        finally {
             this.closeMasterConnection();
         }
     }
@@ -178,4 +173,6 @@ export class StartupService extends BaseService implements OnModuleInit {
             }
         });
     }
+
+
 } 

@@ -20,8 +20,7 @@ export class AvailabilityScheduleService extends BaseService {
         }
         const prisma = await this.getPrismaClient(orgId)
         const existingSchedule = await prisma.availabilitySchedule.findFirst();
-        if(existingSchedule)
-        {
+        if (existingSchedule) {
             throw new ConflictException("This calendar already have an availability schedule");
         }
         const schedule = await prisma.availabilitySchedule.create({ data: scheduleData });
@@ -36,54 +35,53 @@ export class AvailabilityScheduleService extends BaseService {
                 include: { availableHours: true }
             });
             return allSchedules;
-        } 
-        catch(error)
-        {
-          console.log(error);
-          throw error;
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
         }
         finally {
-          await this.closeConnection(orgId);
+            prisma.$disconnect()
+            await this.closeConnection(orgId);
         }
     }
 
-    async findOneByOrgId(orgId:string)
-    {
+    async findOneByOrgId(orgId: string) {
+        const prisma = await this.getPrismaClient(orgId)
         try {
-            const prisma = await this.getPrismaClient(orgId)
             const allSchedules = await prisma.availabilitySchedule.findFirst({ include: { availableHours: true } });
             return allSchedules;
-        } 
-        catch(error)
-        {
-          console.log(error);
-          throw error;
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
         }
         finally {
-          await this.closeConnection(orgId);
+            prisma.$disconnect()
+            await this.closeConnection(orgId);
         }
     }
 
-    async findOne(orgId: string,id:string) {
+    async findOne(orgId: string, id: string) {
+        const prisma = await this.getPrismaClient(orgId)
         try {
-            const prisma = await this.getPrismaClient(orgId)
-            const allSchedules = await prisma.availabilitySchedule.findFirst({ where:{id},include: { availableHours: true } });
+            const allSchedules = await prisma.availabilitySchedule.findFirst({ where: { id }, include: { availableHours: true } });
             return allSchedules;
-        } 
-        catch(error)
-        {
-          console.log(error);
-          throw error;
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
         }
         finally {
-          await this.closeConnection(orgId);
+            prisma.$disconnect()
+            await this.closeConnection(orgId);
         }
     }
 
     async update(serviceParams: ServiceParams<UpdateScheduleDto>) {
         const { orgId, id, data: updateScheduleDto } = serviceParams;
+        const prisma = await this.getPrismaClient(orgId)
         try {
-            const prisma = await this.getPrismaClient(orgId)
             const existingSchedule = await prisma.availabilitySchedule.findUnique({
                 where: { id }
             });
@@ -101,21 +99,21 @@ export class AvailabilityScheduleService extends BaseService {
                 data: scheduleData
             });
             return updatedSchedule;
-        } 
-        catch(error)
-        {
-          console.log(error);
-          throw error;
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
         }
         finally {
-          await this.closeConnection(orgId);
+            prisma.$disconnect()
+            await this.closeConnection(orgId);
         }
     }
 
     async delete(serviceParams: ServiceParams<{ id: string }>) {
         const { orgId, data: { id } } = serviceParams
+        const prisma = await this.getPrismaClient(orgId)
         try {
-            const prisma = await this.getPrismaClient(orgId)
             const existingSchedule = await prisma.availabilitySchedule.findUnique({
                 where: { id }
             });
@@ -123,22 +121,21 @@ export class AvailabilityScheduleService extends BaseService {
                 throw new NotFoundException('Availability schedule not found');
             }
             await prisma.availabilitySchedule.delete({ where: { id } });
-        } 
-        catch(error)
-        {
-          console.log(error);
-          throw error;
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
         }
         finally {
-          await this.closeConnection(orgId);
+            prisma.$disconnect()
+            await this.closeConnection(orgId);
         }
     }
 
     async deleteAndCreateAvailableHours(serviceParams: ServiceParams<{ scheduleId: string, availableHours: any[] }>) {
         const { orgId, data: { scheduleId, availableHours } } = serviceParams;
         const prisma = await this.getPrismaClient(orgId)
-        try
-        {
+        try {
             await prisma.availableHours.deleteMany({
                 where: {
                     scheduleId: scheduleId
@@ -154,13 +151,13 @@ export class AvailabilityScheduleService extends BaseService {
                 await prisma.availableHours.create({ data: availableHourData })
             }
         }
-        catch(error)
-        {
-          console.log(error);
-          throw error;
+        catch (error) {
+            console.log(error);
+            throw error;
         }
         finally {
-          await this.closeConnection(orgId);
+            prisma.$disconnect()
+            await this.closeConnection(orgId);
         }
     }
 

@@ -59,6 +59,7 @@ export class AccountsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -122,6 +123,7 @@ export class AccountsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -146,6 +148,7 @@ export class AccountsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -165,6 +168,7 @@ export class AccountsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -199,6 +203,7 @@ export class AccountsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -230,6 +235,7 @@ export class AccountsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -288,9 +294,9 @@ export class AccountsService {
 
 
   async hasMapping(orgId: string): Promise<Boolean> {
+    const prisma = await this.prismaClientManager.getClient(orgId);
     try {
       const crmName = await this.externalCRMService.getActiveCRM(orgId);
-      const prisma = await this.prismaClientManager.getClient(orgId);
       const contacts = await prisma.crmMapping.count({
         where: {
           crmName,
@@ -301,6 +307,10 @@ export class AccountsService {
     }
     catch (e) {
       return false;
+    }
+    finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
     }
   }
 
@@ -458,6 +468,7 @@ export class AccountsService {
         'Error while fetching ABM',
       );
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -479,6 +490,7 @@ export class AccountsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }

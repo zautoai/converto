@@ -34,6 +34,7 @@ export class StageService extends BaseService {
             throw err;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -53,6 +54,7 @@ export class StageService extends BaseService {
             throw err;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -72,6 +74,7 @@ export class StageService extends BaseService {
             throw err;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -102,6 +105,7 @@ export class StageService extends BaseService {
             }
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -137,6 +141,7 @@ export class StageService extends BaseService {
             throw err;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -166,6 +171,7 @@ export class StageService extends BaseService {
             throw err;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -216,6 +222,7 @@ export class StageService extends BaseService {
             throw err;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -239,6 +246,7 @@ export class StageService extends BaseService {
             console.error(`Error creating stage: `, error);
             console.error(error)
         } finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }
@@ -257,6 +265,7 @@ export class StageService extends BaseService {
             throw err;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }

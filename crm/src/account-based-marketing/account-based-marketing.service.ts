@@ -28,6 +28,7 @@ export class AccountBasedMarketingService {
       throw new BadRequestException(error)
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -45,6 +46,7 @@ export class AccountBasedMarketingService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -67,6 +69,7 @@ export class AccountBasedMarketingService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -87,6 +90,7 @@ export class AccountBasedMarketingService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -104,6 +108,7 @@ export class AccountBasedMarketingService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }

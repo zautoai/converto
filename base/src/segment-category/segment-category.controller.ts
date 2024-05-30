@@ -32,8 +32,6 @@ export class SegmentCategoryController {
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
-    console.log("Send from controller");
-
     return await this.segmentCategoryService.findAll(orgId);
   }
 
