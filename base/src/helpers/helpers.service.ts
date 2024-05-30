@@ -8,7 +8,7 @@ import { ZAUTO_HELPERS } from './entities/helpers.model';
 import { BaseService } from 'src/common/services/base.service';
 
 @Injectable()
-export class HelpersService extends BaseService{
+export class HelpersService extends BaseService {
 
   constructor(private llmService: LlmService) {
     super();
@@ -31,119 +31,116 @@ export class HelpersService extends BaseService{
   }
 
   async removeById(id: string) {
+    const prisma = await this.getPrismaMasterClient();
     try {
-      const prisma = await this.getPrismaMasterClient();
       const helper = await prisma.openAIAssistant.findUnique({ where: { id } });
       const assistantId = helper.assistantId;
       await this.llmService.deleteAgent(assistantId);
       await prisma.openAIAssistant.delete({ where: { id } });
-    } 
-    catch(error)
-    {
+    }
+    catch (error) {
       console.log(error);
       throw error;
     }
     finally {
-      await this.closeMasterConnection();
+      prisma.$disconnect()
+      await this.closeMasterConnection();;
     }
 
   }
 
   async remove(id: string, assistantId: string) {
+    const prisma = await this.getPrismaMasterClient();
     try {
-      const prisma = await this.getPrismaMasterClient();
       await prisma.openAIAssistant.delete({ where: { id } });
       await this.llmService.deleteAgent(assistantId);
     }
-    catch(error)
-    {
+    catch (error) {
       console.log(error);
       throw error;
     }
     finally {
-      await this.closeMasterConnection();
+      prisma.$disconnect()
+      await this.closeMasterConnection();;
     }
   }
 
   async removeByName(name: string) {
-    try 
-    {
-      const prisma = await this.getPrismaMasterClient();
+    const prisma = await this.getPrismaMasterClient();
+    try {
       await prisma.openAIAssistant.delete({ where: { name } });
     }
-    catch(error)
-    {
+    catch (error) {
       console.log(error);
       throw error;
     }
     finally {
-      await this.closeMasterConnection();
+      prisma.$disconnect()
+      await this.closeMasterConnection();;
     }
   }
 
   async removeByAssistant(id: string) {
 
+    const prisma = await this.getPrismaMasterClient();
     try {
-      const prisma = await this.getPrismaMasterClient();
       const helper = await prisma.openAIAssistant.findFirst({ where: { assistantId: id } });
       if (helper) {
         await this.llmService.deleteAgent(id);
         await prisma.openAIAssistant.delete({ where: { id: helper.id } });
       }
-    } 
-    catch(error)
-    {
+    }
+    catch (error) {
       console.log(error);
       throw error;
     }
     finally {
-      await this.closeMasterConnection();
+      prisma.$disconnect()
+      await this.closeMasterConnection();;
     }
 
   }
 
   async removeAll() {
-    try
-    {
-      const prisma = await this.getPrismaMasterClient();
+    const prisma = await this.getPrismaMasterClient();
+    try {
       const helpers = await prisma.openAIAssistant.findMany();
       for (let helper of helpers) {
         await this.llmService.deleteAgent(helper.assistantId);
         await this.remove(helper.id, helper.assistantId);
       }
     }
-    catch(error)
-    {
+    catch (error) {
       console.log(error);
       throw error;
     }
     finally {
-      await this.closeMasterConnection();
+      prisma.$disconnect()
+      await this.closeMasterConnection();;
     }
   }
 
   async findByName(name: string) {
-    try 
-    {
-      const prisma = await this.getPrismaMasterClient();
+    const prisma = await this.getPrismaMasterClient();
+    try {
       return await prisma.openAIAssistant.findUnique({ where: { name } });
-    } 
-    catch(error)
-    {
+    }
+    catch (error) {
       console.log(error);
       throw error;
     }
     finally {
-      await this.closeMasterConnection();
+      prisma.$disconnect()
+      await this.closeMasterConnection();;
     }
   }
 
   async createHelper(agentConf: AgentConfig) {
+    const prisma = await this.getPrismaMasterClient();
     try {
       const envName = process.env.NAME;
       let name = agentConf.name
       agentConf.name = envName + '_' + agentConf.name;
-      const prisma = await this.getPrismaMasterClient();
       const _assistant = await this.llmService.createAgent(agentConf);
       const helper = await prisma.openAIAssistant.create({
         data: {
@@ -154,14 +151,14 @@ export class HelpersService extends BaseService{
         }
       });
       return helper
-    } 
-    catch(error)
-    {
+    }
+    catch (error) {
       console.log(error);
       throw error;
     }
     finally {
-      await this.closeMasterConnection();
+      prisma.$disconnect()
+      await this.closeMasterConnection();;
     }
   }
 

@@ -32,7 +32,10 @@ CREATE TYPE "CampaignStatus" AS ENUM ('ACTIVE', 'INACTIVE');
 CREATE TYPE "CTAType" AS ENUM ('CTA', 'NAVIGATOR', 'CALENDAR');
 
 -- CreateEnum
-CREATE TYPE "ProspecActivityType" AS ENUM ('CTA_PERFORMED', 'PAGE_VIEWED', 'LINK_CLICKED', 'CHAT_INITIATED', 'OTHER');
+CREATE TYPE "ProspectActivityType" AS ENUM ('CTA_PERFORMED', 'PAGE_VIEWED', 'PAGE_CLOSED', 'LINK_CLICKED', 'CHAT_INITIATED', 'OTHER');
+
+-- CreateEnum
+CREATE TYPE "IntentType" AS ENUM ('POSITIVE', 'NEGATIVE');
 
 -- CreateTable
 CREATE TABLE "Role" (
@@ -353,19 +356,32 @@ CREATE TABLE "ExternalToolCredential" (
 );
 
 -- CreateTable
-CREATE TABLE "ProspecJourney" (
+CREATE TABLE "ProspectJourney" (
     "id" TEXT NOT NULL,
     "visitId" TEXT NOT NULL,
     "data" TEXT,
     "url" TEXT NOT NULL,
-    "type" "ProspecActivityType" NOT NULL DEFAULT 'OTHER',
+    "type" "ProspectActivityType" NOT NULL DEFAULT 'OTHER',
     "timeSpend" INTEGER NOT NULL DEFAULT 0,
-    "score" DOUBLE PRECISION NOT NULL DEFAULT 0.0,
     "scrollDepth" DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    "previousPageId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "ProspecJourney_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ProspectJourney_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "IntentScoring" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "value" DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    "type" "IntentType" NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "modifiedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "IntentScoring_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -444,7 +460,13 @@ CREATE UNIQUE INDEX "OpenAIAssistant_name_key" ON "OpenAIAssistant"("name");
 CREATE UNIQUE INDEX "CallToAction_name_key" ON "CallToAction"("name");
 
 -- CreateIndex
-CREATE INDEX "ProspecJourney_visitId_type_idx" ON "ProspecJourney"("visitId", "type");
+CREATE INDEX "ProspectJourney_visitId_type_idx" ON "ProspectJourney"("visitId", "type");
+
+-- CreateIndex
+CREATE INDEX "ProspectJourney_previousPageId_idx" ON "ProspectJourney"("previousPageId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "IntentScoring_name_key" ON "IntentScoring"("name");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -486,4 +508,7 @@ ALTER TABLE "ZautoMessage" ADD CONSTRAINT "ZautoMessage_sentById_fkey" FOREIGN K
 ALTER TABLE "availableHours" ADD CONSTRAINT "availableHours_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "AvailabilitySchedule"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ProspecJourney" ADD CONSTRAINT "ProspecJourney_visitId_fkey" FOREIGN KEY ("visitId") REFERENCES "Visit"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ProspectJourney" ADD CONSTRAINT "ProspectJourney_previousPageId_fkey" FOREIGN KEY ("previousPageId") REFERENCES "ProspectJourney"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProspectJourney" ADD CONSTRAINT "ProspectJourney_visitId_fkey" FOREIGN KEY ("visitId") REFERENCES "Visit"("id") ON DELETE CASCADE ON UPDATE CASCADE;

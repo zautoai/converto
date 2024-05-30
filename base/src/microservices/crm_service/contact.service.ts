@@ -10,7 +10,7 @@ export class ContactService extends BaseService {
     super();
   }
 
-  async getContacts(orgId: string, filterDto: FilterDto) {
+  async getContacts(orgId: string, filterDto?: FilterDto) {
     try {
       return this.CRMClient.send(
         { cmd: 'GET_CONTACTS' },

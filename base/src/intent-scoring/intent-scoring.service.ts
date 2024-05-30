@@ -7,41 +7,38 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 
 @Injectable()
-export class IntentScoringService extends BaseService{
+export class IntentScoringService extends BaseService {
 
-  constructor(){
+  constructor() {
     super();
   }
 
   async create(serviceParams: ServiceParams<CreateIntentScoringDto>) {
     const { orgId, data } = serviceParams;
-    try
-    {
-      const prisma = await this.getPrismaClient(orgId);
-      const existingIntentScoring = await prisma.intentScoring.findFirst({where:{name:data.name}});
-      if(existingIntentScoring)
-      {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const existingIntentScoring = await prisma.intentScoring.findFirst({ where: { name: data.name } });
+      if (existingIntentScoring) {
         throw new BadRequestException("Intent Scoring already exists");
       }
-      const intentScoring = await prisma.intentScoring.create({data});
+      const intentScoring = await prisma.intentScoring.create({ data });
       return intentScoring;
     }
-    catch(error)
-    {
+    catch (error) {
       throw new BadRequestException(error.message);
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
 
   async findAll(serviceParams: ServiceParams<PaginationDto>) {
-    const { orgId, data:paginationDto } = serviceParams;
+    const { orgId, data: paginationDto } = serviceParams;
     const { page, limit } = paginationDto;
-      const skip = (page - 1) * limit;
-    try
-    {
-      const prisma = await this.getPrismaClient(orgId);
+    const skip = (page - 1) * limit;
+    const prisma = await this.getPrismaClient(orgId);
+    try {
       const intentScorings = await prisma.intentScoring.findMany({ skip, take: limit });
       const total = await prisma.intentScoring.count();
       return {
@@ -50,71 +47,68 @@ export class IntentScoringService extends BaseService{
         total: total
       }
     }
-    catch (error)
-    {
+    catch (error) {
       throw new BadRequestException(error.message);
-    }  
+    }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
-    }  
+    }
   }
 
-  async findOne(orgId:string,id: string) {
-    try
-    {
-      const prisma = await this.getPrismaClient(orgId);
-      const intentScoring = await prisma.intentScoring.findUnique({where:{id:id}});
+  async findOne(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const intentScoring = await prisma.intentScoring.findUnique({ where: { id: id } });
       return intentScoring;
     }
-    catch (error)
-    {
+    catch (error) {
       throw new BadRequestException(error.message);
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
 
-  async update(serviceParams: ServiceParams<{updateIntentScoringDto:UpdateIntentScoringDto, id:string}>) {
-    const {orgId, data:{ updateIntentScoringDto, id} } = serviceParams;
-    try
-    {
-      const prisma = await this.getPrismaClient(orgId);
-      await this.findOne(orgId,id);
-      const existingIntentScoring = await prisma.intentScoring.findFirst({where:{
-        name:updateIntentScoringDto.name,
-        id:{not:id}
-      }
+  async update(serviceParams: ServiceParams<{ updateIntentScoringDto: UpdateIntentScoringDto, id: string }>) {
+    const { orgId, data: { updateIntentScoringDto, id } } = serviceParams;
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      await this.findOne(orgId, id);
+      const existingIntentScoring = await prisma.intentScoring.findFirst({
+        where: {
+          name: updateIntentScoringDto.name,
+          id: { not: id }
+        }
       });
-      if(existingIntentScoring)
-      {
+      if (existingIntentScoring) {
         throw new BadRequestException("Intent Scoring already exists");
       }
-      const intentScoring = await prisma.intentScoring.update({where:{id:id},data:updateIntentScoringDto});
+      const intentScoring = await prisma.intentScoring.update({ where: { id: id }, data: updateIntentScoringDto });
       return intentScoring;
     }
-    catch (error)
-    {
+    catch (error) {
       throw new BadRequestException(error.message);
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
 
-  async remove(orgId:string,id: string) {
-    try
-    {
-      const prisma = await this.getPrismaClient(orgId);
-      await this.findOne(orgId,id);
-      const intentScoring = await prisma.intentScoring.delete({where:{id:id}});
+  async remove(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      await this.findOne(orgId, id);
+      const intentScoring = await prisma.intentScoring.delete({ where: { id: id } });
       return intentScoring;
     }
-    catch (error)
-    {
+    catch (error) {
       throw new BadRequestException(error.message);
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }

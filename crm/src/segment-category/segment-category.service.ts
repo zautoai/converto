@@ -35,6 +35,7 @@ export class SegmentCategoryService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -52,6 +53,7 @@ export class SegmentCategoryService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -76,6 +78,7 @@ export class SegmentCategoryService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -117,6 +120,7 @@ export class SegmentCategoryService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -146,6 +150,7 @@ export class SegmentCategoryService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }

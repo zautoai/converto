@@ -66,6 +66,7 @@ export class FormBuilderService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -118,6 +119,7 @@ export class FormBuilderService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -145,6 +147,7 @@ export class FormBuilderService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -192,6 +195,7 @@ export class FormBuilderService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -209,6 +213,7 @@ export class FormBuilderService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -277,6 +282,7 @@ export class FormBuilderService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }

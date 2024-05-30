@@ -52,6 +52,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -72,6 +73,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -101,6 +103,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -147,6 +150,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -171,6 +175,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -198,6 +203,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -214,6 +220,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -233,6 +240,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -252,6 +260,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -275,6 +284,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -426,6 +436,7 @@ export class SiteService extends BaseService {
       return null;
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -466,6 +477,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -483,6 +495,7 @@ export class SiteService extends BaseService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }
@@ -519,6 +532,7 @@ export class SiteService extends BaseService {
     } catch (error) {
       throw error;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId)
     }
   }

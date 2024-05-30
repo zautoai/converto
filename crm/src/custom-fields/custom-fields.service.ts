@@ -28,6 +28,7 @@ export class CustomFieldsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -54,6 +55,7 @@ export class CustomFieldsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -75,6 +77,7 @@ export class CustomFieldsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -92,6 +95,7 @@ export class CustomFieldsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -106,6 +110,7 @@ export class CustomFieldsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -126,6 +131,7 @@ export class CustomFieldsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -144,6 +150,7 @@ export class CustomFieldsService {
     } catch (e) {
       return [];
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }

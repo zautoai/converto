@@ -5,32 +5,33 @@ import { ServiceParams } from "src/common/models/service-param.model";
 import { BaseService } from "src/common/services/base.service";
 
 
-@Injectable() 
-export class TrackingService extends BaseService{
+@Injectable()
+export class TrackingService extends BaseService {
 
-    constructor(){
+    constructor() {
         super();
     }
 
-    async addTracking(serviceParams: ServiceParams<{convId:string,trackingDto:TrackingDto}>):Promise<void>
-    {
-        const { orgId,data:{convId, trackingDto} } = serviceParams;
+    async addTracking(serviceParams: ServiceParams<{ convId: string, trackingDto: TrackingDto }>): Promise<void> {
+        const { orgId, data: { convId, trackingDto } } = serviceParams;
         const { data } = trackingDto;
         const prisma = await this.getPrismaClient(orgId);
         try {
             const jsonData = JSON.parse(data);
-            const activity = await prisma.zautoMessage.create({data:{
-                activityJson:jsonData,
-                convId,
-                type:MessageMediaType.PAGE_ACTIVITY,
-                role:'user'
-            }});
+            const activity = await prisma.zautoMessage.create({
+                data: {
+                    activityJson: jsonData,
+                    convId,
+                    type: MessageMediaType.PAGE_ACTIVITY,
+                    role: 'user'
+                }
+            });
         }
-        catch (error)
-        {
+        catch (error) {
             throw new BadRequestException(error.message);
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId);
         }
     }

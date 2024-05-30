@@ -3,13 +3,13 @@ import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketSe
 import { Socket } from 'socket.io';
 import { ProspectJourneySocketService } from './prospect-journey-socket.service';
 
-@WebSocketGateway(8080,{
+@WebSocketGateway(8081, {
     cors: { origin: '*' }
-  })
-  
-export class ProspectJourneySocketGateway implements OnGatewayConnection,OnGatewayDisconnect{
+})
 
-    constructor(private readonly prospectJourneySocketService:ProspectJourneySocketService){}
+export class ProspectJourneySocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
+
+    constructor(private readonly prospectJourneySocketService: ProspectJourneySocketService) { }
 
     @WebSocketServer()
     private server: Socket;
@@ -21,5 +21,5 @@ export class ProspectJourneySocketGateway implements OnGatewayConnection,OnGatew
     handleDisconnect(client: Socket) {
         this.prospectJourneySocketService.handleDisconnect(client);
     }
-    
+
 }

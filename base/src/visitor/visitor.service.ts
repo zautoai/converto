@@ -15,14 +15,11 @@ export class VisitorService extends BaseService {
     super();
   }
 
-  async createSession(serviceParams: ServiceParams<{createSessionDto:CreateSessionDto , request: Request}>)
-  {
+  async createSession(serviceParams: ServiceParams<{ createSessionDto: CreateSessionDto, request: Request }>) {
     const { orgId, data: { createSessionDto, request } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
-    try 
-    {
-      if(!createSessionDto.visitorId)
-        {
+    try {
+      if (!createSessionDto.visitorId) {
         const ipAddress = request.headers['x-forwarded-for'] as string;
         const ipData = await this.iptrackingService.getIPData(ipAddress);
         const headers = request.headers;
@@ -34,34 +31,38 @@ export class VisitorService extends BaseService {
           ipAddress: ipAddress,
           trackingInfo: JSON.stringify(ipData)
         };
-        const newVisitor = await this.create({orgId,data:visitorObj});
-        const newVisit = await this.createOrUpdateVisit({orgId, data: { 
-          visitorId: newVisitor.id, 
-          source: createSessionDto.source,
-          campaignId: createSessionDto.campaignId
-        }});
+        const newVisitor = await this.create({ orgId, data: visitorObj });
+        const newVisit = await this.createOrUpdateVisit({
+          orgId, data: {
+            visitorId: newVisitor.id,
+            source: createSessionDto.source,
+            campaignId: createSessionDto.campaignId
+          }
+        });
         return {
           visitorId: newVisitor.id,
           visitId: newVisit.id
         }
       }
-      else
-      {
-        const visit = await this.createOrUpdateVisit({orgId, data: { 
-          visitorId: createSessionDto.visitorId, 
-          source: createSessionDto.source,
-          campaignId: createSessionDto.campaignId
-        }});
+      else {
+        const visit = await this.createOrUpdateVisit({
+          orgId, data: {
+            visitorId: createSessionDto.visitorId,
+            source: createSessionDto.source,
+            campaignId: createSessionDto.campaignId
+          }
+        });
         return {
           visitorId: createSessionDto.visitorId,
           visitId: visit.id
         };
       }
-    } 
+    }
     catch (err) {
       throw err;
-    } 
+    }
     finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -74,6 +75,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -100,6 +102,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -120,6 +123,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -147,6 +151,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -171,6 +176,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -185,6 +191,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -199,6 +206,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -231,6 +239,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -246,6 +255,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -260,6 +270,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }
@@ -284,6 +295,7 @@ export class VisitorService extends BaseService {
     } catch (err) {
       throw err;
     } finally {
+      prisma.$disconnect()
       await this.closeConnection(orgId);
     }
   }

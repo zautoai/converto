@@ -45,7 +45,8 @@ export class OrganizationsService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await this.closeMasterConnection()
+      prisma.$disconnect()
+      await this.closeMasterConnection();
     }
   }
 
@@ -71,7 +72,8 @@ export class OrganizationsService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await this.closeMasterConnection()
+      prisma.$disconnect()
+      await this.closeMasterConnection();
     }
   }
 
@@ -92,7 +94,8 @@ export class OrganizationsService extends BaseService {
     catch (error) {
       throw error
     } finally {
-      await this.closeMasterConnection()
+      prisma.$disconnect()
+      await this.closeMasterConnection();
     }
   }
 
@@ -108,7 +111,8 @@ export class OrganizationsService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await this.closeMasterConnection()
+      prisma.$disconnect()
+      await this.closeMasterConnection();
     }
   }
 
@@ -126,7 +130,8 @@ export class OrganizationsService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await this.closeMasterConnection()
+      prisma.$disconnect()
+      await this.closeMasterConnection();
     }
   }
 
@@ -149,7 +154,8 @@ export class OrganizationsService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await this.closeMasterConnection()
+      prisma.$disconnect()
+      await this.closeMasterConnection();
     }
   }
 
@@ -161,7 +167,8 @@ export class OrganizationsService extends BaseService {
     } catch (error) {
       throw error
     } finally {
-      await this.closeMasterConnection()
+      prisma.$disconnect()
+      await this.closeMasterConnection();
     }
   }
 
@@ -175,7 +182,8 @@ export class OrganizationsService extends BaseService {
       throw new InternalServerErrorException(err.message);
     }
     finally {
-      await this.closeMasterConnection()
+      prisma.$disconnect()
+      await this.closeMasterConnection();
     }
   }
 

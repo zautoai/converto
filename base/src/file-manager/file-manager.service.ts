@@ -59,6 +59,7 @@ export class FileManagerService extends BaseService {
         } catch (error) {
             throw error
         } finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId)
         }
     }
@@ -78,6 +79,7 @@ export class FileManagerService extends BaseService {
         } catch (error) {
             throw error
         } finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId)
         }
     }
@@ -171,6 +173,7 @@ export class FileManagerService extends BaseService {
             throw error;
         }
         finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId)
         }
     }
@@ -196,6 +199,7 @@ export class FileManagerService extends BaseService {
         } catch (error) {
             throw error
         } finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId)
         }
     }
@@ -224,6 +228,7 @@ export class FileManagerService extends BaseService {
         } catch (error) {
             throw error
         } finally {
+            prisma.$disconnect()
             await this.closeConnection(orgId)
         }
     }

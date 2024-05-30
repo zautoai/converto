@@ -100,6 +100,7 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -132,6 +133,7 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -214,6 +216,7 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -318,6 +321,7 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -348,6 +352,7 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -362,6 +367,7 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -405,6 +411,7 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -422,6 +429,7 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -486,6 +494,7 @@ export class ContactsService {
     } catch (error) {
       console.error(error)
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -506,6 +515,7 @@ export class ContactsService {
       return false;
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -609,6 +619,7 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -628,6 +639,7 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }

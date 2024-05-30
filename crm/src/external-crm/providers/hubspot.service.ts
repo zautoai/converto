@@ -9,10 +9,10 @@ import { FilterOperatorEnum, PublicGdprDeleteInput, SimplePublicObjectInput, Sim
 
 @Injectable()
 export class HubspotService extends BaseExternalCrm {
-    
-       
+
+
     constructor(
-        private readonly httpService:HttpService,
+        private readonly httpService: HttpService,
         private readonly prismaClientManager: PrismaClientManager
     ) {
         super({
@@ -24,12 +24,12 @@ export class HubspotService extends BaseExternalCrm {
         });
     }
 
-    getAuthUrl(orgId:string,additionalInfo:any): string {
+    getAuthUrl(orgId: string, additionalInfo: any): string {
         const authUrl = `https://app.hubspot.com/oauth/authorize?client_id=${this.clientId}&redirect_uri=${this.redirectUri}&scope=${this.scope}&state=${additionalInfo}`;
         return authUrl;
     }
 
-    async exchangeCodeForAccessToken(orgId:string,code: string): Promise<any> {
+    async exchangeCodeForAccessToken(orgId: string, code: string): Promise<any> {
         const tokenEndpoint = 'https://api.hubapi.com/oauth/v1/token';
         const requestBody = {
             grant_type: 'authorization_code',
@@ -38,14 +38,14 @@ export class HubspotService extends BaseExternalCrm {
             redirect_uri: this.redirectUri,
             code: code
         };
-    
+
         try {
             const response = await this.httpService.post(tokenEndpoint, requestBody, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             }).toPromise();
-            await this.handleToken(orgId,response.data);
+            await this.handleToken(orgId, response.data);
             return {
                 statusCode: 200,
                 message: 'Access token fetched successfully',
@@ -79,47 +79,45 @@ export class HubspotService extends BaseExternalCrm {
         }
     }
 
-    async getAccessToken(orgId:string): Promise<any> {
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+    async getAccessToken(orgId: string): Promise<any> {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const hubspotToken = await prisma.externalCrmCredential.findFirst({
                 where: {
-                    crmName: this.crmName 
+                    crmName: this.crmName
                 }
             });
-            if(!hubspotToken) throw new Error('Plugin not connected!.'); 
-            if(this.isTokenExpired(hubspotToken.expiresIn, hubspotToken.modifiedAt))
-            {
-                const data = await this.exchangeRefreshTokenForAccessToken(orgId,hubspotToken.refreshToken);
-                return data.access_token;   
+            if (!hubspotToken) throw new Error('Plugin not connected!.');
+            if (this.isTokenExpired(hubspotToken.expiresIn, hubspotToken.modifiedAt)) {
+                const data = await this.exchangeRefreshTokenForAccessToken(orgId, hubspotToken.refreshToken);
+                return data.access_token;
             }
             return hubspotToken.accessToken;
         }
-        catch(e)
-        {
+        catch (e) {
             this.logger.error(e.message);
-            throw new Error(e.message); 
+            throw new Error(e.message);
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId)
         }
     }
 
     async revokeAccess(orgId: string): Promise<any> {
-
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
-            const existingCredential = await prisma.externalCrmCredential.findFirst({where:{crmName:CrmNames.HUBSPOT}});
-            if(existingCredential)
-            {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
+            const existingCredential = await prisma.externalCrmCredential.findFirst({ where: { crmName: CrmNames.HUBSPOT } });
+            if (existingCredential) {
                 let tokenEndpoint = 'https://api.hubapi.com/oauth/v1/refresh-tokens/{{token}}';
-                tokenEndpoint = tokenEndpoint.replace("{{token}}",existingCredential.refreshToken);    
+                tokenEndpoint = tokenEndpoint.replace("{{token}}", existingCredential.refreshToken);
                 try {
                     const response = await this.httpService.delete(tokenEndpoint, {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         }
                     }).toPromise();
-                    await this.handleRvokeAccess(orgId,existingCredential.id);
+                    await this.handleRvokeAccess(orgId, existingCredential.id);
                     return {
                         statusCode: 200,
                         message: 'Access token revoked successfully',
@@ -130,16 +128,17 @@ export class HubspotService extends BaseExternalCrm {
                 }
             }
         }
-        catch(err)
-        {
-
+        catch (err) {
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId)
         }
     }
 
-    async handleToken(orgId:string,tokenData: Token): Promise<void> {
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+    async handleToken(orgId: string, tokenData: Token): Promise<void> {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const hubspotToken = await prisma.externalCrmCredential.findFirst({
                 where: {
                     crmName: this.crmName
@@ -151,10 +150,10 @@ export class HubspotService extends BaseExternalCrm {
                         id: hubspotToken.id
                     },
                     data: {
-                        ...tokenData.access_token ? {accessToken: tokenData.access_token} : {},
-                        ...tokenData.refresh_token ? {refreshToken: tokenData.refresh_token} : {},
-                        ...tokenData.expires_in ? {expiresIn: tokenData.expires_in} : {},
-                        ...tokenData.token_type ?{tokeType: tokenData.token_type} : {}
+                        ...tokenData.access_token ? { accessToken: tokenData.access_token } : {},
+                        ...tokenData.refresh_token ? { refreshToken: tokenData.refresh_token } : {},
+                        ...tokenData.expires_in ? { expiresIn: tokenData.expires_in } : {},
+                        ...tokenData.token_type ? { tokeType: tokenData.token_type } : {}
                     }
                 });
             } else {
@@ -164,80 +163,82 @@ export class HubspotService extends BaseExternalCrm {
                         accessToken: tokenData.access_token,
                         refreshToken: tokenData.refresh_token,
                         expiresIn: tokenData.expires_in,
-                        ...tokenData.token_type ?{tokeType: tokenData.token_type} : {}
+                        ...tokenData.token_type ? { tokeType: tokenData.token_type } : {}
                     }
                 });
             }
         }
-        catch(e)
-        {
+        catch (e) {
             this.logger.error(e.message);
         }
-    } 
-    
-    async handleRvokeAccess(orgId:string,id:string):Promise<void>
-    {
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
-            await prisma.externalCrmCredential.delete({where:{id}});
-        }
-        catch(err)
-        {
-            this.logger.error(err);
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId)
         }
     }
 
-    async getProfile(orgId:string): Promise<any> {
-        try
-        {
+    async handleRvokeAccess(orgId: string, id: string): Promise<void> {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
+            await prisma.externalCrmCredential.delete({ where: { id } });
+        }
+        catch (err) {
+            this.logger.error(err);
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId)
+        }
+    }
+
+    async getProfile(orgId: string): Promise<any> {
+        try {
             const accessToken = await this.getAccessToken(orgId);
-            if(!accessToken) return null;
-            const hubspotClient = new Client({ accessToken:  accessToken});
+            if (!accessToken) return null;
+            const hubspotClient = new Client({ accessToken: accessToken });
             const profile = await hubspotClient.settings.users.usersApi.getPage();
             return profile.results[0];
         }
-        catch(err)
-        {
-            throw new BadRequestException(err.message); 
+        catch (err) {
+            throw new BadRequestException(err.message);
         }
     }
 
-    async getContactProperties(orgId:string): Promise<any> {
+    async getContactProperties(orgId: string): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const properties = await hubspotClient.apiRequest({
             method: 'GET',
             path: '/crm/v3/properties/contacts',
             qs: {
-                properties:['name','label','type'], 
-             }
+                properties: ['name', 'label', 'type'],
+            }
         });
         const _updatedFields = await properties.json();
         return _updatedFields.results;
     }
 
-    async getCompanyProperties(orgId:string): Promise<any> {
+    async getCompanyProperties(orgId: string): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const properties = await hubspotClient.apiRequest({
             method: 'GET',
             path: '/crm/v3/properties/companies',
             qs: {
-                properties:['name','label','type'],
-             }
+                properties: ['name', 'label', 'type'],
+            }
         });
         const _updatedFields = await properties.json();
         return _updatedFields.results;
     }
 
     // contact crud
-    async getContacts(orgId:string): Promise<any> {
+    async getContacts(orgId: string): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const contacts = await hubspotClient.crm.contacts.getAll()
         const _contacts = contacts.map(contact => {
             return contact.properties;
@@ -246,17 +247,16 @@ export class HubspotService extends BaseExternalCrm {
     }
     async getContact(orgId: string, id: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const contact = await hubspotClient.crm.contacts.basicApi.getById(id);
         return contact.properties;
     }
     async getContactByEmail(orgId: string, email: string): Promise<any> {
-        try
-        {
+        try {
             const accessToken = await this.getAccessToken(orgId);
-            if(!accessToken) return null;
-            const hubspotClient = new Client({ accessToken:  accessToken});
+            if (!accessToken) return null;
+            const hubspotClient = new Client({ accessToken: accessToken });
             const contact = await hubspotClient.crm.contacts.searchApi.doSearch({
                 filterGroups: [
                     {
@@ -274,46 +274,45 @@ export class HubspotService extends BaseExternalCrm {
                 sorts: [],
                 properties: []
             });
-            return contact.results[0].properties || null; 
+            return contact.results[0].properties || null;
         }
-        catch(e)
-        {
+        catch (e) {
             return null;
         }
     }
     async createContact(orgId: string, data: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const payload = new SimplePublicObjectInputForCreate()
         payload.properties = data;
         const contact = await hubspotClient.crm.contacts.basicApi.create(payload);
         return contact.properties;
     }
-    async updateContact(orgId: string, id:any, data: any): Promise<any> {
+    async updateContact(orgId: string, id: any, data: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const payload = new SimplePublicObjectInput();
         payload.properties = data;
         const contact = await hubspotClient.crm.contacts.basicApi.update(id, payload);
         return contact.properties;
     }
-    async deleteContact(orgId: string, id:any): Promise<any> {
+    async deleteContact(orgId: string, id: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const payload = new PublicGdprDeleteInput();
         payload.objectId = id;
         const contact = await hubspotClient.crm.contacts.gdprApi.purge(payload);
         return contact;
     }
-    
+
     // company crud
     async getCompanies(orgId: string): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const companies = await hubspotClient.crm.companies.getAll()
         const _companies = companies.map(company => {
             return company.properties;
@@ -322,17 +321,16 @@ export class HubspotService extends BaseExternalCrm {
     }
     async getCompany(orgId: string, id: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const company = await hubspotClient.crm.companies.basicApi.getById(id);
         return company.properties;
     }
     async getCompanyByName(orgId: string, name: string): Promise<any> {
-        try
-        {
+        try {
             const accessToken = await this.getAccessToken(orgId);
-            if(!accessToken) return null;
-            const hubspotClient = new Client({ accessToken:  accessToken});
+            if (!accessToken) return null;
+            const hubspotClient = new Client({ accessToken: accessToken });
             const company = await hubspotClient.crm.companies.searchApi.doSearch({
                 filterGroups: [
                     {
@@ -350,35 +348,34 @@ export class HubspotService extends BaseExternalCrm {
                 sorts: [],
                 properties: []
             });
-            return company.results[0].properties || null; 
+            return company.results[0].properties || null;
         }
-        catch(e)
-        {
+        catch (e) {
             return null;
         }
     }
     async createCompany(orgId: string, data: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const payload = new SimplePublicObjectInputForCreate()
         payload.properties = data;
         const company = await hubspotClient.crm.companies.basicApi.create(payload);
         return company.properties;
     }
-    async updateCompany(orgId: string, id:any, data: any): Promise<any> {
+    async updateCompany(orgId: string, id: any, data: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const payload = new SimplePublicObjectInput();
         payload.properties = data;
         const company = await hubspotClient.crm.companies.basicApi.update(id, payload);
         return company.properties;
     }
-    async deleteCompany(orgId: string, id:any): Promise<any> {
+    async deleteCompany(orgId: string, id: any): Promise<any> {
         const accessToken = await this.getAccessToken(orgId);
-        if(!accessToken) return null;
-        const hubspotClient = new Client({ accessToken:  accessToken});
+        if (!accessToken) return null;
+        const hubspotClient = new Client({ accessToken: accessToken });
         const payload = new PublicGdprDeleteInput();
         payload.objectId = id;
         const company = await hubspotClient.crm.companies.gdprApi.purge(payload);
@@ -386,9 +383,8 @@ export class HubspotService extends BaseExternalCrm {
     }
 
     async hasPriority(orgId: string): Promise<boolean> {
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const hubspotToken = await prisma.externalCrmCredential.findFirst({
                 where: {
                     crmName: this.crmName
@@ -396,9 +392,12 @@ export class HubspotService extends BaseExternalCrm {
             });
             return hubspotToken.isPriority;
         }
-        catch(e)
-        {
+        catch (e) {
             return false;
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId)
         }
     }
 }

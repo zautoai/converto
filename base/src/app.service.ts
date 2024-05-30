@@ -6,7 +6,7 @@ export class AppService {
     return `ZautoAI App is running!`;
   }
 
-  getHealth() : any {
+  getHealth(): any {
     return {
       status: true,
       heath: 'OK'

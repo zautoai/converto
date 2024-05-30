@@ -23,6 +23,7 @@ export class MappingService {
             throw e;
         }
         finally {
+            prisma.$disconnect()
             await this.prismaClientManager.disconnectClient(orgId);
         }
     }
@@ -42,6 +43,7 @@ export class MappingService {
             throw e;
         }
         finally {
+            prisma.$disconnect()
             await this.prismaClientManager.disconnectClient(orgId);
         }
     }
@@ -61,6 +63,7 @@ export class MappingService {
             throw e;
         }
         finally {
+            prisma.$disconnect()
             await this.prismaClientManager.disconnectClient(orgId);
         }
     }
@@ -79,6 +82,7 @@ export class MappingService {
             throw e;
         }
         finally {
+            prisma.$disconnect()
             await this.prismaClientManager.disconnectClient(orgId);
         }
     }
@@ -99,6 +103,7 @@ export class MappingService {
             throw e;
         }
         finally {
+            prisma.$disconnect()
             await this.prismaClientManager.disconnectClient(orgId);
         }
     }
@@ -116,6 +121,7 @@ export class MappingService {
             throw e;
         }
         finally {
+            prisma.$disconnect()
             await this.prismaClientManager.disconnectClient(orgId);
         }
     }
@@ -135,6 +141,7 @@ export class MappingService {
             throw e;
         }
         finally {
+            prisma.$disconnect()
             await this.prismaClientManager.disconnectClient(orgId);
         }
     }
@@ -153,6 +160,7 @@ export class MappingService {
             throw e;
         }
         finally {
+            prisma.$disconnect()
             await this.prismaClientManager.disconnectClient(orgId);
         }
     }

@@ -45,6 +45,7 @@ export class IcpService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -85,6 +86,7 @@ export class IcpService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -130,6 +132,7 @@ export class IcpService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -195,6 +198,7 @@ export class IcpService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
@@ -225,6 +229,7 @@ export class IcpService {
       throw error
     }
     finally {
+      prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }

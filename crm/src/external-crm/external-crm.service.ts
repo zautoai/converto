@@ -60,6 +60,7 @@ export class ExternalCrmService {
             this.logger.error(err);
             throw new Error(err);
         } finally {
+            prisma.$disconnect()
             await this.prismaClientManager.disconnectClient(orgId)
         }
     }
