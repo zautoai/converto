@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   base:
-    image: ghcr.io/zautoai/converto:dev-base
+    image: ghcr.io/zautoai/converto:stage-base
     networks:
       - converto-network
     volumes:
