@@ -169,16 +169,14 @@ model AgentPrompt {
 }
 
 model Visitor {
-  id String @id @default(uuid())
-
-  userAgent    String  @db.Text
-  infoJson     String  @db.Text
-  trackingInfo String? @db.Text
-
-  ipAddress String? @db.VarChar(40)
-
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @updatedAt
+  id           String   @id @default(uuid())
+  userAgent    String   @db.Text
+  infoJson     String   @db.Text
+  trackingInfo String?  @db.Text
+  ipAddress    String?  @db.VarChar(40)
+  score        Float    @default(0.0)
+  createdAt    DateTime @default(now())
+  modifiedAt   DateTime @updatedAt
 
   conversations Conversation[]
   visits        Visit[]
@@ -193,6 +191,8 @@ model Visit {
   count  Int    @default(1)
   source String @default("site") @db.VarChar(50)
 
+  score Float @default(0.0)
+
   campaignId String?
   campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
 
@@ -203,7 +203,6 @@ model Visit {
   prospectJourneyActivitys ProspectJourney[]
 
   @@index([visitorId], map: "Visitor_visitorId_fkey")
-  @@index([campaignId], map: "Visitor_campaignId_fkey")
   @@index([source], map: "Visitor_source_key")
 }
 

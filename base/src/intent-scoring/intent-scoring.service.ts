@@ -20,8 +20,8 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
   }
 
   async onModuleInit() {
-    // const orgId = '5eb02fe4-b2c9-4d32-823a-87c2f248dea1';   
-    // const visitId = 'e198128c-49ec-4f98-b7ee-e584d0d1c698'; 
+    // const orgId = 'e8177085-f420-4ced-acb3-99388d2a4e5b';   
+    // const visitId = '4e3e7a5b-916a-4b68-a905-545fef885fc9'; 
     // const result =  await this.generateIntentScore(orgId, visitId);
     // console.log(result); 
   }
