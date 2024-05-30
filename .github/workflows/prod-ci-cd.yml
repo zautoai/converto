@@ -126,7 +126,7 @@ jobs:
         run: |
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
-            --targets "Key=tag:Role,Values=Base" \
+            --targets "Key=tag:Role,Values=Prod-Base" \
             --parameters 'commands=["BASE_APP_CONTAINER=converto-base-1", "HEALTH_CHECK_URL=http://localhost:3000/health", "if curl --fail $HEALTH_CHECK_URL; then echo Container $BASE_APP_CONTAINER is healthy; else echo Container $BASE_APP_CONTAINER is not healthy; exit 1; fi"]'
 
   deploy-crm:
@@ -163,7 +163,7 @@ jobs:
         run: |
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
-            --targets "Key=tag:Role,Values=CRM" \
+            --targets "Key=tag:Role,Values=Prod-CRM" \
             --parameters 'commands=["CRM_APP_CONTAINER=converto-crm-1", "HEALTH_CHECK_URL=http://localhost:3001/api/v1/ping", "if curl --fail $HEALTH_CHECK_URL; then echo Container $CRM_APP_CONTAINER is healthy; else echo Container $CRM_APP_CONTAINER is not healthy; exit 1; fi"]'
 
   deployment-success:
