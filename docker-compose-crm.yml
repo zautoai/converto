@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+
+  crm:
+    image: ghcr.io/zautoai/converto:stage-crm
+    ports:
+      - "3031:3001"
+    restart: always
+
+ 
