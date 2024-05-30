@@ -74,3 +74,13 @@ export function stringToArray(inputString:string, separator: string) {
 export function isElementInArray(element:any[], array:any) {
     return array.includes(element);
 }
+
+export function toNegative(value: number): number {
+    if (value > 0) {
+        return -value;
+    } else if (value < 0) {
+        return value;
+    } else {
+        return 0;
+    }
+}

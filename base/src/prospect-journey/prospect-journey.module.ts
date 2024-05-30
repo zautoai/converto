@@ -15,5 +15,6 @@ import { OrganizationsModule } from 'src/organizations/organizations.module';
     ProspectJourneySocketService,
     ProspectJourneySocketGateway
   ],
+  exports: [ProspectjourneyService]
 })
 export class ProspectjourneyModule {}

@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { toNegative } from 'src/app/common/utils';
 import { API } from 'src/app/config/endpoint.config';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
@@ -92,7 +93,12 @@ export class IntentScoringComponent implements OnInit{
     if(this.form.valid){
       if(this.isEditing)
       {
-        this.restService.patch(API.main.intentScoring, this.selectedEntity?.id,this.form.value).subscribe({
+        const data = this.form.value;
+        if(this.form.get('type')?.value === IntentType.NEGATIVE)
+        {
+          data.value = toNegative(this.form.get('value')?.value);
+        }
+        this.restService.patch(API.main.intentScoring, this.selectedEntity?.id,data).subscribe({
           next: (data) => {
             this.getAll();
             this.offcanvasService.dismiss();
@@ -155,5 +161,14 @@ export class IntentScoringComponent implements OnInit{
   onPageChange(event: any) {
     this.currentPage = event.page;
     this.getAll();
+  }
+
+  toNegative(value:number)
+  {
+    if(this.form.get('type')?.value === IntentType.NEGATIVE)
+    {
+      return toNegative(this.form.get('value')?.value);
+    }
+    return value;
   }
 }

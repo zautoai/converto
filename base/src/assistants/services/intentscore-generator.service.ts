@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { extractJsonFromMarkdown } from "src/common/helpers/extractJson.helper";
 import { INTENT_SCORE_PROMPT } from "src/common/templates/intentscore.prompt";
+import { LLMModels, LLMNames } from "src/llm/llm.contants";
 import { LlmService } from "src/llm/llm.service";
 
 
@@ -9,18 +10,18 @@ export class IntentScoreGeneratorService implements OnModuleInit{
 
     constructor(private readonly llmService: LlmService) {}
 
-    onModuleInit() {
+    onModuleInit() { 
     }
 
     async getIntentScore(rules: string,activities:string) {
         const result = await this.generateIntentScore(rules,activities);
-        return this.processResultContent(result);
+        return this.processResultContent(result.content);
     }
 
     private processResultContent(content: string) {
         let jsonResponse;
         if (content && content.includes('```json')) {
-          jsonResponse = extractJsonFromMarkdown(content);
+          jsonResponse = extractJsonFromMarkdown(content);  
         } else {
           jsonResponse = JSON.parse(content);
         }
@@ -32,9 +33,9 @@ export class IntentScoreGeneratorService implements OnModuleInit{
         const promptMessage = [
             { role: 'system', content: content },
             { role: 'user', content: activities }
-        ];
+        ]; 
          
-        return await this.llmService.chat(promptMessage);
+        return await this.llmService.sendDirect(promptMessage,LLMNames.COHERE,LLMModels.COHER_COMMAND_R_PLUS);
     }
 
 }

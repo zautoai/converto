@@ -104,6 +104,21 @@ export class ProspectjourneyService extends BaseService {
     }
   }
 
+  async getByVisitId(orgId: string, visitId: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const prospectjourney = await prisma.prospectJourney.findMany({ where: { visitId } });
+      return prospectjourney;
+    }
+    catch (error) {
+      throw new BadRequestException(error.message);
+    }
+    finally {
+      prisma.$disconnect()
+      await this.closeConnection(orgId);
+    }
+  }
+
   async update(serviceParams: ServiceParams<{ id: string, updateProspectjourneyDto: UpdateProspectjourneyDto }>) {
     const { orgId, data: { id, updateProspectjourneyDto } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);

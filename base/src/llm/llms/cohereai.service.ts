@@ -25,9 +25,9 @@ export class CohereAIService implements LLMServiceIntf {
         const messages = this.chatHistoryFormat(chatHistory.slice(0, -1));
         const message = chatHistory[chatHistory.length - 1].content;
 
-        console.log("Request is: ", messages)
+        console.log("Request is: ", chatHistory)
 
-        const chatCompletion = await this.cohereClient.chat({
+        const chatCompletion = await this.cohereClient.chat({ 
             message: message,
             model: model,
             chatHistory: messages,

@@ -82,7 +82,7 @@
                 <textarea name="description" id="description" class="form-control" formControlName="description" placeholder="description"  rows="5"></textarea>
             </div>
             <div class="form-group">
-                <label class="form-label" for="score" >Score ({{form.get('value')?.value}})</label>
+                <label class="form-label" for="score" >Score ({{toNegative(form.get('value')?.value)}})</label>
                 <input type="range" step="1" min="0" max="100" class="form-range" formControlName="value">
             </div>
             <div class="form-group">
