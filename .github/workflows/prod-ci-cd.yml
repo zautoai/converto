@@ -85,10 +85,6 @@ jobs:
           REDIS_IP=${{ secrets.REDIS_IP }}
           REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
           REDIS_PORT=${{ secrets.REDIS_PORT }}
-          CRM_ACCESS_TOKEN=${{ secrets.CRM_ACCESS_TOKEN }}
-          CRM_API_PORT=${{ secrets.CRM_API_PORT }}
-          CRM_BASE_URL=${{ secrets.CRM_BASE_URL }}
-          CRM_DATABASE_URL=${{ secrets.CRM_DATABASE_URL }}
           CRM_HOST=${{ secrets.CRM_HOST }}
           CRM_HOST_PORT=${{ secrets.CRM_HOST_PORT }}
           CRM_JWT_SECRET=${{ secrets.CRM_JWT_SECRET }}
