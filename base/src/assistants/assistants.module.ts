@@ -13,6 +13,7 @@ import { CalendarObsorverService } from './services/calendar-obsorver.service';
 import { StarterGeneratorService } from './services/starters-generator.service';
 import { MapperService } from './services/mapper.service';
 import { ContactsModule } from 'src/contacts/contacts.module';
+import { IntentScoreGeneratorService } from './services/intentscore-generator.service';
 
 @Module({
   imports: [
@@ -30,14 +31,16 @@ import { ContactsModule } from 'src/contacts/contacts.module';
     EndOfConversationService,
     CalendarObsorverService,
     StarterGeneratorService,
-    MapperService
+    MapperService,
+    IntentScoreGeneratorService
   ],
   exports: [
     SummarizerService,
     PageGreeterService,
     CTACreatorService,
     StarterGeneratorService,
-    MapperService
+    MapperService,
+    IntentScoreGeneratorService
   ]
 })
 export class AssistantsModule {}
