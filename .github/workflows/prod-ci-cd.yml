@@ -120,7 +120,7 @@ jobs:
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Role,Values=Prod-Base" \
-            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.LOGIN_GITHUB_USER }} -p ${{ secrets.LOGIN_GITHUB_TOKEN }}", "cd /base", "docker-compose -f docker-compose-base.yml pull", "docker-compose -f docker-compose-base.yml up -d", "docker image prune -a -f"]'
+            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.LOGIN_GITHUB_USER }} -p ${{ secrets.LOGIN_GITHUB_TOKEN }}", "cd /home/ubuntu/base", "docker-compose -f docker-compose-base.yml pull", "docker-compose -f docker-compose-base.yml up -d", "docker image prune -a -f"]'
 
       - name: Check Health of Base Application Container
         run: |
@@ -157,7 +157,7 @@ jobs:
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Role,Values=Prod-CRM" \
-            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.LOGIN_GITHUB_USER }} -p ${{ secrets.LOGIN_GITHUB_TOKEN }}", "cd /crm", "docker-compose -f docker-compose-crm.yml pull", "docker-compose -f docker-compose-crm.yml up -d", "docker image prune -a -f"]'
+            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.LOGIN_GITHUB_USER }} -p ${{ secrets.LOGIN_GITHUB_TOKEN }}", "cd /home/ubuntu/crm", "docker-compose -f docker-compose-crm.yml pull", "docker-compose -f docker-compose-crm.yml up -d", "docker image prune -a -f"]'
 
       - name: Check Health of CRM Application Container
         run: |
