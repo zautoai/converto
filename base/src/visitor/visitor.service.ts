@@ -11,7 +11,9 @@ import { IPTrackingService } from 'src/common/services/iptracking.service';
 @Injectable()
 export class VisitorService extends BaseService {
 
-  constructor(private readonly iptrackingService: IPTrackingService) {
+  constructor(
+    private readonly iptrackingService: IPTrackingService,
+  ) {
     super();
   }
 
@@ -314,6 +316,11 @@ export class VisitorService extends BaseService {
         console.error('Error during disconnection:', disconnectError);
       }
     }
+  }
+
+  private async addToScoringQueue()
+  {
+    
   }
 
   parseDurationToSeconds(duration: string): number {

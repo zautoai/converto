@@ -7,9 +7,10 @@ import { ProspectjourneyModule } from 'src/prospect-journey/prospect-journey.mod
 @Module({
   imports:[
     AssistantsModule,
-    ProspectjourneyModule
+    ProspectjourneyModule,
   ],
   controllers: [IntentScoringController],
   providers: [IntentScoringService],
+  exports:[IntentScoringService]
 })
 export class IntentScoringModule {}

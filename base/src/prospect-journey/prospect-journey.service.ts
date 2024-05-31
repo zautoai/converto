@@ -3,11 +3,13 @@ import { CreateProspectjourneyDto, ProspecActivityType } from './dto/create-pros
 import { UpdateProspectjourneyDto } from './dto/update-prospect-journey.dto';
 import { BaseService } from 'src/common/services/base.service';
 import { ServiceParams } from 'src/common/models/service-param.model';
+import { Queue } from 'bullmq';
+import { InjectQueue } from '@nestjs/bull';
 
 @Injectable()
 export class ProspectjourneyService extends BaseService {
 
-  constructor() {
+  constructor(@InjectQueue('intent_score_queue') private intentScoreQueue: Queue) {
     super();
   }
 
@@ -31,7 +33,9 @@ export class ProspectjourneyService extends BaseService {
         prospectjourney = await prisma.prospectJourney.create({ data });
       }
       await this.updateTimeSpend(orgId, data.visitId, prospectjourney.url);
-
+      if (data.type == ProspecActivityType.PAGE_CLOSED) {
+        await this.addOrUpdateIntentScoreJob(data, orgId, prospectjourney);
+      }
       return prospectjourney;
     }
     catch (error) {
@@ -71,6 +75,21 @@ export class ProspectjourneyService extends BaseService {
     finally {
       prisma.$disconnect()
       await this.closeConnection(orgId);
+    }
+  }
+
+  async addOrUpdateIntentScoreJob(data:any, orgId:string, prospectjourney:any)
+  {
+    if (data.type === ProspecActivityType.PAGE_CLOSED) {
+      const jobId = `intent_score_${data.visitId}`;
+      const existingJob = await this.intentScoreQueue.getJob(jobId);
+      if (existingJob) {
+        await existingJob.updateData({orgId,visitId: data.visitId,data: prospectjourney});
+      }
+      else
+      {
+        await this.intentScoreQueue.add('intent_score', { orgId, visitId: data.visitId, data: prospectjourney },{jobId, attempts: 2, removeOnComplete:true, delay:1000});
+      }
     }
   }
 

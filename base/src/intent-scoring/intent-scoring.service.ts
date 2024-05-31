@@ -21,9 +21,9 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
 
   async onModuleInit() {
     // const orgId = 'e8177085-f420-4ced-acb3-99388d2a4e5b';   
-    // const visitId = '4e3e7a5b-916a-4b68-a905-545fef885fc9'; 
+    // const visitId = '8ee284fa-7583-4b8c-976b-cdec2b251134'; 
     // const result =  await this.generateIntentScore(orgId, visitId);
-    // console.log(result); 
+    // console.log(result);
   }
 
   async generateIntentScore(orgId:string,visitId:string):Promise<{positiveScore:number,negativeScore:number,score:number}>
