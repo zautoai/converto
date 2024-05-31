@@ -10,7 +10,7 @@ services:
       - app_images:/usr/src/public/images
     ports:
       - "3030:3000"
-    restart: always  # Restart policy for the Node app
+    restart: always  # Restart policy for the Node app.
 
 
 volumes:
