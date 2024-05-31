@@ -1,0 +1,67 @@
+<div class="d-flex justify-content-center" *ngIf="convData && humanSupportRequested">
+    <div class="msg_cotainer w-90 center">
+        <div class="d-flex justify-content-end ">
+            <button (click)="requestHumanSupport()"><i class="fe fe-x"></i></button>
+        </div>
+        <form (ngSubmit)="confirmSend()">
+            <div class="form-group">
+                <label for="name"><i class="fe fe-user"></i> Name</label>
+                <div class="input-group">
+                    <input type="text" class="form-control form-control-sm" placeholder="Enter name" name="name"
+                        [(ngModel)]="lead.name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email"><i class="fe fe-mail"></i> Email</label>
+                <div class="input-group">
+                    <input type="email" class="form-control form-control-sm" placeholder="Enter email address"
+                        name="email" [(ngModel)]="lead.email">
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-outline-primary btn-sm"><i class="fe fe-send"></i>
+                    Connect</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="d-flex chat-action-footer justify-content-center" *ngIf="handoverRequested">
+    <div class="d-flex chat-action-footer justify-content-center">
+        <div class="msg_cotainer center">
+            <span><i class="fa fa-spinner text-muted status-loader"></i>Waiting for Human Agent to connect</span>
+        </div>
+    </div>
+</div>
+
+<!-- chat footer -->
+<div class="footer-container" *ngIf="show">
+    <div ngbDropdown class="my-auto">
+        <button type="submit" id="contextMenu" ngbDropdownToggle [ngStyle]="{'color': background}">
+            <i class="fe fe-menu"></i>
+        </button>
+        <div ngbDropdownMenu aria-labelledby="contextMenu">
+            <button ngbDropdownItem (click)="requestHumanSupport()"><i class="fa-solid fa-headset"></i> Connect to a human agent</button>
+        </div>
+    </div>
+    <div class="input-button-container">
+        <textarea type="text" 
+        id="messageInputField" 
+        #messageInputField
+        placeholder="Write a question..." 
+        rows="1" 
+        [(ngModel)]="messageInput"
+        (keydown.enter)="sendMessageEvent($event)"
+        (keydown.shift.enter)="newLine($event)"
+        [disabled]="disable"></textarea>
+
+        <button 
+        type="submit" 
+        class="btn-send" 
+        (click)="sendMessageEvent()"
+        [disabled]="disable"
+        [ngStyle]="{'color': background}">
+            <i class="zmdi zmdi-mail-send"></i>
+        </button>
+    </div>
+</div>

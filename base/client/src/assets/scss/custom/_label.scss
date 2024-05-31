@@ -1,0 +1,50 @@
+label {
+	display: inline-block;
+	margin-bottom: 0.5rem;
+	font-weight: 600;
+}
+
+.label-size {
+	font-size: 3.8em;
+	margin-left: 9px;
+}
+
+.label-font-size {
+	font-size: 1.8em;
+}
+
+.label-medium-size {
+	font-size: 1.2em;
+}
+
+.labels li {
+	display: inline;
+}
+
+.label-title {
+	font-size: 1.125rem;
+}
+
+.label-font {
+	font-size: 0.8em;
+}
+
+.label-default {
+	background: #d5e0ec;
+}
+
+.label-success {
+	background: #21c44c;
+}
+
+.label-danger {
+	background: #f5334f;
+}
+
+.label-warning {
+	background: #ffb209;
+}
+
+.label-info {
+	background: #26c2f7;
+}

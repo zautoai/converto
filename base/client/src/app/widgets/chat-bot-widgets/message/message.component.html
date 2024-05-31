@@ -1,0 +1,34 @@
+<ng-container *ngIf="data.type == messageType.TEXT">
+    <div class="d-flex justify-content-{{getMessageClass(data.role)}}" [ngStyle]="{ 'font-size.px': fontSize }">
+        <div class="msg_img" *ngIf="data.role == sentBy.ASSISTANT">
+            <img [src]="agent?.logoUrl ||GLOBAL_IMAGES.default_avatar_image" class="rounded-circle user_img_msg"
+                alt="assistant">
+        </div>
+        <div class="msg_cotainer mt-5 {{getMessageClass(data.role)}}" [ngStyle]="{'color': (data.role == sentBy.USER && textColor),'background-color': (data.role == sentBy.USER && background)}">
+            <div [appMarkdown]="data.content" [animationSpeed]="(data.role == sentBy.ASSISTANT ? animationSpeed : 0)" [linkColor]="(data.role == sentBy.ASSISTANT ? background : textColor)"></div>
+            <div class="d-flex justify-content-between">
+                <span>{{data.createdAt | chatTime}}</span>
+    
+                <ng-container *ngIf="data.role == sentBy.ASSISTANT">
+                    <div *ngIf="!data.vote">
+                        <button class="btn btn-sm" (click)="onVoteSumbit(vote.UPVOTE)"><i class="fe fe-thumbs-up"></i></button>
+                        <button class="btn btn-sm" (click)="onVoteSumbit(vote.DOWNVOTE)"><i class="fe fe-thumbs-down"></i></button>
+                    </div>
+                    <span class="text-success" *ngIf="data.vote == vote.UPVOTE"><i class="fa fa-thumbs-up"></i></span>
+                    <span class="text-danger" *ngIf="data.vote == vote.DOWNVOTE"><i class="fa fa-thumbs-down"></i></span>
+                </ng-container>
+            </div>
+        </div>
+        <div class="msg_img" *ngIf="data.role == sentBy.USER">
+            <img [src]="GLOBAL_IMAGES.default_user" class="rounded-circle user_img_msg"
+                alt="assistant">
+        </div>
+    </div>
+</ng-container>
+
+<ng-container *ngIf="data.type == messageType.ACTIVITY">
+    <div class="msg_cotainer activity mt-5">
+        <div>{{data.createdAt | chatTime}}</div>
+        <div [innerText]="data.content"></div>
+    </div>
+</ng-container>

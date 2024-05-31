@@ -1,0 +1,178 @@
+<div class="row mt-3">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fa fa-user commonClass text-primary"></i> Contacts
+        </h3>
+      </div>
+      <div class="card-body p-0">
+        <div class="row p-0">
+          <div class="col-lg-3 m-0 pe-0">
+            <ul class="scroll-container-v fixed-vh right-line" #scrollContainer>
+              <ng-container *ngIf="!leadList.data">
+                <li>
+                  <ngx-skeleton-loader count="3" [theme]="{'border-radius': '0', height: '100px'}"></ngx-skeleton-loader>
+                </li>
+              </ng-container>
+              <ng-container *ngIf="leadList.data">
+                <li class="zauto-card" *ngFor="let lead of leadList.data" (click)="selectLead(lead)"
+                  [ngClass]="{'active':(selectedLead && selectedLead?.id == lead?.id)}">
+                  <h5><i class="fe fe-user"></i> {{lead?.name || '----'}}</h5>
+                  <div><i class="fe fe-award"></i> {{lead?.conversation?.campaign?.title || '----'}}</div>
+                  <div class="row">
+                    <div class="col-6">
+                      <div><i class="fa fa-{{getPlatformIcon(lead?.conversation?.visit?.source).icon}}"></i> {{lead?.conversation?.visit?.source || '----'}}</div>
+                    </div>
+                    <div class="col-6 d-flex justify-content-end">
+                      <div><i class="fe fe-calendar"></i> {{lead?.createdAt| date:'dd/MM/yyyy'}}</div>
+                    </div>
+                  </div>
+                </li>
+              </ng-container>
+            </ul>
+          </div>
+          <div class="col-lg-9 m-0">
+            <div class="scroll-container-v fixed-vh">
+              <div class="row h-100" *ngIf="selectedLead">
+                <div class="col-6 right-line">
+                  <ng-container *ngIf="isLeadLoading">
+                    <table class="table table-borderless">
+                      <tbody>
+                        <tr>
+                          <td><ngx-skeleton-loader [theme]="{width:'30%'}"></ngx-skeleton-loader></td>
+                          <td><ngx-skeleton-loader [theme]="{width:'60%'}"></ngx-skeleton-loader></td>
+                        </tr>
+                        <tr>
+                          <td><ngx-skeleton-loader [theme]="{width:'40%'}"></ngx-skeleton-loader></td>
+                          <td><ngx-skeleton-loader [theme]="{width:'75%'}"></ngx-skeleton-loader></td>
+                        </tr>
+                        <tr>
+                          <td><ngx-skeleton-loader [theme]="{width:'55%'}"></ngx-skeleton-loader></td>
+                          <td><ngx-skeleton-loader [theme]="{width:'45%'}"></ngx-skeleton-loader></td>
+                        </tr>
+                        <tr>
+                          <td><ngx-skeleton-loader [theme]="{width:'70%'}"></ngx-skeleton-loader></td>
+                          <td><ngx-skeleton-loader [theme]="{width:'35%'}"></ngx-skeleton-loader></td>
+                        </tr>
+                        <tr>
+                          <td><ngx-skeleton-loader [theme]="{width:'20%'}"></ngx-skeleton-loader></td>
+                          <td><ngx-skeleton-loader [theme]="{width:'90%'}"></ngx-skeleton-loader></td>
+                        </tr>
+                        <tr>
+                          <td><ngx-skeleton-loader [theme]="{width:'50%'}"></ngx-skeleton-loader></td>
+                          <td><ngx-skeleton-loader [theme]="{width:'65%'}"></ngx-skeleton-loader></td>
+                        </tr>
+                        <tr>
+                          <td><ngx-skeleton-loader [theme]="{width:'55%'}"></ngx-skeleton-loader></td>
+                          <td><ngx-skeleton-loader [theme]="{width:'45%'}"></ngx-skeleton-loader></td>
+                        </tr>
+                        <tr>
+                          <td><ngx-skeleton-loader [theme]="{width:'70%'}"></ngx-skeleton-loader></td>
+                          <td><ngx-skeleton-loader [theme]="{width:'35%'}"></ngx-skeleton-loader></td>
+                        </tr>
+                        <tr>
+                          <td><ngx-skeleton-loader [theme]="{width:'20%'}"></ngx-skeleton-loader></td>
+                          <td><ngx-skeleton-loader [theme]="{width:'90%'}"></ngx-skeleton-loader></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </ng-container>
+                  <ng-container *ngIf="!isLeadLoading">
+                    <table class="table table-borderless">
+                      <tbody>
+                        <tr>
+                          <td><b>Name : </b></td>
+                          <td>{{selectedLead?.name || '---'}}</td>
+                        </tr>
+                        <tr>
+                          <td><b>Email : </b></td>
+                          <td>{{selectedLead?.email || '---'}}</td>
+                        </tr>
+                        <tr>
+                          <td><b>Phone : </b></td>
+                          <td>{{selectedLead?.mobile || '---'}}</td>
+                        </tr>
+                        <tr>
+                          <td><b>Date : </b></td>
+                          <td>{{selectedLead?.createdAt | date:'dd/MM/yyyy'}}</td>
+                        </tr>
+                        <tr>
+                          <td><b>Source : </b></td>
+                          <td>{{selectedLead?.conversation?.visit?.source || '---'}}</td>
+                        </tr>
+                        <tr>
+                          <td><b>Campaign : </b></td>
+                          <td>{{selectedLead?.conversation?.campaign?.title || '---'}}</td>
+                        </tr>
+                        <tr>
+                          <td><b>city : </b></td>
+                          <td>{{jsonParse(selectedLead?.conversation?.visitor?.trackingInfo)?.city || '---'}}</td>
+                        </tr>
+                        <tr>
+                          <td><b>Region : </b></td>
+                          <td>{{jsonParse(selectedLead?.conversation?.visitor?.trackingInfo)?.region || '---'}}</td>
+                        </tr>
+                        <tr>
+                          <td><b>Country : </b></td>
+                          <td>{{jsonParse(selectedLead?.conversation?.visitor?.trackingInfo)?.country_name || '---'}}
+                            <img *ngIf="jsonParse(selectedLead?.conversation?.visitor?.trackingInfo)?.flag" src="{{jsonParse(selectedLead?.conversation?.visitor?.trackingInfo)?.flag}}" alt="flag"
+                              width="20">
+                          </td>
+                        </tr>
+                        <tr>
+                          <td><b>Time zone : </b></td>
+                          <td>{{jsonParse(selectedLead?.conversation?.visitor?.trackingInfo)?.time_zone?.name || '---'}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td><b>Time offset : </b></td>
+                          <td>{{jsonParse(selectedLead?.conversation?.visitor?.trackingInfo)?.time_zone?.offset ||
+                            '---'}}</td>
+                        </tr>
+                        <tr *ngFor="let keyValuePair  of jsonParse(selectedLead?.info) | keyvalue">
+                          <td><b>{{keyValuePair.key | lead}}</b></td>
+                          <td>{{keyValuePair.value}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </ng-container>
+                </div>
+                <div class="col-6">
+                  <ng-container *ngIf="isLeadLoading">
+                    <div class="p-2">
+                      <ngx-skeleton-loader [theme]="{width:'20%',height:'30px'}"></ngx-skeleton-loader>
+                      <ngx-skeleton-loader [theme]="{width:'100%'}"></ngx-skeleton-loader>
+                      <ngx-skeleton-loader [theme]="{width:'100%'}"></ngx-skeleton-loader>
+                      <ngx-skeleton-loader [theme]="{width:'100%'}"></ngx-skeleton-loader>
+                      <ngx-skeleton-loader [theme]="{width:'70%'}"></ngx-skeleton-loader>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="!isLeadLoading">
+                    <div class="p-2">
+                      <div class="mb-3 d-flex justify-content-center">
+                        <a routerLink="/conversations/{{selectedLead?.convId}}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-arrow-up-right-from-square"></i> View conversation</a>
+                      </div>
+                      <div>
+                        <h4>Summary</h4>
+                        <markdown [data]="selectedLead?.conversation?.summary"></markdown>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+              <div class="row h-100" *ngIf="!selectedLead">
+                <div class="col-6 right-line d-flex justify-content-center align-items-center">
+                  <span class="text-muted">Select contact for more details</span>
+                </div>
+                <div class="col-6 d-flex justify-content-center align-items-center">
+                  <span class="text-muted">Select contact for summary</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

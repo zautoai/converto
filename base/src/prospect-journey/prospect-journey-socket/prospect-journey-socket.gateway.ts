@@ -15,11 +15,11 @@ export class ProspectJourneySocketGateway implements OnGatewayConnection, OnGate
     private server: Socket;
 
     handleConnection(client: Socket, ...args: any[]) {
-        this.prospectJourneySocketService.handleConnection(client);
+        // this.prospectJourneySocketService.handleConnection(client);
     }
 
     handleDisconnect(client: Socket) {
-        this.prospectJourneySocketService.handleDisconnect(client);
+        // this.prospectJourneySocketService.handleDisconnect(client);
     }
 
 }

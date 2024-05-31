@@ -1,0 +1,46 @@
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header">
+                <h1 class="card-title"><i class="fe fe-share-2"></i> Platforms</h1>
+            </div>
+            <div class="card-body">
+                <form (ngSubmit)="addPlatform()">
+                    <label for="form-label">Platform name</label>
+                    <div class="input-group">
+                        <input 
+                        type="text" 
+                        class="form-control" 
+                        placeholder="Enter platform names ex: facebook, linkedIn, ect"
+                        autocomplete="off"
+                        name="platformName"
+                        [(ngModel)]="platformInput"
+                        [disabled]="isLoading">
+                        <button 
+                        class="btn btn-outline-primary" 
+                        type="submit"
+                        [disabled]="isLoading"><i class="fe fe-plus"></i></button>
+                    </div>
+                </form>
+                <div class="mt-5">
+                    <div *ngIf="orgPlatformList" class="row">
+                        <div class="col-auto mb-3" *ngFor="let platform of orgPlatformList?.data">
+                            <div class="d-flex platform badge bg-primary-transparent text-primary">
+                                <span class="icon">
+                                    <i class="fa fa-{{getPlatformIcon(platform?.platform?.name).icon}}"></i>
+                                </span>
+                                <div class="my-auto">
+                                    {{platform?.platform?.name}}
+                                </div>
+                                <a href="javascript:void(0)" class="ms-5" (click)="removePlatform(platform?.id)"><i class="fe fe-x"></i></a>
+                            </div>
+                        </div>
+                        <div *ngIf="orgPlatformList?.data.length == 0">
+                            <div>No platforms selected.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

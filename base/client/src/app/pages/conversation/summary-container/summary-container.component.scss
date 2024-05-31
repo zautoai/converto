@@ -1,0 +1,47 @@
+.summary {
+    width: 100%;
+    overflow-y: scroll;
+    padding: 10px !important;
+}
+
+.custom-accordion {
+    // border: 1px solid #ccc;
+}
+
+.custom-accordion-item {
+}
+
+.custom-accordion-header {
+    margin: 0;
+}
+
+.custom-accordion-button {
+    font-size: 0.9rem;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+.custom-accordion-button:focus
+{
+    color: var(--primary);
+    box-shadow: none;
+    border: 1px var(--primary) solid;
+}
+
+.custom-accordion-button:not(.collapsed)
+{
+    color: var(--primary);
+    background-color: var(--primary01);
+    box-shadow: none;
+    border: 1px var(--primary) solid;
+}
+
+.accordion-button::after {
+    background-image: url("/assets/images/svgs/up-chevron.svg");
+    transform: rotate(-180deg);
+    transition: transform 0.3s ease;
+}
+.accordion-button:not(.collapsed)::after {
+    background-image: url("/assets/images/svgs/up-chevron.svg");
+    transform: rotate(0deg);
+}

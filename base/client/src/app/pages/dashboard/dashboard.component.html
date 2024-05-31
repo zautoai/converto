@@ -1,0 +1,54 @@
+<div class="m-3">
+  <app-wlcome-card [name]="authService.getUser().name">
+    <div class="d-none d-lg-block">
+      <div class="d-flex gap-2">
+        <select name="" id="" class="form-select form-select-sm " (change)="getDashboardData()" [(ngModel)]="selectedDateFilter">
+          <option [value]="filter" *ngFor="let filter of dateFilter">{{removeUnderscore(filter) | titlecase}}</option>
+        </select>
+        <ng-container *ngIf="selectedDateFilter == DateFilter.BETWEEN">
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="startDate" [max]="endDate" (change)="getDashboardData()">
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="endDate" [min]="startDate" (change)="getDashboardData()">
+        </ng-container>
+      </div>
+    </div>
+  </app-wlcome-card>
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <app-counter-card [isLoading]="isLoading" [title]="'Impressions'" [counter]="countData.visitorCount" [icon]="'fa-regular fa-eye'"></app-counter-card>
+        </div>
+        <div class="col-lg-6">
+          <app-counter-card [isLoading]="isLoading" [title]="'Conversations'" [counter]="countData.convoCount" [icon]="'fa-regular fa-message'"></app-counter-card>
+        </div>
+        <div class="col-lg-6">
+          <app-counter-card [isLoading]="isLoading" [title]="'Contacts'" [counter]="countData.leadCount" [icon]="'fa-regular fa-user'"></app-counter-card>
+        </div>
+        <div class="col-lg-6">
+          <app-counter-card [isLoading]="isLoading" [title]="'Campaigns'" [counter]="countData.campaignCount" [icon]="'fe fe-award'"></app-counter-card>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <app-progress-card [isLoading]="isLoading" [title]="'Engagement Metrics'" [percentageData]="handleProgressData(countData)"></app-progress-card>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <app-table-card
+      [isLoading]="isLoading"
+      [title]="'Top 5 campaign'"
+      [columns]="tableColumns"
+      [data]="topCampaignData"></app-table-card>
+    </div>
+    <div class="col-lg-6">
+        <app-chart-card 
+        [isLoading]="isLoading"
+        [title]="'Performance Analysis'"
+        [chartData]="chartData" 
+        [categories]="categories"
+        ></app-chart-card>
+    </div>
+  </div>
+</div>

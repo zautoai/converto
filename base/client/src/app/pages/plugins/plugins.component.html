@@ -1,0 +1,67 @@
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card shadow fixed-vh">
+            <div class="card-header">
+                <h4 class="card-title">Plugins</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @for (item of plugins; track $index) {
+                        <div class="col-2">
+                            <app-plugin-card 
+                            [data]="item" 
+                            (mappingOpen)="openCrmMappingOffcanvas($event)"
+                            (onScheduleOpen)="openCalendarScheduleOffcanvas($event)"
+                            ></app-plugin-card>
+                        </div>
+                    }
+                    @empty {
+    
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #crmMappingOffcanvas let-offcanvas>
+    <div class="offcanvas-header">
+        <h4 class="offcanvas-title">CRM Mapping</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    </div>
+    <hr class="m-0">
+    <div class="offcanvas-body p-0">
+        <div class="panel panel-primary">
+            <div class="tab-menu-heading">
+                <div class="tabs-menu1">
+                    <ul ngbNav #nav="ngbNav" class="panel-tabs nav">
+                        <li [ngbNavItem]="1">
+                            <button ngbNavLink>Contact</button>
+                            <ng-template ngbNavContent>
+                                <app-crm-contact-mapping [crmName]="crmName" (onCancel)="offcanvas.dismiss()"></app-crm-contact-mapping>
+                            </ng-template>
+                        </li>
+                        <li [ngbNavItem]="2">
+                            <button ngbNavLink>Company</button>
+                            <ng-template ngbNavContent>
+                                <app-crm-company-mapping [crmName]="crmName" (onCancel)="offcanvas.dismiss()"></app-crm-company-mapping>
+                            </ng-template>
+                        </li>
+                    </ul>
+                </div>
+                <div [ngbNavOutlet]="nav" class="p-0"></div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #calendarScheduleOffcanvas Offcanvas let-offcanvas>
+    <div class="offcanvas-header">
+        <h4 class="offcanvas-title">Calendar Schedule</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    </div>
+    <hr class="m-0">
+    <div class="offcanvas-body">
+        <app-calendar-schedule (onCancel)="offcanvas.dismiss()"></app-calendar-schedule>
+    </div>
+</ng-template>

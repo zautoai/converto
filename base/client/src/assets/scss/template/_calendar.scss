@@ -1,0 +1,185 @@
+@media (max-width: 320px) {
+	.fc-toolbar .fc-right {
+		float: right;
+		width: 100%;
+		text-align: center;
+		margin: 10px 0;
+	}
+}
+
+.fc-toolbar {
+	// &:before {
+	// 	content: "";
+	// }
+
+	.ui-button {
+		text-align: center;
+	}
+}
+
+.fc-unthemed {
+
+	.fc-content,
+	.fc-divider,
+	.fc-list-heading td,
+	.fc-list-view,
+	.fc-popover,
+	.fc-row,
+	tbody,
+	td,
+	th,
+	thead {
+		border-color: $border;
+		z-index: 0;
+	}
+}
+
+.fc-unthemed {
+
+	.fc-divider,
+	.fc-list-heading td,
+	.fc-popover .fc-header {
+		background: #e2e3e4;
+	}
+}
+
+.fc-toolbar {
+
+	.fc-state-active,
+	.ui-state-active {
+		background: #b4b4b4;
+	}
+}
+
+.fc-today-button fc-button fc-state-default fc-corner-left fc-corner-right fc-state-disabled:focus {
+	border: none !important;
+	box-shadow: none !important;
+}
+
+.fc-unthemed .fc-list-item:hover td {
+	background-color: #eeeeee;
+}
+
+@media (max-width: 480px) {
+	.cal1 .clndr {
+		.clndr-table tr {
+			height: 50px !important;
+		}
+
+		.clndr-controls {
+			.month {
+				width: 100% !important;
+				text-align: inherit !important;
+			}
+
+			.clndr-control-button {
+				float: none !important;
+				width: 100% !important;
+				text-align: inherit !important;
+			}
+		}
+	}
+}
+
+.cal1 {
+	.clndr {
+		.clndr-table {
+			.header-days .header-day {
+				border-top: 1px solid $border;
+				border-left: 1px solid rgba($border, 0.2);
+			}
+
+			tr {
+
+				.empty,
+				.adjacent-month,
+				.my-empty,
+				.my-adjacent-month {
+					border-left: 1px solid $border;
+					border-top: 1px solid $border;
+					background: $background;
+				}
+
+				.day {
+
+					&.event,
+					&.my-event {
+						background: $background;
+					}
+
+					border-left: 1px solid $border;
+					border-top: 1px solid $border;
+
+					&:last-child {
+						border-right: 1px solid $border;
+					}
+
+					&:hover {
+						background: $background;
+					}
+				}
+			}
+		}
+
+		.clndr-controls {
+			.clndr-control-button {
+
+				.clndr-previous-button,
+				.clndr-next-button {
+					color: #fff;
+				}
+			}
+
+			background: $background !important;
+			border: 1px solid $border !important;
+		}
+
+		.clndr-table tr {
+			.day {
+
+				&.today:hover,
+				&.my-today:hover {
+					background: $primary;
+				}
+			}
+
+			.empty:hover,
+			.adjacent-month:hover,
+			.my-empty:hover,
+			.my-adjacent-month:hover {
+				background: #f2f7fa;
+			}
+		}
+	}
+
+	font-size: 14px;
+}
+
+// .fc button {
+// 	background: #0099ff !important;
+// }
+
+.calendar-title th {
+	background: $background !important;
+	border: 1px solid $border !important;
+}
+
+.calendar-header th {
+	border: 1px solid $border !important;
+}
+
+.calendar tbody tr td {
+	border: 1px solid $border !important;
+
+	&.today {
+		background: $background !important;
+		color: #000;
+	}
+}
+
+@media (max-width: 400px) {
+	.cal1 .clndr .clndr-controls {
+		display: block !important;
+	}
+
+}

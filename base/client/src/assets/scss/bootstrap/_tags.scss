@@ -1,0 +1,239 @@
+/*---- Tags-----*/
+
+.tag {
+	font-size: 0.75rem;
+	color: $color;
+	background-color: $background;
+	border-radius: 3px;
+	padding: 0 .5rem;
+	line-height: 2em;
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	cursor: default;
+	font-weight: 400;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+a.tag {
+	text-decoration: none;
+	cursor: pointer;
+	transition: .3s color, .3s background;
+
+	&:hover {
+		background-color: rgba(110, 118, 135, 0.2);
+		color: inherit;
+	}
+}
+
+.tag-addon {
+	display: inline-block;
+	padding: 0 .5rem;
+	color: inherit;
+	text-decoration: none;
+	background: rgba(0, 0, 0, 0.06);
+	margin: 0 -.5rem 0 .5rem;
+	text-align: center;
+	min-width: 1.5rem;
+
+	&:last-child {
+		border-top-right-radius: 3px;
+		border-bottom-right-radius: 3px;
+	}
+
+	i {
+		vertical-align: middle;
+		margin: 0 -.25rem;
+	}
+}
+
+a.tag-addon {
+	text-decoration: none;
+	cursor: pointer;
+	transition: .3s color, .3s background;
+
+	&:hover {
+		background: rgba(0, 0, 0, 0.16);
+		color: inherit;
+	}
+}
+
+.tag-avatar {
+	width: 1.5rem;
+	height: 1.5rem;
+	border-radius: 3px 0 0 3px;
+	margin: 0 .5rem 0 -.5rem;
+}
+
+.tag-blue {
+	background-color: #467fcf !important; 
+	color: #fff;
+}
+
+.tag-indigo {
+	background-color: #6574cd !important;
+	color: #fff;
+}
+
+.tag-purple {
+	background-color: #867efc !important;
+	color: #fff;
+}
+
+.tag-pink {
+	background-color: #ec82ef !important;
+	color: #fff;
+}
+
+.tag-red {
+	background-color: #c21a1a !important;
+	color: #fff;
+}
+
+.tag-orange {
+	background-color: #fc7303 !important;
+	color: #fff;
+}
+
+.tag-yellow {
+	background-color: #ecb403 !important;
+	color: #fff;
+}
+
+.tag-green {
+	background-color: #4ecc48 !important;
+	color: #fff;
+}
+
+.tag-teal {
+	background-color: #2bcbba !important;
+	color: #fff;
+}
+
+.tag-cyan {
+	background-color: #17a2b8 !important;
+	color: #fff;
+}
+
+.tag-white {
+	background-color: #fff !important;
+	color: #fff;
+}
+
+.tag-gray {
+	background-color: #868e96 !important;
+	color: #fff;
+}
+
+.tag-gray-dark {
+	background-color: #343a40 !important;
+	color: #fff;
+}
+
+.tag-azure {
+	background-color: #45aaf2 !important;
+	color: #fff;
+}
+
+.tag-lime {
+	background-color: #7bd235 !important;
+	color: #fff;
+}
+
+.tag-primary {
+	background-color: #467fcf !important;
+	color: #fff;
+}
+
+.tag-secondary {
+	background-color: #868e96 !important;
+	color: #fff;
+}
+
+.tag-success {
+	background-color: #4ecc48 !important;
+	color: #fff;
+}
+
+.tag-info {
+	background-color: #45aaf2 !important;
+	color: #fff;
+}
+
+.tag-warning {
+	background-color: #ecb403 !important;
+	color: #fff;
+}
+
+.tag-danger {
+	background-color: #c21a1a !important;
+	color: #fff;
+}
+
+.tag-light {
+	background-color: #f8f9fa !important;
+	color: #fff;
+}
+
+.tag-dark {
+	background-color: #343a40 !important;
+	color: #fff;
+}
+
+.tag-rounded {
+	border-radius: 50px;
+
+	.tag-avatar {
+		border-radius: 50px;
+	}
+}
+
+.tags {
+	margin-bottom: -.5rem;
+	font-size: 0;
+
+	>.tag {
+		margin-bottom: .5rem;
+
+		&:not(:last-child) {
+			margin-right: .5rem;
+		}
+	}
+}
+
+.tag-outline-primary {
+	color: $primary  !important;
+	border-color: $primary  !important;
+}
+
+.tag-outline-secondary {
+	color: $secondary  !important;
+	border-color: $secondary  !important;
+}
+
+.tag-outline-success {
+	color: $success  !important;
+	border-color: $success  !important;
+}
+
+.tag-outline-warning {
+	color: $warning  !important;
+	border-color: $warning  !important;
+}
+
+.tag-outline-info {
+	color: $info  !important;
+	border-color: $info  !important;
+}
+
+.tag-outline-danger {
+	color: $danger  !important;
+	border-color: $danger  !important;
+}
+
+.tag-outline-pink {
+	color: $pink  !important;
+	border-color: $pink  !important;
+}

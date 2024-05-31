@@ -1,0 +1,23 @@
+<table class="table border card-table table-vcenter text-nowrap align-items-center">
+    <thead class="bg-primary text-white">
+        <tr>
+            <th class="text-light" colspan="2">Links</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let link of linkList">
+            <td>
+                <i class="fa fa-{{getPlatformIcon(link.name).icon}} me-2 text-dark"></i>
+                {{link.url}}
+            </td>
+            <td>
+                <a href="javascript:void(0)" ngbTooltip="Copy URL" appClickToCopy [textToCopy]="link.url">
+                    <i class="fa fa-clone"></i>
+                </a>
+            </td>
+        </tr>
+        <tr *ngIf="linkList.length <= 0" >
+            <td colspan="2" class="text-center">Platform not available.</td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,289 @@
+/* app.component.css */
+
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header Styles */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.app-header-actions button {
+  margin-left: 10px;
+}
+
+/* User Profile Styles */
+.user-profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.user-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.user-details h3 {
+  margin: 0;
+}
+
+.user-links a {
+  margin-right: 10px;
+  text-decoration: none;
+  color: #333;
+}
+
+/* Segment List Styles */
+.segment-list {
+  margin-bottom: 20px;
+}
+
+.segment-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.segment-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.segment-list .status {
+  font-weight: bold;
+}
+
+.segment-list .count {
+  background-color: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 20px;
+}
+
+/* Key Details Styles */
+.key-details {
+  margin-bottom: 20px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* Link Styles */
+ a {
+   color: #007bff;
+   text-decoration: none;
+ }
+
+// a:hover {
+//   text-decoration: underline;
+// }
+.label {
+
+  padding:5px 10px;         
+  border: 1px solid #ccc;    
+  border-radius: 3px;       
+  font-weight: bold;       
+  color:black;           
+  display: inline-block;
+  border-radius: 30px;   
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.roadmap {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.roadmap-timeline {
+  position: relative;
+  margin-top: 2rem;
+}
+
+.roadmap-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  height: 100%;
+  width: 4px;
+  background-color: #ddd;
+}
+
+.roadmap-milestone {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.milestone-icon {
+  font-size: 2rem;
+  color: #4caf50;
+  margin-right: 1rem;
+}
+
+.milestone-content {
+  text-align: left;
+  max-width: 300px;
+}
+
+.milestone-content h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.milestone-content p {
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.roadmap-milestone:nth-child(even) {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.roadmap-milestone:nth-child(even) .milestone-icon {
+  margin-right: 0;
+  margin-left: 1rem;
+}
+.lead-card {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.lead-card h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.lead-card p {
+  margin-bottom: 5px;
+}
+
+.lead-card strong {
+  font-weight: bold;
+}
+
+.lead-card a {
+  display: block;
+  margin-top: 10px;
+}
+.no-underline {
+  text-decoration: none;
+  color:black; /* Inherit color from parent element */
+  
+}
+.profile-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 1150px;
+  margin: auto;
+  
+  background-color: #fff;
+}
+.profile-card img {
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+}
+.profile-card h5 {
+  margin-top: 15px;
+  font-size: 1.25rem;
+}
+.profile-card .rating {
+  font-size: 0.9rem;
+  color: #ffc107;
+}
+.profile-card .info-item {
+  margin-bottom: 10px;
+}
+.profile-card .info-item i {
+  margin-right: 10px;
+}
+.profile-card .buttons {
+  margin-top: 20px;
+}
+.profile-card .buttons .btn {
+  margin-right: 10px;
+}
+
+.single-chart {
+width: 80%;
+
+}
+.circular-chart {
+display: block;
+margin: 10px auto;
+max-width: 60%;
+max-height: 200px;
+
+}
+.circle-bg {
+fill: none;
+stroke: #eee;
+stroke-width: 3.8;
+}
+.circle {
+fill: none;
+stroke-width: 2.8;
+
+stroke-linecap: round;
+animation: progress 1s ease-out forwards;
+}
+@keyframes progress {
+0% {
+  stroke-dasharray: 0 100;
+}
+}
+
+.circular-chart.blue .circle {
+stroke: #191e21;
+}
+.percentage {
+fill: #666;
+font-family: sans-serif;
+font-size: 0.5em;
+text-anchor: middle;
+}

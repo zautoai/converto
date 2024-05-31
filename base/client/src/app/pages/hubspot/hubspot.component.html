@@ -1,0 +1,119 @@
+<div class="card shadow mt-5">
+    <div class="card-header d-lfex justify-content-between">
+        <h4><i class="fa fa-hubspot"></i> Hubspot</h4>
+        <button class="btn btn-sm btn-outline-primary" [disabled]="!profile" (click)="openAddMaping()">Add mapping</button>
+    </div>
+    <div class="card-body p-0" style="min-height: calc(100vh - 200px);">
+        <table class="table table-striped" *ngIf="profile">
+            <thead>
+                <tr>
+                    <th>Field name</th>
+                    <th>Externalfield name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let mapping of keyMappingData">
+                    <td>{{mapping?.fieldName}}</td>
+                    <td>{{mapping?.externalFieldName}}</td>
+                    <td>
+                        <a role="button" class="btn text-primary p-0" (click)="openEditMaping(mapping)"><i class="fa fa-edit"></i></a>
+                        <a role="button" class="btn p-0" (click)="openDeleteMapping(mapping)"><i class="fa fa-trash"></i></a>
+                    </td>
+                </tr>
+                <tr *ngIf="keyMappingData.length <= 0">
+                    <td colspan="3" class="text-center">
+                        No Mapping found.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div *ngIf="!profile" class="">
+            <div class="mt-5 text-center">
+                <div class="alert alert-danger w-45 mx-auto" role="alert">
+                    "Oops! It looks like your HubSpot account is not connected.
+                </div>
+                <!-- <a routerLink="/integrations" class="btn btn-primary mx-auto">Connect Hubspot</a> -->
+                <div class="mx-auto w-25">
+                    <app-oauth-button
+                    [provider]="'hubspot'"
+                    [text]="'Connect Hubspot'"
+                    [icon]="'https://img.icons8.com/external-tal-revivo-color-tal-revivo/48/external-hubspot-a-developer-and-marketer-of-software-products-logo-color-tal-revivo.png'"
+                    (clickEventEmitter)="onConnectClick($event)"
+                    ></app-oauth-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #addMappingCanvas let-offcanvas>
+    <div class="offcanvas-header">
+        <h4 class="offcanvas-title"><i class="fa fa-hubspot"></i> Add mapping</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form [formGroup]="mappingForm" (ngSubmit)="onAddSubmit()">
+            <div class="form-group">
+                <label for="fieldname">Field name</label>
+                <ng-select [items]="zautoCRMProperties" [bindLabel]="'label'" [bindValue]="'label'" [groupBy]="'groupBy'" 
+                formControlName="fieldName" class="custom form-control"
+                [ngClass]="{'is-invalid':isFieldValid('fieldName') || errorFeedback.fieldName.length > 0}"></ng-select>
+                <div class="invalid-feedback">
+                    {{errorFeedback.fieldName}}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="externalFieldName">External field name</label>
+                <ng-select [items]="hubspotCRMProperties" formControlName="externalFieldName"  class="custom form-control"
+                [ngClass]="{'is-invalid':isFieldValid('externalFieldName') || errorFeedback.fieldName.length > 0}"></ng-select>
+                <div class="invalid-feedback">
+                    {{errorFeedback.externalFieldName}}
+                </div>
+            </div>
+            <div class="d-flex">
+                <button type="button" class="btn btn-outline-primary me-2 w-100" (click)="offcanvas.dismiss()">
+                    <i class="fa fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-primary w-100">Add</button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<ng-template #editMappingCanvas let-offcanvas>
+    <div class="offcanvas-header">
+        <h4 class="offcanvas-title"><i class="fa fa-hubspot"></i> Edit mapping</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form [formGroup]="mappingForm" (ngSubmit)="onEditSubmit()">
+            <div class="form-group">
+                <label for="fieldname">Field name</label>
+                <div class="form-group">
+                    <label for="fieldname">Field name</label>
+                    <ng-select [items]="zautoCRMProperties" [bindLabel]="'label'" [bindValue]="'label'" [groupBy]="'groupBy'" formControlName="fieldName"
+                    class="custom form-control"
+                    [ngClass]="{'is-invalid':isFieldValid('fieldName') || errorFeedback.fieldName.length > 0}"></ng-select>
+                    <div class="invalid-feedback">
+                        {{errorFeedback.fieldName}}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="externalFieldName">External field name</label>
+                <ng-select [items]="hubspotCRMProperties" formControlName="externalFieldName"  class="custom form-control"
+                [ngClass]="{'is-invalid':isFieldValid('externalFieldName') || errorFeedback.fieldName.length > 0}"></ng-select>
+                <div class="invalid-feedback">
+                    {{errorFeedback.externalFieldName}}
+                </div>
+            </div>
+            <div class="d-flex">
+                <button type="button" class="btn btn-outline-primary me-2 w-100" (click)="offcanvas.dismiss()">
+                    <i class="fa fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-primary w-100">Add</button>
+            </div>
+        </form>
+    </div>
+</ng-template>

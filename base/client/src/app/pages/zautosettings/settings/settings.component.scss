@@ -1,0 +1,135 @@
+.scroll
+{
+  height: 65vh;
+  padding-right: 10px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.label1 {
+  font-weight: bold;
+  color: #591ef0; 
+  font-size: 18px; 
+}
+
+.input1{
+  border: 1px solid #ccc; 
+  padding: 8px; 
+  font-size: 16px; 
+
+}
+
+.span1{
+  font-size: 18px;
+}
+
+.logo{
+width: 80px;
+}
+
+/* styles.css */
+
+/* Card Widget Styles */
+.card.widget {
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+
+  /* Hover Effect */
+  cursor: pointer;
+}
+
+.card.widget:hover {
+  box-shadow: 0px 10px 20px rgba(47, 52, 213, 0.3);
+  transform: translateY(-5px);
+}
+
+/* Widget Headers Styles */
+.card.widget .widget-header-lg {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  
+}
+
+.card.widget .widget-header-md {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  
+}
+
+
+.card.widget-logo img {
+  max-width: 100%;
+}
+
+#agentLogo
+{
+  display: none;
+}
+
+.logo-weaper
+{
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  width: 110px;
+  height: 110px;
+  cursor: pointer;
+  img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+}
+
+.logo-wrapper-overflow {
+  overflow: hidden;
+  position: relative;
+  
+}
+.edit-icon
+{
+  cursor: pointer;
+  position: absolute;
+  background-color: var(--primary);
+  text-align: center;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  bottom: 0;
+  right: 5px;
+  z-index: 1;
+  i{
+    color: #fff !important;
+  }
+}
+
+
+.logo-weaper.disabled
+{
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.edit-icon.disabled
+{
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+.widget
+{
+    border-radius: 0.75rem;
+    margin: 0 auto; 
+    overflow: hidden;
+    width: 75%;
+    height: 100%;
+}

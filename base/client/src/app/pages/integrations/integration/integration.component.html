@@ -1,0 +1,54 @@
+
+<ng-container *ngFor="let config of integrationConfigs">
+    <div class="card shadow mt-3">
+        <div class="card-header">
+            <h4 class="my-auto">
+                <img width="25" height="25" [src]="config.icon" alt="icon"/>
+                {{config.provider}}
+            </h4>
+        </div>
+        <div class="card-body" style="min-height: calc(100vh / 3);">
+            <ng-container *ngIf="!profiles.hasOwnProperty(config.provider)">
+                <div class="w-100 h-100 ">
+                    <p class="text-center">{{config.description}}</p>
+                    <div class="d-flex justify-content-center align-items-center mt-5">
+                        <app-oauth-button
+                        [provider]="config.provider"
+                        [text]="config.btntext"
+                        [icon]="config.icon"
+                        (clickEventEmitter)="onConnectClick($event)"
+                        ></app-oauth-button>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="profiles.hasOwnProperty(config.provider)">
+                <div class="row justify-content-center align-items-center">
+                    <div class="col-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <div class="main-img-user avatar-md">
+                                            <img alt="avatar" class="rounded-circle" [src]="profiles[config.provider]?.picture || GLOBAL_IMAGES.default_user">
+                                        </div>
+                                    </div>
+                                    <div class="col-8 d-flex align-items-center text-truncate">
+                                        <div>
+                                            <h4 class="m-0">{{profiles[config.provider]?.name || profiles[config.provider]?.accountType}}</h4>
+                                            <h6 class="m-0 text-muted">{{profiles[config.provider]?.email}}</h6>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <button class="btn" (click)="logOut(config.provider)">
+                                            <i class="fe fe-log-out"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</ng-container>
