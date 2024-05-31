@@ -112,9 +112,9 @@ jobs:
           sudo apt-get install -y awscli
       - name: Configure AWS CLI
         run: |
-          aws configure set aws_access_key_id ${{ env.DEPLOY_AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ env.DEPLOY_AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region ${{ env.DEPLOY_AWS_REGION }}
+          aws configure set aws_access_key_id ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region ${{ secrets.DEPLOY_AWS_REGION }}
 
       - name: Deploy Base to EC2 via SSM
         run: |
@@ -146,16 +146,16 @@ jobs:
           sudo apt-get install -y awscli
       - name: Configure AWS CLI
         run: |
-          aws configure set aws_access_key_id ${{ env.DEPLOY_AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ env.DEPLOY_AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region ${{ env.DEPLOY_AWS_REGION }}
+          aws configure set aws_access_key_id ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region ${{ secrets.DEPLOY_AWS_REGION }}
 
       - name: Deploy CRM to EC2 via SSM
         run: |
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Role,ValuesConverto-CRM-Stage" "Key=tag:UpdateGroup,Values=${{ matrix.update_group }}" \
-            --parameters 'commands=["docker login ghcr.io -u ${{ env.GITHUB_USER }} -p ${{ secrets.GITHUB_TOKEN }}", "cd /path/to/your/project", "docker-compose -f docker-compose-crm.yml pull", "docker-compose -f docker-compose-crm.yml up -d", "docker image prune -a -f"]'
+            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.GITHUB_USER }} -p ${{ secrets.GITHUB_TOKEN }}", "cd /path/to/your/project", "docker-compose -f docker-compose-crm.yml pull", "docker-compose -f docker-compose-crm.yml up -d", "docker image prune -a -f"]'
 
       - name: Check Health of CRM Application Container
         run: |
