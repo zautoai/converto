@@ -24,6 +24,6 @@ import { BullModule } from '@nestjs/bull';
     ProspectJourneySocketService,
     ProspectJourneySocketGateway
   ],
-  exports: [ProspectjourneyService]
+  exports: [ProspectjourneyService,ProspectJourneySocketService]
 })
 export class ProspectjourneyModule {}

@@ -1,8 +1,8 @@
-import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import converto from "../../img/converto.png";
-function Head({ backArrow, handleClick, msgVisible }) {
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import converto from '../../img/converto.png';
+function Head({ backArrow, handleClick, msgVisible, data }) {
   // Adjusted prop name
   return (
     <div>
@@ -10,7 +10,7 @@ function Head({ backArrow, handleClick, msgVisible }) {
         <nav className="bg-dark position-relative p-1 px-2">
           {backArrow && (
             <div
-              style={{ cursor: "pointer", top: "10%" }}
+              style={{ cursor: 'pointer', top: '10%' }}
               className="text-light position-absolute left-0"
             >
               <FontAwesomeIcon
@@ -20,7 +20,7 @@ function Head({ backArrow, handleClick, msgVisible }) {
               />
             </div>
           )}
-          <div className=" p-2 text-light d-flex align-item-center justify-content-center py-4">
+          <div className=" p-2 text-light d-flex align-item-center justify-content-center py-3">
             {msgVisible == 1 && <h3>Messages</h3>}
           </div>
         </nav>
@@ -30,7 +30,7 @@ function Head({ backArrow, handleClick, msgVisible }) {
         <nav className="bg-dark position-relative p-1 px-2">
           {backArrow && (
             <div
-              style={{ cursor: "pointer", top: "10%" }}
+              style={{ cursor: 'pointer', top: '10%' }}
               className="text-light position-absolute left-0"
             >
               <FontAwesomeIcon
@@ -40,10 +40,11 @@ function Head({ backArrow, handleClick, msgVisible }) {
               />
             </div>
           )}
-          <div className=" p-2 text-light d-flex align-item-center justify-content-between w-75  py-4">
-          
-          <div><img className="w-25" src={converto} alt="" /></div>
-          <h1>Title</h1>
+          <div className=" p-2 text-light  py-2">
+            <div className="d-flex gap-2 align-item-center justify-content-center">
+              <img  src={data.logoUrl||converto} alt="Logo" width="50" />{' '}
+              <h1 className="w-100">{data.displayName}</h1>
+            </div>
           </div>
         </nav>
       )}

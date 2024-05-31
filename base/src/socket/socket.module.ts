@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { SiteModule } from 'src/site/site.module';
 import { ContactsModule } from 'src/contacts/contacts.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { ProspectjourneyModule } from 'src/prospect-journey/prospect-journey.module';
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
         VisitorModule,
         ActiveClientModule,
         PrismaModule,
+        ProspectjourneyModule,
         JwtModule.register({
             secret: process.env.JWT_SECRET, // Use your secret or private key here
             signOptions: { expiresIn: '60s' },

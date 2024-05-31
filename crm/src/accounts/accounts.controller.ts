@@ -24,7 +24,7 @@ import { FilterDto } from 'src/common/dtos/filter.dto';
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService) { }
+  constructor(private readonly accountsService: AccountsService) {}
 
   @Post()
   @ApiOperation({ description: 'Create Account', summary: 'Create Account' })

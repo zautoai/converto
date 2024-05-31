@@ -138,6 +138,17 @@ export class AgentController {
     } else return agent;
   }
 
+  @Get(':id/primary')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    type: ResponseDTO<Agent>
+  })
+  async findOrgAgent(@Param('id') id: string, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+    return await this.agentsService.findOneByOrg(orgId);
+  }
+
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

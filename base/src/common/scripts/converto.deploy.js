@@ -111,8 +111,7 @@
 
             let actionHistory = [];
 
-            const socketUrl = 'http://localhost:8080';
-            const socket = io(socketUrl,{query:{orgId:tenantId}});
+            const socket = io(apiRootUrl,{query:{orgId:tenantId}});
             socket.on('connect', () => {
                 console.log('Socket connected');
                 handleActionHistory();

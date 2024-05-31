@@ -14,7 +14,7 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
 
   constructor(
     private readonly intentScoreGeneratorService:IntentScoreGeneratorService,
-    private readonly prospectJourneyService: ProspectjourneyService
+    private readonly prospectJourneyService: ProspectjourneyService,
   ) {
     super();
   }
@@ -26,7 +26,7 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
     // console.log(result);
   }
 
-  async generateIntentScore(orgId:string,visitId:string):Promise<{positiveScore:number,negativeScore:number,score:number}>
+  async generateIntentScore(orgId:string,visitId:string)
   {
     let _rules = await this.getAll(orgId);
     const rules = _rules.map((rule:any)=> {
@@ -52,24 +52,35 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
       try
       {
         const result = await this.intentScoreGeneratorService.getIntentScore(JSON.stringify(rules),JSON.stringify(activities));
-        return { 
-          positiveScore: result.positiveScore,
-          negativeScore: result.negativeScore,
-          score: result.score 
-        };        
+        const prisma = await this.getPrismaClient(orgId);
+        try
+        {
+          const updatedVisit = await prisma.visit.update({where:{id:visitId},data:{score:result?.score}});
+          const sumOfScore = await prisma.visit.aggregate({
+            where: { visitorId: updatedVisit.visitorId },
+            _sum: { score: true },
+          });
+          
+          await prisma.visitor.update({
+            where: { id: updatedVisit.visitorId },
+            data: { score: sumOfScore._sum.score },
+          });
+          
+        }
+        catch(err)
+        {
+          console.log(err);
+        } 
+        finally
+        {
+          prisma.$disconnect();
+          await this.closeConnection(orgId);
+        } 
       }
       catch(error)
       {
         console.log(error);
       }
-    }
-    else
-    {
-      return { 
-        positiveScore: 0,
-        negativeScore: 0,
-        score: 0 
-      };
     }
   }
 

@@ -18,9 +18,7 @@ export class IntentScoreProcessor {
         {
             this.logger.log(`Processing task started: ${JSON.stringify(taskData)}`);
             this.logger.log(taskData)
-            // const result = await this.intentScoringService.generateIntentScore(taskData.orgId,taskData.visitId);
-            // console.log(result);
-            
+            await this.intentScoringService.generateIntentScore(taskData.orgId,taskData.visitId);            
             this.logger.log(`Processing task completed: ${JSON.stringify(taskData)}`);
         }
         catch(error)
