@@ -13,52 +13,60 @@ function Widge() {
   const [backArrow, setBackArrow] = useState(false);
   const [msgVisible, setMsgVisible] = useState(false);
   const [data, setData] = useState([]);
-  const [socket, setSocket] = useState(null);
+  // const [socket, setSocket] = useState(null);
 
 
-  console.log(data);
-  useEffect(() => {
-    const socket = io(ENDPOINT, {
-      query: {
-        orgId: orgId,
-      },
-    });
+  // useEffect(() => {
+  //   const socket = io(ENDPOINT, {
+  //     query: {
+  //       orgId: orgId,
+  //     },
+  //   });
 
-    setSocket(socket);
+  //   setSocket(socket);
 
-    socket.on('connect', () => {
-      console.log('Connected');
-    });
+  //   socket.on('connect', () => {
+  //     console.log('Connected');
+  //   });
 
-    
-    const payload = {
-      agentId: '95b5dcd5-b69c-4927-a165-4423db4c16c8',
-      vittorId: '',
-      chatMessage: {
-        messages: [
-          {
-            role:'assistant',
-            content:"message"
+  //   const payload = {
+  //     agentId: '95b5dcd5-b69c-4927-a165-4423db4c16c8',
+  //     visitId: localStorage.getItem('visitId'),
+  //     visitorId: localStorage.getItem('visitorId'),
+  //     chatMessage: {
+  //       messages: [
+  //         {
+  //           role: 'assistant',
+  //           content: 'message',
+  //         },
+  //       ],
+  //     },
+  //   };
 
-          } 
-        ]
-      },
-    };
+  //   try {
+  //     socket.emit('createConversation', payload);
+  //   } catch (error) {
+  //     console.error('Error emitting avatarDataReceived event:', error);
+  //   }
 
-    try {
-      socket.emit('createConversation', payload);
-    } catch (error) {
-      console.error('Error emitting avatarDataReceived event:', error);
-    }
-  }, []);
+  //   socket.on('convCreated', (data) => {
+  //   console.log(data);
+  //   });
 
-  localStorage.setItem('orgId', orgId);
+  // }, []);
+
+
+
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          process.env.REACT_APP_BOT_API + '/api/agents/' + agentId,
+          process.env.REACT_APP_BOT_API +
+            '/api/agents/' +
+            agentId +
+            '?source=site',
           {
             headers: {
               'Content-Type': 'application/json',
@@ -67,6 +75,8 @@ function Widge() {
           },
         );
         setData(response.data);
+        localStorage.setItem('visitId', response.data.visit.id);
+        localStorage.setItem('visitorId', response.data.visitor.id);
       } catch (error) {
         console.error('Error fetching data:', error);
       }

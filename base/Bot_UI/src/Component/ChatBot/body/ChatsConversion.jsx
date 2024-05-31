@@ -1,4 +1,5 @@
-import { React, useState } from "react";
+import { React } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 function ChatsConversion({ index, msg }) {
   return (
@@ -6,16 +7,16 @@ function ChatsConversion({ index, msg }) {
       <div
         key={index}
         className={`d-flex mb-2 ${
-          msg.sender === "user" ? "justify-content-end" : ""
+          msg.sender === 'user' ? 'justify-content-end' : ''
         }`}
       >
         <div
           className={`p-2 ${
-            msg.sender === "user" ? "bg-dark text-white" : "bg-light"
+            msg.sender === 'user' ? 'bg-dark text-white' : 'bg-light'
           }`}
-          style={{ borderRadius: "10px" }}
+          style={{ borderRadius: '10px' }}
         >
-          {msg.text}
+          <ReactMarkdown className={'p-0'}>{msg.text}</ReactMarkdown>
         </div>
       </div>
     </div>

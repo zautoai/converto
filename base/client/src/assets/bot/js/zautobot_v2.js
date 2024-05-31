@@ -1376,6 +1376,7 @@ class ChatBotLogic {
         this.socket.on('disconnect', () => {
             console.log('Disconnected from socket server');
         });
+
         this.socket.on('convCreated', (data) => {
             this.convoId = data.id;
             this.setVisitor(data.visitorId);
@@ -1387,6 +1388,9 @@ class ChatBotLogic {
         this.socket.on('replyMessage', (data) => {
             this.eventEmitter.emit("messageReceived",data);
         });
+
+
+
         this.socket.on('leadfound', (data) => {
             this.eventEmitter.emit("leadFound",data);
             localStorage.setItem("leadForm",JSON.stringify(data.content));
