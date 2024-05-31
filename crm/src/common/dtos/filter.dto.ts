@@ -15,25 +15,25 @@ export class FilterDto {
   @IsOptional()
   @IsNumber()
   @IsPositive({ message: 'Page must be a positive integer' })
-  page: number = 1;
+  page?: number = 1;
 
   @ApiProperty({ required: false })
   @Transform(({ value }) => toNumber(value, { default: 5, min: 1 }))
   @IsOptional()
   @IsNumber()
   @IsPositive({ message: 'Page size must be a positive integer' })
-  limit: number = 10;
+  limit?: number = 10;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  searchTerm: string;
+  searchTerm?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   @IsIn(['asc', 'desc'], { message: 'Order must be either "asc" or "desc"' })
-  sort: 'asc' | 'desc' = 'asc';
+  sort?: 'asc' | 'desc' = 'asc';
 
   constructor() {
     this.page = this.page || 1;

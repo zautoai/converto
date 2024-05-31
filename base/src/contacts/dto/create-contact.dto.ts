@@ -1,5 +1,12 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsOptional, IsString, IsUrl } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import {
+    IsEmail,
+    IsNumber,
+    IsOptional,
+    IsString,
+    IsUrl,
+    validateOrReject
+} from 'class-validator';
 
 export class CreateContactDto {
     @ApiProperty({
@@ -100,10 +107,33 @@ export class CreateContactDto {
     @IsString()
     status?: string;
 
-    @ApiProperty({ required: false, description: 'Conversation Id from which the contact is created' })
+    @ApiProperty({ required: false, description: 'Visitor Id from which the contact is created' })
     @IsOptional()
     @IsString()
-    conversationId?: string;
+    visitorId?: string;
 
+    @ApiProperty({ required: false, description: 'Account Id of the contact' })
+    @IsOptional()
+    @IsString()
+    accountId?: string;
 
+    @ApiProperty({ required: false, description: 'ICP score of the contact' })
+    @IsOptional()
+    @IsNumber()
+    icpScore?: number;
+
+    async validate() {
+        try {
+            await validateOrReject(this, { skipMissingProperties: true });
+        } catch (errors) {
+            const messages = errors
+                .map((error) => Object.values(error.constraints))
+                .join(', ');
+            throw Error(messages);
+        }
+    }
+
+    constructor(data: Partial<CreateContactDto>) {
+        Object.assign(this, data);
+    }
 }

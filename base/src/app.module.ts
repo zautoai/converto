@@ -50,7 +50,6 @@ import { SegmentsModule } from './segments/segments.module';
 import { SegmentCategoryModule } from './segment-category/segment-category.module';
 import { IcpModule } from './icp/icp.module';
 import { IntentScoringModule } from './intent-scoring/intent-scoring.module';
-import { IcpScoreModule } from './icp-score/icp-score.module';
 
 @Module({
   imports: [
@@ -118,7 +117,6 @@ import { IcpScoreModule } from './icp-score/icp-score.module';
     SegmentCategoryModule,
     IcpModule,
     IntentScoringModule,
-    IcpScoreModule,
   ],
   controllers: [AppController],
   providers: [AppService],

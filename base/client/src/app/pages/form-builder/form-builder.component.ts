@@ -55,7 +55,7 @@ export class FormBuilderComponent implements OnInit {
   submittedData: any[] = [];
   selectedData: any = null;
   totalItems: number = 1;
-  limit = 2;
+  limit = 20;
   selectedCheckboxes: string[] = [];
   htmlData: string = '';
   jsData: string = '';
@@ -103,7 +103,6 @@ export class FormBuilderComponent implements OnInit {
   }
 
   onSubmitForm(): void {
-    this.submittedData.push({ ...this.Form.value });
 
     this.selectedCheckboxes = [];
     if (this.Form.get('name')?.value) {
@@ -115,25 +114,22 @@ export class FormBuilderComponent implements OnInit {
     if (this.Form.get('contactdetails')?.value) {
       this.selectedCheckboxes.push('Phone Number');
     }
-    console.log(
-      'Form submitted with selected checkboxes:',
-      this.selectedCheckboxes,
-    );
+
   }
 
-  getForms = () :void=> {
+  getForms(): void {
     this.restService
-    .get(API.main.formbuilder, `?limit=${this.limit}&page=${this.currentPage}`)
-    .subscribe(
-      (response: any) => {
-        this.submittedData = response.data;
-        this.totalItems = response.total
-      },
-      (error) => {
-        console.error(error);
-        this.notifService.showError(error.error.message);
-      },
-    );
+      .get(API.main.formbuilder, `?limit=${this.limit}&page=${this.currentPage}`)
+      .subscribe(
+        (response: any) => {
+          this.submittedData = response.data;
+          this.totalItems = response.total
+        },
+        (error) => {
+          console.error(error);
+          this.notifService.showError(error.error.message);
+        },
+      );
   };
 
   openCreateForm() {
@@ -230,9 +226,9 @@ export class FormBuilderComponent implements OnInit {
       this.restService.post(API.main.formbuilder, data).subscribe({
         next: (response: any) => {
           console.log(response);
+          this.getForms();
           this.offcanvasService.dismiss();
           this.notifService.showSuccess('Form Added Successfully.');
-          this.getForms();
         },
         error: (error) => {
           console.error(error);
@@ -370,9 +366,9 @@ export class FormBuilderComponent implements OnInit {
   //   this.currentPage = pageNumber;
   //   this.getForms();
   // }
-  onPageChange(event:any){
-    this.currentPage=event.page;
-    
+  onPageChange(event: any) {
+    this.currentPage = event.page;
+
     this.getForms()
   }
 

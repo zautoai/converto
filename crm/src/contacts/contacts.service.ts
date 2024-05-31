@@ -4,6 +4,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { AccountsService } from 'src/accounts/accounts.service';
 import { FilterDto } from 'src/common/dtos/filter.dto';
 import { CustomFieldParent } from 'src/common/enum/enums';
 import { MappingService } from 'src/common/services/mapping.service';
@@ -25,6 +26,7 @@ export class ContactsService {
     private readonly customFieldsService: CustomFieldsService,
     private readonly externalCRMService: ExternalCrmService,
     private readonly mappingService: MappingService,
+    private readonly accountService: AccountsService,
   ) { }
 
   async getContacts(orgId: string, filterDto: FilterDto) {
@@ -193,6 +195,7 @@ export class ContactsService {
             contactId: contact.id,
           },
         });
+        await this.handleAccountContactMap(orgId, contact);
       }
 
       // enriche
@@ -488,7 +491,7 @@ export class ContactsService {
       //   data: {...data},
       // });
       const enrichedContact = (await this.updateContact(orgId, contactId, data)).data;
-
+      await this.handleAccountContactMap(orgId, enrichedContact)
       this.logger.log(`Enriched contact with id: ${enrichedContact.email}`);
       return enrichedContact;
     } catch (error) {
@@ -639,6 +642,33 @@ export class ContactsService {
     } catch (error) {
       throw error
     } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
+  }
+
+  async handleAccountContactMap(orgId: string, contact: any) {
+    if (!contact.organizationName) {
+      return
+    }
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    try {
+      const accountName = contact.organizationName.trim()
+      const existingAccount = await this.accountService.getAccountByName(orgId, accountName);
+      if (existingAccount) {
+        await prisma.contact.update({
+          where: { id: contact.id },
+          data: { accountId: existingAccount.id },
+        });
+        return
+      }
+      await this.accountService.create(orgId, { accountName });
+      return
+    }
+    catch (e) {
+      throw e
+    }
+    finally {
       prisma.$disconnect()
       await this.prismaClientManager.disconnectClient(orgId)
     }

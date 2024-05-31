@@ -494,4 +494,21 @@ export class AccountsService {
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
+
+  async getAccountByName(orgId: string, name: string) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    try {
+      const account = await prisma.account.findFirst({
+        where: {
+          accountName: name
+        }
+      })
+      return account
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
+  }
 }

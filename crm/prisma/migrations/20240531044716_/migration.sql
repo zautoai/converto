@@ -55,6 +55,8 @@ CREATE TABLE "Contact" (
     "leadSource" TEXT,
     "status" TEXT,
     "conversationId" TEXT,
+    "visitorId" TEXT,
+    "accountId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modifiedAt" TIMESTAMP(3) NOT NULL,
 
@@ -260,6 +262,9 @@ CREATE UNIQUE INDEX "CrmMapping_objectType_fieldName_externalCRMObjectType_exter
 
 -- CreateIndex
 CREATE UNIQUE INDEX "SegmentCategory_name_key" ON "SegmentCategory"("name");
+
+-- AddForeignKey
+ALTER TABLE "Contact" ADD CONSTRAINT "Contact_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ContactTag" ADD CONSTRAINT "ContactTag_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
