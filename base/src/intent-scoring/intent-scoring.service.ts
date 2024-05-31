@@ -56,7 +56,16 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
         try
         {
           const updatedVisit = await prisma.visit.update({where:{id:visitId},data:{score:result?.score}});
-          // const overallScore = await prisma.visit.
+          const sumOfScore = await prisma.visit.aggregate({
+            where: { visitorId: updatedVisit.visitorId },
+            _sum: { score: true },
+          });
+          
+          await prisma.visitor.update({
+            where: { id: updatedVisit.visitorId },
+            data: { score: sumOfScore._sum.score },
+          });
+          
         }
         catch(err)
         {
