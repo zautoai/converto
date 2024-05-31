@@ -141,14 +141,12 @@ export class AgentController {
   @Get(':id/primary')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiQuery({ name: 'page', description: 'Page number.', required: false })
-  @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
   @ApiOkResponse({
     type: ResponseDTO<Agent>
   })
-  async findVisitors(@Query() paginationDto: PaginationDto, @Param('id') id: string, @Req() request: ZautoRequest) {
+  async findOrgAgent(@Param('id') id: string, @Req() request: ZautoRequest) {
     const orgId = request.user.orgId;
-    return await this.agentsService.findAllByOrg({orgId, data:paginationDto, id});
+    return await this.agentsService.findOneByOrg(orgId);
   }
 
   @Patch(':id')
