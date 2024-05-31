@@ -104,10 +104,6 @@ jobs:
         stage_base: [1, 2, 3]  # Define your update groups
     steps:
       - uses: actions/checkout@v2
-      - name: Insert Redis Password for Base
-        run: |
-          sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ env.REDIS_PASSWORD }}|g" docker-compose-base.yml
-
       - name: Show Updated Docker Compose File for Base
         run: cat docker-compose-base.yml
       - name: Install AWS CLI
@@ -142,10 +138,6 @@ jobs:
         stage_crm: [1, 2, 3]  # Define your update groups
     steps:
       - uses: actions/checkout@v2
-      - name: Insert Redis Password for CRM
-        run: |
-          sed -i'' -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ env.REDIS_PASSWORD }}|g" docker-compose-crm.yml
-
       - name: Show Updated Docker Compose File for CRM
         run: cat docker-compose-crm.yml
       - name: Install AWS CLI
