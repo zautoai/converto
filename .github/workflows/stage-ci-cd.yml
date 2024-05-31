@@ -12,94 +12,100 @@ jobs:
     runs-on: ubuntu-latest
     environment: stage
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: ${{ secrets.LOGIN_GITHUB_TOKEN }}
-        password: ${{ secrets.LOGIN_GITHUB_TOKEN }}
-    - name: Build and push Docker image for base
-      if: contains(github.event.head_commit.message, 'base')
-      uses: docker/build-push-action@v2
-      with:
-        push: true
-        context: ./base
-        file: ./base/Dockerfile
-        tags: |
-          ghcr.io/zautoai/converto:stage-base${{ github.sha }}
-          ghcr.io/zautoai/converto:stage-base
-        build-args: |
-          APOLLO_API_KEY=${{ secrets.APOLLO_API_KEY }}
-          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_REGION=${{ secrets.AWS_REGION }}
-          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          CHROMA_AUTH_CREDENTIALS=${{ secrets.CHROMA_AUTH_CREDENTIALS }}
-          CHROMA_AUTH_PROVIDER=${{ secrets.CHROMA_AUTH_PROVIDER }}
-          CHROMA_URL=${{ secrets.CHROMA_URL }}
-          CHUNCK_SIZE=${{ secrets.CHUNCK_SIZE }}
-          CLAUDE_API_KEY=${{ secrets.CLAUDE_API_KEY }}
-          COHERE_API_KEY=${{ secrets.COHERE_API_KEY }}
-          CONVERTO_EMAIL=${{ secrets.CONVERTO_EMAIL }}
-          CONVERTO_TRAIN_BUCKET_NAME=${{ secrets.CONVERTO_TRAIN_BUCKET_NAME }}
-          COVERTO_PIC_BUCKET_NAME=${{ secrets.COVERTO_PIC_BUCKET_NAME }}
-          CRYPTO_ENCRYPTION_SECRET=${{ secrets.CRYPTO_ENCRYPTION_SECRET }}
-          DATABASE_URL=${{ secrets.DATABASE_URL_BASE }}
-          EMBEDDING_PROVIDER=${{ secrets.EMBEDDING_PROVIDER }}
-          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-          HOST_PORT=${{ secrets.HOST_PORT }}
-          HOST_URL=${{ secrets.HOST_URL }}
-          IP_DATA_KEY=${{ secrets.IP_DATA_KEY }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          LLM_PROVIDER=${{ secrets.LLM_PROVIDER }}
-          MAX_SMTP_CONNECTIONS=${{ secrets.MAX_SMTP_CONNECTIONS }}
-          MAX_TOTAL_FILE_SIZE=${{ secrets.MAX_TOTAL_FILE_SIZE }}
-          NODE_secrets=${{ secrets.NODE_secrets }}
-          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-          OPENAI_ASSISTANT_DEFAULT_MODEL=${{ secrets.OPENAI_ASSISTANT_DEFAULT_MODEL }}
-          OPEN_AI_EMBEDDING_MODEL=${{ secrets.OPEN_AI_EMBEDDING_MODEL }}
-          OPEN_AI_MODEL=${{ secrets.OPEN_AI_MODEL }}
-          QUICK_MAIL_VALIDATOR_API=${{ secrets.QUICK_MAIL_VALIDATOR_API }}
-          REDIS_IP=${{ secrets.REDIS_IP }}
-          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
-          REDIS_PORT=${{ secrets.REDIS_PORT }}
-          SENDGRID_KEY=${{ secrets.SENDGRID_KEY }}
-          SIGNUP_ALERT_MAIL=${{ secrets.SIGNUP_ALERT_MAIL }}
-          SUPER_USER_EMAIL=${{ secrets.SUPER_USER_EMAIL }}
-          SUPER_USER=${{ secrets.SUPER_USER }}
-          SUPER_USER_PASSWORD=${{ secrets.SUPER_USER_PASSWORD }}
-          TRAINING_CONTENT_PATH=${{ secrets.TRAINING_CONTENT_PATH }}
-          UPLOADS_FOLDER=${{ secrets.UPLOADS_FOLDER }}
-          VERIFICATION_EXPIRES_IN=${{ secrets.VERIFICATION_EXPIRES_IN }}
+      - uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.LOGIN_GITHUB_TOKEN }}
+          password: ${{ secrets.LOGIN_GITHUB_TOKEN }}
+      - name: Build and push Docker image for base
+        if: contains(github.event.head_commit.message, 'base')
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: ./base
+          file: ./base/Dockerfile
+          tags: |
+            ghcr.io/zautoai/converto:stage-base${{ github.sha }}
+            ghcr.io/zautoai/converto:stage-base
+          build-args: |
+            APOLLO_API_KEY=${{ secrets.APOLLO_API_KEY }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            CHROMA_AUTH_CREDENTIALS=${{ secrets.CHROMA_AUTH_CREDENTIALS }}
+            CHROMA_AUTH_PROVIDER=${{ secrets.CHROMA_AUTH_PROVIDER }}
+            CHROMA_URL=${{ secrets.CHROMA_URL }}
+            CHUNCK_SIZE=${{ secrets.CHUNCK_SIZE }}
+            CLAUDE_API_KEY=${{ secrets.CLAUDE_API_KEY }}
+            COHERE_API_KEY=${{ secrets.COHERE_API_KEY }}
+            CONVERTO_EMAIL=${{ secrets.CONVERTO_EMAIL }}
+            CONVERTO_TRAIN_BUCKET_NAME=${{ secrets.CONVERTO_TRAIN_BUCKET_NAME }}
+            COVERTO_PIC_BUCKET_NAME=${{ secrets.COVERTO_PIC_BUCKET_NAME }}
+            CRYPTO_ENCRYPTION_SECRET=${{ secrets.CRYPTO_ENCRYPTION_SECRET }}
+            DATABASE_URL=${{ secrets.DATABASE_URL_BASE }}
+            EMBEDDING_PROVIDER=${{ secrets.EMBEDDING_PROVIDER }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            HOST_PORT=${{ secrets.HOST_PORT }}
+            HOST_URL=${{ secrets.HOST_URL }}
+            IP_DATA_KEY=${{ secrets.IP_DATA_KEY }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            LLM_PROVIDER=${{ secrets.LLM_PROVIDER }}
+            MAX_SMTP_CONNECTIONS=${{ secrets.MAX_SMTP_CONNECTIONS }}
+            MAX_TOTAL_FILE_SIZE=${{ secrets.MAX_TOTAL_FILE_SIZE }}
+            NODE_secrets=${{ secrets.NODE_secrets }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            OPENAI_ASSISTANT_DEFAULT_MODEL=${{ secrets.OPENAI_ASSISTANT_DEFAULT_MODEL }}
+            OPEN_AI_EMBEDDING_MODEL=${{ secrets.OPEN_AI_EMBEDDING_MODEL }}
+            OPEN_AI_MODEL=${{ secrets.OPEN_AI_MODEL }}
+            QUICK_MAIL_VALIDATOR_API=${{ secrets.QUICK_MAIL_VALIDATOR_API }}
+            REDIS_IP=${{ secrets.REDIS_IP }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            REDIS_PORT=${{ secrets.REDIS_PORT }}
+            SENDGRID_KEY=${{ secrets.SENDGRID_KEY }}
+            SIGNUP_ALERT_MAIL=${{ secrets.SIGNUP_ALERT_MAIL }}
+            SUPER_USER_EMAIL=${{ secrets.SUPER_USER_EMAIL }}
+            SUPER_USER=${{ secrets.SUPER_USER }}
+            SUPER_USER_PASSWORD=${{ secrets.SUPER_USER_PASSWORD }}
+            TRAINING_CONTENT_PATH=${{ secrets.TRAINING_CONTENT_PATH }}
+            UPLOADS_FOLDER=${{ secrets.UPLOADS_FOLDER }}
+            VERIFICATION_EXPIRES_IN=${{ secrets.VERIFICATION_EXPIRES_IN }}
 
-    - name: Build and push Docker image for crm
-      if: contains(github.event.head_commit.message, 'crm')
-      uses: docker/build-push-action@v2
-      with:
-        push: true
-        context: ./crm
-        file: ./crm/Dockerfile
-        tags: |
-          ghcr.io/zautoai/converto:stage-crm${{ github.sha }}
-          ghcr.io/zautoai/converto:stage-crm
-        build-args: |
-          REDIS_IP=${{ secrets.REDIS_IP }}
-          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
-          REDIS_PORT=${{ secrets.REDIS_PORT }}
-          CRM_HOST=${{ secrets.CRM_HOST }}
-          CRM_HOST_PORT=${{ secrets.CRM_HOST_PORT }}
-          CRM_JWT_SECRET=${{ secrets.CRM_JWT_SECRET }}
-          CRM_HUBSPOT_CLIENT_ID=${{ secrets.CRM_HUBSPOT_CLIENT_ID }}
-          CRM_HUBSPOT_CLIENT_SECRET=${{ secrets.CRM_HUBSPOT_CLIENT_SECRET }}
-          CRM_HUBSPOT_REDIRECT_URI=${{ secrets.CRM_HUBSPOT_REDIRECT_URI }}
+      - name: Build and push Docker image for crm
+        if: contains(github.event.head_commit.message, 'crm')
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: ./crm
+          file: ./crm/Dockerfile
+          tags: |
+            ghcr.io/zautoai/converto:stage-crm${{ github.sha }}
+            ghcr.io/zautoai/converto:stage-crm
+          build-args: |
+            REDIS_IP=${{ secrets.REDIS_IP }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            REDIS_PORT=${{ secrets.REDIS_PORT }}
+            CRM_HOST=${{ secrets.CRM_HOST }}
+            CRM_HOST_PORT=${{ secrets.CRM_HOST_PORT }}
+            CRM_JWT_SECRET=${{ secrets.CRM_JWT_SECRET }}
+            CRM_HUBSPOT_CLIENT_ID=${{ secrets.CRM_HUBSPOT_CLIENT_ID }}
+            CRM_HUBSPOT_CLIENT_SECRET=${{ secrets.CRM_HUBSPOT_CLIENT_SECRET }}
+            CRM_HUBSPOT_REDIRECT_URI=${{ secrets.CRM_HUBSPOT_REDIRECT_URI }}
 
   deploy-base:
     runs-on: ubuntu-latest
-    environment: stage
     needs: build-and-push
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.DEPLOY_AWS_REGION }}
       - uses: actions/checkout@v2
       - name: Show Updated Docker Compose File for Base
         run: cat base/docker-compose-base.yml
@@ -107,11 +113,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y awscli
-      - name: Configure AWS CLI
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region ${{ secrets.DEPLOY_AWS_REGION }}
       - name: Upload Docker Compose File to S3
         run: |
           aws s3 cp base/docker-compose-base.yml s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-base.yml
@@ -140,9 +141,15 @@ jobs:
 
   deploy-crm:
     runs-on: ubuntu-latest
-    environment: stage
     needs: build-and-push
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.DEPLOY_AWS_REGION }}
       - uses: actions/checkout@v2
       - name: Show Updated Docker Compose File for CRM
         run: cat crm/docker-compose-crm.yml
@@ -150,11 +157,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y awscli
-      - name: Configure AWS CLI
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region ${{ secrets.DEPLOY_AWS_REGION }}
       - name: Upload Docker Compose File to S3
         run: |
           aws s3 cp crm/docker-compose-crm.yml s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-crm.yml
