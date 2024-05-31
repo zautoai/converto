@@ -3,7 +3,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketSe
 import { Socket } from 'socket.io';
 import { ProspectJourneySocketService } from './prospect-journey-socket.service';
 
-@WebSocketGateway(8081, {
+@WebSocketGateway(8080, {
     cors: { origin: '*' }
 })
 

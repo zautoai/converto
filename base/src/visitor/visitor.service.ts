@@ -11,7 +11,9 @@ import { IPTrackingService } from 'src/common/services/iptracking.service';
 @Injectable()
 export class VisitorService extends BaseService {
 
-  constructor(private readonly iptrackingService: IPTrackingService) {
+  constructor(
+    private readonly iptrackingService: IPTrackingService,
+  ) {
     super();
   }
 
@@ -35,7 +37,7 @@ export class VisitorService extends BaseService {
         const newVisit = await this.createOrUpdateVisit({
           orgId, data: {
             visitorId: newVisitor.id,
-            source: createSessionDto.source,
+            source: createSessionDto.source || 'site',
             campaignId: createSessionDto.campaignId
           }
         });
@@ -48,7 +50,7 @@ export class VisitorService extends BaseService {
         const visit = await this.createOrUpdateVisit({
           orgId, data: {
             visitorId: createSessionDto.visitorId,
-            source: createSessionDto.source,
+            source: createSessionDto.source || 'site',
             campaignId: createSessionDto.campaignId
           }
         });
@@ -284,19 +286,62 @@ export class VisitorService extends BaseService {
           visitorId: createVisitDto.visitorId,
           campaignId: createVisitDto.campaignId,
           source: createVisitDto.source
-        }
+        },
+        orderBy: { createdAt: 'desc' }
       });
+
       if (visit) {
-        const count = visit.count + 1;
-        return await prisma.visit.update({ data: { count }, where: { id: visit.id } })
+        const now = new Date();
+        const modifiedAt = new Date(visit.modifiedAt);
+        const diffInSeconds = Math.abs((now.getTime() - modifiedAt.getTime()) / 1000);
+
+        const durationInSeconds = this.parseDurationToSeconds('1h');
+        if (diffInSeconds > durationInSeconds) {
+          return await prisma.visit.create({ data: createVisitDto });
+        } else {
+          const count = visit.count + 1;
+          return await prisma.visit.update({ data: { count }, where: { id: visit.id } });
+        }
       } else {
         return await prisma.visit.create({ data: createVisitDto });
       }
     } catch (err) {
-      throw err;
+      console.error('Error in createOrUpdateVisit:', err);
+      throw new Error('Failed to create or update visit.');
     } finally {
-      prisma.$disconnect()
-      await this.closeConnection(orgId);
+      try {
+        await prisma.$disconnect();
+        await this.closeConnection(orgId);
+      } catch (disconnectError) {
+        console.error('Error during disconnection:', disconnectError);
+      }
+    }
+  }
+
+  private async addToScoringQueue()
+  {
+    
+  }
+
+  parseDurationToSeconds(duration: string): number {
+    const unit = duration.slice(-1);
+    const value = parseInt(duration.slice(0, -1), 10);
+
+    if (isNaN(value)) {
+      throw new Error('Invalid duration value');
+    }
+
+    switch (unit) {
+      case 's':
+        return value;
+      case 'm':
+        return value * 60;
+      case 'h':
+        return value * 60 * 60;
+      case 'd':
+        return value * 24 * 60 * 60;
+      default:
+        throw new Error('Invalid duration unit');
     }
   }
 }

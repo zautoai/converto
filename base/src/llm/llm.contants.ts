@@ -9,6 +9,7 @@ export enum LLMModels {
     GPT_3_5_TURBO = 'gpt-3.5-turbo',
     GPT_4_1106_PREVIEW = 'gpt-4-1106-preview',
     GPT_4_0125_PREVIEW = 'gpt-4-0125-preview',
+    GPT_4O = 'gpt-4o',
 
     OPEN_MISTRAL_7B = 'open-mistral-7b',
     OPEN_MISTRAL_8x7B = 'open-mixtral-8x7b',

@@ -1,16 +1,87 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { CreateIntentScoringDto } from './dto/create-intent-scoring.dto';
 import { UpdateIntentScoringDto } from './dto/update-intent-scoring.dto';
 import { BaseService } from 'src/common/services/base.service';
 import { ServiceParams } from 'src/common/models/service-param.model';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { IntentScoreGeneratorService } from 'src/assistants/services/intentscore-generator.service';
+import { ProspectjourneyService } from 'src/prospect-journey/prospect-journey.service';
+import { ProspecActivityType } from 'src/prospect-journey/dto/create-prospect-journey.dto';
 
 
 @Injectable()
-export class IntentScoringService extends BaseService {
+export class IntentScoringService extends BaseService implements OnModuleInit{
 
-  constructor() {
+  constructor(
+    private readonly intentScoreGeneratorService:IntentScoreGeneratorService,
+    private readonly prospectJourneyService: ProspectjourneyService,
+  ) {
     super();
+  }
+
+  async onModuleInit() {
+    // const orgId = 'e8177085-f420-4ced-acb3-99388d2a4e5b';   
+    // const visitId = '8ee284fa-7583-4b8c-976b-cdec2b251134'; 
+    // const result =  await this.generateIntentScore(orgId, visitId);
+    // console.log(result);
+  }
+
+  async generateIntentScore(orgId:string,visitId:string)
+  {
+    let _rules = await this.getAll(orgId);
+    const rules = _rules.map((rule:any)=> {
+      return {
+        name:rule.name,
+        description: rule.description,
+        type: rule.type,
+        score: rule.value  
+      }
+    });
+    const _activities = await this.prospectJourneyService.getByVisitId(orgId,visitId);
+    const activities = _activities.map((activity:any)=> {
+      return {
+        type: activity.type,
+        data: activity.data,
+        url: activity.url,
+        ...(activity.type == ProspecActivityType.PAGE_VIEWED) ? {scrollDepth: activity.scrollDepth,timeSpend: activity.timeSpend} : {},
+        timeStamp: activity.createdAt
+      }
+    });
+    if(activities.length > 0)
+    { 
+      try
+      {
+        const result = await this.intentScoreGeneratorService.getIntentScore(JSON.stringify(rules),JSON.stringify(activities));
+        const prisma = await this.getPrismaClient(orgId);
+        try
+        {
+          const updatedVisit = await prisma.visit.update({where:{id:visitId},data:{score:result?.score}});
+          const sumOfScore = await prisma.visit.aggregate({
+            where: { visitorId: updatedVisit.visitorId },
+            _sum: { score: true },
+          });
+          
+          await prisma.visitor.update({
+            where: { id: updatedVisit.visitorId },
+            data: { score: sumOfScore._sum.score },
+          });
+          
+        }
+        catch(err)
+        {
+          console.log(err);
+        } 
+        finally
+        {
+          prisma.$disconnect();
+          await this.closeConnection(orgId);
+        } 
+      }
+      catch(error)
+      {
+        console.log(error);
+      }
+    }
   }
 
   async create(serviceParams: ServiceParams<CreateIntentScoringDto>) {
@@ -46,6 +117,26 @@ export class IntentScoringService extends BaseService {
         page: page,
         total: total
       }
+    }
+    catch (error) {
+      throw new BadRequestException(error.message);
+    }
+    finally {
+      prisma.$disconnect()
+      await this.closeConnection(orgId);
+    }
+  }
+
+  async getAll(orgId:string)
+  {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const intentScorings = await prisma.intentScoring.findMany({
+        orderBy: {
+          value: 'asc'
+        }
+      });
+      return intentScorings;
     }
     catch (error) {
       throw new BadRequestException(error.message);

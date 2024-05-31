@@ -514,7 +514,3 @@ ALTER TABLE "ProspectJourney" ADD CONSTRAINT "ProspectJourney_previousPageId_fke
 
 -- AddForeignKey
 ALTER TABLE "ProspectJourney" ADD CONSTRAINT "ProspectJourney_visitId_fkey" FOREIGN KEY ("visitId") REFERENCES "Visit"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- DropIndex
-DROP INDEX "Visitor_campaignId_fkey";
-

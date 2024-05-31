@@ -6,6 +6,8 @@ import { ZautoRequest } from 'src/common/models/request.model';
 import { CalendarAuthDto } from './dto/calendar.dto';
 import { CallBackDto } from './dto/callbac.dto';
 import { BookEventDto } from './dto/book-event.dto';
+import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
+import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
 
 @ApiTags('Calendar')
 @Controller('api/calendar')
@@ -61,26 +63,27 @@ export class CalendarController {
     return await this.calendarService.getProfile({ orgId, data: { calendarName: crmAuthDto.name } });
   }
 
-  @Get('/available-dates/:agentId')
-  async getAvailableDates(@Param('agentId') agentId: string) {
-    const orgId = "From Subdomain"
+  @Get('/available-dates')
+  @UseGuards(SubdomainGuard)
+  async getAvailableDates(@Req() request:SubdomainRequest) {
+    const orgId = request.orgId;
     return await this.calendarService.getAvailableDates(orgId);
   }
 
-  @Get('/available-slots/:agentId')
+  @Get('/available-slots')
   @ApiQuery({ name: 'date' })
-  async getAvailableSlots(@Param('agentId') agentId: string, @Query() queryParams: { date: string }) {
+  async getAvailableSlots(@Query() queryParams: { date: string },@Req() request:SubdomainRequest) {
     const { date } = queryParams;
-    const orgId = "From Subdomain"
+    const orgId = request.orgId;
     if (!date) {
       throw new BadRequestException('Date not provided.');
     }
     return await this.calendarService.getSlots({ orgId, data: { _date: date } });
   }
 
-  @Post('book-event/:agentId')
-  async bookEvents(@Param('agentId') agentId: string, @Body() bookEventDto: BookEventDto) {
-    const orgId = "From Subdomain"
+  @Post('book-event')
+  async bookEvents(@Body() bookEventDto: BookEventDto,@Req() request:SubdomainRequest) {
+    const orgId = request.orgId;
     return await this.calendarService.addEvent({ orgId, data: { event: bookEventDto } });
   }
 
