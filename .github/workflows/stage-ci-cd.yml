@@ -113,7 +113,7 @@ jobs:
           aws configure set default.region ${{ secrets.DEPLOY_AWS_REGION }}
       - name: Upload Docker Compose File to S3
         run: |
-          aws s3 cp base/docker-compose-base.yml s3://${{ secrets.S3_BUCKET }}/docker-compose-base.yml
+          aws s3 cp base/docker-compose-base.yml s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-base.yml
       - name: Deploy Base to EC2 via SSM
         run: |
           TAGS="Key=tag:Role,Values=Converto-Base-Stage"
@@ -155,7 +155,7 @@ jobs:
           aws configure set default.region ${{ secrets.DEPLOY_AWS_REGION }}
       - name: Upload Docker Compose File to S3
         run: |
-          aws s3 cp crm/docker-compose-crm.yml s3://${{ secrets.S3_BUCKET_NA }}/docker-compose-crm.yml
+          aws s3 cp crm/docker-compose-crm.yml s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-crm.yml
       - name: Deploy CRM to EC2 via SSM
         run: |
           TAGS="Key=tag:Role,Values=Converto-CRM-Stage"
