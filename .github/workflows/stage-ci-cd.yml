@@ -104,7 +104,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.DEPLOY_AWS_ROLE_ARN }}
           aws-region: ${{ secrets.DEPLOY_AWS_REGION }}
       - uses: actions/checkout@v2
       - name: Show Updated Docker Compose File for Base
@@ -148,7 +148,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.DEPLOY_AWS_ROLE_ARN }}
           aws-region: ${{ secrets.DEPLOY_AWS_REGION }}
       - uses: actions/checkout@v2
       - name: Show Updated Docker Compose File for CRM
