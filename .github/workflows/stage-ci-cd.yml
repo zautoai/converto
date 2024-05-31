@@ -97,6 +97,7 @@ jobs:
 
   deploy-base:
     runs-on: ubuntu-latest
+    environment: stage
     needs: build-and-push
     steps:
       - uses: actions/checkout@v2
@@ -139,6 +140,7 @@ jobs:
 
   deploy-crm:
     runs-on: ubuntu-latest
+    environment: stage
     needs: build-and-push
     steps:
       - uses: actions/checkout@v2
