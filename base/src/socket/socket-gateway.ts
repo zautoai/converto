@@ -31,6 +31,7 @@ import { SiteService } from 'src/site/site.service';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { ContactsService } from 'src/contacts/contacts.service';
 import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
+import { ProspectJourneySocketService } from 'src/prospect-journey/prospect-journey-socket/prospect-journey-socket.service';
 
 @Injectable()
 @WebSocketGateway({
@@ -60,6 +61,7 @@ export class SocketGateway
     private siteService: SiteService,
     private contactsService: ContactsService,
     private prismaClientManager: PrismaClientManager,
+    private readonly prospectJourneySocketService: ProspectJourneySocketService
   ) {
     this.redisPublisher = new Redis({
       host: process.env.REDIS_IP,
@@ -185,6 +187,7 @@ export class SocketGateway
   async handleDisconnect(client: Socket) {
     console.log('Client: ' + client.id + ' got disconnected...');
     try {
+      this.prospectJourneySocketService.handleDisconnect(client);
       const { orgId } = await this.getClientInfo(client);
       const agentClient = await this.activeClientService.findByClient(
         orgId,
@@ -244,6 +247,7 @@ export class SocketGateway
   async handleConnection(client: Socket, ...args: any[]) {
     console.log('Client Connected..' + client.id);
     try {
+      this.prospectJourneySocketService.handleConnection(client);
       if (client.handshake.headers.authorization) {
         const authInfo = await this.getClientInfo(client);
 
