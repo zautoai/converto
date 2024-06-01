@@ -50,7 +50,7 @@ ENV REDIS_PORT=${REDIS_PORT}
 ENV NODE_ENV=${NODE_ENV}
 
 
-# Only copy over the built elements from the dist folder from the previous stage
+# Only copy over the built elements from the dist folder from the previous stage.
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist ./
 COPY --from=builder /usr/src/app/prisma ./prisma
