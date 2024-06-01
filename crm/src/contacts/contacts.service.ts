@@ -64,6 +64,7 @@ export class ContactsService {
           contactCustomFieldValues: {
             select: { value: true, customField: true },
           },
+          account: true
         },
       });
       const transformedContacts = contacts.map((contact) => ({
@@ -117,6 +118,7 @@ export class ContactsService {
           contactCustomFieldValues: {
             select: { value: true, customField: true },
           },
+          account: true
         },
       });
       if (!contact) {
@@ -195,8 +197,8 @@ export class ContactsService {
             contactId: contact.id,
           },
         });
-        await this.handleAccountContactMap(orgId, contact);
       }
+      await this.handleAccountContactMap(orgId, contact);
 
       // enriche
       if (contact.email) {
@@ -662,7 +664,11 @@ export class ContactsService {
         });
         return
       }
-      await this.accountService.create(orgId, { accountName });
+      const account = await this.accountService.create(orgId, { accountName });
+      await prisma.contact.update({
+        where: { id: contact.id },
+        data: { accountId: account.data.id },
+      });
       return
     }
     catch (e) {

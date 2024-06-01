@@ -87,6 +87,7 @@ export class AccountsService {
             }
             : {}),
         },
+        include: { Contact: true },
         take: limit,
         skip: skip,
         orderBy: {
@@ -135,6 +136,7 @@ export class AccountsService {
         where: {
           id,
         },
+        include: { Contact: true },
       });
 
       if (!account) {
