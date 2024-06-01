@@ -67,6 +67,7 @@ import { IcpCreatorComponent } from './icp-creator/icp-creator.component';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { IcpviewComponent } from './icpview/icpview.component';
 import { IntentScoringComponent } from './intent-scoring/intent-scoring.component';
+import { ChannelengagementComponent } from './dashboard/widgets/channelengagement/channelengagement.component';
 
 @NgModule({
   declarations: [
@@ -120,7 +121,8 @@ import { IntentScoringComponent } from './intent-scoring/intent-scoring.componen
     IcpComponent,
     IcpCreatorComponent,
     IcpviewComponent,
-    IntentScoringComponent
+    IntentScoringComponent,
+    ChannelengagementComponent
   ],
   imports: [
     PlatformLinkModule,
