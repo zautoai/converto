@@ -5,9 +5,6 @@
   <!-- PAGE -->
   <div class="page">
     <div class="">
-      <!-- Theme-Layout -->
-
-      <!-- CONTAINER OPEN -->
       <div class="col col-login mx-auto mt-7">
         <div class="text-center">
           <a routerLink="/zautodashboard"><img src="{{GLOBAL_IMAGES.zauto_logo_black}}" class="header-brand-img m-0"
@@ -18,28 +15,35 @@
         <div class="wrap-login100 p-6">
           <form [formGroup]="loginForm" (ngSubmit)="Submit()" class="login100-form validate-form">
             <h3 class="login100-form-title">Login</h3>
-            <div class="wrap-input100 validate-input input-group">
-              <a href="javascript:void(0)" class="input-group-text bg-white text-muted">
-                <i class="zmdi zmdi-email text-muted" aria-hidden="true"></i>
-              </a>
-              <input type="text" class="form-control" tabindex="1" placeholder="Email" autocomplete
-                formControlName="username" />
+            <div class="form-group mb-3">
+              <advanced-input 
+              [label]="'Email'"
+              [type]="'email'"
+              [placeholder]="'Your email ID'"
+              [size]="'md'"
+              [control]="email"
+              [isDisabled]="isLoading"
+              [errorMessages]="errorMessages.email"
+              ></advanced-input>
             </div>
-            <div class="input-group mb-4">
-              <a role="btn" class=" btn input-group-text bg-white text-muted btn-password" (click)="togglePassword('password', 'zmdi-eye', 'zmdi-eye-off')">
-                <i class="zmdi zmdi-eye-off text-muted" aria-hidden="true"></i>
-              </a>
-              <input [type]="'password'" tabindex="2" class="form-control"
-                placeholder="Password" autocomplete formControlName="password" id="password" />
+            <div class="form-group mb-3">
+              <advanced-input 
+              [label]="'Password'"
+              [type]="'password'"
+              [placeholder]="'Your password'"
+              [size]="'md'"
+              [control]="password"
+              [isDisabled]="isLoading"
+              [errorMessages]="errorMessages.password"
+              ></advanced-input>
             </div>
-          
-          
-            <button [disabled]="isSubmitting" type="submit"
-              class="btn btn-md btn-primary btn-block" autofocus>
-              <ng-container *ngIf="!isSubmitting; else spinner">
-                Login
-              </ng-container>
-            </button>
+            <advanced-button
+            [label]="'Login'"
+            [size]="'md'"
+            [classes]="'w-100'"
+            [type]="'submit'"
+            [isLoading]="isLoading"
+            ></advanced-button>
             <div class="text-center pt-3">
               <p class="text-dark mb-0">
                 Not a member?<a routerLink="/auth/register" class="text-primary ms-1">Sign UP</a>

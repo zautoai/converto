@@ -73,27 +73,15 @@
     </table>
     <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
 
-    <app-advanced-modals #deleteModal modalTitle="Delete Confirmation"
-      modalMessage="Are you sure you want to delete this contact?" modalConformMessage="Yes" modalCancelMessage="No"
+    <app-advanced-modals 
+      #deleteModal 
+      deleteModalTitle="Delete Confirmation"
+      deleteModalMessage="Are you sure you want to delete this contact?" 
+      deleteModalConformMessage="Yes" 
+      deleteModalCancelMessage="No"
       (confirm)="confirmDelete($event)">
     </app-advanced-modals>
-    <!-- <ng-template #deleteModal let-modal>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4><i class="fa fa-exclamation-triangle"></i> Delete Form</h4>
-          <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to delete ?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-primary" (click)="closeModal()">
-            Cancel
-          </button>
-          <button class="btn btn-danger" type="button">Yes</button>
-        </div>
-      </div>
-    </ng-template> -->
+    
 
     <ng-template #createUserOffcanvas let-offcanvas>
       <div class="offcanvas-header">

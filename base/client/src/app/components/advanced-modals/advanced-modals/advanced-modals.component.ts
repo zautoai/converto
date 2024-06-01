@@ -10,15 +10,16 @@ export class AdvancedModalsComponent {
 
   entity: any | null = null;
   isLoading: boolean = false
-  @Input() modalTitle: string = '';
-  @Input() modalMessage: string = '';
-  @Input() modalConformMessage: string = '';
-  @Input() modalCancelMessage: string = '';
+  @Input() deleteModalTitle: string = '';
+  @Input() deleteModalMessage: string = '';
+  @Input() deleteModalConformMessage: string = '';
+  @Input() deleteModalCancelMessage: string = '';
 
   @Output() confirm = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
 
   @ViewChild('deleteModal') deleteModal?: ElementRef
+  @ViewChild('errorModal') errorModal?: ElementRef
 
 
   constructor(private readonly modalService: NgbModal) {
@@ -27,6 +28,7 @@ export class AdvancedModalsComponent {
 
   open(entity?: any) {
     this.entity = entity;
+    this.isLoading = false;
     this.modalService.open(this.deleteModal, {
       centered: true,
       backdrop: 'static',
@@ -34,6 +36,7 @@ export class AdvancedModalsComponent {
     });
   }
   onConfirm() {
+    this.isLoading = true;
     this.confirm.emit(this.entity);
   }
 

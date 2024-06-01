@@ -8,6 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ComponentsModule } from '../components/components.module';
 
 
 @NgModule({
@@ -23,6 +24,7 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
     AuthenticationRoutingModule,
     NgbModule,
     FormsModule,
+    ComponentsModule,
     ReactiveFormsModule,
   ],
   providers: [
