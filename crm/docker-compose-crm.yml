@@ -7,3 +7,4 @@ services:
     ports:
       - "3031:3001"
     restart: always
+
