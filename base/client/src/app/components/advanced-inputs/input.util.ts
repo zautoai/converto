@@ -1,4 +1,4 @@
-import { FormGroup } from "@angular/forms";
+import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn } from "@angular/forms";
 
 export function markFormGroupAsDirty(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {
@@ -6,13 +6,16 @@ export function markFormGroupAsDirty(formGroup: FormGroup) {
     });
 }
 
-export function passwordMatchValidator(formGroup: FormGroup) {
-  const password = formGroup.get('password');
-  const confirmPassword = formGroup.get('confirmPassword');
 
-  if (password && confirmPassword && (password?.value !== confirmPassword?.value)) {
-    confirmPassword?.setErrors({ mismatch: true });
+export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const password = control.get('password');
+  const confirmPassword = control.get('confirm_password');
+
+  if (password && confirmPassword && password.value !== confirmPassword.value) {
+    confirmPassword.setErrors({ mismatch: true });
+    return { mismatch: true }; 
   } else {
     confirmPassword?.setErrors(null);
   }
-}
+  return null;
+};
