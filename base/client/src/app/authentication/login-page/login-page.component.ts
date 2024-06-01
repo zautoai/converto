@@ -21,7 +21,7 @@ export class LoginPageComponent implements OnInit {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
   isLoading:boolean = false;
 
-  @ViewChild(AdvancedModalsComponent) confirgModal!:AdvancedModalsComponent;
+  @ViewChild(AdvancedModalsComponent) alertModal!:AdvancedModalsComponent;
 
   errorMessages = {
     email: {
@@ -60,7 +60,8 @@ export class LoginPageComponent implements OnInit {
           this.sweetAlert.success("Email Account Verified!","You can now enjoy full access to our platform.")
         },(error)=>{
           console.log(error);
-          this.sweetAlert.error("Error",error.error.message);
+          this.alertModal.modalMessage = error.error.message;
+          this.alertModal.open();
         });
 
       }
@@ -105,7 +106,8 @@ export class LoginPageComponent implements OnInit {
             });
           }
           else {
-            this.sweetAlert.error("Error", _error.error.message);
+            this.alertModal.modalMessage = _error.error.message;
+            this.alertModal.open();
           }
           this.isLoading = false;
           this.loginForm.enable();
