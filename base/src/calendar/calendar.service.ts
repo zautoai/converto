@@ -1,8 +1,7 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { AvailabilityScheduleService } from 'src/availability-schedule/availability-schedule.service';
 import { BaseService } from 'src/common/services/base.service';
 import { CalendarProvider } from './calendar.provider';
-import { BookEventDto } from './dto/book-event.dto';
 import { CalendarName } from './enum/calendar.enum';
 import { CalendarEvent } from './interface/event.interface';
 import { EventSlot } from './interface/slot.interface';
@@ -29,7 +28,7 @@ export class CalendarService extends BaseService {
             return { url: authUrl }
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
     async exchangeCodeForAccessToken(serviceParams: ServiceParams<{ calendarName: string, code: string }>): Promise<any> {
@@ -39,7 +38,7 @@ export class CalendarService extends BaseService {
             return await calendar.exchangeCodeForAccessToken({ orgId, data: { code } });
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
     async exchangeRefreshTokenForAccessToken(serviceParams: ServiceParams<{ calendarName: string, refreshToken: string }>): Promise<any> {
@@ -49,7 +48,7 @@ export class CalendarService extends BaseService {
             return await calendar.exchangeRefreshTokenForAccessToken({ orgId, data: { refreshToken } });
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
@@ -60,7 +59,7 @@ export class CalendarService extends BaseService {
             return await calendar.getAccessToken(orgId);
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
     async revokeAccess(serviceParams: ServiceParams<{ calendarName: string }>): Promise<any> {
@@ -70,7 +69,7 @@ export class CalendarService extends BaseService {
             return await calendar.revokeAccess(orgId);
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
@@ -81,7 +80,7 @@ export class CalendarService extends BaseService {
             return await calendar.getProfile(orgId);
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
@@ -96,7 +95,7 @@ export class CalendarService extends BaseService {
             return await calendar.getCalendars(orgId);
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
@@ -109,7 +108,7 @@ export class CalendarService extends BaseService {
             return calendarId;
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
@@ -124,7 +123,7 @@ export class CalendarService extends BaseService {
         }
         catch (err) {
             this.logger.error(err);
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
@@ -137,7 +136,7 @@ export class CalendarService extends BaseService {
             return await calendar.getEventById({ orgId, data: { calendarId, eventId } });
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
@@ -150,7 +149,7 @@ export class CalendarService extends BaseService {
             return await calendar.addEvent({ orgId, data: { calendarId, event } });
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
@@ -165,7 +164,7 @@ export class CalendarService extends BaseService {
             return await calendar.updateEvent({ orgId, data: { calendarId, eventId, event } });
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
@@ -180,7 +179,7 @@ export class CalendarService extends BaseService {
             return await calendar.removeEvent({ orgId, data: { calendarId, eventId } });
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
@@ -193,7 +192,7 @@ export class CalendarService extends BaseService {
             return await calendar.getFreeBusy({ orgId, data: { calendarId, startDate, endDate } });
         }
         catch (err) {
-            throw new InternalServerErrorException(err.message);
+            throw new BadRequestException(err.message);
         }
     }
 
