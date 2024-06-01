@@ -26,23 +26,23 @@
                 formControlName="username" />
             </div>
             <div class="input-group mb-4">
-              <a role="btn" class=" btn input-group-text bg-white text-muted btn-password" (click)="togglePassword('password', 'zmdi-eye', 'zmdi-eye-off')">
+              <a role="btn" class=" btn input-group-text bg-white text-muted btn-password"
+                (click)="togglePassword('password', 'zmdi-eye', 'zmdi-eye-off')">
                 <i class="zmdi zmdi-eye-off text-muted" aria-hidden="true"></i>
               </a>
-              <input [type]="'password'" tabindex="2" class="form-control"
-                placeholder="Password" autocomplete formControlName="password" id="password" />
+              <input [type]="'password'" tabindex="2" class="form-control" placeholder="Password" autocomplete
+                formControlName="password" id="password" />
             </div>
-          
-          
-            <button [disabled]="isSubmitting" type="submit"
-              class="btn btn-md btn-primary btn-block" autofocus>
+
+
+            <button [disabled]="isSubmitting" type="submit" class="btn btn-md btn-primary btn-block" autofocus>
               <ng-container *ngIf="!isSubmitting; else spinner">
                 Login
               </ng-container>
             </button>
             <div class="text-center pt-3">
               <p class="text-dark mb-0">
-                Not a member?<a routerLink="/auth/register" class="text-primary ms-1">Sign UP</a>
+                Not a member?<a routerLink="/auth/register" class="text-primary ms-1">Sign up</a>
               </p>
             </div>
             <div class="text-center pt-3">
@@ -65,5 +65,3 @@
     <span class="visually-hidden" role="status">Loading...</span>
   </div>
 </ng-template>
-
-

@@ -92,11 +92,11 @@ export class HeaderComponent implements OnInit {
   }
 
   
-  toggleSidebar(){
-    if ((this.navServices.collapseSidebar = true)) {
-      document.querySelector("body")?.classList.toggle("sidenav-toggled")
-    }
-  }
+  toggleSidebar() {
+    this.navServices.collapseSidebar = !this.navServices.collapseSidebar;
+    document.querySelector("body")?.classList.toggle("sidenav-toggled", this.navServices.collapseSidebar);
+}
+
 
   open(content:any) {
     this.modalService.open(content, {backdrop : 'static' , windowClass : 'modalCusSty', size: 'lg' })

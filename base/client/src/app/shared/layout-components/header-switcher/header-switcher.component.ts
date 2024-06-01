@@ -38,8 +38,8 @@ export class HeaderSwitcherComponent implements OnInit {
 
 
   toggleSidebar(){
-    if ((this.navServices.collapseSidebar = true)) {
-      document.querySelector("body")?.classList.toggle("sidenav-toggled")
+     if ((this.navServices.collapseSidebar = true)) {
+       document.querySelector("body")?.classList.toggle("sidenav-toggled")
     }
   }
 
