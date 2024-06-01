@@ -73,8 +73,11 @@
     </table>
     <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
 
-    <ng-template #deleteModal let-modal>
-      <!--  SMALL MODAL -->
+    <app-advanced-modals #deleteModal modalTitle="Delete Confirmation"
+      modalMessage="Are you sure you want to delete this contact?" modalConformMessage="Yes" modalCancelMessage="No"
+      (confirm)="confirmDelete($event)">
+    </app-advanced-modals>
+    <!-- <ng-template #deleteModal let-modal>
       <div class="modal-content">
         <div class="modal-header">
           <h4><i class="fa fa-exclamation-triangle"></i> Delete Form</h4>
@@ -90,7 +93,7 @@
           <button class="btn btn-danger" type="button">Yes</button>
         </div>
       </div>
-    </ng-template>
+    </ng-template> -->
 
     <ng-template #createUserOffcanvas let-offcanvas>
       <div class="offcanvas-header">

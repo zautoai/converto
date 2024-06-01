@@ -1,0 +1,15 @@
+<ng-template #deleteModal let-modal>
+
+    <div class="modal-content rounded-4 shadow">
+        <div class="modal-body p-4 text-center">
+            <h5 class="mb-0">{{ modalTitle }}</h5>
+            <p class="mb-0">{{ modalMessage }}</p>
+        </div>
+        <div class="modal-footer flex-nowrap p-0">
+            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-right"
+                (click)="onConfirm()"><strong>{{modalConformMessage}}</strong></button>
+            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0"
+                (click)="onCancel()">{{modalCancelMessage}}</button>
+        </div>
+    </div>
+</ng-template>

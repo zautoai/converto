@@ -4,13 +4,15 @@ import { UpdateIcpDto } from './dto/update-icp.dto';
 import { BaseService } from 'src/common/services/base.service';
 import { IcpMicroService } from 'src/microservices/crm_service/icp.service';
 import { IcpScoreGenerator } from 'src/assistants/services/icp-score-generator.service';
+import { ContactService } from 'src/microservices/crm_service/contact.service';
 
 @Injectable()
 export class IcpService extends BaseService {
 
   constructor(
     private readonly icpService: IcpMicroService,
-    private readonly icpScoreGenerator: IcpScoreGenerator
+    private readonly icpScoreGenerator: IcpScoreGenerator,
+    private readonly contactService: ContactService,
   ) {
     super();
   }
@@ -20,7 +22,7 @@ export class IcpService extends BaseService {
       await this.handleException(
         await this.icpService.createIcp(orgId, createIcpDto),
       );
-
+      await this.addOrUpdateIcpScore(orgId);
     }
     catch (e) {
       console.log(e);

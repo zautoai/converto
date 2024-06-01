@@ -1,9 +1,9 @@
-import { Component, ElementRef, Input, OnInit, ViewChild , ChangeDetectorRef, TemplateRef,} from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild, ChangeDetectorRef, TemplateRef, } from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
 import { FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
-import { NgbDropdownConfig,NgbDropdownModule, NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
- 
+import { NgbDropdownConfig, NgbDropdownModule, NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+
 import { NotificationService } from '../../shared/services/notification.service';
 import { RestService } from '../../shared/services/rest.service';
 import { SweetAlertService } from '../../shared/services/sweet-alart.service';
@@ -12,20 +12,20 @@ import { API } from '../../config/endpoint.config';
 import { error } from 'console';
 import { PaginationData } from 'src/app/common/intefaces';
 import { ActivatedRoute, Router } from '@angular/router';
-  
+import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
+
 
 @Component({
   selector: 'app-contacts',
   templateUrl: './contacts.component.html',
   styleUrls: ['./contacts.component.scss'],
-  
+
 
 })
 export class ContactsComponent implements OnInit {
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
-  @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
   @Input() chatBotWidget!: ChatBotWidgetsComponent;
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
 
@@ -35,7 +35,7 @@ export class ContactsComponent implements OnInit {
   selectedUser: any = undefined;
   showActionMenu = false;
   isEdit: boolean = false;
-  photo1:any="https://imgs.search.brave.com/Mvm4VXGBy83NyhAuuehkrHYV0s4BvjtY6ZwR2dXCGro/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9ncGNh/dGFseXNpcy5ibG9i/LmNvcmUud2luZG93/cy5uZXQvZ3Bob3N0/ZWRjb250ZW50LXBy/b2Qvd1pVNzFpND1f/S2FtYXRoX05pa2hp/bF81MDB4NTAwLmpw/Zw" 
+  photo1: any = "https://imgs.search.brave.com/Mvm4VXGBy83NyhAuuehkrHYV0s4BvjtY6ZwR2dXCGro/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9ncGNh/dGFseXNpcy5ibG9i/LmNvcmUud2luZG93/cy5uZXQvZ3Bob3N0/ZWRjb250ZW50LXBy/b2Qvd1pVNzFpND1f/S2FtYXRoX05pa2hp/bF81MDB4NTAwLmpw/Zw"
   Form: FormGroup;
   errorFeedback: any = { title: '', describe: '' };
   showDescription: boolean = true;
@@ -43,17 +43,19 @@ export class ContactsComponent implements OnInit {
   showScript: boolean = false;
   currentPage: number = 1;
   totalPages: number = 1;
-  hoveredData: any=null;
+  hoveredData: any = null;
   isHovered: any;
   itemPerPage: number = 10;
   submittedData: any[] = [];
   selectedData: any = '';
   limit = 5;
   totalItems: number = 0;
-https: any;
-isLeadScore: any=80;
+  https: any;
+  isLeadScore: any = 80;
   clickedData: any;
 
+  //Delete Modal
+  @ViewChild(AdvancedModalsComponent) deleteModal!: AdvancedModalsComponent;
 
 
   constructor(
@@ -94,7 +96,7 @@ isLeadScore: any=80;
       this.limit = +params['limit'] || this.limit;
       this.getContacts();
       this.onPageChange({ page: this.currentPage })
-      console.log("test",this.submittedData)
+      console.log("test", this.submittedData)
     });
   }
 
@@ -110,7 +112,7 @@ isLeadScore: any=80;
         (response: any) => {
           this.submittedData = response.data;
           this.totalItems = response.total
-          console.log("accountdata",this.submittedData)
+          console.log("accountdata", this.submittedData)
         },
         (error) => {
           console.error(error);
@@ -426,21 +428,9 @@ isLeadScore: any=80;
   // }
 
 
-
-  delete = (data: any) => {
-    this.user = data;
-
-    this.sweetAlertService.warning(
-      'Delete user',
-      'Are you sure you want to delete ?',
-      ['Delete', 'Cancel'],
-      (confirm: any) => {
-        if (confirm.isConfirmed) {
-          this.confirmDelete(data);
-        }
-      },
-    );
-  };
+  delete(data: any) {
+    this.deleteModal.open(data)
+  }
 
 
   confirmDelete = (data: any) => {
@@ -473,7 +463,7 @@ isLeadScore: any=80;
   onPageChange(event: any) {
     this.currentPage = event.page;
     this.getContacts()
-    
+
   }
   toggleActionMenu() {
     this.showActionMenu = !this.showActionMenu;
@@ -481,7 +471,7 @@ isLeadScore: any=80;
 
 
   getCountryFlagClass(countryCode: string): string {
-    
+
     if (countryCode) {
       // const countrysCode = countryCode.trim()
       const countryCodes: { [key: string]: string } = {
@@ -490,13 +480,13 @@ isLeadScore: any=80;
         australia: 'au'
         // Add more country codes as needed
       };
-  
+
       return countryCodes[countryCode.toLowerCase()] || '';
     } else {
       return ''; // Return an empty string if countryCode is falsy
     }
   }
-  
+
 
 
   resetErrorFeedback() {
@@ -517,22 +507,23 @@ isLeadScore: any=80;
     Validators.required,
   ]);
   onMouseEnter(data: any) {
-    if(data){
-    this.clickedData=data;
-    console.log("hovereddata",this.clickedData)
+    if (data) {
+      this.clickedData = data;
+      console.log("hovereddata", this.clickedData)
     }
+  }
+
+  openModal(data: any) {
+    if (this.hoveredData) {
+      const modalRef = this.modalService.open(this.modalContent, {
+        ariaLabelledBy: 'modal-title',
+        ariaDescribedBy: 'modal-body'
+      });
+
+      modalRef.componentInstance.hoveredData = this.hoveredData;
+
     }
+  }
+}
 
-    openModal(data:any ) {
-      if (this.hoveredData) {
-        const modalRef = this.modalService.open(this.modalContent, {
-          ariaLabelledBy: 'modal-title',
-          ariaDescribedBy: 'modal-body'
-        });
-    
-        modalRef.componentInstance.hoveredData = this.hoveredData;
-    
-      } 
-    }}
 
-    
