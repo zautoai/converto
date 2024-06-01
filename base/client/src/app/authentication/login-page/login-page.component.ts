@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -10,6 +10,7 @@ import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
 import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
+import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
 
 @Component({
   selector: 'app-login-page',
@@ -19,6 +20,8 @@ import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.u
 export class LoginPageComponent implements OnInit {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
   isLoading:boolean = false;
+
+  @ViewChild(AdvancedModalsComponent) confirgModal!:AdvancedModalsComponent;
 
   errorMessages = {
     email: {
@@ -63,7 +66,6 @@ export class LoginPageComponent implements OnInit {
       }
     });
   }
-
 
   onLogin() {
     this.isLoading = true;
