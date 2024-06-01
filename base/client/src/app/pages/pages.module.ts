@@ -68,6 +68,7 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { IcpviewComponent } from './icpview/icpview.component';
 import { IntentScoringComponent } from './intent-scoring/intent-scoring.component';
 import { ChannelengagementComponent } from './dashboard/widgets/channelengagement/channelengagement.component';
+import { ComponentsModule } from '../components/components.module';
 
 @NgModule({
   declarations: [
@@ -147,7 +148,8 @@ import { ChannelengagementComponent } from './dashboard/widgets/channelengagemen
     NgApexchartsModule,
     NgbProgressbarModule,
     NgbNavModule,
-    NgbAccordionModule
+    NgbAccordionModule,
+    ComponentsModule
   ],
 })
 export class PagesModule { }

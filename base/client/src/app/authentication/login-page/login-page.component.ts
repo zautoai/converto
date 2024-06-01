@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { ActivatedRoute } from '@angular/router';
 import { API } from 'src/app/config/endpoint.config';
-import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
-import { togglePassword} from 'src/app/common/utils'
+import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
+import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
 
 @Component({
   selector: 'app-login-page',
@@ -18,32 +18,37 @@ import { togglePassword} from 'src/app/common/utils'
 })
 export class LoginPageComponent implements OnInit {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
-  errorMessage = '';
-  _error: any;
-  email: string = '';
-  password: string = '';
-  togglePassword = togglePassword;
+  isLoading:boolean = false;
 
-  isSubmitting:boolean = false;
+  @ViewChild('errorModal') errorModal!:AdvancedModalsComponent;
+  @ViewChild('accountVerificationModal') accountVerificationModal!:AdvancedModalsComponent;
+
+  errorMessages = {
+    email: {
+      required: 'Email is required',
+      email: 'Invalid email format'
+    },
+    password: {
+      required: 'Password is required'
+    }
+  };
+  loginForm:FormGroup = new FormGroup({
+    email: new FormControl(null, [Validators.required, Validators.email]),
+    password: new FormControl(null, [Validators.required]),
+  });
+  
 
   constructor(
     public authservice: AuthService,
     private router: Router,
-    private formBuilder: FormBuilder,
     public restService: RestService,
     private notifService: NotificationService,
     private route: ActivatedRoute,
-    private sweetAlert:SweetAlertService,
     private avatarService:AvatarService,
   ) { 
   }
 
   ngOnInit(): void {
-    this.loginForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-    });
-
     this.route.queryParamMap.subscribe(querys=>{
       const token = querys.get('token');
       if(token)
@@ -52,112 +57,83 @@ export class LoginPageComponent implements OnInit {
         this.restService.get(API.main.register + "/verify","")
         .subscribe((response)=>{
           console.log(response);
-          this.sweetAlert.success("Email Account Verified!","You can now enjoy full access to our platform.")
+          this.errorModal.modalTitle = 'Email Account Verified';
+          this.errorModal.modalMessage = "Email Account Verified!";
+          this.errorModal.open();
         },(error)=>{
           console.log(error);
-          this.sweetAlert.error("Error",error.error.message);
+          this.errorModal.modalTitle = 'Email Account Not Verified';
+          this.errorModal.modalMessage = error.error.message;
+          this.errorModal.open();
         });
 
       }
     });
   }
 
-  clearErrorMessage() {
-    this.errorMessage = '';
-    this._error = { name: '', message: '' };
-  }
-
-  login() {
-    this.clearErrorMessage();
-    this.isSubmitting = true;
-    this.loginForm.disable();
-    if (this.validateForm(this.email, this.password)) {
-      this.restService
-        .auth(this.email, this.password)
-        .subscribe({next: (response: any) => {
+  onLogin() {
+    this.isLoading = true;
+    if (this.loginForm.valid) {
+      this.restService.auth(this.email.value, this.password.value).subscribe({
+        next: (response: any) => {
           localStorage.setItem('token', response.accessToken);
           this.authservice.setUser(response.user);
           this.notifService.showInfo('Welcome to Converto!');
-          if(!response.avatar)
-          {
+          if (!response.avatar) {
             this.router.navigate(['/setup']);
           }
-          else
-          {            
+          else {
             this.avatarService.setAvatarData(response.avatar);
-            if(response.avatar.status == 'ACTIVE')
-            {
+            if (response.avatar.status == 'ACTIVE') {
               this.router.navigate(['/dashboard']);
             }
-            else
-            {
+            else {
               this.router.navigate(['/setup']);
             }
           }
-          this.isSubmitting = false;
-          this.loginForm.enable();
-        }, error: (_error: any) => {
-          this._error = _error;
-          if(_error.error.message == 'Account not verified')
-          {
-            this.sweetAlert.warning("Verify email account",`✉ ${this.email}`,['Resend mail'],(result)=>{
-              if (result.isConfirmed) {
-                console.log('User clicked OK');
-                this.restService.post(API.main.register+`/resendVerification`,{email:this.email})
-                .subscribe((response:any)=>{
-                  console.log(response);
-                  
-                },(error)=>{
-                  console.log(error);
-                });
-              }
-            });
+          this.isLoading = false;
+        },
+        error: (_error: any) => {
+          if (_error.error.message == 'Account not verified') {
+            this.errorModal.modalTitle = 'Account not verified';
+            this.errorModal.modalMessage = 'Please verify your email account';
+            this.accountVerificationModal.open();
           }
-          else
-          {
-            this.sweetAlert.error("Error",_error.error.message);
+          else {
+            this.errorModal.modalTitle = 'Login Failed';
+            this.errorModal.modalMessage = _error.error.message;
+            this.errorModal.open();
           }
-          this.password = '';
-          this.isSubmitting = false;
+          this.isLoading = false;
           this.loginForm.enable();
-        }});
+        }
+      });
+    }
+    else
+    {
+      markFormGroupAsDirty(this.loginForm);
     }
   }
 
-  validateForm(email: string, password: string) {
-    if (email.length === 0) {
-      this.errorMessage = 'please enter email id';
-      return false;
-    }
+  onVerifySubmit(event:any)
+  {
+    this.restService.post(API.main.register + `/resendVerification`, { email: this.email })
+    .subscribe((response: any) => {
+      console.log(response);
 
-    if (password.length === 0) {
-      this.errorMessage = 'please enter password';
-      return false;
-    }
-
-    if (password.length < 6) {
-      this.errorMessage = 'password should be at least 6 char';
-      return false;
-    }
-
-    this.errorMessage = '';
-    return true;
+    }, (error) => {
+      console.log(error);
+    });
   }
-
-  //angular
-  public loginForm!: FormGroup;
-  public error: any = '';
 
   get form() {
     return this.loginForm.controls;
   }
-
-  Submit() {
-    this.clearErrorMessage();
-    this.email = this.loginForm.get('username')?.value
-    this.password = this.loginForm.get('password')?.value
-
-    this.login();
+  get email() {
+    return this.loginForm.get('email') as FormControl;
+  }
+  get password() {
+    return this.loginForm.get('password') as FormControl;
   }
 
 }
