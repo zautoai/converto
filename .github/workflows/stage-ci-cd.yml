@@ -101,7 +101,7 @@ jobs:
     environment: stage
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
@@ -116,6 +116,7 @@ jobs:
           sudo apt-get install -y awscli
       - name: Upload Docker Compose File to S3
         run: |
+          set -x
           aws s3 cp base/docker-compose-base.yml s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-base.yml
       - name: Deploy Base to EC2 via SSM
         run: |
@@ -148,7 +149,7 @@ jobs:
     environment: stage
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.DEPLOY_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.DEPLOY_AWS_SECRET_ACCESS_KEY }}
@@ -163,6 +164,7 @@ jobs:
           sudo apt-get install -y awscli
       - name: Upload Docker Compose File to S3
         run: |
+          set -x
           aws s3 cp crm/docker-compose-crm.yml s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-crm.yml
       - name: Deploy CRM to EC2 via SSM
         run: |
