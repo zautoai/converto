@@ -7,7 +7,6 @@ import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
-import { togglePassword } from 'src/app/common/utils';
 import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
 
 @Component({
@@ -37,12 +36,13 @@ export class RegisterComponent implements OnInit {
       requiredTrue: 'You must agree to the terms and conditions'
     }
   };
+  errorMessage:string | null = null;
 
   registrForm:FormGroup = new FormGroup({
     name: new FormControl(null, [Validators.required, Validators.minLength(3)]),
     email: new FormControl(null, [Validators.required, Validators.email]),
     password: new FormControl(null, [Validators.required, Validators.minLength(6)]),
-    terms: new FormControl(false, [Validators.requiredTrue])
+    terms: new FormControl(false, [])
   });
 
   constructor(public authService: AuthService,
@@ -70,20 +70,20 @@ export class RegisterComponent implements OnInit {
 
   submit() {
     this.isLoading = true;
+    this.errorMessage = null;
     if (this.registrForm.valid) {
       this.restService.post(API.main.register, this.registrForm.value)
         .subscribe({
           next: (response: any) => {
-            console.log(response)
-            this.sweetAlert.success("Welcome to ZautoAI!","Please check and verify your account.");
+            // this.sweetAlert.success("Welcome to ZautoAI!","Please check and verify your account.");
+            this.notifService.showSuccess("Welcome to Converto!, Please check and verify your account.")
             this.router.navigate(['']);
+            this.isLoading = false;
           }, error: (error) => {
-            console.log(error)
-            const _error = error.error;
-            this.sweetAlert.error("Error",_error.message);
+            this.errorMessage = error.error.message;
             this.isLoading = false;
           }
-        })
+        });
     } 
     else 
     {
