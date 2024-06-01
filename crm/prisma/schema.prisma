@@ -68,6 +68,9 @@ model Contact {
   leadSource               String?
   status                   String?
   conversationId           String?
+  visitorId                String?
+  accountId                String?
+  account                  Account?                  @relation(fields: [accountId], references: [id])
   createdAt                DateTime                  @default(now())
   modifiedAt               DateTime                  @updatedAt
   contactTag               ContactTag[]
@@ -169,6 +172,7 @@ model Account {
   modifiedAt      DateTime    @updatedAt
   parentAccount   Account?    @relation("ParentAccount", fields: [parentAccountId], references: [id])
   subAccounts     Account[]   @relation("ParentAccount")
+  Contact         Contact[]
 }
 
 model AccountBasedMarketingTarget {

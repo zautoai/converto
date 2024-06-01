@@ -67,7 +67,7 @@ export class SettingsComponent implements OnInit, AfterContentInit {
   }
 
   getAgent() {
-    this.restService.get(API.main.agent,this.botId)
+    this.restService.get(API.main.agent,this.botId + "/primary")
       .subscribe((response: any) => {
         this.agentData = {...response};
         this.currentSettings = {...response};

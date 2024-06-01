@@ -87,6 +87,7 @@ export class AccountsService {
             }
             : {}),
         },
+        include: { Contact: true },
         take: limit,
         skip: skip,
         orderBy: {
@@ -135,6 +136,7 @@ export class AccountsService {
         where: {
           id,
         },
+        include: { Contact: true },
       });
 
       if (!account) {
@@ -487,6 +489,23 @@ export class AccountsService {
         message: 'ABM fetched successfully',
         data: abm,
       };
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
+  }
+
+  async getAccountByName(orgId: string, name: string) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    try {
+      const account = await prisma.account.findFirst({
+        where: {
+          accountName: name
+        }
+      })
+      return account
     } catch (error) {
       throw error
     } finally {
