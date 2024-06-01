@@ -1,5 +1,6 @@
 import { Component, Input, EventEmitter, Output, ViewChild, ElementRef } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ModalTypes } from '../types';
 
 @Component({
   selector: 'app-advanced-modals',
@@ -10,16 +11,17 @@ export class AdvancedModalsComponent {
 
   entity: any | null = null;
   isLoading: boolean = false
-  @Input() deleteModalTitle: string = '';
-  @Input() deleteModalMessage: string = '';
-  @Input() deleteModalConformMessage: string = '';
-  @Input() deleteModalCancelMessage: string = '';
+  @Input() modalSize: 'sm' | 'md' | 'lg' | 'xl' = 'md';
+  @Input() modalType: ModalTypes = 'delete'
+  @Input() modalTitle: string = '';
+  @Input() modalMessage: string = '';
+  @Input() modalConformMessage: string = '';
+  @Input() modalCancelMessage: string = '';
 
   @Output() confirm = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
 
-  @ViewChild('deleteModal') deleteModal?: ElementRef
-  @ViewChild('errorModal') errorModal?: ElementRef
+  @ViewChild('contentModal') contentModal?: ElementRef
 
 
   constructor(private readonly modalService: NgbModal) {
@@ -29,9 +31,10 @@ export class AdvancedModalsComponent {
   open(entity?: any) {
     this.entity = entity;
     this.isLoading = false;
-    this.modalService.open(this.deleteModal, {
+    this.modalService.open(this.contentModal, {
       centered: true,
       backdrop: 'static',
+      size: this.modalSize,
       backdropClass: 'blur-backdrop' // Apply blur to the backdrop
     });
   }

@@ -1,0 +1,1 @@
+export type ModalTypes = 'delete' | 'error' | 'success' | 'warning' | 'info' | 'confirm';

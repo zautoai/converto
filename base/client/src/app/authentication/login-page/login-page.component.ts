@@ -9,6 +9,7 @@ import { API } from 'src/app/config/endpoint.config';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
+import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
 
 @Component({
   selector: 'app-login-page',
@@ -64,54 +65,54 @@ export class LoginPageComponent implements OnInit {
   }
 
 
-  login() {
+  onLogin() {
     this.isLoading = true;
     if (this.loginForm.valid) {
-      this.restService.auth(this.email.value, this.password.value).subscribe({next: (response: any) => {
+      this.restService.auth(this.email.value, this.password.value).subscribe({
+        next: (response: any) => {
           localStorage.setItem('token', response.accessToken);
           this.authservice.setUser(response.user);
           this.notifService.showInfo('Welcome to Converto!');
-          if(!response.avatar)
-          {
+          if (!response.avatar) {
             this.router.navigate(['/setup']);
           }
-          else
-          {            
+          else {
             this.avatarService.setAvatarData(response.avatar);
-            if(response.avatar.status == 'ACTIVE')
-            {
+            if (response.avatar.status == 'ACTIVE') {
               this.router.navigate(['/dashboard']);
             }
-            else
-            {
+            else {
               this.router.navigate(['/setup']);
             }
           }
           this.isLoading = false;
-        }, 
+        },
         error: (_error: any) => {
-          if(_error.error.message == 'Account not verified')
-          {
-            this.sweetAlert.warning("Verify email account",`✉ ${this.email}`,['Resend mail'],(result)=>{
+          if (_error.error.message == 'Account not verified') {
+            this.sweetAlert.warning("Verify email account", `✉ ${this.email}`, ['Resend mail'], (result) => {
               if (result.isConfirmed) {
                 console.log('User clicked OK');
-                this.restService.post(API.main.register+`/resendVerification`,{email:this.email})
-                .subscribe((response:any)=>{
-                  console.log(response);
-                  
-                },(error)=>{
-                  console.log(error);
-                });
+                this.restService.post(API.main.register + `/resendVerification`, { email: this.email })
+                  .subscribe((response: any) => {
+                    console.log(response);
+
+                  }, (error) => {
+                    console.log(error);
+                  });
               }
             });
           }
-          else
-          {
-            this.sweetAlert.error("Error",_error.error.message);
+          else {
+            this.sweetAlert.error("Error", _error.error.message);
           }
           this.isLoading = false;
           this.loginForm.enable();
-        }});
+        }
+      });
+    }
+    else
+    {
+      markFormGroupAsDirty(this.loginForm);
     }
   }
 
@@ -123,10 +124,6 @@ export class LoginPageComponent implements OnInit {
   }
   get password() {
     return this.loginForm.get('password') as FormControl;
-  }
-
-  Submit() {
-    this.login();
   }
 
 }
