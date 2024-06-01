@@ -127,22 +127,28 @@ jobs:
         run: |
           set -x
           aws s3 cp base/docker-compose-base.yml s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-base.yml
-      - name: Deploy Base to EC2 via SSM
+      - name: Verify Instances for Base Deployment
         run: |
           set -x
           TAGS="Key=tag:Role,Values=Converto-Base-Stage"
-          INSTANCE_IDS=$(aws ec2 describe-instances --filters Name=tag:Role,Values=Converto-Base-Stage Name=tag:aws:autoscaling:groupName --query "Reservations[].Instances[].InstanceId" --output text)
+          INSTANCE_IDS=$(aws ec2 describe-instances --filters Name=tag:Role,Values=Converto-Base-Stage --query "Reservations[].Instances[].InstanceId" --output text)
           if [ -z "$INSTANCE_IDS" ]; then
-            echo "Deploying to single instance"
-            TAGS="Key=tag:Role,Values=Converto-Base-Stage"
+            echo "No instances found with tag Converto-Base-Stage"
+            exit 1
           else
-            echo "Deploying to auto-scaling group"
-            TAGS="Key=tag:aws:autoscaling:groupName,Values=Converto-Base-Stage-ASG"
+            echo "Instances found: $INSTANCE_IDS"
           fi
+      - name: Deploy Base to EC2 via SSM
+        run: |
+          set -x
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
-            --targets "$TAGS" \
-            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.LOGIN_GITHUB_USER }} -p ${{ secrets.LOGIN_GITHUB_TOKEN }}", "aws s3 cp s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-base.yml /home/ubuntu/converto/docker-compose-base.yml", "cd /home/ubuntu/converto", "docker-compose -f docker-compose-base.yml pull", "docker-compose -f docker-compose-base.yml up -d", "docker image prune -a -f"]'
+            --targets "Key=tag:Role,Values=Converto-Base-Stage" \
+            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.LOGIN_GITHUB_USER }} -p ${{ secrets.LOGIN_GITHUB_TOKEN }}", "aws s3 cp s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-base.yml /home/ubuntu/converto/docker-compose-base.yml", "cd /home/ubuntu/converto", "docker-compose -f docker-compose-base.yml pull", "docker-compose -f docker-compose-base.yml up -d", "docker image prune -a -f"]' \
+            --timeout-seconds 600 \
+            --max-concurrency "50" \
+            --max-errors "0" \
+            --region ${{ secrets.DEPLOY_AWS_REGION }}
 
       - name: Check Health of Base Application Container
         run: |
@@ -176,22 +182,28 @@ jobs:
         run: |
           set -x
           aws s3 cp crm/docker-compose-crm.yml s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-crm.yml
-      - name: Deploy CRM to EC2 via SSM
+      - name: Verify Instances for CRM Deployment
         run: |
           set -x
           TAGS="Key=tag:Role,Values=Converto-CRM-Stage"
-          INSTANCE_IDS=$(aws ec2 describe-instances --filters Name=tag:Role,Values=Converto-CRM-Stage Name=tag:aws:autoscaling:groupName --query "Reservations[].Instances[].InstanceId" --output text)
+          INSTANCE_IDS=$(aws ec2 describe-instances --filters Name=tag:Role,Values=Converto-CRM-Stage --query "Reservations[].Instances[].InstanceId" --output text)
           if [ -z "$INSTANCE_IDS" ]; then
-            echo "Deploying to single instance"
-            TAGS="Key=tag:Role,Values=Converto-CRM-Stage"
+            echo "No instances found with tag Converto-CRM-Stage"
+            exit 1
           else
-            echo "Deploying to auto-scaling group"
-            TAGS="Key=tag:aws:autoscaling:groupName,Values=Converto-CRM-Stage-ASG"
+            echo "Instances found: $INSTANCE_IDS"
           fi
+      - name: Deploy CRM to EC2 via SSM
+        run: |
+          set -x
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
-            --targets "$TAGS" \
-            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.LOGIN_GITHUB_USER }} -p ${{ secrets.LOGIN_GITHUB_TOKEN }}", "aws s3 cp s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-crm.yml /home/ubuntu/converto/docker-compose-crm.yml", "cd /home/ubuntu/converto", "docker-compose -f docker-compose-crm.yml pull", "docker-compose -f docker-compose-crm.yml up -d", "docker image prune -a -f"]'
+            --targets "Key=tag:Role,Values=Converto-CRM-Stage" \
+            --parameters 'commands=["docker login ghcr.io -u ${{ secrets.LOGIN_GITHUB_USER }} -p ${{ secrets.LOGIN_GITHUB_TOKEN }}", "aws s3 cp s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-crm.yml /home/ubuntu/converto/docker-compose-crm.yml", "cd /home/ubuntu/converto", "docker-compose -f docker-compose-crm.yml pull", "docker-compose -f docker-compose-crm.yml up -d", "docker image prune -a -f"]' \
+            --timeout-seconds 600 \
+            --max-concurrency "50" \
+            --max-errors "0" \
+            --region ${{ secrets.DEPLOY_AWS_REGION }}
 
       - name: Check Health of CRM Application Container
         run: |
