@@ -18,10 +18,10 @@ import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/adva
 })
 export class LoginPageComponent implements OnInit {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
-  isLoading:boolean = false;
+  isLoading: boolean = false;
 
-  @ViewChild('errorModal') errorModal!:AdvancedModalsComponent;
-  @ViewChild('accountVerificationModal') accountVerificationModal!:AdvancedModalsComponent;
+  @ViewChild('errorModal') errorModal!: AdvancedModalsComponent;
+  @ViewChild('accountVerificationModal') accountVerificationModal!: AdvancedModalsComponent;
 
   errorMessages = {
     email: {
@@ -32,11 +32,13 @@ export class LoginPageComponent implements OnInit {
       required: 'Password is required'
     }
   };
-  loginForm:FormGroup = new FormGroup({
+  errorMessage:string | null = null;
+
+  loginForm: FormGroup = new FormGroup({
     email: new FormControl(null, [Validators.required, Validators.email]),
     password: new FormControl(null, [Validators.required]),
   });
-  
+
 
   constructor(
     public authservice: AuthService,
@@ -44,28 +46,24 @@ export class LoginPageComponent implements OnInit {
     public restService: RestService,
     private notifService: NotificationService,
     private route: ActivatedRoute,
-    private avatarService:AvatarService,
-  ) { 
+    private avatarService: AvatarService,
+  ) {
   }
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe(querys=>{
+    this.route.queryParamMap.subscribe(querys => {
       const token = querys.get('token');
-      if(token)
-      {
+      if (token) {
         console.log(token);
-        this.restService.get(API.main.register + "/verify","")
-        .subscribe((response)=>{
-          console.log(response);
-          this.errorModal.modalTitle = 'Email Account Verified';
-          this.errorModal.modalMessage = "Email Account Verified!";
-          this.errorModal.open();
-        },(error)=>{
-          console.log(error);
-          this.errorModal.modalTitle = 'Email Account Not Verified';
-          this.errorModal.modalMessage = error.error.message;
-          this.errorModal.open();
-        });
+        this.restService.get(API.main.register + "/verify", "")
+          .subscribe((response) => {
+            console.log(response);
+            this.errorModal.modalTitle = 'Email Account Verified';
+            this.errorModal.modalMessage = "Email Account Verified!";
+            this.errorModal.open();
+          }, (error) => {
+            this.errorMessage = 'Email Account Not Verified';
+          });
 
       }
     });
@@ -73,6 +71,7 @@ export class LoginPageComponent implements OnInit {
 
   onLogin() {
     this.isLoading = true;
+    this.errorMessage = null;
     if (this.loginForm.valid) {
       this.restService.auth(this.email.value, this.password.value).subscribe({
         next: (response: any) => {
@@ -94,36 +93,25 @@ export class LoginPageComponent implements OnInit {
           this.isLoading = false;
         },
         error: (_error: any) => {
-          if (_error.error.message == 'Account not verified') {
-            this.errorModal.modalTitle = 'Account not verified';
-            this.errorModal.modalMessage = 'Please verify your email account';
-            this.accountVerificationModal.open();
-          }
-          else {
-            this.errorModal.modalTitle = 'Login Failed';
-            this.errorModal.modalMessage = _error.error.message;
-            this.errorModal.open();
-          }
           this.isLoading = false;
-          this.loginForm.enable();
+          this.errorMessage = _error.error.message;
+          this.isLoading = false;
         }
       });
     }
-    else
-    {
+    else {
       markFormGroupAsDirty(this.loginForm);
     }
   }
 
-  onVerifySubmit(event:any)
-  {
+  onVerifySubmit(event: any) {
     this.restService.post(API.main.register + `/resendVerification`, { email: this.email })
-    .subscribe((response: any) => {
-      console.log(response);
+      .subscribe((response: any) => {
+        console.log(response);
 
-    }, (error) => {
-      console.log(error);
-    });
+      }, (error) => {
+        console.log(error);
+      });
   }
 
   get form() {

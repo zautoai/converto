@@ -1,16 +1,16 @@
-<!-- BACKGROUND-IMAGE -->
-<div class="login-img">
-  <div class="page">
-    <div class="">
 
-      <div class="col col-login mx-auto mt-7">
-        <div class="text-center">
-          <a><img src="{{GLOBAL_IMAGES.zauto_logo_black}}" class="header-brand-img m-0" alt=""></a>
+<div class="container-fluid">
+  <div class="row vh-100 d-flex align-items-center justify-content-center">
+    <div class="col-lg-3 col-md-6">
+      @if(errorMessage)
+      {
+        <div class="alert alert-danger text-center" role="alert">
+          {{errorMessage}}
         </div>
-      </div>
-      <div class="container-login100">
-        <div class="wrap-login100 p-6">
-          <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login100-form validate-form">
+      }
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="">
             <h3 class="text-center">Login</h3>
             <div class="form-group mb-3">
               <advanced-input [label]="'Email'" [type]="'email'" [placeholder]="'Your email ID'" [size]="'md'"
@@ -20,16 +20,14 @@
               <advanced-input [label]="'Password'" [type]="'password'" [placeholder]="'Your password'" [size]="'md'"
                 [control]="password" [isDisabled]="isLoading" [errorMessages]="errorMessages.password"></advanced-input>
             </div>
+            <div class="mb-3 text-end">
+              <a routerLink="/auth/forgot-password" class="text-primary ms-1">Forgot password?</a>
+            </div>
             <advanced-button [label]="'Login'" [size]="'md'" [classes]="'w-100'" [type]="'submit'"
               [isLoading]="isLoading"></advanced-button>
             <div class="text-center pt-3">
               <p class="text-dark mb-0">
-                Not a member?<a routerLink="/auth/register" class="text-primary ms-1">Sign up</a>
-              </p>
-            </div>
-            <div class="text-center pt-3">
-              <p class="text-dark mb-0">
-                <a routerLink="/auth/forgot-password" class="text-primary ms-1">Forgot password</a>
+                <span class="text-muted">Not a member?</span><a routerLink="/auth/register" class="text-primary ms-1">Sign up</a>
               </p>
             </div>
           </form>

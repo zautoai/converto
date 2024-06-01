@@ -18,7 +18,7 @@ export class AuthController {
   @Post('login')
   @ApiOkResponse({ type: AuthEntity })
   async login(@Body() { email, password }: LoginDTO) {
-    return this.authService.login(email, password);
+    return await this.authService.login(email, password);
   }
 
   @Get('verify')
