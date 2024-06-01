@@ -58,12 +58,21 @@
     </div>
   </div>
 </div>
-<app-advanced-modals 
+<app-advanced-modals #errorModal
 [modalType]="'danger'" 
 [modalTitle]="'Auth error'" 
 [modalMessage]="'Are you sure you want to delete this contact?'"
 [modalConformMessage]="'Yes'"
 [modalCancelMessage]="'No'"
+></app-advanced-modals>
+
+<app-advanced-modals #accountVerificationModal
+[modalType]="'danger'" 
+[modalTitle]="'Auth error'" 
+[modalMessage]="'Are you sure you want to delete this contact?'"
+[modalConformMessage]="'Yes'"
+[modalCancelMessage]="'No'"
+(cancel)="onVerifySubmit($event)"
 ></app-advanced-modals>
 
 

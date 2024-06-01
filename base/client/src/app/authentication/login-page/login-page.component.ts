@@ -6,7 +6,6 @@ import { RestService } from 'src/app/shared/services/rest.service';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { ActivatedRoute } from '@angular/router';
 import { API } from 'src/app/config/endpoint.config';
-import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
 import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
@@ -21,7 +20,8 @@ export class LoginPageComponent implements OnInit {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
   isLoading:boolean = false;
 
-  @ViewChild(AdvancedModalsComponent) alertModal!:AdvancedModalsComponent;
+  @ViewChild('errorModal') errorModal!:AdvancedModalsComponent;
+  @ViewChild('accountVerificationModal') accountVerificationModal!:AdvancedModalsComponent;
 
   errorMessages = {
     email: {
@@ -36,6 +36,7 @@ export class LoginPageComponent implements OnInit {
     email: new FormControl(null, [Validators.required, Validators.email]),
     password: new FormControl(null, [Validators.required]),
   });
+  
 
   constructor(
     public authservice: AuthService,
@@ -43,7 +44,6 @@ export class LoginPageComponent implements OnInit {
     public restService: RestService,
     private notifService: NotificationService,
     private route: ActivatedRoute,
-    private sweetAlert:SweetAlertService,
     private avatarService:AvatarService,
   ) { 
   }
@@ -57,11 +57,14 @@ export class LoginPageComponent implements OnInit {
         this.restService.get(API.main.register + "/verify","")
         .subscribe((response)=>{
           console.log(response);
-          this.sweetAlert.success("Email Account Verified!","You can now enjoy full access to our platform.")
+          this.errorModal.modalTitle = 'Email Account Verified';
+          this.errorModal.modalMessage = "Email Account Verified!";
+          this.errorModal.open();
         },(error)=>{
           console.log(error);
-          this.alertModal.modalMessage = error.error.message;
-          this.alertModal.open();
+          this.errorModal.modalTitle = 'Email Account Not Verified';
+          this.errorModal.modalMessage = error.error.message;
+          this.errorModal.open();
         });
 
       }
@@ -92,22 +95,14 @@ export class LoginPageComponent implements OnInit {
         },
         error: (_error: any) => {
           if (_error.error.message == 'Account not verified') {
-            this.sweetAlert.warning("Verify email account", `✉ ${this.email}`, ['Resend mail'], (result) => {
-              if (result.isConfirmed) {
-                console.log('User clicked OK');
-                this.restService.post(API.main.register + `/resendVerification`, { email: this.email })
-                  .subscribe((response: any) => {
-                    console.log(response);
-
-                  }, (error) => {
-                    console.log(error);
-                  });
-              }
-            });
+            this.errorModal.modalTitle = 'Account not verified';
+            this.errorModal.modalMessage = 'Please verify your email account';
+            this.accountVerificationModal.open();
           }
           else {
-            this.alertModal.modalMessage = _error.error.message;
-            this.alertModal.open();
+            this.errorModal.modalTitle = 'Login Failed';
+            this.errorModal.modalMessage = _error.error.message;
+            this.errorModal.open();
           }
           this.isLoading = false;
           this.loginForm.enable();
@@ -118,6 +113,17 @@ export class LoginPageComponent implements OnInit {
     {
       markFormGroupAsDirty(this.loginForm);
     }
+  }
+
+  onVerifySubmit(event:any)
+  {
+    this.restService.post(API.main.register + `/resendVerification`, { email: this.email })
+    .subscribe((response: any) => {
+      console.log(response);
+
+    }, (error) => {
+      console.log(error);
+    });
   }
 
   get form() {
