@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { ActivatedRoute } from '@angular/router';
@@ -9,7 +9,6 @@ import { API } from 'src/app/config/endpoint.config';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
-import { togglePassword} from 'src/app/common/utils'
 
 @Component({
   selector: 'app-login-page',
@@ -18,18 +17,25 @@ import { togglePassword} from 'src/app/common/utils'
 })
 export class LoginPageComponent implements OnInit {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
-  errorMessage = '';
-  _error: any;
-  email: string = '';
-  password: string = '';
-  togglePassword = togglePassword;
+  isLoading:boolean = false;
 
-  isSubmitting:boolean = false;
+  errorMessages = {
+    email: {
+      required: 'Email is required',
+      email: 'Invalid email format'
+    },
+    password: {
+      required: 'Password is required'
+    }
+  };
+  loginForm:FormGroup = new FormGroup({
+    email: new FormControl(null, [Validators.required, Validators.email]),
+    password: new FormControl(null, [Validators.required]),
+  });
 
   constructor(
     public authservice: AuthService,
     private router: Router,
-    private formBuilder: FormBuilder,
     public restService: RestService,
     private notifService: NotificationService,
     private route: ActivatedRoute,
@@ -39,11 +45,6 @@ export class LoginPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loginForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-    });
-
     this.route.queryParamMap.subscribe(querys=>{
       const token = querys.get('token');
       if(token)
@@ -62,19 +63,11 @@ export class LoginPageComponent implements OnInit {
     });
   }
 
-  clearErrorMessage() {
-    this.errorMessage = '';
-    this._error = { name: '', message: '' };
-  }
 
   login() {
-    this.clearErrorMessage();
-    this.isSubmitting = true;
-    this.loginForm.disable();
-    if (this.validateForm(this.email, this.password)) {
-      this.restService
-        .auth(this.email, this.password)
-        .subscribe({next: (response: any) => {
+    this.isLoading = true;
+    if (this.loginForm.valid) {
+      this.restService.auth(this.email.value, this.password.value).subscribe({next: (response: any) => {
           localStorage.setItem('token', response.accessToken);
           this.authservice.setUser(response.user);
           this.notifService.showInfo('Welcome to Converto!');
@@ -94,10 +87,9 @@ export class LoginPageComponent implements OnInit {
               this.router.navigate(['/setup']);
             }
           }
-          this.isSubmitting = false;
-          this.loginForm.enable();
-        }, error: (_error: any) => {
-          this._error = _error;
+          this.isLoading = false;
+        }, 
+        error: (_error: any) => {
           if(_error.error.message == 'Account not verified')
           {
             this.sweetAlert.warning("Verify email account",`✉ ${this.email}`,['Resend mail'],(result)=>{
@@ -117,46 +109,23 @@ export class LoginPageComponent implements OnInit {
           {
             this.sweetAlert.error("Error",_error.error.message);
           }
-          this.password = '';
-          this.isSubmitting = false;
+          this.isLoading = false;
           this.loginForm.enable();
         }});
     }
   }
 
-  validateForm(email: string, password: string) {
-    if (email.length === 0) {
-      this.errorMessage = 'please enter email id';
-      return false;
-    }
-
-    if (password.length === 0) {
-      this.errorMessage = 'please enter password';
-      return false;
-    }
-
-    if (password.length < 6) {
-      this.errorMessage = 'password should be at least 6 char';
-      return false;
-    }
-
-    this.errorMessage = '';
-    return true;
-  }
-
-  //angular
-  public loginForm!: FormGroup;
-  public error: any = '';
-
   get form() {
     return this.loginForm.controls;
   }
+  get email() {
+    return this.loginForm.get('email') as FormControl;
+  }
+  get password() {
+    return this.loginForm.get('password') as FormControl;
+  }
 
   Submit() {
-    this.clearErrorMessage();
-    this.email = this.loginForm.get('username')?.value
-    this.password = this.loginForm.get('password')?.value
-
     this.login();
   }
 
