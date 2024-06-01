@@ -5,8 +5,7 @@
 
       <div class="col col-login mx-auto mt-7">
         <div class="text-center">
-          <a><img src="{{GLOBAL_IMAGES.zauto_logo_black}}" class="header-brand-img m-0"
-              alt=""></a>
+          <a><img src="{{GLOBAL_IMAGES.zauto_logo_black}}" class="header-brand-img m-0" alt=""></a>
         </div>
       </div>
       <div class="container-login100">
@@ -14,37 +13,18 @@
           <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login100-form validate-form">
             <h3 class="text-center">Login</h3>
             <div class="form-group mb-3">
-              <advanced-input 
-              [label]="'Email'"
-              [type]="'email'"
-              [placeholder]="'Your email ID'"
-              [size]="'md'"
-              [control]="email"
-              [isDisabled]="isLoading"
-              [errorMessages]="errorMessages.email"
-              ></advanced-input>
+              <advanced-input [label]="'Email'" [type]="'email'" [placeholder]="'Your email ID'" [size]="'md'"
+                [control]="email" [isDisabled]="isLoading" [errorMessages]="errorMessages.email"></advanced-input>
             </div>
             <div class="form-group mb-3">
-              <advanced-input 
-              [label]="'Password'"
-              [type]="'password'"
-              [placeholder]="'Your password'"
-              [size]="'md'"
-              [control]="password"
-              [isDisabled]="isLoading"
-              [errorMessages]="errorMessages.password"
-              ></advanced-input>
+              <advanced-input [label]="'Password'" [type]="'password'" [placeholder]="'Your password'" [size]="'md'"
+                [control]="password" [isDisabled]="isLoading" [errorMessages]="errorMessages.password"></advanced-input>
             </div>
-            <advanced-button
-            [label]="'Login'"
-            [size]="'md'"
-            [classes]="'w-100'"
-            [type]="'submit'"
-            [isLoading]="isLoading"
-            ></advanced-button>
+            <advanced-button [label]="'Login'" [size]="'md'" [classes]="'w-100'" [type]="'submit'"
+              [isLoading]="isLoading"></advanced-button>
             <div class="text-center pt-3">
               <p class="text-dark mb-0">
-                Not a member?<a routerLink="/auth/register" class="text-primary ms-1">Sign UP</a>
+                Not a member?<a routerLink="/auth/register" class="text-primary ms-1">Sign up</a>
               </p>
             </div>
             <div class="text-center pt-3">
@@ -58,21 +38,10 @@
     </div>
   </div>
 </div>
-<app-advanced-modals #errorModal
-[modalType]="'danger'" 
-[modalTitle]="'Auth error'" 
-[modalMessage]="'Are you sure you want to delete this contact?'"
-[modalConformMessage]="'Yes'"
-[modalCancelMessage]="'No'"
-></app-advanced-modals>
+<app-advanced-modals #errorModal [modalType]="'danger'" [modalTitle]="'Auth error'"
+  [modalMessage]="'Are you sure you want to delete this contact?'" [modalConformMessage]="'Yes'"
+  [modalCancelMessage]="'No'"></app-advanced-modals>
 
-<app-advanced-modals #accountVerificationModal
-[modalType]="'danger'" 
-[modalTitle]="'Auth error'" 
-[modalMessage]="'Are you sure you want to delete this contact?'"
-[modalConformMessage]="'Yes'"
-[modalCancelMessage]="'No'"
-(cancel)="onVerifySubmit($event)"
-></app-advanced-modals>
-
-
+<app-advanced-modals #accountVerificationModal [modalType]="'danger'" [modalTitle]="'Auth error'"
+  [modalMessage]="'Are you sure you want to delete this contact?'" [modalConformMessage]="'Yes'"
+  [modalCancelMessage]="'No'" (cancel)="onVerifySubmit($event)"></app-advanced-modals>
