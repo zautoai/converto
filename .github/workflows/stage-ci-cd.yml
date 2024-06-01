@@ -119,6 +119,7 @@ jobs:
           aws s3 cp base/docker-compose-base.yml s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-base.yml
       - name: Deploy Base to EC2 via SSM
         run: |
+          set -x
           TAGS="Key=tag:Role,Values=Converto-Base-Stage"
           INSTANCE_IDS=$(aws ec2 describe-instances --filters Name=tag:Role,Values=Converto-Base-Stage Name=tag:aws:autoscaling:groupName --query "Reservations[].Instances[].InstanceId" --output text)
           if [ -z "$INSTANCE_IDS" ]; then
@@ -135,6 +136,7 @@ jobs:
 
       - name: Check Health of Base Application Container
         run: |
+          set -x
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Role,Values=Converto-Base-Stage" \
@@ -164,6 +166,7 @@ jobs:
           aws s3 cp crm/docker-compose-crm.yml s3://${{ secrets.S3_BUCKET_NAME }}/docker-compose-crm.yml
       - name: Deploy CRM to EC2 via SSM
         run: |
+          set -x
           TAGS="Key=tag:Role,Values=Converto-CRM-Stage"
           INSTANCE_IDS=$(aws ec2 describe-instances --filters Name=tag:Role,Values=Converto-CRM-Stage Name=tag:aws:autoscaling:groupName --query "Reservations[].Instances[].InstanceId" --output text)
           if [ -z "$INSTANCE_IDS" ]; then
@@ -180,6 +183,7 @@ jobs:
 
       - name: Check Health of CRM Application Container
         run: |
+          set -x
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=tag:Role,Values=Converto-CRM-Stage" \
