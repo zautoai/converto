@@ -74,12 +74,15 @@ export class CalendarScheduleComponent implements OnInit{
     this.restService.getAll(API.main.schedule)
     .subscribe({
       next:(response:any)=>{
-        this.schedule = {...response};
-        this.availableDays = stringToArray(this.schedule.availableDays,',');   
-        this.handleAvailableHours(this.schedule.availableHours);     
-        this.selectedEventDuration = this.schedule.eventDuration;
-        this.selectedCalendar = this.schedule.calendarId;
-        this.originalSchedule = {...this.schedule};
+        this.schedule = response[0];
+        if(this.schedule)
+        {
+          this.availableDays = stringToArray(this.schedule.availableDays,',');   
+          this.handleAvailableHours(this.schedule.availableHours);     
+          this.selectedEventDuration = this.schedule.eventDuration;
+          this.selectedCalendar = this.schedule.calendarId;
+          this.originalSchedule = {...this.schedule};
+        }
         this.isLoading = false;
       },
       error:(error)=>{
@@ -130,7 +133,6 @@ export class CalendarScheduleComponent implements OnInit{
       eventDuration: Number(this.selectedEventDuration),
       calendarId: this.selectedCalendar,
     }
-
     if(!this.schedule)
     {
       this.isLoading = true;

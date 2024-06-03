@@ -84,6 +84,7 @@ export class CalendarController {
   }
 
   @Post('book-event')
+  @ApiBearerAuth("x-tenant-id")
   async bookEvents(@Body() bookEventDto: BookEventDto,@Req() request:SubdomainRequest) {
     const orgId = request.orgId;
     return await this.calendarService.addEvent({ orgId, data: { event: bookEventDto } });

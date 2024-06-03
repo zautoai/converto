@@ -213,20 +213,27 @@ export class CalendarService extends BaseService {
 
     async getAvailableDates(orgId: string) {
         const { availableDays } = await this.getAvailabilitySchedule(orgId);
-        const currentDate = new Date();
-        const availableDates: Date[] = [];
-        let i = 0;
-        while (availableDates.length < 9) {
-            const nextDate = new Date(currentDate);
-            nextDate.setDate(currentDate.getDate() + i);
-            const dayIndex = nextDate.getDay().toString();
-            const day = this.daysOfWeek[dayIndex];
-            if (availableDays.includes(day)) {
-                availableDates.push(nextDate);
+        if(availableDays)
+        {
+            const currentDate = new Date();
+            const availableDates: Date[] = [];
+            let i = 0;
+            while (availableDates.length < 9) {
+                const nextDate = new Date(currentDate);
+                nextDate.setDate(currentDate.getDate() + i);
+                const dayIndex = nextDate.getDay().toString();
+                const day = this.daysOfWeek[dayIndex];
+                if (availableDays.includes(day)) {
+                    availableDates.push(nextDate);
+                }
+                i++;
             }
-            i++;
+            return availableDates;
         }
-        return availableDates;
+        else
+        {
+            return [];
+        }
     }
 
     async getSlots(serviceParams: ServiceParams<{ _date: string }>) {
@@ -234,32 +241,35 @@ export class CalendarService extends BaseService {
         const date = new Date(_date);
         const { availableDays, availableHours, eventDuration } = await this.getAvailabilitySchedule(orgId);
         const slots: EventSlot[] = [];
-        const dayIndex = new Date(date).getDay().toString();
-        const day = this.daysOfWeek[dayIndex];
-        if (!availableDays.includes(day)) return slots;
-        const { timeMin, timeMax } = this.getStartEndTimesForDay(date);
-        const busyTimes = await this.getFreeBusy({ orgId, data: { startDate: timeMin, endDate: timeMax } });
-        const dayOfWeek = this.daysOfWeek.indexOf(day);
-        if (dayOfWeek !== -1) {
-            availableHours.forEach(hour => {
-                const [startHour, startMinute] = hour.start.split(':').map(Number);
-                const [endHour, endMinute] = hour.end.split(':').map(Number);
-                const currentDate = new Date(date.getTime());
-                currentDate.setHours(startHour, startMinute);
-                while (currentDate.getHours() < endHour || (currentDate.getHours() === endHour && currentDate.getMinutes() < endMinute)) {
-                    const slotStart = new Date(currentDate.getTime());
-                    const slotEnd = new Date(currentDate.getTime() + eventDuration * 60000);
-                    const isSlotBusy = busyTimes.some(busySlot => {
-                        const busyStart = new Date(busySlot.start);
-                        const busyEnd = new Date(busySlot.end);
-                        return (slotStart < busyEnd && slotEnd > busyStart);
-                    });
-                    if (!isSlotBusy) {
-                        slots.push({ start: slotStart.toISOString(), end: slotEnd.toISOString() });
+        if(availableDays && availableHours && eventDuration)
+        {
+            const dayIndex = new Date(date).getDay().toString();
+            const day = this.daysOfWeek[dayIndex];
+            if (!availableDays.includes(day)) return slots;
+            const { timeMin, timeMax } = this.getStartEndTimesForDay(date);
+            const busyTimes = await this.getFreeBusy({ orgId, data: { startDate: timeMin, endDate: timeMax } });
+            const dayOfWeek = this.daysOfWeek.indexOf(day);
+            if (dayOfWeek !== -1) {
+                availableHours.forEach(hour => {
+                    const [startHour, startMinute] = hour.start.split(':').map(Number);
+                    const [endHour, endMinute] = hour.end.split(':').map(Number);
+                    const currentDate = new Date(date.getTime());
+                    currentDate.setHours(startHour, startMinute);
+                    while (currentDate.getHours() < endHour || (currentDate.getHours() === endHour && currentDate.getMinutes() < endMinute)) {
+                        const slotStart = new Date(currentDate.getTime());
+                        const slotEnd = new Date(currentDate.getTime() + eventDuration * 60000);
+                        const isSlotBusy = busyTimes.some(busySlot => {
+                            const busyStart = new Date(busySlot.start);
+                            const busyEnd = new Date(busySlot.end);
+                            return (slotStart < busyEnd && slotEnd > busyStart);
+                        });
+                        if (!isSlotBusy) {
+                            slots.push({ start: slotStart.toISOString(), end: slotEnd.toISOString() });
+                        }
+                        currentDate.setTime(currentDate.getTime() + eventDuration * 60000);
                     }
-                    currentDate.setTime(currentDate.getTime() + eventDuration * 60000);
-                }
-            });
+                });
+            }
         }
         return slots;
     }
