@@ -11,12 +11,14 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ComponentsModule } from 'src/app/components/components.module';
+import { VisitorsComponent } from './visitors/visitors.component';
 
 
 @NgModule({
   declarations: [
     CampaignComponent,
-    StatsComponent
+    StatsComponent,
+    VisitorsComponent
   ],
   imports: [
     CommonModule,

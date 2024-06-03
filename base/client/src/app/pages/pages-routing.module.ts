@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { ZautoDashboardComponent } from './dashboard/dashboard.component';
 import { conversationcomponent } from './conversation/conversation/conversation.component';
 import { leadscomponent } from './leads/leads.component';
-import { VisitorsComponent } from './visitors/visitors.component';
 import { StagesComponent } from './stages/stages.component';
 import { CallToActionComponent } from './call-to-action/call-to-action.component';
 import { PlatformsComponent } from './platforms/platforms.component';
@@ -106,18 +105,6 @@ const routes: Routes = [
     path: 'form-builder',
     title: "FormBuilder",
     component: FormBuilderComponent,
-    canActivate: [SetupGuard]
-  },
-  {
-    path: 'visitors',
-    title: "Visitors",
-    component: VisitorsComponent,
-    canActivate: [SetupGuard]
-  },
-  {
-    path: 'visitors/:id',
-    title: "Visitors",
-    component: VisitorsComponent,
     canActivate: [SetupGuard]
   },
   {

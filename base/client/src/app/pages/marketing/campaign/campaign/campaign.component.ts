@@ -141,7 +141,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
 
   ngOnInit(): void {
     this.getPlatforms();
-    this.getContacts();
+    this.getAccounts();
     this.getCampaigns();
     const isabmControl = this.campaignForm.get('isabm');
     if (isabmControl !== null && isabmControl !== undefined && isabmControl.valueChanges) {
@@ -204,6 +204,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
         this.notifService.showError(error.error.message);
       });
   }
+
   getCampaignaccount(id: string) {
     this.restService.get(API.main.abm, id )
       .subscribe((response: any) => {
@@ -457,7 +458,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     return queryString;
   }
 
-  getContacts(): void {
+  getAccounts(): void {
 
     this.restService
       .getAll(API.main.abm) // Fetch all contacts from the API

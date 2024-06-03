@@ -13,7 +13,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { leadscomponent } from './leads/leads.component';
-import { VisitorsComponent } from './visitors/visitors.component';
 import { StagesComponent } from './stages/stages.component';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { CallToActionComponent } from './call-to-action/call-to-action.component';
@@ -78,7 +77,6 @@ import { ComponentsModule } from '../components/components.module';
     SummaryContainerComponent,
     AbmComponent,
     leadscomponent,
-    VisitorsComponent,
     StagesComponent,
     CallToActionComponent,
     PlatformsComponent,
