@@ -4,6 +4,7 @@ import { AdvancedInputComponent } from './advanced-inputs/advanced-input/advance
 import { AdvancedModalsComponent } from './advanced-modals/advanced-modals/advanced-modals.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AdvancedButtonComponent } from './advanced-inputs/advanced-button/advanced-button.component';
+import { AdvanceOffcanvasComponent } from './advance-offcanvas/advance-offcanvas.component';
 
 
 
@@ -11,7 +12,8 @@ import { AdvancedButtonComponent } from './advanced-inputs/advanced-button/advan
   declarations: [
     AdvancedInputComponent,
     AdvancedModalsComponent,
-    AdvancedButtonComponent
+    AdvancedButtonComponent,
+    AdvanceOffcanvasComponent
   ],
   imports: [
     CommonModule,
@@ -20,7 +22,8 @@ import { AdvancedButtonComponent } from './advanced-inputs/advanced-button/advan
   exports: [
     AdvancedInputComponent,
     AdvancedButtonComponent,
-    AdvancedModalsComponent
+    AdvancedModalsComponent,
+    AdvanceOffcanvasComponent
   ]
 })
 export class ComponentsModule { }
