@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { ZautoDashboardComponent } from './dashboard/dashboard.component';
 import { conversationcomponent } from './conversation/conversation/conversation.component';
 import { leadscomponent } from './leads/leads.component';
-import { CampaignComponent } from './campaign/campaign/campaign.component';
 import { VisitorsComponent } from './visitors/visitors.component';
 import { StagesComponent } from './stages/stages.component';
 import { CallToActionComponent } from './call-to-action/call-to-action.component';
@@ -12,17 +11,14 @@ import { SMTPConfigComponent } from './smtpconfig/smtpconfig.component';
 import { SitesComponent } from './sites/sites.component';
 import { TeamComponent } from './teams/team.component';
 import { LaunchAvatarComponent } from './launch-avatar/launch-avatar.component';
-import { SettingsComponent } from './zautosettings/settings/settings.component';
 import { ExternalApisComponent } from './external-apis/external-apis.component';
 import { HubspotComponent } from './hubspot/hubspot.component';
 import { IntegrationComponent } from './integrations/integration/integration.component';
-import { CalenderComponent } from './calender/calender.component';
 import { FileManagerComponent } from './file-manager/file-manager.component';
 import { LeadCategoryComponent } from './lead-category/lead-category/lead-category.component';
 import { CalendarEventComponent } from './calendar-event/calendar-event.component';
 import { SetupGuard } from '../shared/guard/setup.guard';
 import { SetupCompletedGuard } from '../shared/guard/setup-completed.guard';
-import { PromptComponent } from './prompt/prompt.component';
 import { LeadConfigComponent } from './lead-config/lead-config.component';
 import { StartersConfigComponent } from './starters-config/starters-config.component';
 import { CustomiseAvatarComponent } from './customise-avatar/customise-avatar/customise-avatar.component';
@@ -104,18 +100,6 @@ const routes: Routes = [
     path: 'contacts/:id',
     title: "Contacts",
     component: ContactsComponent,
-    canActivate: [SetupGuard]
-  },
-  {
-    path: 'campaigns',
-    title: "Campaigns",
-    component: CampaignComponent,
-    canActivate: [SetupGuard]
-  },
-  {
-    path: 'campaigns/:id',
-    title: "Campaigns",
-    component: CampaignComponent,
     canActivate: [SetupGuard]
   },
   {
@@ -305,7 +289,7 @@ const routes: Routes = [
   },
   {
     path:'',
-    loadChildren:() => import('./pages.module').then(m => m.PagesModule)
+    loadChildren:() => import('./marketing/marketing.module').then(m => m.MarketingModule)
   }
 ];
 

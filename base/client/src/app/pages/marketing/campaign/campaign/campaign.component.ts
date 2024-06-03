@@ -12,7 +12,6 @@ import { Subject, debounceTime } from 'rxjs';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { ScrollUtilService } from 'src/app/shared/services/scroll-util.service';
 import { updateDataList } from 'src/app/common/utils';
-import { ContactsComponent } from '../../contacts/contacts.component';
 
 interface link {
   name: string;
