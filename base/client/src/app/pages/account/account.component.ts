@@ -47,7 +47,7 @@ isHovered: any;
   totalItems: number = 0;
   accountcontact: Object="";
   hoveredData: any=null;
-
+statusOptions:string[]=['New','Contacted','Interested','Unqualified']
   data = this.hoveredData
 
 

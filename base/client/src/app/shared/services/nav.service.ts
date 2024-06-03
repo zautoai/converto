@@ -106,135 +106,111 @@ export class NavService implements OnDestroy {
 
 	MENUITEMS: Menu[] = [
 		{
-			title: 'Dashboard', icon: 'fe fe-home', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/dashboard', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.SUPERADMIN]
+			title: 'Dashboard', icon: 'fa-solid fa-chart-line', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/dashboard', type: 'link'
 		},
 		{
-			headTitle: 'ENGAGEMENTS',
-			show: false,
-			roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
+			title: 'Engagements', icon: 'fa-solid fa-comments', active: false,type:'sub',
+			children:[
+				{
+					title: 'Conversations', icon: 'fa-solid fa-comments', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/conversations', type: 'link'
+				},
+				{
+					title: 'Accounts', icon: 'fa-regular fa-building', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/accounts', type: 'link'
+				},
+				{
+					title: 'Contacts', icon: 'fe fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/contacts', type: 'link'
+				},
+			]
 		},
 		{
-			title: 'Conversations', icon: 'fa-solid fa-comments', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/conversations', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-
-
-		{
-			title: 'Accounts', icon: 'fa-regular fa-building', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/accounts', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'Contacts', icon: 'fe fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/contacts', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			headTitle: 'MARKETING',
-			show: false,
-			roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'ABM', icon: 'fa-solid fa-bullseye', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/abm', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'FormBuilder', icon: 'fa-solid fa-cube', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/form-builder', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'Campaigns', icon: 'fe fe-award', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/campaigns', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'Traffic', icon: 'fa-solid fa-chart-line', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/visitors', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.SUPERADMIN]
+			title: 'Marketing', icon: 'fa-solid fa-bullseye', active: false, type:'sub',
+			children:[
+				{
+					title: 'ABM', icon: 'fa-solid fa-bullseye', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/abm', type: 'link'
+				},
+				{
+					title: 'FormBuilder', icon: 'fa-solid fa-cube', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/form-builder', type: 'link'
+				},
+				{
+					title: 'Campaigns', icon: 'fe fe-award', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/campaigns', type: 'link'
+				},
+				{
+					title: 'Traffic', icon: 'fa-solid fa-chart-line', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/visitors', type: 'link'
+				},
+				{
+					title: 'Segment', icon: 'fa-solid fa-object-ungroup', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/segment', type: 'link'
+				},
+				{
+					title: 'ICP', icon: 'fa-solid fa-user-check', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/icp', type: 'link'
+				},
+				{
+					title: 'Intent scoring', icon: 'fa-solid fa-object-ungroup', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/intent-scoring', type: 'link'
+				},
+			]
 		},
 		{
-			headTitle: 'SALES',
-			show: false,
-			roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
+			title: 'Sales', icon: 'fe fe-layers', active: false, type:'sub',
+			children:[
+				{
+					title: 'Playbook', icon: 'fe fe-layers', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/sales-playbook', type: 'link'
+				},
+				{
+					title: 'Lead settings', icon: 'fa-solid fa-sliders', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/lead-settings', type: 'link'
+				},
+				{
+					title: 'CTA (Call-to-Action)', icon: 'fe fe-check-circle', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/call-to-action', type: 'link'
+				},
+				{
+					title: 'Starters', icon: 'fa-regular fa-circle-play', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/starters', type: 'link'
+				},
+			]
 		},
 		{
-			title: 'Playbook', icon: 'fe fe-layers', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/sales-playbook', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
+			title: 'Configuration', icon: 'fa-regular fa-envelope', active: false, type:'sub',
+			children:[
+				{
+					title: 'SMTP (Email Integration)', icon: 'fa-regular fa-envelope', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/smtp', type: 'link'
+				},
+		
+				{
+					title: 'Plugins', icon: 'fa-solid fa-plug', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/plugins', type: 'link'
+				},
+			]
 		},
 		{
-			title: 'Lead settings', icon: 'fa-solid fa-sliders', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/lead-settings', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
+			title: 'Calendar', icon: 'fa-solid fa-calendar-check', active: false, type:'sub',
+			children:[
+				{
+					title: 'Events', icon: 'fa-solid fa-calendar-check', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/calendar-events', type: 'link'
+				},
+			]
 		},
 		{
-			title: 'CTA (Call-to-Action)', icon: 'fe fe-check-circle', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/call-to-action', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
+			title: 'Data management', icon: 'fe fe-link', active: false, type:'sub',
+			children:[
+				{
+					title: 'Sites', icon: 'fe fe-link', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/sites', type: 'link'
+				},
+				{
+					title: 'File manager', icon: 'fa-solid fa-folder', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/file-manager', type: 'link'
+				},
+			]
 		},
 		{
-			title: 'Starters', icon: 'fa-regular fa-circle-play', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/starters', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
+			title: 'Deployment', icon: 'fa-solid fa-paintbrush', active: false, type:'sub',
+			children:[
+				{
+					title: 'Customize & Deploy', icon: 'fa-solid fa-paintbrush', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/customize-avatar', type: 'link'
+				},
+			]
 		},
 		{
-			headTitle: 'CONFIGURATION',
-			show: false,
-			roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		// {
-		// 	title: 'Settings', icon: 'fe fe-settings', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/settings', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		// },
-		// {
-		// 	title: 'Categories', icon: 'fe fe-award', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/lead-categories', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		// },
-		// {
-		// 	title: 'Platforms', icon: 'fe fe-share-2', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/platforms', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		// },
-		{
-			title: 'SMTP (Email Integration)', icon: 'fa-regular fa-envelope', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/smtp', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		// {
-		// 	title: 'Integrations', icon: 'fe fe-download', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/integrations', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		// },
-		{
-			title: 'Plugins', icon: 'fa-solid fa-plug', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/plugins', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			headTitle: 'Calendar',
-			show: false,
-			roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		// {
-		// 	title: 'Calendar (Scheduling)', icon: 'fa-solid fa-calendar', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/calendar', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		// },
-		{
-			title: 'Calendar (Events)', icon: 'fa-solid fa-calendar-check', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/calendar-events', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		// {
-		// 	headTitle: 'CRM',
-		// 	show:false,
-		// 	roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		// },
-		// {
-		// 	title: 'Hubspot', icon: 'fa fa-hubspot', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/hubspot', type: 'link',show:false ,roles:[Role.SUPERADMIN,Role.ADMIN,Role.USER]
-		// },
-		{
-			headTitle: 'DATA MANAGEMENT',
-			show: false,
-			roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'Sites', icon: 'fe fe-link', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/sites', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'File manager', icon: 'fa-solid fa-folder', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/file-manager', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'Segment', icon: 'fa-solid fa-object-ungroup', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/segment', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'ICP', icon: 'fa-solid fa-user-check', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/icp', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'Intent scoring', icon: 'fa-solid fa-object-ungroup', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/intent-scoring', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			headTitle: 'Deployment',
-			show: false,
-			roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			title: 'Customize & Deploy', icon: 'fa-solid fa-paintbrush', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/customize-avatar', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN, Role.USER]
-		},
-		{
-			headTitle: 'Team Management',
-			show: false,
-			roles: [Role.SUPERADMIN, Role.ADMIN]
-		},
-		{
-			title: 'Team', icon: 'fe fe-user', active: true, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/team', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN]
+			title: 'Team Management', icon: 'fe fe-user', active: false, type:'sub',
+			children:[
+				{
+					title: 'Team', icon: 'fe fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/team', type: 'link', show: false, roles: [Role.SUPERADMIN, Role.ADMIN]
+				},
+			]
 		},
 	];
 

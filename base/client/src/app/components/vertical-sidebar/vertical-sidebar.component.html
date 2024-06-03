@@ -1,0 +1,46 @@
+<div class="app-sidebar d-flex flex-column sticky">
+    <div class="main-sidebar-header active">
+        <a class="desktop-logo logo-light active" routerLink="/dashboard">
+            <img src="../../../assets/images/brand/black_full_png.png" class="main-logo" alt="Logo" />
+        </a>
+    </div>
+    <ng-scrollbar>
+        <div class="main-sidemenu">
+            <ul class="side-menu">
+                @for (menuItem of menuItems; track $index) {
+                    @if(menuItem.type === 'link')
+                    {
+                        <li class="mx-0" [ngClass]="{'side-item side-item-category':menuItem.headTitle,'slide':menuItem.title, 'is-expanded': menuItem.active}">
+                            <a class="side-menu__item" routerLink="{{!menuItem.type ? null : menuItem.path}}" (click)="toggleNavActive(menuItem)"  routerLinkActive="active">
+                                <span class="side-menu__icon"><i class="{{menuItem.icon}} "></i></span>
+                                <span class="side-menu__label">{{menuItem.title}}</span>
+                            </a>
+                        </li>
+                    }
+                    @else if (menuItem.type === 'sub') {
+                        <li class="mx-0" [ngClass]="{'side-item side-item-category':menuItem.headTitle,'slide':menuItem.title, 'is-expanded': menuItem.active}">
+                            <a class="side-menu__item" (click)="toggleNavActive(menuItem)">
+                                <span class="side-menu__icon"><i class="{{menuItem.icon}} "></i></span>
+                                <span class="side-menu__label">{{menuItem.title}}</span>
+                                <i class="angle fe fe-chevron-right"></i>
+                            </a>
+                            @if (menuItem.children && menuItem.type === 'sub') {
+                            <ul class="slide-menu" [ngClass]="{ 'open': menuItem.active }">
+                                @for (childrenItem of menuItem.children; track $index) {
+                                    <li [ngClass]="{'is-expanded active': childrenItem.active, 'sub-slide': childrenItem.Menusub}">
+                                        <a class="slide-item" routerLink="{{!childrenItem.type ? null : [childrenItem.path]}}" routerLinkActive="active"
+                                            *ngIf="childrenItem.type === 'link' "
+                                            (click)="toggleNavActive(childrenItem)">
+                                            {{childrenItem.title}}
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                            }
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </ng-scrollbar>
+</div>

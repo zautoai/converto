@@ -1,10 +1,11 @@
 import { Component,OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AsyncValidator } from '@angular/forms';
+import { FormGroup, Validators, AsyncValidator, FormControl } from '@angular/forms';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { API } from 'src/app/config/endpoint.config';
 import { Router } from '@angular/router';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
+import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
 
 @Component({
   selector: 'app-forgot-password',
@@ -14,21 +15,30 @@ import { GLOBAL_IMAGES } from 'src/app/config/image.config';
 export class ForgotPasswordComponent implements OnInit
 {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
-  email: string = '';
-  resetForm:FormGroup;
 
-  isSubmitting:boolean = false;
+  isLoading:boolean = false;
 
+  errorMessages = {
+    email: {
+      required: 'Email is required',
+      email: 'Invalid email format'
+    }
+  }
+  errorMessage:string | null = null;
+
+  resetForm:FormGroup = new FormGroup({
+    email: new FormControl(null, [Validators.required, Validators.email]),
+  });
   constructor(
     public restService: RestService,
-    private formBuilder: FormBuilder,
     private notifService: NotificationService,
     private router: Router,
   ){
-    this.resetForm = this.formBuilder.group({
-      email:['',[Validators.required, Validators.email]],
-    });
 
+  }
+
+  get email(){
+    return this.resetForm.get('email') as FormControl;
   }
 
   ngOnInit(): void 
@@ -37,38 +47,25 @@ export class ForgotPasswordComponent implements OnInit
 
   submit()
   {
-    this.email = this.resetForm.value.email;    
     if(this.resetForm.valid)
     {
-      this.isSubmitting = true;
-      this.resetForm.disable({onlySelf:true});
-      this.restService.post(API.main.password+"/forgot",{email:this.email})
+      this.isLoading = true;
+      this.restService.post(API.main.password+"/forgot",this.resetForm.value)
       .subscribe((response:any)=>{
-        console.log(response);
         if(response.success)
         {
           this.notifService.showSuccess("Reset password link sent to your mail.");
-          this.isSubmitting = false;
+          this.isLoading = false;
           this.resetForm.reset();
-          this.resetForm.disable({onlySelf:false});
         }
       },(error)=>{
-        console.log(error);
-        this.isSubmitting = false;
+        this.isLoading = false;
         this.resetForm.reset();
-        this.resetForm.disable({onlySelf:false});
       });
     }
     else
     {
-      if(this.email.length === 0)
-      {
-        this.notifService.showError("Enter registered email account.");
-      }
-      else if(!this.email.includes('@'))
-      {
-        this.notifService.showError("Enter valid email.");
-      }
+      markFormGroupAsDirty(this.resetForm);
     }
   }
 }

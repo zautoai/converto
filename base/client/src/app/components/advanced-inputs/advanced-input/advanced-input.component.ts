@@ -10,7 +10,7 @@ import { FormControl } from '@angular/forms';
 })
 export class AdvancedInputComponent implements OnChanges{
 
-  @Input() label: string = '';
+    @Input() label: string = '';
     @Input() toolTips: string = '';
     @Input() control:FormControl = new FormControl();
     @Input() type: InputTypes = 'text';
@@ -23,6 +23,7 @@ export class AdvancedInputComponent implements OnChanges{
     @Input() badgeText: string | null = null;
     @Input() toggleVisibility: boolean = false;
     @Input() rows:number = 3;
+    @Input() backendErrors: { [key: string]: string } = {};
     show:boolean = false;
 
     private static idCounter = 0;
@@ -44,11 +45,14 @@ export class AdvancedInputComponent implements OnChanges{
         return !!this.toolTips;
     }
 
-    getErrorMessage() {
+    getErrorMessage(): string {
         for (const errorKey in this.errorMessages) {
-        if (this.control.hasError(errorKey)) {
-            return this.errorMessages[errorKey];
+            if (this.control.hasError(errorKey)) {
+                return this.errorMessages[errorKey];
+            }
         }
+        if (this.backendErrors && Object.keys(this.backendErrors).length > 0) {
+            return this.backendErrors[Object.keys(this.backendErrors)[0]]; // Display the first backend error
         }
         return '';
     }
@@ -56,6 +60,9 @@ export class AdvancedInputComponent implements OnChanges{
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['isDisabled']) {
             this.toggleControl();
+        }
+        if (changes['backendErrors']) {
+            this.control.setErrors({ backend: true });
         }
     }
 
