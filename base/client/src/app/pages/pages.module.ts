@@ -66,6 +66,8 @@ import { IcpviewComponent } from './icpview/icpview.component';
 import { IntentScoringComponent } from './intent-scoring/intent-scoring.component';
 import { ChannelengagementComponent } from './dashboard/widgets/channelengagement/channelengagement.component';
 import { ComponentsModule } from '../components/components.module';
+import { ContactCardComponent } from './contacts/components/contact-card/contact-card.component';
+import { ContactPreviewComponent } from './contacts/components/contact-preview/contact-preview.component';
 
 @NgModule({
   declarations: [
@@ -117,7 +119,9 @@ import { ComponentsModule } from '../components/components.module';
     IcpCreatorComponent,
     IcpviewComponent,
     IntentScoringComponent,
-    ChannelengagementComponent
+    ChannelengagementComponent,
+    ContactCardComponent,
+    ContactPreviewComponent
   ],
   imports: [
     PlatformLinkModule,

@@ -23,14 +23,14 @@ import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.u
 })
 export class ContactsComponent implements OnInit {
   @ViewChild(AdvanceOffcanvasComponent) contactComposeCanvas!: AdvanceOffcanvasComponent;
-  @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
+  @ViewChild('viewContactOffcanvas') viewContactOffcanvas: ElementRef | undefined;
   @Input() chatBotWidget!: ChatBotWidgetsComponent;
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
 
   isLoading:boolean = false;
-  user: any = {};
-  userList: any = [];
-  selectedUser: any = undefined;
+  contact: any = {};
+  contactList: any = [];
+  selectedContact: any = undefined;
   showActionMenu = false;
   isEdit: boolean = false;
   photo1: any = "https://imgs.search.brave.com/Mvm4VXGBy83NyhAuuehkrHYV0s4BvjtY6ZwR2dXCGro/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9ncGNh/dGFseXNpcy5ibG9i/LmNvcmUud2luZG93/cy5uZXQvZ3Bob3N0/ZWRjb250ZW50LXBy/b2Qvd1pVNzFpND1f/S2FtYXRoX05pa2hp/bF81MDB4NTAwLmpw/Zw"
@@ -43,7 +43,6 @@ export class ContactsComponent implements OnInit {
   hoveredData: any = null;
   isHovered: any;
   itemPerPage: number = 10;
-  submittedData: any[] = [];
   selectedData: any = '';
   limit = 5;
   totalItems: number = 0;
@@ -93,9 +92,7 @@ export class ContactsComponent implements OnInit {
     private modalService: NgbModal,
     private notifService: NotificationService,
     private restService: RestService,
-    private offcanvasService: NgbOffcanvas,
     private changeDetectorRef: ChangeDetectorRef,
-    private sweetAlertService: SweetAlertService,
     private route: ActivatedRoute,
     private router: Router,
   ) {
@@ -108,7 +105,6 @@ export class ContactsComponent implements OnInit {
       this.limit = +params['limit'] || this.limit;
       this.getContacts();
       this.onPageChange({ page: this.currentPage })
-      console.log("test", this.submittedData)
     });
   }
 
@@ -190,9 +186,8 @@ export class ContactsComponent implements OnInit {
       .get(API.main.contact, `?limit=${this.limit}&page=${this.currentPage}`)
       .subscribe(
         (response: any) => {
-          this.submittedData = response.data;
+          this.contactList = response.data;
           this.totalItems = response.total
-          console.log("accountdata", this.submittedData)
         },
         (error) => {
           console.error(error);
@@ -201,19 +196,22 @@ export class ContactsComponent implements OnInit {
       );
   }
 
-  deleteSubmittedData(data: any): void {
-    const index = this.submittedData.indexOf(data);
-    if (index !== -1) {
-      this.submittedData.splice(index, 1);
-    }
-  }
-
-  openCreateUser() {
+  openCreateContact() {
     this.form.reset();
+    this.isEdit = false;
+    this.contact = null;
+    this.contactComposeCanvas.open();
+  }
+  
+  openUpdateContact(contact: any) {
+    this.contact = contact; 
+    this.form.reset();
+    this.form.patchValue(contact)
+    this.isEdit = true;
     this.contactComposeCanvas.open();
   }
 
-  openViewUser(data: any) {
+  openViewContact(data: any) {
     this.selectedData = data;
     this.form.reset();
     this.router.navigate(['contacts/view-contacts', data.id]);
@@ -235,7 +233,7 @@ export class ContactsComponent implements OnInit {
       this.isLoading = true;
       if(this.isEdit)
       {
-        this.restService.patch(API.main.contact, this.user.id, this.form.value)
+        this.restService.patch(API.main.contact, this.contact.id, this.form.value)
         .subscribe(
           (response: any) => {
             this.notifService.showSuccess('Account Updated Successfully.');
@@ -244,7 +242,13 @@ export class ContactsComponent implements OnInit {
             this.contactComposeCanvas.close();
           },
           (error) => {
-            this.notifService.showError('Something Went Wrong! Try Again Later');
+            if(error.status == 500)
+            {
+              this.notifService.showError('Something Went Wrong! Try Again Later');
+            }
+            else{
+              this.notifService.showError(error.error.message);
+            }
             this.isLoading = false;
           },
         );
@@ -253,7 +257,7 @@ export class ContactsComponent implements OnInit {
       {
         this.restService.post(API.main.contact, data).subscribe({
           next: (response: any) => {
-            this.notifService.showSuccess('User Added Successfully.');
+            this.notifService.showSuccess('Contact Added Successfully.');
             this.getContacts();
             this.changeDetectorRef.detectChanges();
             this.isLoading = false;
@@ -261,7 +265,13 @@ export class ContactsComponent implements OnInit {
           },
           error: (error) => {
             this.isLoading = false;
-            this.notifService.showError('Something Went Wrong! Try Again Later');
+            if(error.status == 500)
+            {
+              this.notifService.showError('Something Went Wrong! Try Again Later');
+            }
+            else{
+              this.notifService.showError(error.error.message);
+            }
           },
         });
       }
@@ -276,47 +286,15 @@ export class ContactsComponent implements OnInit {
     this.contactComposeCanvas.close();
   }
 
-  openUpdateUser(user: any) {
-    this.user = user; // Store the selected user data
-    this.form.reset();
-    console.log("test", user)
-    this.form.patchValue(user)
-
-    // this.Form.get('parentAccountId')?.setValue(user?.parentAccountId);
-    // this.Form.get('accountName')?.setValue(user?.accountName);
-    // this.Form.get('industry')?.setValue(user?.industry);
-    // this.Form.get('companySize')?.setValue(user?.companySize);
-    // this.Form.get('annualRevenue')?.setValue(user?.annualRevenue);
-    // this.Form.get('accountType')?.setValue(user?.accountType);
-    // this.Form.get('website')?.setValue(user?.website);
-    // this.Form.get('address')?.setValue(user?.address);
-    // this.Form.get('city')?.setValue(user?.city);
-    // this.Form.get('state')?.setValue(user?.state);
-    // this.Form.get('zip')?.setValue(user?.zip);
-    // this.Form.get('country')?.setValue(user?.country);
-    // this.Form.get('phone')?.setValue(user?.phone);
-    // this.Form.get('email')?.setValue(user?.email);
-    // this.Form.get('socialMedia')?.setValue(user?.socialMedia);
-    // this.Form.get('notes')?.setValue(user?.notes);
-    // this.Form.get('source')?.setValue(user?.source);
-    // this.Form.get('status')?.setValue(user?.status);
-    // this.Form.get('isabm')?.setValue(user?.abm);
-
-
-    // this.Form.patchValue(user); // Pre-fill the form with the user data
-    this.contactComposeCanvas.open();
-  }
-
   delete(data: any) {
     this.deleteModal.open(data)
   }
-
 
   confirmDelete = (data: any) => {
     this.restService.delete(API.main.contact, data.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Accounts Deleted Successfully.');
-        console.log(this.user);
+        console.log(this.contact);
         this.getContacts()
       },
       (error) => {
@@ -326,42 +304,16 @@ export class ContactsComponent implements OnInit {
     );
   };
 
+  selectContact(contact:any)
+  {
+    this.selectedContact = contact;
+  }
+
   onPageChange(event: any) {
     this.currentPage = event.page;
     this.getContacts()
-
   }
 
-
-  getCountryFlagClass(countryCode: string): string {
-
-    if (countryCode) {
-      // const countrysCode = countryCode.trim()
-      const countryCodes: { [key: string]: string } = {
-        unitedstates: 'us',
-        india: 'in',
-        australia: 'au'
-        // Add more country codes as needed
-      };
-
-      return countryCodes[countryCode.toLowerCase()] || '';
-    } else {
-      return ''; // Return an empty string if countryCode is falsy
-    }
-  }
-
-  
-  preventDefault(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-    }
-  }
-  emailFormControl = new FormControl('', [
-
-    Validators.email,
-
-    Validators.required,
-  ]);
   onMouseEnter(data: any) {
     if (data) {
       this.clickedData = data;
@@ -381,5 +333,3 @@ export class ContactsComponent implements OnInit {
     }
   }
 }
-
-
