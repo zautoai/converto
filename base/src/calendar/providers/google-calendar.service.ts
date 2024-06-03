@@ -114,7 +114,7 @@ export class GoogleCalendarService extends BaseCalendar {
                         ...tokenData.access_token ? { accessToken: tokenData.access_token } : {},
                         ...tokenData.refresh_token ? { refreshToken: tokenData.refresh_token } : {},
                         ...tokenData.expires_in ? { expiresIn: tokenData.expires_in } : {},
-                        ...tokenData.token_type ? { tokeType: tokenData.token_type } : {}
+                        ...tokenData.token_type ? { tokenType: tokenData.token_type } : {}
                     }
                 });
             } else {

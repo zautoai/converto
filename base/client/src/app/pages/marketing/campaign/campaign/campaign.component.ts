@@ -12,6 +12,9 @@ import { Subject, debounceTime } from 'rxjs';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { ScrollUtilService } from 'src/app/shared/services/scroll-util.service';
 import { updateDataList } from 'src/app/common/utils';
+import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
+import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
+import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
 
 interface link {
   name: string;
@@ -26,8 +29,27 @@ interface link {
 export class CampaignComponent implements OnInit,AfterViewInit {
 
   // agentId:any = undefined;
-  campaignForm: FormGroup;
-  errorFeedback: any = { title: "", desc: "", url: "",key:"",value:"" };
+  campaignForm:FormGroup = new FormGroup({
+    title: new FormControl("",[Validators.required]),
+    description: new FormControl(""),
+    url: new FormControl("",[Validators.pattern('^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$')]),
+    startDate: new FormControl(""),
+    endDate: new FormControl(""),
+    isOthers: new FormControl(false),
+    idParam: new FormControl(""),
+    idValue: new FormControl(""),
+    isabm:new FormControl(false),
+    accountId: new FormControl(null),
+  });
+  errorMessages = {
+    title: {
+      required: 'Title is required',
+    },
+    url: {
+      pattern: 'URL is invalid'
+    },
+  };
+  
   selectedCampaign: any;
   Accounts: any;
   selectedCampaignStats: any;
@@ -37,10 +59,9 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   platforms: any = [];
   linkList: link[] = [];
   customLinkList: link[] = [];
-  isOn: boolean = false;
-  showaccounts: boolean=false
+  isLoading:boolean = false;
+  isEdit: boolean = false;
   
-
   searchTerm: string = '';
   private searchSubject: Subject<string> = new Subject<string>();
 
@@ -48,19 +69,12 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   currentPage: number = 1;
   itemPerPage: number = 25;
 
-  @ViewChild('createCampaignOffcanvas') createCampaignModal: ElementRef | any;
-  @ViewChild('editCampaignOffcanvas') editCampaignModal: ElementRef | any;
-  @ViewChild('deleteCampaignModal') deleteCampaignModal: ElementRef | any;
-  @ViewChild('filterOffcanvas') filterOffcanvas: ElementRef | any;
-
+  @ViewChild(AdvanceOffcanvasComponent) advanceOffcanvasComponent!: AdvanceOffcanvasComponent;
+  @ViewChild(AdvancedModalsComponent) deleteCampaignModal!: AdvancedModalsComponent;
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-  
-
-
 
   constructor(
     private modalService: NgbModal,
-    private formBuilder: FormBuilder,
     private restService: RestService,
     private avatarService: AvatarService,
     private notifService: NotificationService,
@@ -71,19 +85,6 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     private sweetAlertService: SweetAlertService,
     private scrollService: ScrollUtilService
   ) {
-    this.campaignForm = new FormGroup({
-      title: new FormControl(""),
-      description: new FormControl(""),
-      url: new FormControl(""),
-      startDate: new FormControl(""),
-      endDate: new FormControl(""),
-      status: new FormControl(""),
-      isOthers: new FormControl(""),
-      idParam: new FormControl(""),
-      idValue: new FormControl(""),
-      isabm:new FormControl(false),
-      campaignAccount: new FormControl(null),
-    });
 
     this.searchSubject.pipe(debounceTime(1000)).subscribe((term) => {
       this.currentPage = 1;
@@ -92,6 +93,50 @@ export class CampaignComponent implements OnInit,AfterViewInit {
       this.selectedCampaign = null;
       this.getCampaigns();
     });
+  }
+
+  get title() {
+    return this.campaignForm.get('title') as FormControl;
+  }
+
+  get description() {
+    return this.campaignForm.get('description') as FormControl;
+  }
+
+  get url() {
+    return this.campaignForm.get('url') as FormControl;
+  }
+
+  get isOthers(){
+    return this.campaignForm.get('isOthers') as FormControl;
+  }
+
+  get idParam(){
+    return this.campaignForm.get('idParam') as FormControl;
+  }
+
+  get idValue(){
+    return this.campaignForm.get('idValue') as FormControl;
+  }
+
+  get startDate() {
+    return this.campaignForm.get('startDate') as FormControl;
+  }
+
+  get endDate() {
+    return this.campaignForm.get('endDate') as FormControl;
+  }
+
+  get status() {
+    return this.campaignForm.get('status') as FormControl;
+  }
+
+  get isabm() {
+    return this.campaignForm.get('isabm') as FormControl;
+  }
+
+  get accountId() {
+    return this.campaignForm.get('accountId') as FormControl;
   }
 
   ngOnInit(): void {
@@ -108,7 +153,6 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     }
   }
    
-
   ngAfterViewInit(): void {
     const containerElement = this.scrollContainer.nativeElement;
 
@@ -149,7 +193,6 @@ export class CampaignComponent implements OnInit,AfterViewInit {
         console.log(error);
       });
   }
-  
 
   getCampaignStats(id: string) {
     this.restService.get(API.main.campaign, id + "/stats")
@@ -210,143 +253,38 @@ export class CampaignComponent implements OnInit,AfterViewInit {
       });
   }
 
-
   openCreateCampaign() {
+    this.isEdit = false;
     this.campaignForm.reset();
-    this.resetErrorFeedback();
-    this.offcanvasService.open(this.createCampaignModal, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
+    this.advanceOffcanvasComponent.open();
   }
 
   openEditCampaign() {
-    this.resetErrorFeedback();
+    this.isEdit = true;
     this.campaignForm.reset();
-    if (this.selectedCampaign) {
-      this.campaignForm.get('title')?.setValue(this.selectedCampaign.title);
-      this.campaignForm.get('description')?.setValue(this.selectedCampaign.description);
-      this.campaignForm.get('url')?.setValue(this.selectedCampaign.url);
-      this.campaignForm.get('startDate')?.setValue(this.formatDate(this.selectedCampaign.startDate));
-      this.campaignForm.get('endDate')?.setValue(this.formatDate(this.selectedCampaign.endDate));
-      this.campaignForm.get('status')?.setValue(this.selectedCampaign.status);
-      this.campaignForm.get('isOthers')?.setValue(!this.selectedCampaign.isZauto);
-      this.campaignForm.get('idParam')?.setValue(this.selectedCampaign.idParam);
-      this.campaignForm.get('idValue')?.setValue(this.selectedCampaign.idValue);
-      this.campaignForm.get('isAbm')?.setValue(this.selectedCampaign.isAbm);
-
-    }
-    this.offcanvasService.open(this.editCampaignModal, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
+    this.campaignForm.patchValue(this.selectedCampaign);
+    this.isabm?.setValue((this.accountId.value ? true : false));
+    this.isOthers?.setValue((this.idParam.value ? true : false));
+    this.advanceOffcanvasComponent.open();
   }
 
-  openDeleteCampaign() {
-    // this.modalService.open(this.deleteCampaignModal, { size: 'md', centered: true });
-    this.sweetAlertService.warning("Delete campaign","Are you sure you want to delete ?",['Delete','Cancel'],(confirm:any)=>{
-      if(confirm.isConfirmed)
-      {
-        this.onDeleteCampaignSubmit();
-      }
-    });
+  openDeleteCampaign(entity:any) {
+    this.deleteCampaignModal.open(entity);
   }
 
   closeModal() {
     this.modalService.dismissAll();
   }
 
-  onCreateCampaignSubmit() {
-    this.resetErrorFeedback();
-    const title: string = this.campaignForm.value.title || "";
-    const desc: string = this.campaignForm.value.description || "";
-    const url: string = this.campaignForm.value.url || "";
-    const isZauto: boolean = !this.campaignForm.value.isOthers || false;
-    const idParam: string = this.campaignForm.value.idParam || "";
-    const idValue: string = this.campaignForm.value.idValue || "";
-    const isabm: string = this.campaignForm.value.isabm || "";
-    const campaignAccount:string=this.campaignForm.value.campaignAccount||"";
-    
+  onSubmit() {    
 
     if (this.campaignForm.valid) {
-      const data = {
-        agentId: this.avatarService.getAvatarId(),
-        title: title,
-        description: desc,
-        url: url,
-        isZauto: isZauto,
-        idParam: idParam,
-        idValue: idValue,
-        isabm:isabm,
-        accountId:campaignAccount,
-
-        
-
-      };
-      this.restService.post(API.main.campaign, data)
-        .subscribe((response: any) => {
-          this.getCampaigns();
-          this.campaignForm.reset();
-          this.offcanvasService.dismiss();
-          this.notifService.showSuccess("New campaign created.");
-        }, (error) => {
-          this.notifService.showError(error.error.message);
-          console.log(error);
-        });
-    }
-    else {
-      if (title.length <= 0) {
-        this.errorFeedback.title = "Title required.";
-      }
-      if (desc.length <= 0) {
-        this.errorFeedback.desc = "Description required.";
-      }
-      if(!isZauto)
+      const data = this.campaignForm.value;
+      console.log(data);
+      
+      this.isLoading = true;
+      if(this.isEdit)
       {
-        if (idParam.length <= 0) {
-          this.errorFeedback.key = "Key required.";
-        }
-        if (idValue.length <= 0) {
-          this.errorFeedback.value = "Key required.";
-        }
-      }
-    }
-  }
-
-  onEditCampaignSubmit() {
-    this.resetErrorFeedback();
-    const title: string = this.campaignForm.value.title || "";
-    const desc: string = this.campaignForm.value.description || "";
-    const url: string = this.campaignForm.value.url || "";
-    const startDate: string = this.campaignForm.value.startDate || "";
-    const endDate: string = this.campaignForm.value.endDate || "";
-    // const status: string = this.campaignForm.value.status || "";
-    const isZauto: boolean = !this.campaignForm.value.isOthers || false;
-    const idParam: string = this.campaignForm.value.idParam || "";
-    const idValue: string = this.campaignForm.value.idValue || "";
-    const campaignAccount=this.campaignForm.value.campaignAccount||'';
-
-    if (this.campaignForm.valid) {
-      const data: any = {
-        title: title,
-        description: desc,
-        url: url,
-        // status: status,
-        isZauto: isZauto,
-        idParam: idParam,
-        idValue: idValue,
-        accountId:campaignAccount,
-      };
-
-      if (startDate) data['startDateTimestamp'] = new Date(startDate).getTime();
-      if (endDate) data['endDateTimestamp'] = new Date(endDate).getTime();
-
-
-      if (this.selectedCampaign) {
         this.restService.patch(API.main.campaign, this.selectedCampaign.id, data)
           .subscribe((response: any) => {
             this.getCampaigns();
@@ -355,33 +293,38 @@ export class CampaignComponent implements OnInit,AfterViewInit {
             this.notifService.showSuccess("Campaign updated.");
             this.selectedCampaign = response;
             this.generateLinks();
+            this.isLoading = false;
           }, (error) => {
+            this.isLoading = false;
             console.log(error);
+          });
+      }
+      else
+      {
+        this.restService.post(API.main.campaign, data)
+          .subscribe((response: any) => {
+            this.getCampaigns();
+            this.campaignForm.reset();
+            this.offcanvasService.dismiss();
+            this.notifService.showSuccess("New campaign created.");
+
+            this.isLoading = false;
+          }, (error) => {
+            this.notifService.showError(error.error.message);
+            console.log(error);
+            this.isLoading = false;
           });
       }
     }
     else {
-      if (title.length <= 0) {
-        this.errorFeedback.title = "Title required.";
-      }
-      if (desc.length <= 0) {
-        this.errorFeedback.desc = "Description required.";
-      }
-      if(!isZauto)
-      {
-        if (idParam.length <= 0) {
-          this.errorFeedback.key = "Key required.";
-        }
-        if (idValue.length <= 0) {
-          this.errorFeedback.value = "Key required.";
-        }
-      }
+      markFormGroupAsDirty(this.campaignForm);
+      this.isLoading = false;
     }
   }
 
-  onDeleteCampaignSubmit() {
-    if (this.selectedCampaign && !this.selectedCampaign.isDefault) {
-      this.restService.delete(API.main.campaign, this.selectedCampaign.id)
+  onDeleteCampaignSubmit(entity:any) {
+    if (entity && !entity.isDefault) {
+      this.restService.delete(API.main.campaign, entity.id)
         .subscribe((response: any) => {
           this.closeModal();
           this.getCampaigns();
@@ -426,10 +369,6 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     }
   }
 
-
-  
- 
-
   generateLinks() {
     if (this.platforms.length > 0 && this.selectedCampaign) {
       this.customLinkList.splice(0, this.customLinkList.length);
@@ -464,14 +403,6 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   isFieldValid(fieldName: string): boolean {
     const control = this.campaignForm.get(fieldName)!;
     return control.invalid && control.dirty;
-  }
-
-  resetErrorFeedback() {
-    let keys = Object.keys(this.errorFeedback);
-    for (let key of keys) {
-      this.errorFeedback[key] = "";
-
-    }
   }
 
   formatDate(dateString: string): string {
@@ -509,14 +440,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
   }
 
   // filter
-  openFilterCanvas() {
-    this.offcanvasService.open(this.filterOffcanvas, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
-  }
+
 
   objectToQueryString(obj: { [key: string]: any }): string {
     const queryString = Object.keys(obj)

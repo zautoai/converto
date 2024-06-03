@@ -6,9 +6,8 @@ import { CampaignComponent } from './campaign/campaign/campaign.component';
 const routes: Routes = [
   {
     path: 'campaigns',
-    title: "Campaigns",
-    component: CampaignComponent,
-    canActivate: [SetupGuard]
+    redirectTo: 'campaigns/all',
+    pathMatch: 'full'
   },
   {
     path: 'campaigns/:id',

@@ -73,6 +73,7 @@ export class CalendarController {
 
   @Get('/available-slots')
   @ApiBearerAuth("x-tenant-id")
+  @UseGuards(SubdomainGuard)
   @ApiQuery({ name: 'date' })
   async getAvailableSlots(@Query() queryParams: { date: string },@Req() request:SubdomainRequest) {
     const { date } = queryParams;
@@ -84,6 +85,7 @@ export class CalendarController {
   }
 
   @Post('book-event')
+  @UseGuards(SubdomainGuard)
   @ApiBearerAuth("x-tenant-id")
   async bookEvents(@Body() bookEventDto: BookEventDto,@Req() request:SubdomainRequest) {
     const orgId = request.orgId;

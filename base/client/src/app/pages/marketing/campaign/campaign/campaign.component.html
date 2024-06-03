@@ -81,7 +81,7 @@
                                             <button ngbDropdownItem (click)="openEditCampaign()"><i
                                                     class="fa fa-edit"></i> Edit</button>
                                             <div class="dropdown-divider"></div>
-                                            <button ngbDropdownItem (click)="openDeleteCampaign()" class="text-danger"
+                                            <button ngbDropdownItem (click)="openDeleteCampaign(selectedCampaign)" class="text-danger"
                                                 *ngIf="!this.selectedCampaign?.isDefault"><i class="fa fa-trash"></i>
                                                 Delete</button>
                                         </div>
@@ -238,196 +238,125 @@
     </div>
 </div>
 
-
-<ng-template #deleteCampaignModal let-model>
-    <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title"><i class="fe fe-award"></i> Delete Campaign</h4>
+<app-advance-offcanvas heading="{{ isEdit ? 'Edit' : 'Create'}} campaign">
+<form [formGroup]="campaignForm" (ngSubmit)="onSubmit()">
+    <div class="form-group mb-3">
+        <advanced-input 
+        [label]="'Title'" 
+        [type]="'text'" 
+        [placeholder]="'Campaign title'" 
+        [size]="'md'"
+        [control]="title" 
+        [isDisabled]="isLoading" 
+        [errorMessages]="errorMessages.title"
+        ></advanced-input>
     </div>
-    <div class="modal-body">
-        Are you sure you want to delete ?
+    <div class="form-group mb-3">
+        <advanced-input 
+        [label]="'Description'" 
+        [type]="'textarea'" 
+        [placeholder]="'Campaign description'" 
+        [size]="'md'"
+        [control]="description" 
+        [isDisabled]="isLoading" 
+        [rows]="3"
+        ></advanced-input>
     </div>
-    <div class="modal-footer">
-        <button class="btn btn-outline-primary" (click)="closeModal()">Cancel</button>
-        <button class="btn btn-danger" (click)="onDeleteCampaignSubmit()">Yes</button>
+    <div class="form-group mb-3">
+        <advanced-input 
+        [label]="'URL'" 
+        [type]="'url'" 
+        [placeholder]="'Campaign URL e.g:https://convert.com/'" 
+        [size]="'md'"
+        [control]="url" 
+        [isDisabled]="isLoading" 
+        [errorMessages]="errorMessages.url"
+        ></advanced-input>
     </div>
-</ng-template>
-
-
-
-<!-- Create campaign offcanvas -->
-<ng-template #createCampaignOffcanvas let-offcanvas>
-    <div class="offcanvas-header">
-        <h4 class="offcanvas-title"><i class="fe fe-award"></i> Create Campaign</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+    <div class="form-group mb-3">
+        <advanced-input 
+        [label]="'Is ABM'" 
+        [type]="'checkbox'" 
+        [control]="isabm" 
+        [isDisabled]="isLoading" 
+        ></advanced-input>
     </div>
-    <hr class="m-0">
-    <div class="offcanvas-body">
-        <form [formGroup]="campaignForm" (ngSubmit)="onCreateCampaignSubmit()">
-            <div class="form-group mb-3">
-                <label for="title">Title</label>
-                <input type="text" id="title" name="title" class="form-control" placeholder="Title"
-                    formControlName="title"
-                    [ngClass]="{'is-invalid':isFieldValid('title') || errorFeedback.title.length > 0}">
-                <div class="invalid-feedback">
-                    {{errorFeedback.title}}
+    @if(isabm.value == true){
+        <div class="card">
+            <div class="card-body p-2">
+                <div class="form-group mb-3">
+                    <advanced-input 
+                    [label]="'Account'" 
+                    [type]="'select'" 
+                    [placeholder]="'--- Select Account ---'" 
+                    [size]="'md'"
+                    [control]="accountId" 
+                    [isDisabled]="isLoading" >
+                    @for (account of Accounts; track $index) {
+                        <option [value]="account.id">{{account.accountName}}</option>
+                    }
+                </advanced-input>
                 </div>
             </div>
-            <div class="form-group mb-3">
-                <label for="description">Description</label>
-                <textarea name="description" id="description" class="form-control" placeholder="Description..." rows="5"
-                    formControlName="description"
-                    [ngClass]="{'is-invalid':(isFieldValid('description') || errorFeedback.desc.length > 0)}">
-                    </textarea>
-                <div class="invalid-feedback">
-                    {{errorFeedback.desc}}
+        </div>
+    }
+    <div class="form-group mb-3">
+        <advanced-input 
+        [label]="'Is other campaign'" 
+        [type]="'checkbox'" 
+        [control]="isOthers" 
+        [isDisabled]="isLoading" 
+        ></advanced-input>
+    </div>
+    @if(isOthers.value){
+        <div class="card">
+            <div class="card-body p-2">
+                <div class="form-group mb-3">
+                    <advanced-input 
+                    [label]="'key'" 
+                    [type]="'text'" 
+                    [placeholder]="'Campaign key'" 
+                    [size]="'md'"
+                    [control]="idParam" 
+                    [isDisabled]="isLoading" 
+                    ></advanced-input>
+                </div>
+                <div class="form-group mb-3">
+                    <advanced-input 
+                    [label]="'Value'" 
+                    [type]="'text'" 
+                    [placeholder]="'Campaign Value'" 
+                    [size]="'md'"
+                    [control]="idValue" 
+                    [isDisabled]="isLoading" 
+                    ></advanced-input>
                 </div>
             </div>
-
-            <div class="form-group mb-3" *ngIf="false">
-                <label for="url">URL</label>
-                <input type="text" id="url" name="url" class="form-control" placeholder="URL e.g: example.com"
-                    formControlName="url">
-            </div>
-
-            <div class="form-group mb-3">
-                <label class="custom-control custom-checkbox mb-0">
-                    <input type="checkbox" name="lead-only" formControlName="isOthers" class="custom-control-input">
-                    <span class="custom-control-label">Is Others</span>
-                </label>
-            </div>
-            <div class="form-group mb-3">
-                <label class="custom-control custom-checkbox mb-0">
-                    <input type="checkbox" name="lead-only" formControlName="isabm" class="custom-control-input">
-                    <span class="custom-control-label">Is Account Based Marketing</span>
-                </label>
-            </div>
-
-            <div *ngIf="campaignForm.get('isabm')?.value">
-                <label>Select the Account:</label>
-                <select formControlName="campaignAccount">
-                  <option  *ngFor="let Account of Accounts" value="{{Account.id}}">{{Account.
-                    accountName
-                    }}</option>
-                </select>
-              </div>
-
-            <div class="form-group mb-3" *ngIf="campaignForm.value.isOthers">
-                <label for="key">Campain Id field</label>
-                <input type="text" id="key" name="key" class="form-control mb-2" placeholder="Key"
-                    formControlName="idParam"
-                    [ngClass]="{'is-invalid':isFieldValid('idParam') || errorFeedback.key.length > 0}">
-                <input type="text" id="value" name="value" class="form-control" placeholder="Value"
-                    formControlName="idValue"
-                    [ngClass]="{'is-invalid':isFieldValid('idValue') || errorFeedback.value.length > 0}">
-            </div>
-            <div class="d-flex justify-content-end">
-                <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()"><i
-                        class="fa fa-times"></i>
-                    Close</button>
-                <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> Create</button>
-            </div>
-        </form>
+        </div>
+    }
+    <div class="d-flex gap-3 justify-content-end">
+        <advanced-button 
+        label="{{ isEdit ? 'Update' : 'Create'}}" 
+        [size]="'md'" 
+        [classes]="'w-100'" 
+        [type]="'submit'"
+        [isLoading]="isLoading"
+        ></advanced-button>
+        <advanced-button 
+        label="Cancel" 
+        [size]="'md'" 
+        [classes]="'w-100'" 
+        [type]="'button'"
+        [color]="'outline-primary'"
+        [isLoading]="isLoading"
+        ></advanced-button>
     </div>
-</ng-template>
-
-<ng-template #editCampaignOffcanvas let-offcanvas>
-    <div class="offcanvas-header">
-        <h4 class="offcanvas-title"><i class="fe fe-award"></i> Edit Campaign</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
-    </div>
-    <hr class="m-0">
-    <div class="offcanvas-body">
-        <form [formGroup]="campaignForm" (ngSubmit)="onEditCampaignSubmit()">
-            <div class="form-group mb-3">
-                <label for="title">Title</label>
-                <input type="text" id="title" name="title" class="form-control" placeholder="Title"
-                    formControlName="title"
-                    [ngClass]="{'is-invalid':isFieldValid('title') || errorFeedback.title.length > 0}">
-                <div class="invalid-feedback">
-                    {{errorFeedback.title}}
-                </div>
-            </div>
-            <div class="form-group mb-3">
-                <label for="description">Description</label>
-                <textarea name="description" id="description" class="form-control" placeholder="Description..." rows="5"
-                    formControlName="description"
-                    [ngClass]="{'is-invalid':(isFieldValid('description') || errorFeedback.desc.length > 0)}">
-                    </textarea>
-                <div class="invalid-feedback">
-                    {{errorFeedback.desc}}
-                </div>
-            </div>
-            <div class="form-group mb-3" *ngIf="false">
-                <label for="url">URL</label>
-                <input type="text" id="url" name="url" class="form-control" placeholder="URL e.g: example.com"
-                    formControlName="url">
-            </div>
-
-            <div class="form-group mb-3">
-                <label for="">Start Date</label>
-                <input type="date" class="form-control" formControlName="startDate">
-            </div>
-            <div class="form-group mb-3">
-                <label for="">End Date</label>
-                <input type="date" class="form-control" formControlName="endDate">
-            </div>
-
-            <div class="form-group mb-3" *ngIf="false">
-                <label for=" status">Status</label>
-                <select id="status" class="form-select" formControlName="status">
-                    <option [value]="'ACTIVE'">ACTIVE</option>
-                    <option [value]="'INACTIVE'">INACTIVE</option>
-                </select>
-            </div>
-
-            <div class="form-group mb-3">
-                <label class="custom-control custom-checkbox mb-0">
-                    <input type="checkbox" name="lead-only" formControlName="isOthers" class="custom-control-input">
-                    <span class="custom-control-label">Is Others</span>
-                </label>
-            </div>
-            <div class="form-group mb-3">
-                <label class="custom-control custom-checkbox mb-0">
-                    <input type="checkbox" name="lead-only" formControlName="isabm" class="custom-control-input">
-                    <span class="custom-control-label">Is Account Based Marketing</span>
-                </label>
-            </div>
-            <div *ngIf="campaignForm.get('isabm')?.value">
-                <label>Select the Account:</label>
-                <select formControlName="campaignAccount">
-                  <option  *ngFor="let Account of Accounts" value="{{Account.id}}">{{Account.
-                    accountName
-                    }}</option>
-                </select>
-              </div>
-
-            <div class="form-group mb-3" *ngIf="campaignForm.value.isOthers">
-                <label for="key">Campain Id field</label>
-                <input type="text" id="key" name="key" class="form-control mb-2" placeholder="Key"
-                    formControlName="idParam"
-                    [ngClass]="{'is-invalid':isFieldValid('idParam') || errorFeedback.key.length > 0}">
-                <input type="text" id="value" name="value" class="form-control" placeholder="Value"
-                    formControlName="idValue"
-                    [ngClass]="{'is-invalid':isFieldValid('idValue') || errorFeedback.value.length > 0}">
-            </div>
-
-            <div class="d-flex justify-content-end">
-                <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()"><i
-                        class="fa fa-times"></i>
-                    Close</button>
-                <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> Update</button>
-            </div>
-        </form>
-    </div>
-</ng-template>
-
-<ng-template #filterOffcanvas let-offcanvas>
-    <div class="offcanvas-header">
-        <h4 class="offcanvas-title"><i class="fe fe-filter"></i> Filters</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
-    </div>
-    <hr class="m-0">
-    <div class="offcanvas-body">
-
-    </div>
-</ng-template>
+</form>
+</app-advance-offcanvas>
+<app-advanced-modals
+  [modalTitle]="'Delete Item'"
+  [modalMessage]="'Are you sure you want to delete this item? This action cannot be undone.'"
+  [modalConformMessage]="'Delete'"
+  [modalCancelMessage]="'Cancel'"
+  (confirm)="onDeleteCampaignSubmit($event)"
+></app-advanced-modals>

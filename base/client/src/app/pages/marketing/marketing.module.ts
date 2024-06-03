@@ -10,6 +10,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
+import { ComponentsModule } from 'src/app/components/components.module';
 
 
 @NgModule({
@@ -26,6 +27,7 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
     NgSelectModule,
     NgScrollbar,
     ReactiveFormsModule,
+    ComponentsModule,
     NgxSkeletonLoaderModule.forRoot({
       theme: {
         extendsFromRoot: true,
