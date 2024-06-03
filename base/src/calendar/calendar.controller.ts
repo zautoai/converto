@@ -28,7 +28,7 @@ export class CalendarController {
   async getAuthUrl(@Query() crmAuthDto: CalendarAuthDto, @Req() request: ZautoRequest) {
     const orgId = request.user.orgId;
     const state = crmAuthDto.name;
-    return this.calendarService.getAuthUrl({ orgId, data: { calendarName: crmAuthDto.name, additionalInfo: state } });
+    return this.calendarService.getAuthUrl({ orgId, data: { calendarName: crmAuthDto.name, additionalInfo: {state} } });
   }
 
   @Get('callback')
@@ -64,6 +64,7 @@ export class CalendarController {
   }
 
   @Get('/available-dates')
+  @ApiBearerAuth("x-tenant-id")
   @UseGuards(SubdomainGuard)
   async getAvailableDates(@Req() request:SubdomainRequest) {
     const orgId = request.orgId;
@@ -71,6 +72,7 @@ export class CalendarController {
   }
 
   @Get('/available-slots')
+  @ApiBearerAuth("x-tenant-id")
   @ApiQuery({ name: 'date' })
   async getAvailableSlots(@Query() queryParams: { date: string },@Req() request:SubdomainRequest) {
     const { date } = queryParams;

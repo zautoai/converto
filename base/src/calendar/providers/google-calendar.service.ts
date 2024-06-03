@@ -28,7 +28,7 @@ export class GoogleCalendarService extends BaseCalendar {
     }
 
 
-    getAuthUrl(additionalInfo: any): string {
+    getAuthUrl(orgId:string,additionalInfo: any): string {
         const params = new URLSearchParams({
             client_id: this.clientId,
             redirect_uri: this.redirectUri,
@@ -124,7 +124,7 @@ export class GoogleCalendarService extends BaseCalendar {
                         accessToken: tokenData.access_token,
                         refreshToken: tokenData.refresh_token,
                         expiresIn: tokenData.expires_in,
-                        ...tokenData.token_type ? { tokeType: tokenData.token_type } : {}
+                        ...tokenData.token_type ? { tokenType: tokenData.token_type } : {}
                     }
                 });
             }

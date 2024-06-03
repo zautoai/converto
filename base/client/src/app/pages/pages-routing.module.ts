@@ -302,6 +302,10 @@ const routes: Routes = [
     title: 'Intent Scoring',
     component: IntentScoringComponent,
     canActivate: [SetupGuard]
+  },
+  {
+    path:'',
+    loadChildren:() => import('./pages.module').then(m => m.PagesModule)
   }
 ];
 
