@@ -5,7 +5,7 @@ import {
   ElementRef,
   ViewChild
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Menu, NavService } from '../../services/nav.service';
 import { switcherArrowFn, parentNavActive, checkHoriMenu } from './sidebar';
 import { fromEvent } from 'rxjs';
@@ -77,45 +77,45 @@ export class SidebarComponent {
       this.menuItems = menuItems;
 
       this.router.events.subscribe((event: any) => {
-        // if (event instanceof NavigationStart) {
-        //   this.closeNavActive();
-        //   setTimeout(() => {
-        //     let sidemenu = document.querySelectorAll('.side-menu__item.active');
-        //     let subSidemenu = document.querySelectorAll(
-        //       '.sub-side-menu__item.active'
-        //     );
-        //     sidemenu.forEach((e) => e.classList.remove('active'));
-        //     subSidemenu.forEach((e) => e.classList.remove('active'));
-        //   }, 100);
-        // }
-        // if (event instanceof NavigationEnd) {
-        //   menuItems.filter((items: any) => {
-        //     if (items.path === event.url) {
-        //       this.setNavActive(items);
-        //     }
-        //     if (!items.children) {
-        //       return false;
-        //     }
-        //     items.children.filter((subItems: any) => {
-        //       if (subItems.path === event.url) {
-        //         this.setNavActive(subItems);
-        //       }
-        //       if (!subItems.children) {
-        //         return false;
-        //       }
-        //       subItems.children.filter((subSubItems: any) => {
-        //         if (subSubItems.path === event.url) {
-        //           this.setNavActive(subSubItems);
-        //         }
-        //       });
-        //       return;
-        //     });
-        //     return;
-        //   });
-        //   setTimeout(() => {
-        //     parentNavActive();
-        //   }, 200);
-        // }
+        if (event instanceof NavigationStart) {
+          this.closeNavActive();
+          setTimeout(() => {
+            let sidemenu = document.querySelectorAll('.side-menu__item.active');
+            let subSidemenu = document.querySelectorAll(
+              '.sub-side-menu__item.active'
+            );
+            sidemenu.forEach((e) => e.classList.remove('active'));
+            subSidemenu.forEach((e) => e.classList.remove('active'));
+          }, 100);
+        }
+        if (event instanceof NavigationEnd) {
+          menuItems.filter((items: any) => {
+            if (items.path === event.url) {
+              this.setNavActive(items);
+            }
+            if (!items.children) {
+              return false;
+            }
+            items.children.filter((subItems: any) => {
+              if (subItems.path === event.url) {
+                this.setNavActive(subItems);
+              }
+              if (!subItems.children) {
+                return false;
+              }
+              subItems.children.filter((subSubItems: any) => {
+                if (subSubItems.path === event.url) {
+                  this.setNavActive(subSubItems);
+                }
+              });
+              return;
+            });
+            return;
+          });
+          setTimeout(() => {
+            parentNavActive();
+          }, 200);
+        }
       });
     });
     let submenuItems = this.navServices.setupMenuItems;

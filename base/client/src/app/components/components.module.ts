@@ -4,6 +4,9 @@ import { AdvancedInputComponent } from './advanced-inputs/advanced-input/advance
 import { AdvancedModalsComponent } from './advanced-modals/advanced-modals/advanced-modals.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AdvancedButtonComponent } from './advanced-inputs/advanced-button/advanced-button.component';
+import { VerticalSidebarComponent } from './vertical-sidebar/vertical-sidebar.component';
+import { RouterModule } from '@angular/router';
+import { NgScrollbar } from 'ngx-scrollbar';
 
 
 
@@ -11,16 +14,20 @@ import { AdvancedButtonComponent } from './advanced-inputs/advanced-button/advan
   declarations: [
     AdvancedInputComponent,
     AdvancedModalsComponent,
-    AdvancedButtonComponent
+    AdvancedButtonComponent,
+    VerticalSidebarComponent
   ],
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterModule,
+    NgScrollbar
   ],
   exports: [
     AdvancedInputComponent,
     AdvancedButtonComponent,
-    AdvancedModalsComponent
+    AdvancedModalsComponent,
+    VerticalSidebarComponent
   ]
 })
 export class ComponentsModule { }

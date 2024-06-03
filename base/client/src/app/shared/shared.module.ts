@@ -51,6 +51,7 @@ import { LeadPipe } from './pipes/lead.pipe';
 
 import { WidgetsModule } from '../widgets/widgets.module';
 import { DataTableModule } from './data-table/data-table.module';
+import { ComponentsModule } from '../components/components.module';
 
 
 
@@ -112,7 +113,8 @@ import { DataTableModule } from './data-table/data-table.module';
         }
       }
     ),
-    DataTableModule
+    DataTableModule,
+    ComponentsModule
 
   ],
   exports: [
