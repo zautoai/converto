@@ -4,6 +4,7 @@ import { AdvancedInputComponent } from './advanced-inputs/advanced-input/advance
 import { AdvancedModalsComponent } from './advanced-modals/advanced-modals/advanced-modals.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AdvancedButtonComponent } from './advanced-inputs/advanced-button/advanced-button.component';
+import { AdvanceOffcanvasComponent } from './advance-offcanvas/advance-offcanvas.component';
 import { VerticalSidebarComponent } from './vertical-sidebar/vertical-sidebar.component';
 import { RouterModule } from '@angular/router';
 import { NgScrollbar } from 'ngx-scrollbar';
@@ -15,6 +16,7 @@ import { NgScrollbar } from 'ngx-scrollbar';
     AdvancedInputComponent,
     AdvancedModalsComponent,
     AdvancedButtonComponent,
+    AdvanceOffcanvasComponent,
     VerticalSidebarComponent
   ],
   imports: [
@@ -27,6 +29,7 @@ import { NgScrollbar } from 'ngx-scrollbar';
     AdvancedInputComponent,
     AdvancedButtonComponent,
     AdvancedModalsComponent,
+    AdvanceOffcanvasComponent,
     VerticalSidebarComponent
   ]
 })

@@ -74,14 +74,15 @@
     <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
 
     <app-advanced-modals 
-      #deleteModal 
-      deleteModalTitle="Delete Confirmation"
-      deleteModalMessage="Are you sure you want to delete this contact?" 
-      deleteModalConformMessage="Yes" 
-      deleteModalCancelMessage="No"
+      #contentModal 
+      modalSize="sm"
+      modalType="delete"
+      modalTitle="Delete Confirmation"
+      modalMessage="Are you sure you want to delete this contact?" 
+      modalConformMessage="Yes" 
+      modalCancelMessage="No"
       (confirm)="confirmDelete($event)">
     </app-advanced-modals>
-    
 
     <ng-template #createUserOffcanvas let-offcanvas>
       <div class="offcanvas-header">

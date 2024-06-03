@@ -1,0 +1,10 @@
+<ng-template #offcanvas let-offcanvas>
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title"><i class="fe fe-cube"></i> {{heading}}</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+      </div>
+      <hr class="m-0" />
+      <div class="offcanvas-body">
+        <ng-content></ng-content>
+      </div>
+</ng-template>
