@@ -1,4 +1,4 @@
-<button class="btn btn-{{color}} btn-{{ size }} {{classes}}" [disabled]="isDisabled || isLoading" [type]="type">
+<button class="btn btn-{{color}} btn-{{ size }} {{classes}}" [disabled]="isDisabled || isLoading" [type]="type" (click)="clickEvent()">
     <i *ngIf="" class="{{ icon }} me-2"></i>
     <span *ngIf="!isLoading">{{ label }}</span>
     <span *ngIf="isLoading">

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ButtonTypes } from '../types';
 
 @Component({
@@ -17,5 +17,13 @@ export class AdvancedButtonComponent {
   @Input() isDisabled: boolean = false;
   @Input() isLoading: boolean = false;
   @Input() loadingText: string = 'Loading...';
+
+  @Output() onClick:EventEmitter<any> = new EventEmitter();
+
+  constructor() { }
+
+  clickEvent(){
+    this.onClick.emit();
+  }
 
 }

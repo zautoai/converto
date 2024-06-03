@@ -1,18 +1,17 @@
 import { Component, ElementRef, Input, OnInit, ViewChild, ChangeDetectorRef, TemplateRef, } from '@angular/core';
 import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
-import { FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AvatarService } from '../../shared/services/avatar.service';
-import { NgbDropdownConfig, NgbDropdownModule, NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-
+import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationService } from '../../shared/services/notification.service';
 import { RestService } from '../../shared/services/rest.service';
 import { SweetAlertService } from '../../shared/services/sweet-alart.service';
 import { DeployScriptType } from '../zautosettings/settings/settings.component';
 import { API } from '../../config/endpoint.config';
-import { error } from 'console';
-import { PaginationData } from 'src/app/common/intefaces';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
+import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
+import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
 
 
 @Component({
@@ -23,20 +22,18 @@ import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/adva
 
 })
 export class ContactsComponent implements OnInit {
-  @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
-  @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
+  @ViewChild(AdvanceOffcanvasComponent) contactComposeCanvas!: AdvanceOffcanvasComponent;
   @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
   @Input() chatBotWidget!: ChatBotWidgetsComponent;
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
 
-
+  isLoading:boolean = false;
   user: any = {};
   userList: any = [];
   selectedUser: any = undefined;
   showActionMenu = false;
   isEdit: boolean = false;
   photo1: any = "https://imgs.search.brave.com/Mvm4VXGBy83NyhAuuehkrHYV0s4BvjtY6ZwR2dXCGro/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9ncGNh/dGFseXNpcy5ibG9i/LmNvcmUud2luZG93/cy5uZXQvZ3Bob3N0/ZWRjb250ZW50LXBy/b2Qvd1pVNzFpND1f/S2FtYXRoX05pa2hp/bF81MDB4NTAwLmpw/Zw"
-  Form: FormGroup;
   errorFeedback: any = { title: '', describe: '' };
   showDescription: boolean = true;
   showHTML: boolean = false;
@@ -54,6 +51,39 @@ export class ContactsComponent implements OnInit {
   isLeadScore: any = 80;
   clickedData: any;
 
+  errorMessages = {
+    firstName: {
+      required: 'First name is required',
+    },
+    lastName: {
+      required: 'Last name is required',
+    },
+    email: {
+      required: 'Email is required',
+      email: 'Please enter a valid email address',
+    },
+  };
+    
+  form:FormGroup = new FormGroup({
+    photoURL: new FormControl(''),
+    fullName: new FormControl(''),
+    firstName: new FormControl('',[Validators.required]),
+    lastName: new FormControl('',[Validators.required]),
+    jobTitle: new FormControl(''),
+    organizationName: new FormControl(''),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    phone: new FormControl(''),
+    address: new FormControl(''),
+    city: new FormControl(''),
+    state: new FormControl(''),
+    zip: new FormControl(''),
+    country: new FormControl(''),
+    website: new FormControl(''),
+    notes: new FormControl(''),
+    leadSource: new FormControl(''),
+    status: new FormControl(''),
+  });
+
   //Delete Modal
   @ViewChild(AdvancedModalsComponent) deleteModal!: AdvancedModalsComponent;
 
@@ -69,25 +99,7 @@ export class ContactsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
   ) {
-    this.Form = new FormGroup({
-      photoURL: new FormControl(''),
-      fullName: new FormControl(''),
-      firstName: new FormControl(''),
-      lastName: new FormControl(''),
-      jobTitle: new FormControl(''),
-      organizationName: new FormControl(''),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      phone: new FormControl(''),
-      address: new FormControl(''),
-      city: new FormControl(''),
-      state: new FormControl(''),
-      zip: new FormControl(''),
-      country: new FormControl(''),
-      website: new FormControl(''),
-      notes: new FormControl(''),
-      leadSource: new FormControl(''),
-      status: new FormControl(''),
-    });
+    
   }
 
   ngOnInit(): void {
@@ -98,6 +110,74 @@ export class ContactsComponent implements OnInit {
       this.onPageChange({ page: this.currentPage })
       console.log("test", this.submittedData)
     });
+  }
+
+  get photoURL(): FormControl {
+    return this.form.get('photoURL') as FormControl;
+  }
+
+  get fullName(): FormControl {
+    return this.form.get('fullName') as FormControl;
+  }
+
+  get firstName(): FormControl {
+    return this.form.get('firstName') as FormControl;
+  }
+
+  get lastName(): FormControl {
+    return this.form.get('lastName') as FormControl;
+  }
+
+  get jobTitle(): FormControl {
+    return this.form.get('jobTitle') as FormControl;
+  }
+
+  get organizationName(): FormControl {
+    return this.form.get('organizationName') as FormControl;
+  }
+
+  get email(): FormControl {
+    return this.form.get('email') as FormControl;
+  }
+
+  get phone(): FormControl {
+    return this.form.get('phone') as FormControl;
+  }
+
+  get address(): FormControl {
+    return this.form.get('address') as FormControl;
+  }
+
+  get city(): FormControl {
+    return this.form.get('city') as FormControl;
+  }
+
+  get state(): FormControl {
+    return this.form.get('state') as FormControl;
+  }
+
+  get zip(): FormControl {
+    return this.form.get('zip') as FormControl;
+  }
+
+  get country(): FormControl {
+    return this.form.get('country') as FormControl;
+  }
+
+  get website(): FormControl {
+    return this.form.get('website') as FormControl;
+  }
+
+  get notes(): FormControl {
+    return this.form.get('notes') as FormControl;
+  }
+
+  get leadSource(): FormControl {
+    return this.form.get('leadSource') as FormControl;
+  }
+
+  get status(): FormControl {
+    return this.form.get('status') as FormControl;
   }
 
   ngAfterViewInit(): void {
@@ -128,244 +208,79 @@ export class ContactsComponent implements OnInit {
     }
   }
 
-  // onSubmitForm(): void {
-  //   if (this.Form.valid) {
-  //     this.submittedData.push({ ...this.Form.value });
-  //     this.Form.reset();
-  //   } else {
-  //     console.log('Form is not valid');
-  //     this.notifService.showError('Please fill out all required fields correctly');
-
-  //   }
-  // }
-
   openCreateUser() {
-    this.Form.reset();
-    this.resetErrorFeedback();
-    this.offcanvasService.open(this.createUserOffcanvas, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
+    this.form.reset();
+    this.contactComposeCanvas.open();
   }
 
   openViewUser(data: any) {
     this.selectedData = data;
-    this.Form.reset();
-    this.resetErrorFeedback();
+    this.form.reset();
     this.router.navigate(['contacts/view-contacts', data.id]);
   }
 
-  toggleDescription(): void {
-    this.showDescription = !this.showDescription;
-    this.showHTML = false;
-    this.showScript = false;
-  }
+  onSubmit() {
+    if(this.form.valid)
+    {
+      const formData: { [key: string]: string | null } = this.form.value;
+      const data = Object.entries(formData)
+        .filter(([_, value]) => value !== null)
+        .reduce((acc, [key, value]) => {
+          if (value !== null) {
+            acc[key] = value;
+          }
+          return acc;
+        }, {} as { [key: string]: string });      
 
-  toggleHTML(): void {
-    this.showHTML = !this.showHTML;
-    this.showDescription = false;
-    this.showScript = false;
-  }
-
-  deplymentType = DeployScriptType;
-
-  getAgentDeploy(type: DeployScriptType) {
-    const botId = this.avatarService.getAvatarId();
-
-    let script = '';
-    if (type == DeployScriptType.BOTTOM_BAR) {
-      script = `
-      <script type="text/javascript">
-        (function()
-        {
-            var rootElement = document.createElement("div");
-            rootElement.id = "zauto_root";
-            document.body.appendChild(rootElement);
-            d = document; 
-            s = d.createElement("script");     
-            s.async = 1;     
-            s.src = "${API.rootURL}api/agents/widget/${botId}.js";
-            d.getElementsByTagName("head")[0].appendChild(s);
-        })();
-      </script>
-      `;
-    }
-
-    return script;
-  }
-
-  toggleScript(): void {
-    this.showScript = !this.showScript;
-    this.showDescription = false;
-    this.showHTML = false;
-  }
-
-  onCreateuserSubmit() {
-    this.resetErrorFeedback();
-    const formData: { [key: string]: string | null } = this.Form.value;
-
-    const data = Object.entries(formData)
-      .filter(([_, value]) => value !== null)
-      .reduce((acc, [key, value]) => {
-        if (value !== null) {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as { [key: string]: string });
-
-    this.restService.post(API.main.contact, data).subscribe({
-      next: (response: any) => {
-        console.log("response", response);
-        this.offcanvasService.dismiss();
-        this.notifService.showSuccess('User Added Successfully.');
-        this.getContacts();
-        this.changeDetectorRef.detectChanges();
-      },
-      error: (error) => {
-        console.error(error);
-        this.notifService.showError(error.error.message);
-      },
-    });
-  }
-
-
-  onUpdateuserSubmit(): void {
-    const updateContactFields: any[] = [];
-    if (this.Form.get('photoUrl')?.value) {
-      updateContactFields.push({
-        label: 'Photo Url',
-        value: this.Form.value.photoUrl,
-      });
-    }
-    if (this.Form.get('fullName')?.value) {
-      updateContactFields.push({
-        label: 'Full Name',
-        value: this.Form.value.fullname,
-      });
-    }
-
-    if (this.Form.get('lastName')?.value) {
-      updateContactFields.push({
-        label: 'Last Name',
-        value: this.Form.value.lastname,
-      });
-    }
-    if (this.Form.get('jobTitle')?.value) {
-      updateContactFields.push({
-        label: 'Jobtitle',
-        value: this.Form.value.jobtitle,
-      });
-    }
-    if (this.Form.get('organizationName')?.value) {
-      updateContactFields.push({
-        label: 'Organization Name',
-        value: this.Form.value.website,
-      });
-    }
-    if (this.Form.get('email')?.value) {
-      updateContactFields.push({
-        label: 'Email',
-        value: this.Form.value.address,
-      });
-    }
-    if (this.Form.get('phone')?.value) {
-      updateContactFields.push({
-        label: 'Phone',
-        value: this.Form.value.city,
-      });
-    }
-    if (this.Form.get('address')?.value) {
-      updateContactFields.push({
-        label: 'Address',
-        value: this.Form.value.state,
-      });
-    }
-    if (this.Form.get('zip')?.value) {
-      updateContactFields.push({
-        label: 'Zip',
-        value: this.Form.value.zip,
-      });
-    }
-    if (this.Form.get('country')?.value) {
-      updateContactFields.push({
-        label: 'Country',
-        value: this.Form.value.country,
-      });
-    }
-    if (this.Form.get('city')?.value) {
-      updateContactFields.push({
-        label: 'City',
-        value: this.Form.value.city,
-      });
-    }
-
-    if (this.Form.get('State')?.value) {
-      updateContactFields.push({
-        label: 'State',
-        value: this.Form.value.state,
-      });
-    }
-    if (this.Form.get('notes')?.value) {
-      updateContactFields.push({
-        label: 'Notes',
-        value: this.Form.value.notes,
-      });
-    }
-    if (this.Form.get('source')?.value) {
-      updateContactFields.push({
-        label: 'Source',
-        value: this.Form.value.source,
-      });
-    }
-    if (this.Form.get('website')?.value) {
-      updateContactFields.push({
-        label: 'Website',
-        value: this.Form.value.website,
-      });
-    }
-    if (this.Form.get('status')?.value) {
-      updateContactFields.push({
-        label: 'Status',
-        value: this.Form.value.status,
-      });
-    }
-    if (this.Form.valid) {
-      const updatedContactData = {
-        accountName: this.Form.value.accountName,
-        email: this.Form.value.email,
-        phone: this.Form.value.phone,
-        updateContactFields,
-      };
-      this.restService
-        .patch(API.main.contact, this.user.id, this.Form.value)
+      this.isLoading = true;
+      if(this.isEdit)
+      {
+        this.restService.patch(API.main.contact, this.user.id, this.form.value)
         .subscribe(
           (response: any) => {
             this.notifService.showSuccess('Account Updated Successfully.');
-            console.log("lastname", updatedContactData)
             this.getContacts();
+            this.isLoading = false;
+            this.contactComposeCanvas.close();
           },
           (error) => {
-            console.error(error);
-            this.notifService.showError(
-              'Something Went Wrong! Try Again Later',
-            );
+            this.notifService.showError('Something Went Wrong! Try Again Later');
+            this.isLoading = false;
           },
         );
-      this.offcanvasService.dismiss();
-      this.Form.reset();
-    } else {
-      this.Form.markAllAsTouched();
+      }
+      else
+      {
+        this.restService.post(API.main.contact, data).subscribe({
+          next: (response: any) => {
+            this.notifService.showSuccess('User Added Successfully.');
+            this.getContacts();
+            this.changeDetectorRef.detectChanges();
+            this.isLoading = false;
+            this.contactComposeCanvas.close();
+          },
+          error: (error) => {
+            this.isLoading = false;
+            this.notifService.showError('Something Went Wrong! Try Again Later');
+          },
+        });
+      }
+    }
+    else{
+      markFormGroupAsDirty(this.form);
     }
   }
 
+  onCancel()
+  {
+    this.contactComposeCanvas.close();
+  }
 
   openUpdateUser(user: any) {
     this.user = user; // Store the selected user data
-    this.Form.reset();
+    this.form.reset();
     console.log("test", user)
-    this.Form.patchValue(user)
+    this.form.patchValue(user)
 
     // this.Form.get('parentAccountId')?.setValue(user?.parentAccountId);
     // this.Form.get('accountName')?.setValue(user?.accountName);
@@ -388,45 +303,9 @@ export class ContactsComponent implements OnInit {
     // this.Form.get('isabm')?.setValue(user?.abm);
 
 
-    this.resetErrorFeedback();
     // this.Form.patchValue(user); // Pre-fill the form with the user data
-    this.offcanvasService.open(this.updateUserOffcanvas, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
+    this.contactComposeCanvas.open();
   }
-
-  // onUpdateuserSubmit(): void {
-  //   if (this.Form.valid && this.selectedData) {
-  //     const updatedUserData = this.Form.value;
-  //     // Assuming this.selectedData contains the ID of the selected user
-  //     this.restService.put(API.main.contact, this.selectedData.id, updatedUserData)
-  //       .subscribe({
-  //         next: (response: any) => {
-  //           console.log(response);
-  //           // Close the offcanvas
-  //           this.offcanvasService.dismiss();
-  //           // Reset the form after submission
-  //           this.Form.reset();
-  //           // Optionally, update the user list or perform any necessary actions
-  //           this.getContacts(this.currentPage);
-  //           // Show a success notification
-  //           this.notifService.showSuccess('User Updated Successfully.');
-  //         },
-  //         error: (error) => {
-  //           console.error(error);
-  //           // Show an error notification if the update fails
-  //           this.notifService.showError(error.error.message);
-  //         },
-  //       });
-  //   } else {
-  //     // Mark form controls as touched to display validation errors
-  //     this.Form.markAllAsTouched();
-  //   }
-  // }
-
 
   delete(data: any) {
     this.deleteModal.open(data)
@@ -437,7 +316,6 @@ export class ContactsComponent implements OnInit {
     this.restService.delete(API.main.contact, data.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Accounts Deleted Successfully.');
-        this.closeModal();
         console.log(this.user);
         this.getContacts()
       },
@@ -448,25 +326,10 @@ export class ContactsComponent implements OnInit {
     );
   };
 
-
-  onSubmit = (userForm: any) => {
-    this.modalService.dismissAll();
-    this.notifService.showSuccess('User Added Successfully');
-  };
-
-  closeModal = () => {
-    this.user = {};
-    this.isEdit = false;
-    this.modalService.dismissAll();
-  };
-
   onPageChange(event: any) {
     this.currentPage = event.page;
     this.getContacts()
 
-  }
-  toggleActionMenu() {
-    this.showActionMenu = !this.showActionMenu;
   }
 
 
@@ -487,14 +350,7 @@ export class ContactsComponent implements OnInit {
     }
   }
 
-
-
-  resetErrorFeedback() {
-    let keys = Object.keys(this.errorFeedback);
-    for (let key of keys) {
-      this.errorFeedback[key] = '';
-    }
-  }
+  
   preventDefault(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
       event.preventDefault();
