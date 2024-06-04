@@ -21,7 +21,6 @@ import { SetupCompletedGuard } from '../shared/guard/setup-completed.guard';
 import { LeadConfigComponent } from './lead-config/lead-config.component';
 import { StartersConfigComponent } from './starters-config/starters-config.component';
 import { CustomiseAvatarComponent } from './customise-avatar/customise-avatar/customise-avatar.component';
-import { FormBuilderComponent } from './form-builder/form-builder.component';
 import { AccountsComponent } from './account/account.component';
 import { PluginsComponent } from './plugins/plugins.component';
 import { AbmComponent } from './abm/abm.component';
@@ -86,12 +85,6 @@ const routes: Routes = [
     path: 'leads/:id',
     title: "Leads",
     component: leadscomponent,
-    canActivate: [SetupGuard]
-  },
-  {
-    path: 'form-builder',
-    title: "FormBuilder",
-    component: FormBuilderComponent,
     canActivate: [SetupGuard]
   },
   {

@@ -12,13 +12,15 @@ import { NgScrollbar } from 'ngx-scrollbar';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ComponentsModule } from 'src/app/components/components.module';
 import { VisitorsComponent } from './visitors/visitors.component';
+import { FormBuilderComponent } from './form-builder/form-builder.component';
 
 
 @NgModule({
   declarations: [
     CampaignComponent,
     StatsComponent,
-    VisitorsComponent
+    VisitorsComponent,
+    FormBuilderComponent
   ],
   imports: [
     CommonModule,

@@ -47,7 +47,6 @@ import { CounterFormatPipe } from './dashboard/widgets/pipe/CounterFormat.pipe';
 import { ProgressCardComponent } from './dashboard/widgets/progress-card/progress-card.component';
 import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
 import { AccountsComponent } from './account/account.component';
-import { FormBuilderComponent } from './form-builder/form-builder.component';
 import { PluginCardComponent } from './plugins/plugin-card/plugin-card.component';
 import { PluginsComponent } from './plugins/plugins.component';
 import { CrmContactMappingComponent } from './plugins/crm-mapping/crm-contact-mapping/crm-contact-mapping.component';
@@ -70,7 +69,6 @@ import { ComponentsModule } from '../components/components.module';
   declarations: [
     ZautoDashboardComponent,
     AccountsComponent,
-    FormBuilderComponent,
     conversationcomponent,
     ChatContainerComponent,
     SummaryContainerComponent,
