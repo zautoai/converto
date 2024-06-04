@@ -115,7 +115,7 @@ export class NavService implements OnDestroy {
 					title: 'Conversations', icon: 'fa-solid fa-comments', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/conversations', type: 'link'
 				},
 				{
-					title: 'Accounts', icon: 'fa-regular fa-building', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/accounts', type: 'link'
+					title: 'Accounts', icon: 'fa-regular fa-building', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/account/all', type: 'link'
 				},
 				{
 					title: 'Contacts', icon: 'fe fe-user', active: false, badgeClass: 'badge badge-sm bg-secondary badge-hide', badgeValue: 'new', path: '/contacts', type: 'link'

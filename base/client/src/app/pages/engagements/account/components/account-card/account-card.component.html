@@ -1,17 +1,18 @@
-<div class="card contact-card" [ngClass]="{'active': isActive}" (click)="onClickHandler()">
+<div class="card account-card" [ngClass]="{'active': isActive}" (click)="onClickHandler()">
     <div class="card-body row">
         <div class="col-3 d-flex align-items-center">
-            <img [src]="contact?.photoUrl || '../../../../../assets/images/users/default-user.png'" alt="avatar"
+            <img [src]="account?.photoUrl || '../../../../../assets/images/users/default-user.png'" alt="avatar"
                 class="avatar avatar-lg bg-warning rounded-circle me-3">
             <div>
-                <h5 class="mb-1">{{contact?.firstName}} {{contact?.lastName}}</h5>
-                <h6 class="text-muted mb-2">{{contact?.organizationName}}</h6>
+                <h5 class="mb-1">{{account?.accountName}} {{account?.lastName}}</h5>
+                <h6 class="text-muted mb-2">{{account?.organizationName}}</h6>
             </div>
         </div>
         <div class="col-3">
-            <p class="mb-1"><strong><i class="fa-regular fa-envelope"></i></strong> {{contact?.email}}</p>
-            <p class="mb-1"><strong><i class="fa-solid fa-location-dot"></i></strong> {{contact?.country}} <span
-                    class="flag-icon flag-icon-{{ getCountryFlagClass(contact?.country) }}"></span></p>
+            <p class="mb-1"><strong><i class="fa-regular fa-envelope"></i></strong> {{account?.email}}</p>
+            <p class="mb-1"><strong><i class="fa-solid fa-location-dot"></i></strong> {{account?.country}}
+                <!-- <span
+                    class="flag-icon flag-icon-{{ getCountryFlagClass(account?.country) }}"></span></p> -->
         </div>
         <div class="col-3 d-flex align-items-center gap-5">
             <span class="m-0 badge rounded-pill bg-primary fs-6" ngbTooltip="Intent score" [openDelay]="300"><i
@@ -21,7 +22,7 @@
             <span class="m-0 badge bg-success rounded-pill fs-6" ngbTooltip="ICP status" [openDelay]="300">ICP
                 Fit</span>
         </div>
-        <div class="col-3 d-flex align-items-center justify-content-end">
+        <div class="col-3 d-flex align-items-center justify-content-end" style="margin-left: 500px;">
             <div ngbDropdown class="dropdown option-dropdown">
                 <button ngbDropdownToggle class="btn btn-link text-primary p-0 fs-6">
                     <i class="fa fa-ellipsis-v"></i>

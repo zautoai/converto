@@ -12,13 +12,19 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ContactCardComponent } from './contacts/components/contact-card/contact-card.component';
 import { ContactPreviewComponent } from './contacts/components/contact-preview/contact-preview.component';
 import { ContactsComponent } from './contacts/contacts.component';
+import { AccountCardComponent } from './account/components/account-card/account-card.component';
+import { AccountPreviewComponent } from './account/components/account-preview/account-preview.component';
+import { AccountsComponent } from './account/account.component';
 
 
 @NgModule({
   declarations: [
     ContactCardComponent,
     ContactPreviewComponent,
-    ContactsComponent
+    ContactsComponent,
+    AccountCardComponent,
+    AccountPreviewComponent,
+    AccountsComponent
   ],
   imports: [
     CommonModule,

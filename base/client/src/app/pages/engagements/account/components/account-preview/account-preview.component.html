@@ -1,0 +1,99 @@
+<div class="card shadow-sm">
+    <div class="card-body fixed-vh">
+        @if(account)
+        {
+        <div class="mb-3 d-flex gap-3 align-items-center justify-content-start">
+            <img [src]="account?.photoUrl || 'assets/images/users/default-user.png'" alt="avatar"
+                class="avatar avatar-lg bg-warning rounded-circle me-3">
+            <div>
+                <h3 class="mb-1">{{ account?.firstName }} {{ account?.lastName }}</h3>
+                <h5 class="text-muted">{{ account?.organizationName }}</h5>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between p-3">
+            <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Intent score" [openDelay]="300"><i
+                    class="fa-solid fa-chart-line"></i> 45</span>
+            <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Lead score" [openDelay]="300"><i
+                    class="fa-solid fa-trophy"></i> 78</span>
+            <span class="badge bg-success rounded-pill fs-6" ngbTooltip="ICP status" [openDelay]="300">ICP Fit</span>
+        </div>
+        <div class="account-info-cards h-75 w-100">
+            <ng-scrollbar>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <span>{{ account?.jobTitle || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>{{ account?.email || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-phone"></i>
+                    <span>{{ account?.phone || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-map-marker-alt"></i>
+                    <span>{{ account?.address || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-city"></i>
+                    <span>{{ account?.city || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-map"></i>
+                    <span>{{ account?.state || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-mail-bulk"></i>
+                    <span>{{ account?.zip || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-flag"></i>
+                    <span>{{ account?.country || '---'}}
+                        <!-- <span
+                            class="flag-icon flag-icon-{{ getCountryFlagClass(account?.country) }}"></span> -->
+
+                    </span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-globe"></i>
+                    <span><a [href]="account?.website" target="_blank">{{ account?.website || '---'}}</a></span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-brands fa-linkedin"></i>
+                    <span><a [href]="account?.socialMedia?.linkedin" target="_blank">{{ account?.socialMedia?.linkedin
+                            || '---'}}</a></span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-brands fa-twitter"></i>
+                    <span><a [href]="account?.socialMedia?.twitter" target="_blank">{{ account?.socialMedia?.twitter ||
+                            '---'}}</a></span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-brands fa-facebook"></i>
+                    <span><a [href]="account?.socialMedia?.facebook" target="_blank">{{ account?.socialMedia?.facebook
+                            || '---'}}</a></span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-brands fa-instagram"></i>
+                    <span><a [href]="account?.socialMedia?.instagram" target="_blank">{{ account?.socialMedia?.instagram
+                            || '---'}}</a></span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-sticky-note"></i>
+                    <span>{{ account?.notes || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span>{{ account?.leadSource || '---'}}</span>
+                </div>
+            </ng-scrollbar>
+        </div>
+        }
+        @else {
+        <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+            <h6 class="text-muted">Select account</h6>
+        </div>
+        }
+    </div>
+</div>

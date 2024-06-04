@@ -1,11 +1,12 @@
 import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
 import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
+import { AbmCardComponent } from './components/abm-card/abm-card.component';
 
 @Component({
   selector: 'app-abm',
@@ -13,6 +14,10 @@ import { RestService } from 'src/app/shared/services/rest.service';
   styleUrl: './abm.component.scss'
 })
 export class AbmComponent {
+openViewContact(_t3: any) {
+throw new Error('Method not implemented.');
+}
+
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
@@ -25,6 +30,7 @@ export class AbmComponent {
   totalItems: number = 0;
   isEdit: boolean = false;
   isLoading: boolean = false;
+  selectedabm:any
 
 
   @ViewChild('viewcanvas') viewcanvas!: AdvanceOffcanvasComponent
@@ -35,6 +41,7 @@ export class AbmComponent {
     private offcanvasService: NgbOffcanvas,
     private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private router:Router,
   ) { }
 
   ngOnInit(): void {
@@ -227,5 +234,25 @@ export class AbmComponent {
 
   get socialMedia() {
     return this.abmForm.get('socialMedia') as FormControl;
+  }
+  selectabm(abm:any){
+  this.selectedabm=abm;
+  this.router.navigate(['abm',abm.id])
+  this.getActiveAbm(abm.id)
+  }
+  getActiveAbm(id:string){
+    this.selectedabm = null;
+    if(!id || id == 'all') {
+      return;
+    }
+    this.restService.get(API.main.account, id).subscribe(
+      (response: any) => {
+        this.selectedabm = response.data;
+      },
+      (error) => {
+        console.error(error);
+        this.notifService.showError(error.error.message);
+      },
+    );
   }
 }

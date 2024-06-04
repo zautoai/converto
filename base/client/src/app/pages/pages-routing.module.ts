@@ -22,7 +22,7 @@ import { LeadConfigComponent } from './lead-config/lead-config.component';
 import { StartersConfigComponent } from './starters-config/starters-config.component';
 import { CustomiseAvatarComponent } from './customise-avatar/customise-avatar/customise-avatar.component';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
-import { AccountsComponent } from './account/account.component';
+import { AccountsComponent } from './engagements/account/account.component';
 import { PluginsComponent } from './plugins/plugins.component';
 import { AbmComponent } from './abm/abm.component';
 import { AccountviewComponent } from './accountview/accountview.component';
@@ -35,7 +35,12 @@ import { IntentScoringComponent } from './intent-scoring/intent-scoring.componen
 
 const routes: Routes = [
 
-
+  {
+    path: 'abm/:id',
+    title: "abm",
+    component: AbmComponent,
+    canActivate: [SetupGuard]
+  },
 
   {
     path: 'setup',
@@ -64,12 +69,7 @@ const routes: Routes = [
     component: conversationcomponent,
     canActivate: [SetupGuard]
   },
-  {
-    path: 'accounts',
-    title: "accounts",
-    component: AccountsComponent,
-    canActivate: [SetupGuard]
-  },
+
   // {
   //   path: 'leads',
   //   title: "Leads",
