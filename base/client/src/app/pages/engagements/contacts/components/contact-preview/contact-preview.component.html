@@ -14,8 +14,8 @@
                 <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Lead score" [openDelay]="300"><i class="fa-solid fa-trophy"></i> 78</span>
                 <span class="badge bg-success rounded-pill fs-6" ngbTooltip="ICP status" [openDelay]="300">ICP Fit</span>
             </div>
-            <div class="contact-info-cards h-75 w-100">
-                <ng-scrollbar>
+            <div class="contact-info-cards w-100">
+
                     <div class="info-card border rounded-3 text-truncate">
                         <i class="fa-solid fa-briefcase"></i>
                         <span>{{ contact?.jobTitle || '---'}}</span>
@@ -76,7 +76,6 @@
                         <i class="fa-solid fa-bullhorn"></i>
                         <span>{{ contact?.leadSource || '---'}}</span>
                     </div>
-                </ng-scrollbar>
             </div>
         }
         @else {
