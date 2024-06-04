@@ -129,6 +129,13 @@
         </button>
       </app-contact-card>
     }
+    @empty {
+      <div class="card">
+        <div class="card-body text-center">
+          <h4 class="text-muted">No contacts found</h4>
+        </div>
+      </div>
+    }
     <div class="my-auto">
       <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
     </div>

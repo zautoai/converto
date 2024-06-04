@@ -1,13 +1,13 @@
-<div class="card contact-card" [ngClass]="{'active': isActive}">
+<div class="card contact-card" [ngClass]="{'active': isActive}" (click)="onClickHandler()">
     <div class="card-body row">
-        <div class="col-4 d-flex align-items-center" (click)="onClickHandler()">
+        <div class="col-4 d-flex align-items-center" >
             <span class="text-muted border rounded-2 me-3 px-4 py-3 fs-5"><i class="fa-solid fa-table-list"></i></span>
             <div>
                 <h5 class="mb-1">{{data?.title}}</h5>
                 <h6 class="text-muted mb-2">{{data?.description || '---'}}</h6>
             </div>
         </div>
-        <div class="col-5 d-flex align-items-center gap-3" (click)="onClickHandler()">
+        <div class="col-5 d-flex align-items-center gap-3">
             @for (field of data?.LeadFormField; track $index) {
                 <span class="m-0 badge rounded-pill bg-primary fs-6"><i class="fa-solid fa-chart-line"></i> {{field?.label}}</span>
             }
