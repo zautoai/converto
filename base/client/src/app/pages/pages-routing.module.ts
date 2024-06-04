@@ -24,7 +24,6 @@ import { CustomiseAvatarComponent } from './customise-avatar/customise-avatar/cu
 import { FormBuilderComponent } from './form-builder/form-builder.component';
 import { AccountsComponent } from './account/account.component';
 import { PluginsComponent } from './plugins/plugins.component';
-import { ContactsComponent } from './contacts/contacts.component';
 import { AbmComponent } from './abm/abm.component';
 import { AccountviewComponent } from './accountview/accountview.component';
 import { ContactviewComponent } from './contactview/contactview.component';
@@ -87,18 +86,6 @@ const routes: Routes = [
     path: 'leads/:id',
     title: "Leads",
     component: leadscomponent,
-    canActivate: [SetupGuard]
-  },
-  {
-    path: 'contacts',
-    title: "Contacts",
-    component: ContactsComponent,
-    canActivate: [SetupGuard]
-  },
-  {
-    path: 'contacts/:id',
-    title: "Contacts",
-    component: ContactsComponent,
     canActivate: [SetupGuard]
   },
   {
@@ -273,6 +260,10 @@ const routes: Routes = [
     title: 'Intent Scoring',
     component: IntentScoringComponent,
     canActivate: [SetupGuard]
+  },
+  {
+    path:'',
+    loadChildren:() => import('./engagements/engagements.module').then(m => m.EngagementsModule)
   },
   {
     path:'',

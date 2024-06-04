@@ -52,7 +52,6 @@ import { PluginCardComponent } from './plugins/plugin-card/plugin-card.component
 import { PluginsComponent } from './plugins/plugins.component';
 import { CrmContactMappingComponent } from './plugins/crm-mapping/crm-contact-mapping/crm-contact-mapping.component';
 import { CrmCompanyMappingComponent } from './plugins/crm-mapping/crm-company-mapping/crm-company-mapping.component';
-import { ContactsComponent } from './contacts/contacts.component';
 import { CalendarScheduleComponent } from './plugins/calendar-schedule/calendar-schedule.component';
 import { AbmComponent } from './abm/abm.component';
 import { AccountviewComponent } from './accountview/accountview.component';
@@ -66,8 +65,6 @@ import { IcpviewComponent } from './icpview/icpview.component';
 import { IntentScoringComponent } from './intent-scoring/intent-scoring.component';
 import { ChannelengagementComponent } from './dashboard/widgets/channelengagement/channelengagement.component';
 import { ComponentsModule } from '../components/components.module';
-import { ContactCardComponent } from './contacts/components/contact-card/contact-card.component';
-import { ContactPreviewComponent } from './contacts/components/contact-preview/contact-preview.component';
 
 @NgModule({
   declarations: [
@@ -110,7 +107,6 @@ import { ContactPreviewComponent } from './contacts/components/contact-preview/c
     PluginCardComponent,
     CrmContactMappingComponent,
     CrmCompanyMappingComponent,
-    ContactsComponent,
     CalendarScheduleComponent,
     AccountviewComponent,
     ContactviewComponent,
@@ -120,8 +116,6 @@ import { ContactPreviewComponent } from './contacts/components/contact-preview/c
     IcpviewComponent,
     IntentScoringComponent,
     ChannelengagementComponent,
-    ContactCardComponent,
-    ContactPreviewComponent
   ],
   imports: [
     PlatformLinkModule,

@@ -1,17 +1,13 @@
 import { Component, ElementRef, Input, OnInit, ViewChild, ChangeDetectorRef, TemplateRef, } from '@angular/core';
-import { ChatBotWidgetsComponent } from '../../widgets/chat-bot-widgets/chatbot/chat-bot-widgets.component';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { AvatarService } from '../../shared/services/avatar.service';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { NotificationService } from '../../shared/services/notification.service';
-import { RestService } from '../../shared/services/rest.service';
-import { SweetAlertService } from '../../shared/services/sweet-alart.service';
-import { DeployScriptType } from '../zautosettings/settings/settings.component';
-import { API } from '../../config/endpoint.config';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
 import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
 import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
+import { RestService } from 'src/app/shared/services/rest.service';
+import { NotificationService } from 'src/app/shared/services/notification.service';
+import { API } from 'src/app/config/endpoint.config';
 
 
 @Component({
@@ -24,7 +20,6 @@ import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.u
 export class ContactsComponent implements OnInit {
   @ViewChild(AdvanceOffcanvasComponent) contactComposeCanvas!: AdvanceOffcanvasComponent;
   @ViewChild('viewContactOffcanvas') viewContactOffcanvas: ElementRef | undefined;
-  @Input() chatBotWidget!: ChatBotWidgetsComponent;
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
 
   isLoading:boolean = false;
@@ -88,7 +83,6 @@ export class ContactsComponent implements OnInit {
 
 
   constructor(
-    private avatarService: AvatarService,
     private modalService: NgbModal,
     private notifService: NotificationService,
     private restService: RestService,
@@ -176,11 +170,6 @@ export class ContactsComponent implements OnInit {
     return this.form.get('status') as FormControl;
   }
 
-  ngAfterViewInit(): void {
-    if (this.chatBotWidget) {
-      this.chatBotWidget.getAgent(this.avatarService.getAvatarId());
-    }
-  }
   getContacts(): void {
     this.restService
       .get(API.main.contact, `?limit=${this.limit}&page=${this.currentPage}`)
