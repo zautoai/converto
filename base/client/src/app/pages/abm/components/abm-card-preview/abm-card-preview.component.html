@@ -1,0 +1,99 @@
+<div class="card shadow-sm">
+    <div class="card-body fixed-vh">
+        @if(abm)
+        {
+        <div class="mb-3 d-flex gap-3 align-items-center justify-content-start">
+            <img [src]="abm?.photoUrl || 'assets/images/users/default-user.png'" alt="avatar"
+                class="avatar avatar-lg bg-warning rounded-circle me-3">
+            <div>
+                <h3 class="mb-1">{{ abm?.firstName }} {{ abm?.lastName }}</h3>
+                <h5 class="text-muted">{{ abm?.organizationName }}</h5>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between p-3">
+            <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Intent score" [openDelay]="300"><i
+                    class="fa-solid fa-chart-line"></i> 45</span>
+            <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Lead score" [openDelay]="300"><i
+                    class="fa-solid fa-trophy"></i> 78</span>
+            <span class="badge bg-success rounded-pill fs-6" ngbTooltip="ICP status" [openDelay]="300">ICP Fit</span>
+        </div>
+        <div class="abm-info-cards h-75 w-100">
+            <ng-scrollbar>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <span>{{ abm?.jobTitle || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>{{ abm?.email || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-phone"></i>
+                    <span>{{ abm?.phone || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-map-marker-alt"></i>
+                    <span>{{ abm?.address || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-city"></i>
+                    <span>{{ abm?.city || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-map"></i>
+                    <span>{{ abm?.state || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-mail-bulk"></i>
+                    <span>{{ abm?.zip || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-flag"></i>
+                    <span>{{ abm?.country || '---'}}
+                        <!-- <span
+                            class="flag-icon flag-icon-{{ getCountryFlagClass(abm?.country) }}"></span> -->
+
+                    </span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-globe"></i>
+                    <span><a [href]="abm?.website" target="_blank">{{ abm?.website || '---'}}</a></span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-brands fa-linkedin"></i>
+                    <span><a [href]="abm?.socialMedia?.linkedin" target="_blank">{{ abm?.socialMedia?.linkedin
+                            || '---'}}</a></span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-brands fa-twitter"></i>
+                    <span><a [href]="abm?.socialMedia?.twitter" target="_blank">{{ abm?.socialMedia?.twitter ||
+                            '---'}}</a></span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-brands fa-facebook"></i>
+                    <span><a [href]="abm?.socialMedia?.facebook" target="_blank">{{ abm?.socialMedia?.facebook
+                            || '---'}}</a></span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-brands fa-instagram"></i>
+                    <span><a [href]="abm?.socialMedia?.instagram" target="_blank">{{ abm?.socialMedia?.instagram
+                            || '---'}}</a></span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-sticky-note"></i>
+                    <span>{{ abm?.notes || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fa-solid fa-bullhorn"></i>
+                    <span>{{ abm?.leadSource || '---'}}</span>
+                </div>
+            </ng-scrollbar>
+        </div>
+        }
+        @else {
+        <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+            <h6 class="text-muted">Select abm</h6>
+        </div>
+        }
+    </div>
+</div>
