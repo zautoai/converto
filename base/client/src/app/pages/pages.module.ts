@@ -46,8 +46,8 @@ import { WlcomeCardComponent } from './dashboard/widgets/wlcome-card/wlcome-card
 import { CounterFormatPipe } from './dashboard/widgets/pipe/CounterFormat.pipe';
 import { ProgressCardComponent } from './dashboard/widgets/progress-card/progress-card.component';
 import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
-import { AccountsComponent } from './engagements/account/account.component';
-import { FormBuilderComponent } from './form-builder/form-builder.component';
+
+
 import { PluginCardComponent } from './plugins/plugin-card/plugin-card.component';
 import { PluginsComponent } from './plugins/plugins.component';
 import { CrmContactMappingComponent } from './plugins/crm-mapping/crm-contact-mapping/crm-contact-mapping.component';
@@ -62,7 +62,6 @@ import { IcpComponent } from './icp/icp.component';
 import { IcpCreatorComponent } from './icp-creator/icp-creator.component';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { IcpviewComponent } from './icpview/icpview.component';
-import { IntentScoringComponent } from './intent-scoring/intent-scoring.component';
 import { ChannelengagementComponent } from './dashboard/widgets/channelengagement/channelengagement.component';
 import { ComponentsModule } from '../components/components.module';
 import { AbmCardComponent } from './abm/components/abm-card/abm-card.component';
@@ -71,8 +70,7 @@ import { AbmCardPreviewComponent } from './abm/components/abm-card-preview/abm-c
 @NgModule({
   declarations: [
     ZautoDashboardComponent,
-   
-    FormBuilderComponent,
+    
     conversationcomponent,
     ChatContainerComponent,
     SummaryContainerComponent,
@@ -116,7 +114,6 @@ import { AbmCardPreviewComponent } from './abm/components/abm-card-preview/abm-c
     IcpComponent,
     IcpCreatorComponent,
     IcpviewComponent,
-    IntentScoringComponent,
     ChannelengagementComponent,
     AbmCardComponent,
     AbmCardPreviewComponent,

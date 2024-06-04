@@ -161,8 +161,8 @@ export class FormBuilderService {
     try {
       await this.findOne(orgId, id);
       try {
-        const updateFields = updateFormBuilderDto.updateLeadField;
-        delete updateFormBuilderDto.updateLeadField;
+        const updateFields = updateFormBuilderDto.createLeadField;
+        delete updateFormBuilderDto.createLeadField;
         await prisma.leadForm.update({
           where: { id },
           data: updateFormBuilderDto,

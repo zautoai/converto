@@ -29,11 +29,11 @@
     }
     @case ('checkbox') {
         <div class="form-check">
-            <input type="checkbox" class="form-check-input"
-                [ngClass]="{ 'is-invalid': showIsInvalid && control.dirty && control.invalid }"
-                [formControl]="control" [id]="id">
-            <label class="form-check-label" [for]="id">
-                {{ label }}
+            <label class="custom-control custom-checkbox" [for]="id">
+                <input type="checkbox" class="custom-control-input"
+                    [ngClass]="{ 'is-invalid': showIsInvalid && control.dirty && control.invalid }"
+                    [formControl]="control" [id]="id">
+                <span class="custom-control-label">{{ label }}</span>
             </label>
         </div>
     }

@@ -58,5 +58,5 @@ export class UpdateFormBuilderDto {
     type: [UpdateLeadField],
   })
   @IsOptional()
-  updateLeadField?: UpdateLeadField[];
+  createLeadField?: UpdateLeadField[];
 }

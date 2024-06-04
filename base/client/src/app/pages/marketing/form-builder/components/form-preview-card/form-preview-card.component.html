@@ -1,0 +1,42 @@
+<div class="card shadow-sm">
+    <div class="card-body fixed-vh">
+        @if(htmlContent && scriptContent){
+            <div class="panel panel-primary">
+                <div class="">
+                    <div class="tabs-menu1">
+                        <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" >
+                            <li [ngbNavItem]="1">
+                                <button ngbNavLink>Form HTML</button>
+                                <ng-template ngbNavContent>
+                                    <div class="code-container">
+                                        <pre [innerText]="htmlContent">
+                                        </pre>
+                                        <button class="btn btn-sm btn-primary copy-button" appClickToCopy [textToCopy]="htmlContent">Copy</button>
+                                    </div>
+                                </ng-template>
+                            </li>
+                            <li [ngbNavItem]="2">
+                                <button ngbNavLink>Form Script</button>
+                                <ng-template ngbNavContent>
+                                    <div class="code-container">
+                                        <pre [innerText]="scriptContent">
+                                        </pre>
+                                        <button class="btn btn-sm btn-primary copy-button" appClickToCopy [textToCopy]="scriptContent">Copy</button>
+                                    </div>
+                                </ng-template>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div [ngbNavOutlet]="nav" class="mt-2"></div>
+            </div>
+        }
+        @else {
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                <h6 class="text-muted">Select form</h6>
+            </div>
+        }
+    </div>
+</div>

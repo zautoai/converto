@@ -2,7 +2,11 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { toNegative } from 'src/app/common/utils';
+import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
+import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
+import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
 import { API } from 'src/app/config/endpoint.config';
+import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 
@@ -18,28 +22,59 @@ export enum IntentType {
 })
 export class IntentScoringComponent implements OnInit{
 
-  isEditing:boolean = false;
+  isEdit:boolean = false;
   private selectedEntity:any = null;
   intentScoringList: any = null;
   currentPage: number = 0;
   limit: number = 10;
   totalItems: number = 0;
+  isLoading:boolean = false;
 
-  @ViewChild('createOrEditOffcanvas') createOrEditOffcanvas!: ElementRef;
+  @ViewChild(AdvanceOffcanvasComponent) advanceOffcanvasComponent!: AdvanceOffcanvasComponent;
+  @ViewChild(AdvancedModalsComponent) deleteModal!: AdvancedModalsComponent;
   IntentType = IntentType;
 
   form:FormGroup = new FormGroup({
     name: new FormControl('',Validators.required),
     description: new FormControl(''),
-    value: new FormControl(0,Validators.required),
-    type: new FormControl(this.IntentType.POSITIVE,Validators.required),
-  })
+    value: new FormControl(0,[Validators.required,Validators.min(-100),Validators.max(100)]),
+    type: new FormControl(this.IntentType.POSITIVE,[Validators.required]),
+  });
+
+  errorMessages = {
+    name: {
+      required: 'Name is required',
+    },
+    score: {
+      required: 'Value is required',
+      min: 'Value must be greater than -100',
+      max: 'Value must be less than 100',
+    },
+    type: {
+      required: 'Type is required',
+    }
+  };
 
   constructor(
-    private offcanvasService: NgbOffcanvas,
     private restService: RestService,
-    private sweetAlertService:SweetAlertService
+    private notifService: NotificationService
   ) { }
+
+  get name():FormControl {
+    return this.form.get('name') as FormControl;
+  }
+
+  get description():FormControl {
+    return this.form.get('description') as FormControl;
+  }
+
+  get score():FormControl {
+    return this.form.get('value') as FormControl;
+  }
+
+  get type():FormControl {
+    return this.form.get('type') as FormControl;
+  }
 
   ngOnInit(): void {
     this.getAll();
@@ -59,30 +94,28 @@ export class IntentScoringComponent implements OnInit{
   }
 
   openCreate (){
-    this.isEditing = false;
+    this.isEdit = false;
     this.selectedEntity = null;
     this.form.reset();
     this.form.get('value')?.setValue(0);
     this.form.get('type')?.setValue(this.IntentType.POSITIVE);
-    this.offcanvasService.open(this.createOrEditOffcanvas, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
+    this.advanceOffcanvasComponent.open();
   }
 
   openEdit(item: any){
-    this.isEditing = true;
+    this.isEdit = true;
     this.selectedEntity = item;
     this.form.reset();
     this.form.patchValue(item);
-    this.offcanvasService.open(this.createOrEditOffcanvas, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
+    this.advanceOffcanvasComponent.open();
+  }
+
+  openDelete(entity:any){
+    this.deleteModal.open(entity);
+  }
+
+  closeCanvas(){
+    this.advanceOffcanvasComponent.close();
   }
 
   get intentType(): string[] {
@@ -91,7 +124,8 @@ export class IntentScoringComponent implements OnInit{
 
   submit(){
     if(this.form.valid){
-      if(this.isEditing)
+      this.isLoading = true;
+      if(this.isEdit)
       {
         const data = this.form.value;
         if(this.form.get('type')?.value === IntentType.NEGATIVE)
@@ -101,10 +135,19 @@ export class IntentScoringComponent implements OnInit{
         this.restService.patch(API.main.intentScoring, this.selectedEntity?.id,data).subscribe({
           next: (data) => {
             this.getAll();
-            this.offcanvasService.dismiss();
+            this.closeCanvas();
+            this.isLoading = false;
+            this.notifService.showSuccess('Intent score updated successfully');
           },
           error: (error) => {
-            console.log(error);
+            this.isLoading = false;
+            if(error.status == 500)
+              {
+                this.notifService.showError('Something Went Wrong! Try Again Later');
+              }
+              else{
+                this.notifService.showError(error.error.message);
+              }
           }
         });
       }
@@ -113,49 +156,40 @@ export class IntentScoringComponent implements OnInit{
         this.restService.post(API.main.intentScoring,this.form.value).subscribe({
           next: (data) => {
             this.getAll();
-            this.offcanvasService.dismiss();
+            this.closeCanvas();
+            this.isLoading = false;
+            this.notifService.showSuccess('Intent score created successfully');
           },
           error: (error) => {
-            console.log(error);
+            this.isLoading = false;
+            if(error.status == 500)
+              {
+                this.notifService.showError('Something Went Wrong! Try Again Later');
+              }
+              else{
+                this.notifService.showError(error.error.message);
+              }
           }
         });
       }
     }
     else
     {
+      markFormGroupAsDirty(this.form);
+      this.isLoading = false;
     }
   }
 
-  delete(data: any) {
-    this.selectedEntity = data;
-
-    this.sweetAlertService.warning(
-      'Delete Intent score',
-      'Are you sure you want to delete ?',
-      ['Delete', 'Cancel'],
-      (confirm: any) => {
-        if (confirm.isConfirmed) {
-          this.confirmDelete(data);
-        }
-      },
-    );
-  };
-
-  confirmDelete = (data: any) => {
+  onDeleteSubmit(data: any){
     this.restService.delete(API.main.intentScoring, data.id).subscribe(
       (response: any) => {
-        this.closeModal();
-        this.getAll()
+        this.getAll();
+        this.notifService.showSuccess('Intent score deleted successfully');
       },
       (error) => {
         console.error(error);
       },
     );
-  };
-
-  closeModal = () => {
-    this.selectedEntity = null;
-    this.isEditing = false;
   };
 
   onPageChange(event: any) {
