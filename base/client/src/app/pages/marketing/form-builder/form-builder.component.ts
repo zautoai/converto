@@ -4,7 +4,7 @@ import { API } from 'src/app/config/endpoint.config';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
 import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
 import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
@@ -37,7 +37,7 @@ export class FormBuilderComponent implements OnInit {
     },
   };
 
-  formList: any = [];
+  formData: any;
   selectedForm: any = undefined;
   isEdit: boolean = false;
   showDescription: boolean = true;
@@ -49,8 +49,8 @@ export class FormBuilderComponent implements OnInit {
   totalItems: number = 1;
   limit = 20;
   selectedCheckboxes: string[] = [];
-  htmlData: string = '';
-  jsData: string = '';
+  htmlContent: string = '';
+  scriptContent: string = '';
 
   isLoading:boolean = false
 
@@ -59,6 +59,7 @@ export class FormBuilderComponent implements OnInit {
     private restService: RestService,
     private authService: AuthService,
     private route: ActivatedRoute,
+    private router: Router
   ) {
   }
 
@@ -88,6 +89,8 @@ export class FormBuilderComponent implements OnInit {
       this.limit = +params['limit'] || this.limit;
       this.getForms();
       this.onPageChange({ page: this.currentPage })
+      const activeFormId = this.route.snapshot.paramMap.get('id') as string;
+      this.getActiveForm(activeFormId);
     });
 
   }
@@ -104,7 +107,7 @@ export class FormBuilderComponent implements OnInit {
       .get(API.main.formbuilder, `?limit=${this.limit}&page=${this.currentPage}`)
       .subscribe(
         (response: any) => {
-          this.submittedData = response.data;
+          this.formData = response;
           this.totalItems = response.total
         },
         (error) => {
@@ -138,6 +141,10 @@ export class FormBuilderComponent implements OnInit {
     this.deleteFormModal.open(entity);
   }
 
+  closeComposeCanvas(){
+    this.formComposeOffcanvas.close();
+  }
+
   onSubmitForm(): void {
     if(this.form.valid)
     {
@@ -156,7 +163,7 @@ export class FormBuilderComponent implements OnInit {
             this.getForms();
             this.notifService.showSuccess('Form Updated Successfully.');
             this.isLoading = false;
-            this.formComposeOffcanvas.close();
+            this.closeComposeCanvas();
           },
           error: (error) => {
             this.isLoading = false;
@@ -177,7 +184,7 @@ export class FormBuilderComponent implements OnInit {
             this.getForms();
             this.notifService.showSuccess('Form Added Successfully.');
             this.isLoading = false;
-            this.formComposeOffcanvas.close();
+            this.closeComposeCanvas();
           },
           error: (error) => {
             this.isLoading = false;
@@ -197,6 +204,32 @@ export class FormBuilderComponent implements OnInit {
       this.isLoading = false;
       markFormGroupAsDirty(this.form);
     }
+  }
+
+  getActiveForm(id:string){
+    this.selectedForm = null;
+    if(!id || id == 'all') {
+      return;
+    }
+    this.restService.get(API.main.formbuilder, id).subscribe(
+      (response: any) => {
+        this.selectedForm = response.data;
+      },
+      (error) => {
+        console.error(error);
+        this.notifService.showError(error.error.message);
+      },
+    );
+    this.getHtmlScript(id);
+    this.getJsScript(id);
+  }
+
+  selectForm(entity:any){
+    this.selectedForm = entity;
+    this.getHtmlScript(entity.id);
+    this.getJsScript(entity.id);
+    this.router.navigate(['form-builder', entity.id]);
+    this.getActiveForm(entity.id);
   }
 
   private getFormpayload() {
@@ -227,12 +260,6 @@ export class FormBuilderComponent implements OnInit {
     return payload
   }
 
-  toggleDescription(): void {
-    this.showDescription = true;
-    this.showHTML = false;
-    this.showScript = false;
-  }
-
   onDeleteSubmit(entity:any) {
     if(!entity) return;
     this.restService.delete(API.main.formbuilder, entity.id).subscribe(
@@ -252,25 +279,21 @@ export class FormBuilderComponent implements OnInit {
     this.getForms()
   }
 
-  getHtmlScript(id: string) {
+  private getHtmlScript(id: string) {
     const { orgId } = this.authService.getUser();
     this.restService
       .get(API.main.formbuilder + `/${orgId}/form/html`, id)
       .subscribe(
         (response: any) => {
-          this.showHTML = true;
-          this.showScript = false;
-          this.showDescription = false;
-          this.htmlData = response.data;
+          this.htmlContent = response.data;
         },
         (error) => {
-          console.error(error.error);
           this.notifService.showError(error.error.message);
         },
       );
   }
 
-  getJsScript(id: string) {
+  private getJsScript(id: string) {
     const { orgId } = this.authService.getUser();
     const script = `<script type="text/javascript" src="${API.main.formbuilder}/${orgId}/form/script/${id}.js"/></script>
     <script>
@@ -284,7 +307,7 @@ export class FormBuilderComponent implements OnInit {
     }
     init(callback);
   </script>`;
-    this.jsData = script;
+    this.scriptContent = script;
     this.showDescription = false;
     this.showHTML = false;
     this.showScript = true;

@@ -13,6 +13,8 @@ import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ComponentsModule } from 'src/app/components/components.module';
 import { VisitorsComponent } from './visitors/visitors.component';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
+import { FormCardComponent } from './form-builder/components/form-card/form-card.component';
+import { FormPreviewCardComponent } from './form-builder/components/form-preview-card/form-preview-card.component';
 
 
 @NgModule({
@@ -20,7 +22,9 @@ import { FormBuilderComponent } from './form-builder/form-builder.component';
     CampaignComponent,
     StatsComponent,
     VisitorsComponent,
-    FormBuilderComponent
+    FormBuilderComponent,
+    FormCardComponent,
+    FormPreviewCardComponent
   ],
   imports: [
     CommonModule,

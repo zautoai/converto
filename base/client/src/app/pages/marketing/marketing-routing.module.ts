@@ -30,11 +30,16 @@ const routes: Routes = [
     canActivate: [SetupGuard]
   },
   {
-    path: 'form-builder',
+    path: 'form-builder/:id',
     title: "FormBuilder",
     component: FormBuilderComponent,
     canActivate: [SetupGuard]
   },
+  {
+    path: 'form-builder',
+    redirectTo: 'form-builder/all',
+    pathMatch: 'full'
+  }
 ];
 
 @NgModule({
