@@ -1,14 +1,10 @@
-.contact-info-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
 
 .info-card {
     display: flex;
     align-items: center;
     padding: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
 }
 
 .info-card i {

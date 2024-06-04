@@ -162,7 +162,10 @@ export class ContactsComponent implements OnInit {
   }
 
   getActiveContact(id:string){
-    if(!id || id == 'all') return;
+    this.selectedContact = null;
+    if(!id || id == 'all') {
+      return;
+    }
     this.restService.get(API.main.contact, id).subscribe(
       (response: any) => {
         this.selectedContact = response.data;
@@ -300,6 +303,7 @@ export class ContactsComponent implements OnInit {
   {
     this.selectedContact = contact;
     this.router.navigate(['contacts', contact.id])
+    this.getActiveContact(contact.id);
   }
 
   onPageChange(event: any) {
