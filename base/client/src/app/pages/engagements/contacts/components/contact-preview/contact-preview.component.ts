@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { getCountryFlagClass } from '../../contact.utils';
 
 @Component({
   selector: 'app-contact-preview',
@@ -7,4 +8,9 @@ import { Component } from '@angular/core';
 })
 export class ContactPreviewComponent {
 
+  @Input() contact:any;
+
+  getCountryFlagClass(countryCode: string): string {
+    return getCountryFlagClass(countryCode);
+  }
 }

@@ -1,0 +1,42 @@
+.contact-info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.info-card i {
+    margin-right: 10px;
+}
+
+.info-card span {
+    font-size: 1rem;
+    color: #495057;
+}
+
+.avatar-lg {
+    width: 100px;
+    height: 100px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+h3, h5 {
+    margin: 0;
+}
+
+h5 {
+    color: #6c757d;
+}
+
+.badge {
+    font-size: 1rem;
+}

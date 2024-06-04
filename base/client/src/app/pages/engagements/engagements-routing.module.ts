@@ -5,17 +5,16 @@ import { SetupGuard } from 'src/app/shared/guard/setup.guard';
 
 const routes: Routes = [
   {
-    path: 'contacts',
-    title: "Contacts",
-    component: ContactsComponent,
-    canActivate: [SetupGuard]
-  },
-  {
     path: 'contacts/:id',
     title: "Contacts",
     component: ContactsComponent,
     canActivate: [SetupGuard]
   },
+  {
+    path: 'contacts',
+    redirectTo: 'contacts/all',
+    pathMatch: 'full'
+  }
 ];
 
 @NgModule({

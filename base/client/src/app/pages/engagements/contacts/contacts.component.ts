@@ -23,27 +23,17 @@ export class ContactsComponent implements OnInit {
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
 
   isLoading:boolean = false;
-  contact: any = {};
   contactList: any = [];
   selectedContact: any = undefined;
-  showActionMenu = false;
   isEdit: boolean = false;
-  photo1: any = "https://imgs.search.brave.com/Mvm4VXGBy83NyhAuuehkrHYV0s4BvjtY6ZwR2dXCGro/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9ncGNh/dGFseXNpcy5ibG9i/LmNvcmUud2luZG93/cy5uZXQvZ3Bob3N0/ZWRjb250ZW50LXBy/b2Qvd1pVNzFpND1f/S2FtYXRoX05pa2hp/bF81MDB4NTAwLmpw/Zw"
-  errorFeedback: any = { title: '', describe: '' };
   showDescription: boolean = true;
-  showHTML: boolean = false;
-  showScript: boolean = false;
   currentPage: number = 1;
   totalPages: number = 1;
   hoveredData: any = null;
-  isHovered: any;
   itemPerPage: number = 10;
   selectedData: any = '';
   limit = 5;
   totalItems: number = 0;
-  https: any;
-  isLeadScore: any = 80;
-  clickedData: any;
 
   errorMessages = {
     firstName: {
@@ -83,7 +73,6 @@ export class ContactsComponent implements OnInit {
 
 
   constructor(
-    private modalService: NgbModal,
     private notifService: NotificationService,
     private restService: RestService,
     private changeDetectorRef: ChangeDetectorRef,
@@ -98,6 +87,8 @@ export class ContactsComponent implements OnInit {
       this.currentPage = +params['page'] || 1;
       this.limit = +params['limit'] || this.limit;
       this.getContacts();
+      const activeContactId = this.route.snapshot.paramMap.get('id') as string;
+      this.getActiveContact(activeContactId);
       this.onPageChange({ page: this.currentPage })
     });
   }
@@ -170,6 +161,19 @@ export class ContactsComponent implements OnInit {
     return this.form.get('status') as FormControl;
   }
 
+  getActiveContact(id:string){
+    if(!id || id == 'all') return;
+    this.restService.get(API.main.contact, id).subscribe(
+      (response: any) => {
+        this.selectedContact = response.data;
+      },
+      (error) => {
+        console.error(error);
+        this.notifService.showError(error.error.message);
+      },
+    );
+  }
+
   getContacts(): void {
     this.restService
       .get(API.main.contact, `?limit=${this.limit}&page=${this.currentPage}`)
@@ -188,12 +192,12 @@ export class ContactsComponent implements OnInit {
   openCreateContact() {
     this.form.reset();
     this.isEdit = false;
-    this.contact = null;
+    this.selectedContact = null;
     this.contactComposeCanvas.open();
   }
   
   openUpdateContact(contact: any) {
-    this.contact = contact; 
+    this.selectedContact = contact; 
     this.form.reset();
     this.form.patchValue(contact)
     this.isEdit = true;
@@ -222,7 +226,7 @@ export class ContactsComponent implements OnInit {
       this.isLoading = true;
       if(this.isEdit)
       {
-        this.restService.patch(API.main.contact, this.contact.id, this.form.value)
+        this.restService.patch(API.main.contact, this.selectedContact.id, this.form.value)
         .subscribe(
           (response: any) => {
             this.notifService.showSuccess('Account Updated Successfully.');
@@ -283,7 +287,6 @@ export class ContactsComponent implements OnInit {
     this.restService.delete(API.main.contact, data.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Accounts Deleted Successfully.');
-        console.log(this.contact);
         this.getContacts()
       },
       (error) => {
@@ -296,29 +299,11 @@ export class ContactsComponent implements OnInit {
   selectContact(contact:any)
   {
     this.selectedContact = contact;
+    this.router.navigate(['contacts', contact.id])
   }
 
   onPageChange(event: any) {
     this.currentPage = event.page;
     this.getContacts()
-  }
-
-  onMouseEnter(data: any) {
-    if (data) {
-      this.clickedData = data;
-      console.log("hovereddata", this.clickedData)
-    }
-  }
-
-  openModal(data: any) {
-    if (this.hoveredData) {
-      const modalRef = this.modalService.open(this.modalContent, {
-        ariaLabelledBy: 'modal-title',
-        ariaDescribedBy: 'modal-body'
-      });
-
-      modalRef.componentInstance.hoveredData = this.hoveredData;
-
-    }
   }
 }

@@ -1,7 +1,7 @@
 
 <h3 class="my-3">Contacts</h3>
 <div class="d-flex justify-content-end my-3">
-  <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addContact"(click)="openCreateContact()"><i class="fa fa-plus"></i> Create Contacts</button>
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContact"(click)="openCreateContact()"><i class="fa fa-plus"></i> Create Contacts</button>
 </div>
 <!--modal-->
 
@@ -134,7 +134,7 @@
     </div>
   </div>
   <div class="col-4">
-    <app-contact-preview></app-contact-preview>
+    <app-contact-preview [contact]="selectedContact"></app-contact-preview>
   </div>
 </div>
 
