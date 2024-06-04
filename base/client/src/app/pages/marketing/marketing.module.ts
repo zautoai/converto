@@ -15,6 +15,7 @@ import { VisitorsComponent } from './visitors/visitors.component';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
 import { FormCardComponent } from './form-builder/components/form-card/form-card.component';
 import { FormPreviewCardComponent } from './form-builder/components/form-preview-card/form-preview-card.component';
+import { IntentScoringComponent } from './intent-scoring/intent-scoring.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { FormPreviewCardComponent } from './form-builder/components/form-preview
     VisitorsComponent,
     FormBuilderComponent,
     FormCardComponent,
-    FormPreviewCardComponent
+    FormPreviewCardComponent,
+    IntentScoringComponent
   ],
   imports: [
     CommonModule,
