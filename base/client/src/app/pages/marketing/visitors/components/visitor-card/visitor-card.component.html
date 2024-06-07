@@ -1,0 +1,32 @@
+<div class="card contact-card " [ngClass]="{'active': isActive}" (click)="onClickHandler()">
+    <div class="card-body row">
+        <div class="col-2 d-flex align-items-center">
+            <div class="me-3">
+                <img src="{{ getTrackingInfo()?.flag }}" class="img-fluid rounded-start" alt="Flag">
+            </div>
+            <div>
+                <div class="card-text">
+                    <i class="fas fa-map-marker-alt"></i> {{ getTrackingInfo().country_name }}({{getTrackingInfo()?.country_code}})
+                </div>
+                <div class="card-text">
+                    <i class="fas fa-city"></i> {{ getTrackingInfo().city || '---'}}
+                </div>
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="card-text">
+                <i class="fas fa-map"></i> {{ getTrackingInfo().region || '---'}}
+            </div>
+            <div class="card-text">
+                <i class="fas fa-clock"></i> {{ getTrackingInfo().time_zone.name || '---'}}
+            </div>
+        </div>
+        <div class="col-3">
+            
+        </div>
+        <div class="col-2 d-flex align-items-center gap-3">
+            <span class="m-0 badge rounded-pill bg-primary fs-6" ngbTooltip="Intent score" [openDelay]="300"><i class="fa-solid fa-chart-line"></i> {{data?.score}}</span>
+            <span class="m-0 badge rounded-pill bg-primary fs-6" ngbTooltip="Visits" [openDelay]="300"><i class="fa-solid fa-eye"></i> {{data?.visits.length }}</span>
+        </div>
+    </div>
+</div>
