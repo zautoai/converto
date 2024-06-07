@@ -28,9 +28,6 @@ const routes: Routes = [
     redirectTo: "account/all",
   pathMatch:'full'
   },
- 
-
-
 
 ];
 

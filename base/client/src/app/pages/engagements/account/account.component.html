@@ -160,7 +160,11 @@
         [isDisabled]="isLoading"></advanced-input>
     </div>
     <div class="form-group mb-3">
-      <advanced-input [label]="'industry'" [type]="'text'" [placeholder]="'job title'" [size]="'md'"
+      <advanced-input [label]="'industry'" [type]="'text'" [placeholder]="'industry'" [size]="'md'" [control]="industry"
+        [isDisabled]="isLoading"></advanced-input>
+    </div>
+    <div class="form-group mb-3">
+      <advanced-input [label]="'organisation'" [type]="'text'" [placeholder]="'organisation'" [size]="'md'"
         [control]="industry" [isDisabled]="isLoading"></advanced-input>
     </div>
     <div class="form-group mb-3">
