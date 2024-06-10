@@ -21,9 +21,9 @@ export class LaunchAvatarComponent implements OnInit {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
   avatar!: Avatar;
   launchForm: FormGroup = new FormGroup({
-    companyName: new FormControl('',[Validators.required,Validators.minLength(3)]),
-    siteUrl: new FormControl('',[Validators.required, Validators.pattern('https?://.+')]),
-    avatarName: new FormControl('',[Validators.required])
+    companyName: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    siteUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
+    avatarName: new FormControl('', [Validators.required])
   });
   errorMessages = {
     companyName: {
@@ -39,11 +39,11 @@ export class LaunchAvatarComponent implements OnInit {
     }
   };
 
-  isLoading:boolean = false;
-  
+  isLoading: boolean = false;
+
   trainingProgress = 0;
   isAvatarNameValid: boolean = true;
-  isSubmitting:boolean = false;
+  isSubmitting: boolean = false;
 
   constructor(
     private setupService: SetupService,
@@ -65,8 +65,7 @@ export class LaunchAvatarComponent implements OnInit {
     this.socketService.agentStatusEvent$.subscribe((data: any) => {
       this.avatar.status = data.status;
       this.avatar.message = data.message;
-      if(data.status != 'TRAININGFAILED')
-      {
+      if (data.status != 'TRAININGFAILED') {
         this.trainingProgress += 20;
       }
       this.setTrainingProgress(data?.status, data?.message, this.trainingProgress);
@@ -84,15 +83,15 @@ export class LaunchAvatarComponent implements OnInit {
     });
   }
 
-  get companyName():FormControl {
+  get companyName(): FormControl {
     return this.launchForm.get('companyName') as FormControl;
   }
 
-  get siteUrl():FormControl {
+  get siteUrl(): FormControl {
     return this.launchForm.get('siteUrl') as FormControl;
   }
 
-  get avatarName():FormControl {
+  get avatarName(): FormControl {
     return this.launchForm.get('avatarName') as FormControl;
   }
 
@@ -132,18 +131,17 @@ export class LaunchAvatarComponent implements OnInit {
       return;
     }
     this.restService.post(API.main.agentAvailability, { name: name })
-    .subscribe(
-      (response: any) => {
-        this.isAvatarNameValid = response?.available;
-        if (!this.isAvatarNameValid) {
-          // this.errorFeedback.avatarName = "Avatar name already taken.";
+      .subscribe(
+        (response: any) => {
+          this.isAvatarNameValid = response?.available;
+          if (!this.isAvatarNameValid) {
+            // this.errorFeedback.avatarName = "Avatar name already taken.";
+          }
+        },
+        (error) => {
+          console.log(error);
         }
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-
+      );
   }
 
   getStatusColor(status: string): string {
@@ -169,19 +167,18 @@ export class LaunchAvatarComponent implements OnInit {
 
   deleteAvatar() {
     let id = this.avatarService.getAvatarId();
-    if(id) {
+    if (id) {
       this.restService.delete(API.main.agent, id)
-      .subscribe((response: any) => {
-        this.router.navigate(['/auth/login']);
-        this.clearTrainingStatus();
-      }, (error) => {
-        console.log(error);
-      });
+        .subscribe((response: any) => {
+          this.router.navigate(['/auth/login']);
+          this.clearTrainingStatus();
+        }, (error) => {
+          console.log(error);
+        });
     }
   }
 
-  clearTrainingStatus()
-  {
+  clearTrainingStatus() {
     localStorage.removeItem('training_progress')
     localStorage.removeItem('training_status')
     localStorage.removeItem('training_message')

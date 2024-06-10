@@ -14,9 +14,10 @@ import { AbmCardComponent } from './components/abm-card/abm-card.component';
   styleUrl: './abm.component.scss'
 })
 export class AbmComponent {
-openViewContact(_t3: any) {
-throw new Error('Method not implemented.');
-}
+
+  openViewContact(abm: any) {
+    this.router.navigate(['abm/view-abm', abm.id])
+  }
 
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
@@ -30,7 +31,7 @@ throw new Error('Method not implemented.');
   totalItems: number = 0;
   isEdit: boolean = false;
   isLoading: boolean = false;
-  selectedabm:any
+  selectedabm: any
 
 
   @ViewChild('viewcanvas') viewcanvas!: AdvanceOffcanvasComponent
@@ -41,7 +42,7 @@ throw new Error('Method not implemented.');
     private offcanvasService: NgbOffcanvas,
     private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private router:Router,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -235,14 +236,14 @@ throw new Error('Method not implemented.');
   get socialMedia() {
     return this.abmForm.get('socialMedia') as FormControl;
   }
-  selectabm(abm:any){
-  this.selectedabm=abm;
-  this.router.navigate(['abm',abm.id])
-  this.getActiveAbm(abm.id)
+  selectabm(abm: any) {
+    this.selectedabm = abm;
+    this.router.navigate(['abm', abm.id])
+    this.getActiveAbm(abm.id)
   }
-  getActiveAbm(id:string){
+  getActiveAbm(id: string) {
     this.selectedabm = null;
-    if(!id || id == 'all') {
+    if (!id || id == 'all') {
       return;
     }
     this.restService.get(API.main.account, id).subscribe(

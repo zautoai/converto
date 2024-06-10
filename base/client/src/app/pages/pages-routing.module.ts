@@ -27,6 +27,7 @@ import { SegmentComponent } from './segment/segment.component';
 import { IcpComponent } from './icp/icp.component';
 import { IcpCreatorComponent } from './icp-creator/icp-creator.component';
 import { IcpviewComponent } from './icpview/icpview.component';
+import { AbmviewComponent } from './abmview/abmview.component';
 
 const routes: Routes = [
 
@@ -35,6 +36,13 @@ const routes: Routes = [
     title: "abm",
     component: AbmComponent,
     canActivate: [SetupGuard]
+  },
+
+  {
+    path: 'abm/view-abm/:id',
+    title: "abmview",
+    component: AbmviewComponent,
+
   },
 
   { path: 'accounts/view-account/:id', component: AccountviewComponent },
@@ -239,12 +247,12 @@ const routes: Routes = [
     canActivate: [SetupGuard]
   },
   {
-    path:'',
-    loadChildren:() => import('./engagements/engagements.module').then(m => m.EngagementsModule)
+    path: '',
+    loadChildren: () => import('./engagements/engagements.module').then(m => m.EngagementsModule)
   },
   {
-    path:'',
-    loadChildren:() => import('./marketing/marketing.module').then(m => m.MarketingModule)
+    path: '',
+    loadChildren: () => import('./marketing/marketing.module').then(m => m.MarketingModule)
   }
 ];
 
