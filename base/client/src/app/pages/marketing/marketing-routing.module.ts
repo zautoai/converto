@@ -20,9 +20,8 @@ const routes: Routes = [
   },
   {
     path: 'visitors',
-    title: "Visitors",
-    component: VisitorsComponent,
-    canActivate: [SetupGuard]
+    redirectTo: 'visitors/all',
+    pathMatch: 'full'
   },
   {
     path: 'visitors/:id',

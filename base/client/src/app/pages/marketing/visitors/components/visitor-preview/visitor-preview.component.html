@@ -1,0 +1,51 @@
+<div class="card shadow-sm">
+    <div class="card-body fixed-vh">
+        @if(visitor){
+            <div class="contact-info-cards w-100">
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fas fa-eye"></i> <span>{{ (visitor?.createdAt | date)|| '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fas fa-network-wired"></i> <span>{{ getTrackingInfo().ip || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fas fa-language"></i> <span>{{ getTrackingInfo().languages[0].name || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fas fa-flag"></i> <span>{{ getTrackingInfo().country_name }}({{getTrackingInfo()?.country_code}})</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fas fa-city"></i> <span>{{ getTrackingInfo().city || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fas fa-map-signs"></i> <span>{{ getTrackingInfo().region || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                    <i class="fas fa-clock"></i> <span>{{ getTrackingInfo().time_zone.name || '---'}}</span>
+                </div>
+                <div class="info-card border rounded-3 text-truncate">
+                <i class="fas fa-hourglass-half"></i> <span>{{ getTrackingInfo().time_zone.offset || '---'}}</span>
+                </div>
+                <h4>Visits</h4>
+                @for (visit of visitor?.visits; track $index) {
+                    <div class="border rounded-3 mb-3 mx-2 shadow-sm">
+                        <div class="info-card border-bottom m-0">
+                            <i class="fas fa-globe"></i> <span>{{ visit.source || '---'}}</span>
+                        </div>
+                        <div class="info-card border-bottom m-0">
+                            <i class="fas fa-eye"></i> <span>{{ visit.count || '---'}}</span>
+                        </div>
+                        <div class="info-card">
+                            <i class="fas fa-calendar-alt"></i> <span>{{ (visit.createdAt | date) || '---'}}</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        @else {
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                <h6 class="text-muted">Select visitor</h6>
+            </div>
+        }
+    </div>
+</div>

@@ -5,7 +5,6 @@ import { PlatformService } from 'src/app/shared/services/platform.service';
 import { ActivatedRoute,Router  } from '@angular/router';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { ScrollUtilService } from 'src/app/shared/services/scroll-util.service';
-import { IVisitorData, TableColumn, Visit } from 'src/app/common/intefaces';
 
 @Component({
   selector: 'app-visitors',
@@ -18,19 +17,13 @@ export class VisitorsComponent implements OnInit, AfterViewInit
   visitersList:any = [];
   currentPage:number = 1;
   itemPerPage:number = 25;
+  totalItems:number = 0;
 
-  selectedVisitor: any = undefined;
+  selectedVisitor: any | null = null;
   isVisitorLoading:boolean = false;
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
   @ViewChild('infoJsonCellTemplate') infoJsonCellTemplate!: TemplateRef<any>;
-
-  tableColumns: TableColumn[] = [
-    { header: 'Country', field: 'countryName', width: '10%' },
-    { header: 'Source', field: 'visitSource', width: '20%', align:'left' },
-    { header: 'Visits', field: 'visitCount', width: '5%', align:'center' },
-    { header: 'Visited At', field: 'visitedAt', width: '10%' },
-  ];
 
 
   constructor(
@@ -47,27 +40,14 @@ export class VisitorsComponent implements OnInit, AfterViewInit
   ngOnInit(): void 
   {
     this.getVisitors();
+    const visitorId = this.router.snapshot.params['id'];
+    if(visitorId)
+    {
+      this.getSelectedVisitor(visitorId);
+    }
   }
   ngAfterViewInit(): void {
     const containerElement = this.scrollContainer.nativeElement;
-
-    this.scrollService.containerReachedBottom(containerElement)
-    .subscribe({
-      next:(reachedBottom)=>{
-        if(reachedBottom)
-        {
-          this.onScrolledBottom();
-        }
-      }
-    });
-    this.scrollService.containerReachedTop(containerElement)
-    .subscribe({
-      next:(reachedTop)=>{
-        if(reachedTop)
-        {
-        }
-      }
-    });
     
   }
 
@@ -82,18 +62,13 @@ export class VisitorsComponent implements OnInit, AfterViewInit
       if (this.visitersList.data) {
         const newData = response.data.filter((item: any) => !this.visitersList.data.some((existingItem: any) => existingItem.id === item.id));
         this.visitersList.data = this.visitersList.data.concat(newData);
-
         this.visitersList.total = response.total;
         this.visitersList.page = response.page;
       }
       else {
         this.visitersList = response;
       }
-      const visitorId = this.router.snapshot.params['id'];
-        if(visitorId)
-        {
-          this.getSelectedVisitor(visitorId);
-        }
+      this.totalItems = response.total;
     },(error)=>{
       console.log(error);
       this.notifService.showError(error.error.message);
@@ -109,6 +84,9 @@ export class VisitorsComponent implements OnInit, AfterViewInit
   }
 
   getSelectedVisitor(id: string) {
+    if(!id || id == 'all') {
+      return;
+    }
     this.isVisitorLoading = true;
     this.restService.get(API.main.visitor, id)
     .subscribe((response: any) => {
@@ -116,7 +94,6 @@ export class VisitorsComponent implements OnInit, AfterViewInit
       this.isVisitorLoading = false;
     }, (error) => {
         this.isVisitorLoading = false;
-        console.log(error);
         this.notifService.showError(error.error.message);
       });
   }
@@ -126,20 +103,6 @@ export class VisitorsComponent implements OnInit, AfterViewInit
     return JSON.parse(text);
   }
 
-  onScrolledBottom() {
-    const totalCount = this.visitersList?.total;
-    const itemPerPage = this.itemPerPage;
-
-    if (totalCount && itemPerPage) {
-      const maxPage = Math.ceil(totalCount / itemPerPage);
-      if (this.currentPage < maxPage) {
-        this.currentPage++;
-        this.getVisitors();
-      }
-    } else {
-      console.error('Total count or items per page not available');
-    }
-  }
 
   objectToQueryString(obj: { [key: string]: any }): string {
     const queryString = Object.keys(obj)
@@ -173,23 +136,9 @@ export class VisitorsComponent implements OnInit, AfterViewInit
     return sum;
   }
 
-  formatDataForTable(data: any[]): IVisitorData[] {
-    const formattedData: IVisitorData[] = [];
-
-    for (const item of data) {
-      const trackingInfo = JSON.parse(item.trackingInfo)
-      
-      const visits: Visit[] = item.visits || [];
-      for (const visit of visits) {
-        formattedData.push({
-          countryName: trackingInfo?.country_name,
-          visitCount: visit.count,
-          visitSource: visit.source,
-          visitedAt: visit.createdAt
-        });
-      }
-    }
-
-    return formattedData;
+  onPageChange(event:any){
+    this.currentPage = event.page;
+    this.getVisitors();
   }
+
 }

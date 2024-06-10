@@ -42,6 +42,7 @@ export class AdvancedModalsComponent {
     this.isLoading = true;
     this.confirm.emit(this.entity);
     this.modalService.dismissAll();
+    this.isLoading = false;
   }
 
   onCancel() {

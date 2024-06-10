@@ -1,5 +1,29 @@
+<h3 class="my-3">Traffics</h3>
 
-  <div class="row mt-3">
+<div class="row">
+  <div class="col-7">
+    @if(visitersList.data){
+      @for (visitor of visitersList.data; track $index) {
+      <app-visitor-card [data]="visitor" [isActive]="visitor?.id === selectedVisitor?.id"
+        (onClick)="selectVisitor(visitor)"></app-visitor-card>
+      }
+      @empty {
+        <div class="card">
+          <div class="card-body text-center">
+            <h4 class="text-muted">No visitors found</h4>
+          </div>
+        </div>
+      }
+      <div class="my-auto">
+        <app-pagination [totalPages]="totalItems" [limit]="itemPerPage" (pageChanged)="onPageChange($event)" />
+      </div>
+    }
+  </div>
+  <div class="col-5">
+    <app-visitor-preview [visitor]="selectedVisitor"></app-visitor-preview>
+  </div>
+</div>
+<!-- <div class="row mt-3">
     <div class="col-12">
       <div class="card">
         <div class="card-header">
@@ -10,7 +34,7 @@
         <div class="card-body p-0">
           <div class="row p-0">
             <div class="col-lg-3 m-0 pe-0">
-              <ul class="scroll-container-v fixed-vh right-line" #scrollContainer >
+              <ul class="scroll-container-v right-line" #scrollContainer >
                 <ng-container *ngIf="!visitersList.data">
                   <li>
                     <ngx-skeleton-loader count="5" [theme]="{'border-radius': '0', height: '50px'}"></ngx-skeleton-loader>
@@ -141,4 +165,4 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->

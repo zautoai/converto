@@ -23,10 +23,10 @@ export class AuthService extends BaseService {
 
   async login(email: string, password: string): Promise<AuthEntity> {
     const org = await this.organizationService.findOrgByEmail(email)
-    const orgId = org.id;
-    if (!orgId) {
-      throw new NotFoundException(`No organization found for email: ${email}`);
+    if (!org) {
+      throw new NotFoundException(`No user found for email: ${email}`);
     }
+    const orgId = org.id;
     const prisma = await this.getPrismaClient(orgId);
     try {
 
