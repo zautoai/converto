@@ -21,7 +21,6 @@ import { SMTPConfigComponent } from './smtpconfig/smtpconfig.component';
 import { SitesComponent } from './sites/sites.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { TeamComponent } from './teams/team.component';
-import { LaunchAvatarComponent } from './launch-avatar/launch-avatar.component';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { SettingsComponent } from './zautosettings/settings/settings.component';
 import { LeadConfigComponent } from './lead-config/lead-config.component';
@@ -70,7 +69,6 @@ import { AbmCardPreviewComponent } from './abm/components/abm-card-preview/abm-c
 @NgModule({
   declarations: [
     ZautoDashboardComponent,
-    
     conversationcomponent,
     ChatContainerComponent,
     SummaryContainerComponent,
@@ -82,7 +80,6 @@ import { AbmCardPreviewComponent } from './abm/components/abm-card-preview/abm-c
     SMTPConfigComponent,
     SitesComponent,
     TeamComponent,
-    LaunchAvatarComponent,
     SettingsComponent,
     LeadConfigComponent,
     CustomiseAvatarComponent,
