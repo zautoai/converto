@@ -20,25 +20,25 @@ export enum IntentType {
   templateUrl: './intent-scoring.component.html',
   styleUrl: './intent-scoring.component.scss'
 })
-export class IntentScoringComponent implements OnInit{
+export class IntentScoringComponent implements OnInit {
 
-  isEdit:boolean = false;
-  private selectedEntity:any = null;
+  isEdit: boolean = false;
+  private selectedEntity: any = null;
   intentScoringList: any = null;
   currentPage: number = 0;
   limit: number = 10;
   totalItems: number = 0;
-  isLoading:boolean = false;
+  isLoading: boolean = false;
 
   @ViewChild(AdvanceOffcanvasComponent) advanceOffcanvasComponent!: AdvanceOffcanvasComponent;
   @ViewChild(AdvancedModalsComponent) deleteModal!: AdvancedModalsComponent;
   IntentType = IntentType;
 
-  form:FormGroup = new FormGroup({
-    name: new FormControl('',Validators.required),
+  form: FormGroup = new FormGroup({
+    name: new FormControl('', Validators.required),
     description: new FormControl(''),
-    value: new FormControl(0,[Validators.required,Validators.min(-100),Validators.max(100)]),
-    type: new FormControl(this.IntentType.POSITIVE,[Validators.required]),
+    value: new FormControl(0, [Validators.required, Validators.min(-100), Validators.max(100)]),
+    type: new FormControl(this.IntentType.POSITIVE, [Validators.required]),
   });
 
   errorMessages = {
@@ -60,19 +60,19 @@ export class IntentScoringComponent implements OnInit{
     private notifService: NotificationService
   ) { }
 
-  get name():FormControl {
+  get name(): FormControl {
     return this.form.get('name') as FormControl;
   }
 
-  get description():FormControl {
+  get description(): FormControl {
     return this.form.get('description') as FormControl;
   }
 
-  get score():FormControl {
+  get score(): FormControl {
     return this.form.get('value') as FormControl;
   }
 
-  get type():FormControl {
+  get type(): FormControl {
     return this.form.get('type') as FormControl;
   }
 
@@ -80,10 +80,9 @@ export class IntentScoringComponent implements OnInit{
     this.getAll();
   }
 
-  getAll()
-  {
+  getAll() {
     this.restService.getAll(API.main.intentScoring + `?limit=${this.limit}&page=${this.currentPage}`).subscribe({
-      next: (data:any) => {
+      next: (data: any) => {
         this.intentScoringList = data;
         this.totalItems = data.total || 0;
       },
@@ -93,7 +92,7 @@ export class IntentScoringComponent implements OnInit{
     });
   }
 
-  openCreate (){
+  openCreate() {
     this.isEdit = false;
     this.selectedEntity = null;
     this.form.reset();
@@ -102,7 +101,7 @@ export class IntentScoringComponent implements OnInit{
     this.advanceOffcanvasComponent.open();
   }
 
-  openEdit(item: any){
+  openEdit(item: any) {
     this.isEdit = true;
     this.selectedEntity = item;
     this.form.reset();
@@ -110,11 +109,11 @@ export class IntentScoringComponent implements OnInit{
     this.advanceOffcanvasComponent.open();
   }
 
-  openDelete(entity:any){
+  openDelete(entity: any) {
     this.deleteModal.open(entity);
   }
 
-  closeCanvas(){
+  closeCanvas() {
     this.advanceOffcanvasComponent.close();
   }
 
@@ -122,17 +121,15 @@ export class IntentScoringComponent implements OnInit{
     return Object.values(this.IntentType).filter((value) => isNaN(Number(value)));
   }
 
-  submit(){
-    if(this.form.valid){
+  submit() {
+    if (this.form.valid) {
       this.isLoading = true;
-      if(this.isEdit)
-      {
+      if (this.isEdit) {
         const data = this.form.value;
-        if(this.form.get('type')?.value === IntentType.NEGATIVE)
-        {
-          data.value = toNegative(this.form.get('value')?.value);
+        if (this.form.get('type')?.value === IntentType.NEGATIVE) {
+          data.value = toNegative(this.form.get('value')?.value as number);
         }
-        this.restService.patch(API.main.intentScoring, this.selectedEntity?.id,data).subscribe({
+        this.restService.patch(API.main.intentScoring, this.selectedEntity?.id, data).subscribe({
           next: (data) => {
             this.getAll();
             this.closeCanvas();
@@ -141,19 +138,17 @@ export class IntentScoringComponent implements OnInit{
           },
           error: (error) => {
             this.isLoading = false;
-            if(error.status == 500)
-              {
-                this.notifService.showError('Something Went Wrong! Try Again Later');
-              }
-              else{
-                this.notifService.showError(error.error.message);
-              }
+            if (error.status == 500) {
+              this.notifService.showError('Something Went Wrong! Try Again Later');
+            }
+            else {
+              this.notifService.showError(error.error.message);
+            }
           }
         });
       }
-      else
-      {
-        this.restService.post(API.main.intentScoring,this.form.value).subscribe({
+      else {
+        this.restService.post(API.main.intentScoring, this.form.value).subscribe({
           next: (data) => {
             this.getAll();
             this.closeCanvas();
@@ -162,25 +157,23 @@ export class IntentScoringComponent implements OnInit{
           },
           error: (error) => {
             this.isLoading = false;
-            if(error.status == 500)
-              {
-                this.notifService.showError('Something Went Wrong! Try Again Later');
-              }
-              else{
-                this.notifService.showError(error.error.message);
-              }
+            if (error.status == 500) {
+              this.notifService.showError('Something Went Wrong! Try Again Later');
+            }
+            else {
+              this.notifService.showError(error.error.message);
+            }
           }
         });
       }
     }
-    else
-    {
+    else {
       markFormGroupAsDirty(this.form);
       this.isLoading = false;
     }
   }
 
-  onDeleteSubmit(data: any){
+  onDeleteSubmit(data: any) {
     this.restService.delete(API.main.intentScoring, data.id).subscribe(
       (response: any) => {
         this.getAll();
@@ -197,10 +190,8 @@ export class IntentScoringComponent implements OnInit{
     this.getAll();
   }
 
-  toNegative(value:number)
-  {
-    if(this.form.get('type')?.value === IntentType.NEGATIVE)
-    {
+  toNegative(value: number) {
+    if (this.form.get('type')?.value === IntentType.NEGATIVE) {
       return toNegative(this.form.get('value')?.value);
     }
     return value;

@@ -1,6 +1,8 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { error } from 'console';
+import { response } from 'express';
 import { forkJoin } from 'rxjs';
 import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from 'src/app/shared/services/notification.service';
@@ -58,6 +60,20 @@ export class IcpComponent {
     this.router.navigate(['/icp/edit', data.id]);
   }
 
+  handleDelete(data: any): any {
+    this.restService.delete(API.main.icp, data.id).subscribe(
+      (response: any) => {
+        this.getIcps();
+        this.notifService.showSuccess("deleted");
+      }, (error) => {
+
+      }
+    )
+
+
+
+  }
+
   delete = (data: any) => {
     this.user = data;
 
@@ -93,7 +109,7 @@ export class IcpComponent {
     this.modalService.dismissAll();
   };
 
-  handleView(data: any): void {
+  handleView(data: any): any {
     this.selectedData = data;
     this.offcanvasService.open(this.viewIcpOffcanvas, {
       position: 'end',

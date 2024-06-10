@@ -1,17 +1,18 @@
 <div class="card mt-3">
-  <div class="card-header d-flex justify-content-between">
+  <div class="card-header d-flex align-items-center">
     <h6 class="card-title"><i class="fa-solid fa-sliders"></i> Lead settings</h6>
-    <div>
-      <button class="btn btn-primary btn-sm me-2" *ngIf="canEdit" [disabled]="isUpdateing" (click)="submit()">
-        <i class="zmdi zmdi-spinner text-white status-loader" *ngIf="isUpdateing"></i> {{!isUpdateing ? 'Save changes' :
-        'Updating'}}</button>
+    <div class="ms-auto d-flex justify-content-end"> <button class="btn btn-primary btn-sm me-2" *ngIf="canEdit"
+        [disabled]="isUpdateing">
+        <i class="zmdi zmdi-spinner text-white status-loader" *ngIf="isUpdateing"></i>
+        {{ isUpdateing ? 'Updating' : 'Save changes' }}
+      </button>
       <button class="btn btn-primary btn-sm" (click)="toggleEdit()">{{!canEdit ? 'Edit' : 'Cancel'}}</button>
     </div>
   </div>
-  <div class="card-body fixed-vh">
+  <div class="card-body">
     <div class="row">
-      <div class="col-6">
-        <ul>
+      <div class="col-12">
+        <ul class="mb-0">
           <li *ngFor="let field of fields; let i = index">
             <div class="field mb-2 d-flex justify-content-between">
               <span>{{field}}</span>
@@ -21,8 +22,8 @@
           </li>
           <li *ngIf="canEdit && !isUpdateing">
             <form (ngSubmit)="addField()">
-              <div class="input-group">
-                <input type="text" class="form-control" placeholder="Field name" name="newField" [(ngModel)]="newField">
+              <div class="input-group justify-content-end"> <input type="text" class="form-control"
+                  placeholder="Field name" name="newField" [(ngModel)]="newField">
                 <button class="btn btn-outline-primary" (click)="addField()">
                   <i class="fa fa-plus"></i>
                 </button>
