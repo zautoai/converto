@@ -41,6 +41,8 @@
                 <td class="icon w-1">
                   <button (click)="handleView(data)"><i class="fa fa-eye text-secondary view"></i></button>
                   <button (click)="handleEdit(data)"><i class="fa fa-edit text-success update"></i></button>
+                  <button (click)="handleDelete(data)"><i class="fa fa-trash text-success delete"></i></button>
+
                 </td>
               </tr>
             </ng-container>
@@ -52,17 +54,40 @@
 </div>
 
 <ng-template #viewIcpOffcanvas let-offcanvas>
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title"><i class="fe fe-cube"></i>ICP Details</h5>
-    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
+  <div class="offcanvas-header bg-primary text-white">
+    <h5 class="text-white">
+      ICP Details
+    </h5>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="offcanvas.dismiss()"></button>
   </div>
-  <hr class="m-0" />
-  <div class="offcanvas-body">
-    <div *ngIf="selectedData">
-      <h4>{{ selectedData.name }}</h4>
-      <span>{{ selectedData.description }}</span>
+  <div class="offcanvas-body p-3">
+    <div *ngIf="selectedData" class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h4 class="text-bold card-title">Name:
+          <span class="text-muted"> {{ selectedData.name }}</span>
+        </h4>
+        <p class="card-text  card-title">
+          Description :
+          <span class="text-muted">
+            {{ selectedData.description }} </span>
+        </p>
+        <div *ngFor="let icp of selectedData.segment">
+          <p class="card-text  card-title">
+            Segment category:
+            <span class="text-muted">
+              {{icp.segmentCategory.name }}
+            </span>
+          </p>
+
+          <p class="card-text  card-title">
+            Segment :<span class="text-muted">{{icp.name}}</span>
+          </p>
+
+
+        </div>
+      </div>
       <div class="mt-3">
-        <div *ngFor="let segment of selectedData.segment" class="badge-container">
+        <div *ngFor="let segment of selectedData.segment" class="badge-container me-2 mb-2">
           <span class="badge" [ngStyle]="{'background-color': segment.segmentCategory.color}">
             {{ segment.name }}
           </span>
@@ -70,4 +95,5 @@
       </div>
     </div>
   </div>
+
 </ng-template>

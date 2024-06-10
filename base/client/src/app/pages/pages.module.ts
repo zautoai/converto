@@ -65,6 +65,7 @@ import { ChannelengagementComponent } from './dashboard/widgets/channelengagemen
 import { ComponentsModule } from '../components/components.module';
 import { AbmCardComponent } from './abm/components/abm-card/abm-card.component';
 import { AbmCardPreviewComponent } from './abm/components/abm-card-preview/abm-card-preview.component';
+import { AbmviewComponent } from './abmview/abmview.component';
 
 @NgModule({
   declarations: [
@@ -114,6 +115,7 @@ import { AbmCardPreviewComponent } from './abm/components/abm-card-preview/abm-c
     ChannelengagementComponent,
     AbmCardComponent,
     AbmCardPreviewComponent,
+    AbmviewComponent,
   ],
   imports: [
     PlatformLinkModule,

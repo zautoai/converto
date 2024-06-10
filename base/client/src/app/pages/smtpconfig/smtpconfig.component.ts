@@ -64,19 +64,19 @@ export class SMTPConfigComponent implements OnInit {
   }
 
   onSaveSubmit() {
-    if (this.configForm.host != "" && 
-    this.configForm.port != null && 
-    this.configForm.user != "" && 
-    this.configForm.name != "") {
+    console.log("working")
+    if (this.configForm.host != "" &&
+      this.configForm.port != null &&
+      this.configForm.user != "" &&
+      this.configForm.name != "") {
       if (this.smtpConfigData) {
         // update
-        const payload:any = this.configForm;
-        if(this.configForm.pass == "")
-        {
+        const payload: any = this.configForm;
+        if (this.configForm.pass == "") {
           delete payload?.pass;
         }
         this.isUpdateing = true;
-        this.restService.patch(API.main.orgSmtpConfig,this.smtpConfigData.id, payload)
+        this.restService.patch(API.main.orgSmtpConfig, this.smtpConfigData.id, payload)
           .subscribe((response: any) => {
             this.smtpConfigData = response;
             this.smtpConfigData.pass = "";
@@ -95,6 +95,7 @@ export class SMTPConfigComponent implements OnInit {
       }
       else {
         // create
+        console.log("creating...")
         const payload = this.configForm;
         this.isUpdateing = true;
         this.restService.post(API.main.orgSmtpConfig, payload)

@@ -44,8 +44,8 @@ export class LaunchAvatarComponent implements OnInit {
     }
   };
 
-  isLoading:boolean = false;
-  
+  isLoading: boolean = false;
+
   trainingProgress = 0;
   isAvatarNameValid: boolean = true;
 
@@ -79,8 +79,7 @@ export class LaunchAvatarComponent implements OnInit {
       
       this.avatar.status = data.status;
       this.avatar.message = data.message;
-      if(data.status != 'TRAININGFAILED')
-      {
+      if (data.status != 'TRAININGFAILED') {
         this.trainingProgress += 20;
       }
       this.setTrainingProgress(data?.status, data?.message, this.trainingProgress);
@@ -99,7 +98,7 @@ export class LaunchAvatarComponent implements OnInit {
     // this.startProcess()
   }
 
-  get companyName():FormControl {
+  get companyName(): FormControl {
     return this.launchForm.get('companyName') as FormControl;
   }
 
@@ -154,18 +153,17 @@ export class LaunchAvatarComponent implements OnInit {
       return;
     }
     this.restService.post(API.main.agentAvailability, { name: name })
-    .subscribe(
-      (response: any) => {
-        this.isAvatarNameValid = response?.available;
-        if (!this.isAvatarNameValid) {
-          // this.errorFeedback.avatarName = "Avatar name already taken.";
+      .subscribe(
+        (response: any) => {
+          this.isAvatarNameValid = response?.available;
+          if (!this.isAvatarNameValid) {
+            // this.errorFeedback.avatarName = "Avatar name already taken.";
+          }
+        },
+        (error) => {
+          console.log(error);
         }
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-
+      );
   }
 
   getStatusColor(status: string): string {
@@ -191,19 +189,18 @@ export class LaunchAvatarComponent implements OnInit {
 
   deleteAvatar() {
     let id = this.avatarService.getAvatarId();
-    if(id) {
+    if (id) {
       this.restService.delete(API.main.agent, id)
-      .subscribe((response: any) => {
-        this.router.navigate(['/auth/login']);
-        this.clearTrainingStatus();
-      }, (error) => {
-        console.log(error);
-      });
+        .subscribe((response: any) => {
+          this.router.navigate(['/auth/login']);
+          this.clearTrainingStatus();
+        }, (error) => {
+          console.log(error);
+        });
     }
   }
 
-  clearTrainingStatus()
-  {
+  clearTrainingStatus() {
     localStorage.removeItem('training_progress')
     localStorage.removeItem('training_status')
     localStorage.removeItem('training_message')
