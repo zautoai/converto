@@ -99,7 +99,7 @@ export class StageService extends BaseService {
         catch (error) {
             if (error instanceof PrismaClientKnownRequestError && error.code == 'P2002') {
                 throw new ConflictException("This Stage already exist for this agent");
-            }
+            } 
             else {
                 throw new BadRequestException(error);
             }
@@ -234,7 +234,6 @@ export class StageService extends BaseService {
                 const stage = AGENT_STAGES[i];
                 const data = {
                     agentId: agent.id,
-                    orgId: agent.orgId,
                     name: stage.name,
                     instruction: stage.instruction,
                     sequence: stage.sequence,
@@ -244,7 +243,6 @@ export class StageService extends BaseService {
             }
         } catch (error) {
             console.error(`Error creating stage: `, error);
-            console.error(error)
         } finally {
             prisma.$disconnect()
             await this.closeConnection(orgId);

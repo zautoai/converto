@@ -26,7 +26,5 @@ export class CreateIntentScoringDto {
     @ApiProperty({description: 'Value of the intent scoring', example: '0'})
     @IsNotEmpty()
     @IsNumber()
-    @Min(-100)
-    @Max(100)
     value:number = 0;
 }
