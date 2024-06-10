@@ -84,3 +84,13 @@ export function toNegative(value: number): number {
         return 0;
     }
 }
+
+export function toPositive(value: number): number {
+    if (value < 0) {
+        return -value;
+    } else if (value > 0) {
+        return value;
+    } else {
+        return 0;
+    }
+}

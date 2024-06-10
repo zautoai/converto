@@ -8,6 +8,8 @@ import { ErrorLayoutComponent } from './shared/layout-components/layout/error-la
 import { Content_Routes } from './shared/routes/error.routes';
 import { AdminGuard } from './shared/guard/admin.guard';
 import { LoginGuard } from './shared/guard/loginGuard';
+import { SetupCompletedGuard } from './shared/guard/setup-completed.guard';
+import { LaunchAvatarComponent } from './launch-avatar/launch-avatar.component';
 
 const routes: Routes = [
 
@@ -26,6 +28,13 @@ const routes: Routes = [
     path: 'auth',
     redirectTo: '/auth/login',
     pathMatch: 'full'
+  },
+  
+  {
+    path: 'setup',
+    title: "Setup",
+    component: LaunchAvatarComponent,
+    canActivate: [SetupCompletedGuard]
   },
   // {
   //   path: '',

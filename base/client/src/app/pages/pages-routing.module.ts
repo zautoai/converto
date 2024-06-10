@@ -9,7 +9,6 @@ import { PlatformsComponent } from './platforms/platforms.component';
 import { SMTPConfigComponent } from './smtpconfig/smtpconfig.component';
 import { SitesComponent } from './sites/sites.component';
 import { TeamComponent } from './teams/team.component';
-import { LaunchAvatarComponent } from './launch-avatar/launch-avatar.component';
 import { ExternalApisComponent } from './external-apis/external-apis.component';
 import { HubspotComponent } from './hubspot/hubspot.component';
 import { IntegrationComponent } from './integrations/integration/integration.component';
@@ -17,7 +16,6 @@ import { FileManagerComponent } from './file-manager/file-manager.component';
 import { LeadCategoryComponent } from './lead-category/lead-category/lead-category.component';
 import { CalendarEventComponent } from './calendar-event/calendar-event.component';
 import { SetupGuard } from '../shared/guard/setup.guard';
-import { SetupCompletedGuard } from '../shared/guard/setup-completed.guard';
 import { LeadConfigComponent } from './lead-config/lead-config.component';
 import { StartersConfigComponent } from './starters-config/starters-config.component';
 import { CustomiseAvatarComponent } from './customise-avatar/customise-avatar/customise-avatar.component';
@@ -39,12 +37,6 @@ const routes: Routes = [
     canActivate: [SetupGuard]
   },
 
-  {
-    path: 'setup',
-    title: "Setup",
-    component: LaunchAvatarComponent,
-    canActivate: [SetupCompletedGuard]
-  },
   { path: 'accounts/view-account/:id', component: AccountviewComponent },
   { path: 'contacts/view-contacts/:id', component: ContactviewComponent },
 

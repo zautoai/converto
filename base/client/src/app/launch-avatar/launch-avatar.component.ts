@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { API } from 'src/app/config/endpoint.config';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -9,6 +9,8 @@ import { Avatar, AvatarService } from 'src/app/shared/services/avatar.service';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
 import { SetupService } from 'src/app/shared/services/setup.service';
+import { markFormGroupAsDirty } from '../components/advanced-inputs/input.util';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-launch-avatar',
@@ -18,27 +20,39 @@ import { SetupService } from 'src/app/shared/services/setup.service';
 export class LaunchAvatarComponent implements OnInit {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
   avatar!: Avatar;
-  launchForm: FormGroup;
-  errorFeedback: any = { avatarName: "", companyName: "", siteUrl: "" };
+  launchForm: FormGroup = new FormGroup({
+    companyName: new FormControl('',[Validators.required,Validators.minLength(3)]),
+    siteUrl: new FormControl('',[Validators.required, Validators.pattern('https?://.+')]),
+    avatarName: new FormControl('',[Validators.required])
+  });
+  errorMessages = {
+    companyName: {
+      required: 'Company name is required',
+      minlength: 'Company name must be at least 3 characters long'
+    },
+    siteUrl: {
+      required: 'Site URL is required',
+      pattern: 'Site URL must be a valid URL'
+    },
+    avatarName: {
+      required: 'Avatar name is required'
+    }
+  };
+
+  isLoading:boolean = false;
+  
   trainingProgress = 0;
   isAvatarNameValid: boolean = true;
   isSubmitting:boolean = false;
-  avatarNameTimeout: any = null;
 
   constructor(
     private setupService: SetupService,
-    private formBuilde: FormBuilder,
     private restService: RestService,
     private socketService: WebsocketService,
     private router: Router,
     private avatarService: AvatarService,
     private notifiService: NotificationService
   ) {
-    this.launchForm = this.formBuilde.group({
-      companyName: ['', Validators.required],
-      siteUrl: ['', [Validators.required, Validators.pattern('https?://.+')]],
-      avatarName: ['', Validators.required],
-    });
     this.avatarService.avatarEvent$.subscribe((data: any) => {
       if (data) {
         this.avatar = data;
@@ -65,8 +79,21 @@ export class LaunchAvatarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.avatarName.valueChanges.pipe(debounceTime(1000)).subscribe(value => {
+      this.checkAvatarName(value);
+    });
+  }
 
+  get companyName():FormControl {
+    return this.launchForm.get('companyName') as FormControl;
+  }
 
+  get siteUrl():FormControl {
+    return this.launchForm.get('siteUrl') as FormControl;
+  }
+
+  get avatarName():FormControl {
+    return this.launchForm.get('avatarName') as FormControl;
   }
 
   registerStatusEvent(agentId: string) {
@@ -75,33 +102,14 @@ export class LaunchAvatarComponent implements OnInit {
   }
 
   onAvatarCreate() {
-    this.resetErrorFeedback();
-    const avatarName: string = this.launchForm.value.avatarName || "";
-    const companyName: string = this.launchForm.value.companyName || "";
-    let websiteUrl: string = this.launchForm.value.siteUrl || "";
-    
     if (this.launchForm.valid) {
-      try {
-        const urlObject = new URL(websiteUrl);
-        websiteUrl = urlObject?.origin;
-      }
-      catch (error) {      
-        this.errorFeedback.siteUrl = "Invalid website URL.";
-        return;
-      }
-      const data = {
-        displayName: avatarName,
-        companyName: companyName,
-        companySite: websiteUrl
-      };
-
+      const data = this.launchForm.value;
       this.clearTrainingStatus();
       this.launchForm.disable();
       this.isSubmitting = true;
       this.restService.post(API.main.launchAvatar, data)
         .subscribe((response: any) => {
           this.avatarService.setAvatarData(response);
-          this.resetErrorFeedback();
           this.launchForm.reset();
           this.launchForm.enable();
           this.isSubmitting = false;
@@ -114,66 +122,28 @@ export class LaunchAvatarComponent implements OnInit {
 
     }
     else {
-
-      if (avatarName.length <= 0) {
-        this.errorFeedback.avatarName = "Avatar name required.";
-      }
-      if (companyName.length <= 0) {
-        this.errorFeedback.companyName = "Company name required.";
-      }
-      if (websiteUrl.length <= 0) {
-        this.errorFeedback.siteUrl = "Website URL required.";
-      }
-      else {
-        const urlPattern = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
-        if (!urlPattern.test(websiteUrl)) {
-          this.errorFeedback.siteUrl = "Invalid website URL.";
-        }
-      }
+      markFormGroupAsDirty(this.launchForm);
     }
 
   }
 
-  checkAvatarName(event: Event) {
-    this.resetErrorFeedback();
-    const name = this.launchForm.value.avatarName;
-
+  checkAvatarName(name: string) {
     if (!name) {
       return;
     }
+    this.restService.post(API.main.agentAvailability, { name: name })
+    .subscribe(
+      (response: any) => {
+        this.isAvatarNameValid = response?.available;
+        if (!this.isAvatarNameValid) {
+          // this.errorFeedback.avatarName = "Avatar name already taken.";
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
 
-    if (this.avatarNameTimeout) {
-      clearTimeout(this.avatarNameTimeout);
-    }
-
-    this.avatarNameTimeout = setTimeout(() => {
-      this.restService.post(API.main.agentAvailability, { name: name })
-        .subscribe(
-          (response: any) => {
-            this.isAvatarNameValid = response?.available;
-            if (!this.isAvatarNameValid) {
-              this.errorFeedback.avatarName = "Avatar name already taken.";
-            }
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
-    }, 1000);
-
-  }
-
-  isFieldValid(fieldName: string): boolean {
-    const control = this.launchForm.get(fieldName)!;
-    return control.invalid && control.dirty;
-  }
-
-  resetErrorFeedback() {
-    let keys = Object.keys(this.errorFeedback);
-    for (let key of keys) {
-      this.errorFeedback[key] = "";
-
-    }
   }
 
   getStatusColor(status: string): string {

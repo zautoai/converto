@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { toNegative } from 'src/app/common/utils';
+import { toNegative, toPositive } from 'src/app/common/utils';
 import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
 import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
 import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
@@ -124,11 +124,15 @@ export class IntentScoringComponent implements OnInit {
   submit() {
     if (this.form.valid) {
       this.isLoading = true;
+      const data = this.form.value;
+      if (this.form.get('type')?.value === IntentType.NEGATIVE) {
+        data.value = toNegative(this.form.get('value')?.value);
+      }
+      else {
+        data.value = toPositive(this.form.get('value')?.value);
+      }
+      data.value = Number(data.value);
       if (this.isEdit) {
-        const data = this.form.value;
-        if (this.form.get('type')?.value === IntentType.NEGATIVE) {
-          data.value = toNegative(this.form.get('value')?.value as number);
-        }
         this.restService.patch(API.main.intentScoring, this.selectedEntity?.id, data).subscribe({
           next: (data) => {
             this.getAll();
