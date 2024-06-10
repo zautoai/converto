@@ -45,6 +45,7 @@ export class IcpComponent {
     this.restService.getAll(API.main.icp).subscribe({
       next: (response: any) => {
         this.icpdata = response.data;
+        console.log("icpdata", this.icpdata)
       },
       error: (error) => {
         console.error(error);
@@ -111,6 +112,7 @@ export class IcpComponent {
 
   handleView(data: any): any {
     this.selectedData = data;
+    console.log(this.selectedData)
     this.offcanvasService.open(this.viewIcpOffcanvas, {
       position: 'end',
       backdrop: 'static',
