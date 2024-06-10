@@ -18,31 +18,31 @@
             <th class="text-white">Name</th>
             <th class="text-white">Email</th>
             <th class="text-white">Role</th>
-            <!-- <th class="text-white">Created At</th> -->
-            <!-- <th class="text-white">Updated At</th> -->
+            <th class="text-white">Created At</th>
+            <th class="text-white">Updated At</th>
             <th class="text-white">Action</th>
           </thead>
           <tbody>
-            <ng-container *ngFor="let user of userList?.data">
+            <ng-container *ngFor="let user of usersData?.data">
               <tr *ngIf="user?.role.name == 'user'">
                 <td>{{ user?.name }}</td>
                 <td>{{ user?.email }}</td>
                 <td>{{user?.role.name}}</td>
-                <!-- <td>{{user.createdAt}}</td> -->
-                <!-- <td>{{user.modifiedAt}}</td> -->
+                <td>{{user?.createdAt | date}}</td>
+                <td>{{user?.modifiedAt | date}}</td>
 
                 <td class="icon w-1">
                   <button (click)="openUpdateUser(user)">
                     <i class="fa fa-edit text-secondary update"></i>
                   </button>
-                  <button (click)="delete(user)">
+                  <button (click)="openDeleteForm(user)">
                     <i class="fa fa-trash-o text-danger delete"></i>
                   </button>
                 </td>
               </tr>
             </ng-container>
-            <tr *ngIf="userList?.data?.length <= 0">
-              <td class="text-center" colspan="4">User not found.</td>
+            <tr *ngIf="usersData?.data?.length <= 0">
+              <td class="text-center" colspan="6">User not found.</td>
             </tr>
           </tbody>
         </table>
@@ -54,133 +54,32 @@
   </div>
 </div>
 
-
-<ng-template #deleteModal let-modal>
-  <!--  SMALL MODAL -->
-  <div class="modal-content">
-    <div class="modal-header">
-
-      <h4> <i class="fa fa-exclamation-triangle"></i> Delete User</h4>
-      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-
-      </button>
+<app-advance-offcanvas heading="{{ isEdit ? 'Edit' : 'Create'}} user">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group mb-3">
+      <advanced-input [label]="'Username'" [type]="'text'" [placeholder]="'username'" [size]="'md'" [control]="name"
+        [isDisabled]="isLoading" [errorMessages]="errorMessages.name"></advanced-input>
     </div>
-    <div class="modal-body">
-      <p>Are you sure you want to delete ?</p>
+    <div class="form-group mb-3">
+      <advanced-input [label]="'Email'" [type]="'email'" [placeholder]="'email'" [size]="'md'" [control]="email"
+        [isDisabled]="isLoading" [errorMessages]="errorMessages.email"></advanced-input>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline-primary" (click)="closeModal()">Cancel</button>
-      <button class="btn btn-danger" type="button" (click)="confirmDelete()">Yes</button>
+    @if(!isEdit){
+      <div class="form-group mb-3">
+        <advanced-input [label]="'Password'" [type]="'password'" [placeholder]="'password'" [size]="'md'" [control]="password"
+          [isDisabled]="isLoading" [errorMessages]="errorMessages.password"></advanced-input>
+      </div>
+    }
+    <div class="d-flex gap-3 justify-content-end">
+      <advanced-button label="{{ isEdit ? 'Update' : 'Create'}}" [size]="'md'" [classes]="'w-100'" [type]="'submit'"
+        [isLoading]="isLoading"></advanced-button>
+      <advanced-button label="Cancel" [size]="'md'" [classes]="'w-100'" [type]="'button'" [color]="'outline-primary'"
+        [isLoading]="isLoading" (onClick)="closeComposeCanvas()"></advanced-button>
     </div>
-  </div>
-</ng-template>
+  </form>
+</app-advance-offcanvas>
 
-<ng-template #createUserOffcanvas let-offcanvas>
-  <div class="offcanvas-header">
-    <h4 class="offcanvas-title"><i class="fe fe-user"></i> Create user</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
-  </div>
-  <hr class="m-0">
-  <div class="offcanvas-body">
-    <form [formGroup]="userForm" (ngSubmit)="onCreateuserSubmit()">
-
-      <div class="form-group">
-        <label class="form-label">Name</label>
-        <input type="text" 
-        class="form-control" 
-        formControlName="name" 
-        name="name"
-        placeholder="Name"
-        [class.is-invalid]="errorFeedback.name.length > 0"
-        >
-        <div class="invalid-feedback">{{errorFeedback.name}}</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" 
-        class="form-control" 
-        formControlName="email" 
-        name="Email"
-        placeholder="Email"
-        [class.is-invalid]="errorFeedback.email.length > 0"
-        >
-        <div class="invalid-feedback">{{errorFeedback.email}}</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" 
-        class="form-control" 
-        formControlName="password" 
-        name="Password"
-        placeholder="Password"
-        [class.is-invalid]="errorFeedback.password.length > 0"
-        >
-        <div class="invalid-feedback">{{errorFeedback.password}}</div>
-      </div>
-
-      <div class="d-flex justify-content-end">
-        <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()"><i
-            class="fa fa-times"></i> Close</button>
-        <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> Create</button>
-      </div>
-    </form>
-    <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
-  </div>
-</ng-template>
-
-<ng-template #updateUserOffcanvas let-offcanvas>
-  <div class="offcanvas-header">
-    <h4 class="offcanvas-title"><i class="fe fe-user"></i> Edit user</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
-  </div>
-  <hr class="m-0">
-  <div class="offcanvas-body">
-    <form [formGroup]="userForm" (ngSubmit)="onUpdateuserSubmit()">
-
-      <div class="form-group">
-        <label class="form-label">Name</label>
-        <input type="text" 
-        class="form-control" 
-        formControlName="name" 
-        name="name"
-        placeholder="Name"
-        [class.is-invalid]="errorFeedback.name.length > 0"
-        >
-        <div class="invalid-feedback">{{errorFeedback.name}}</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" 
-        class="form-control" 
-        formControlName="email" 
-        name="Email"
-        placeholder="Email"
-        [class.is-invalid]="errorFeedback.email.length > 0"
-        >
-        <div class="invalid-feedback">{{errorFeedback.email}}</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input type="password" 
-        class="form-control" 
-        formControlName="password" 
-        name="Password"
-        placeholder="Password"
-        [class.is-invalid]="errorFeedback.password.length > 0"
-        >
-        <div class="invalid-feedback">{{errorFeedback.password}}</div>
-      </div>
-
-      <div class="d-flex justify-content-end">
-        <button class="btn btn-outline-primary me-3" type="button" (click)="offcanvas.dismiss()"><i
-            class="fa fa-times"></i> Close</button>
-        <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> Update</button>
-      </div>
-    </form>
-
-  </div>
-</ng-template>
+<app-advanced-modals [modalTitle]="'Delete Item'" [modalType]="'confirm'"
+  [modalMessage]="'Are you sure you want to delete this item? This action cannot be undone.'"
+  [modalConformMessage]="'Delete'" [modalCancelMessage]="'Cancel'"
+  (confirm)="onDeleteSubmit($event)"></app-advanced-modals>
