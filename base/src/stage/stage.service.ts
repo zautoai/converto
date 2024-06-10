@@ -233,7 +233,6 @@ export class StageService extends BaseService {
             for (let i = 0; i < AGENT_STAGES.length; i++) {
                 const stage = AGENT_STAGES[i];
                 const data = {
-                    agentId: agent.id,
                     name: stage.name,
                     instruction: stage.instruction,
                     sequence: stage.sequence,

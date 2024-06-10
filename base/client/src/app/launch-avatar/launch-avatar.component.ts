@@ -12,6 +12,11 @@ import { SetupService } from 'src/app/shared/services/setup.service';
 import { markFormGroupAsDirty } from '../components/advanced-inputs/input.util';
 import { debounceTime } from 'rxjs';
 
+interface Step {
+  status: 'pending' | 'completed' | 'failed';
+  description: string;
+}
+
 @Component({
   selector: 'app-launch-avatar',
   templateUrl: './launch-avatar.component.html',
@@ -22,8 +27,8 @@ export class LaunchAvatarComponent implements OnInit {
   avatar!: Avatar;
   launchForm: FormGroup = new FormGroup({
     companyName: new FormControl('',[Validators.required,Validators.minLength(3)]),
-    siteUrl: new FormControl('',[Validators.required, Validators.pattern('https?://.+')]),
-    avatarName: new FormControl('',[Validators.required])
+    companySite: new FormControl('',[Validators.required, Validators.pattern('https?://.+')]),
+    displayName: new FormControl('',[Validators.required])
   });
   errorMessages = {
     companyName: {
@@ -43,7 +48,14 @@ export class LaunchAvatarComponent implements OnInit {
   
   trainingProgress = 0;
   isAvatarNameValid: boolean = true;
-  isSubmitting:boolean = false;
+
+  steps: Step[] = [
+    { status: 'pending', description: 'Step 1: Initialization' },
+    { status: 'pending', description: 'Step 2: Processing Data' },
+    { status: 'pending', description: 'Step 3: Validating Results' },
+    { status: 'pending', description: 'Step 4: Finalizing' }
+  ];
+  currentStep: number = 0;
 
   constructor(
     private setupService: SetupService,
@@ -63,6 +75,8 @@ export class LaunchAvatarComponent implements OnInit {
       }
     });
     this.socketService.agentStatusEvent$.subscribe((data: any) => {
+      console.log(data);
+      
       this.avatar.status = data.status;
       this.avatar.message = data.message;
       if(data.status != 'TRAININGFAILED')
@@ -82,6 +96,7 @@ export class LaunchAvatarComponent implements OnInit {
     this.avatarName.valueChanges.pipe(debounceTime(1000)).subscribe(value => {
       this.checkAvatarName(value);
     });
+    // this.startProcess()
   }
 
   get companyName():FormControl {
@@ -89,11 +104,23 @@ export class LaunchAvatarComponent implements OnInit {
   }
 
   get siteUrl():FormControl {
-    return this.launchForm.get('siteUrl') as FormControl;
+    return this.launchForm.get('companySite') as FormControl;
   }
 
   get avatarName():FormControl {
-    return this.launchForm.get('avatarName') as FormControl;
+    return this.launchForm.get('displayName') as FormControl;
+  }
+
+  startProcess(): void {
+    const interval = setInterval(() => {
+      if (this.currentStep < this.steps.length) {
+        const isFailed = Math.random() < 0.3; 
+        this.steps[this.currentStep].status = isFailed ? 'failed' : 'completed';
+        this.currentStep++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 1000); // Adjust the interval as needed
   }
 
   registerStatusEvent(agentId: string) {
@@ -105,19 +132,14 @@ export class LaunchAvatarComponent implements OnInit {
     if (this.launchForm.valid) {
       const data = this.launchForm.value;
       this.clearTrainingStatus();
-      this.launchForm.disable();
-      this.isSubmitting = true;
+      this.isLoading = true;
       this.restService.post(API.main.launchAvatar, data)
         .subscribe((response: any) => {
           this.avatarService.setAvatarData(response);
-          this.launchForm.reset();
-          this.launchForm.enable();
-          this.isSubmitting = false;
         }, (error) => {
           this.notifiService.showError(error.error.message);
           console.log(error);
-          this.launchForm.enable();
-          this.isSubmitting = false;
+          this.isLoading = false;
         });
 
     }
