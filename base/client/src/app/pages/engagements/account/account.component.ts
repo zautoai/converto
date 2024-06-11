@@ -35,7 +35,7 @@ export class AccountsComponent implements OnInit {
   @ViewChild('viewContactOffcanvas') viewContactOffcanvas: ElementRef | undefined;
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
 
-  isLoading:boolean = false;
+  isLoading: boolean = false;
   selectedaccounts: any;
   isEdit: boolean = false;
   showDescription: boolean = true;
@@ -46,20 +46,20 @@ export class AccountsComponent implements OnInit {
   selectedData: any = '';
   limit = 5;
   totalItems: number = 0;
-  accountList: any=[];
+  accountList: any = [];
 
   errorMessages = {
     // firstName: {
     //   required: 'First name is required',
     // },
- 
+
     email: {
       required: 'Email is required',
       email: 'Please enter a valid email address',
     },
   };
-    
-  form:FormGroup = new FormGroup({
+
+  form: FormGroup = new FormGroup({
     photoURL: new FormControl(''),
     accountName: new FormControl(''),
     // firstName: new FormControl('',[Validators.required]),
@@ -67,10 +67,10 @@ export class AccountsComponent implements OnInit {
     jobTitle: new FormControl(''),
     organizationName: new FormControl(''),
     email: new FormControl('', [Validators.required, Validators.email]),
-    annualRevenue:new FormControl(''),
-    companySize:new FormControl(''),
+    annualRevenue: new FormControl(''),
+    companySize: new FormControl(''),
     phone: new FormControl(''),
-    industry:new FormControl(''),
+    industry: new FormControl(''),
     address: new FormControl(''),
     city: new FormControl(''),
     state: new FormControl(''),
@@ -84,8 +84,8 @@ export class AccountsComponent implements OnInit {
 
   //Delete Modal
   @ViewChild(AdvancedModalsComponent) deleteModal!: AdvancedModalsComponent;
- 
-  
+
+
 
 
   constructor(
@@ -95,7 +95,7 @@ export class AccountsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
   ) {
-    
+
   }
 
   ngOnInit(): void {
@@ -132,7 +132,7 @@ export class AccountsComponent implements OnInit {
   get address(): FormControl {
     return this.form.get('address') as FormControl;
   }
-  get  industry(): FormControl {
+  get industry(): FormControl {
     return this.form.get('industry') as FormControl;
   }
 
@@ -174,9 +174,9 @@ export class AccountsComponent implements OnInit {
     return this.form.get('status') as FormControl;
   }
 
-  getActiveaccounts(id:string){
+  getActiveaccounts(id: string) {
     this.selectedaccounts = null;
-    if(!id || id == 'all') {
+    if (!id || id == 'all') {
       return;
     }
     this.restService.get(API.main.account, id).subscribe(
@@ -197,8 +197,8 @@ export class AccountsComponent implements OnInit {
         (response: any) => {
           this.accountList = response.data;
           this.totalItems = response.total
-          console.log("accounts",this.accountList)
-          console.log("accountname",this.accountName)
+          console.log("accounts", this.accountList)
+          console.log("accountname", this.accountName)
         },
         (error) => {
           console.error(error);
@@ -213,9 +213,9 @@ export class AccountsComponent implements OnInit {
     this.selectedaccounts = null;
     this.contactComposeCanvas.open();
   }
-  
+
   openUpdateContact(contact: any) {
-    this.selectedaccounts = contact; 
+    this.selectedaccounts = contact;
     this.form.reset();
     this.form.patchValue(contact)
     this.isEdit = true;
@@ -229,8 +229,7 @@ export class AccountsComponent implements OnInit {
   }
 
   onSubmit() {
-    if(this.form.valid)
-    {
+    if (this.form.valid) {
       console.log("1st stage success")
       const formData: { [key: string]: string | null } = this.form.value;
       const data = Object.entries(formData)
@@ -240,33 +239,32 @@ export class AccountsComponent implements OnInit {
             acc[key] = value;
           }
           return acc;
-        }, {} as { [key: string]: string });      
+        }, {} as { [key: string]: string });
+
+
 
       this.isLoading = true;
-      if(this.isEdit)
-      {
+      if (this.isEdit) {
         this.restService.patch(API.main.account, this.selectedaccounts.id, this.form.value)
-        .subscribe(
-          (response: any) => {
-            this.notifService.showSuccess('Account Updated Successfully.');
-            this.getAccounts();
-            this.isLoading = false;
-            this.contactComposeCanvas.close();
-          },
-          (error) => {
-            if(error.status == 500)
-            {
-              this.notifService.showError('Something Went Wrong! Try Again Later');
-            }
-            else{
-              this.notifService.showError(error.error.message);
-            }
-            this.isLoading = false;
-          },
-        );
+          .subscribe(
+            (response: any) => {
+              this.notifService.showSuccess('Account Updated Successfully.');
+              this.getAccounts();
+              this.isLoading = false;
+              this.contactComposeCanvas.close();
+            },
+            (error) => {
+              if (error.status == 500) {
+                this.notifService.showError('Something Went Wrong! Try Again Later');
+              }
+              else {
+                this.notifService.showError(error.error.message);
+              }
+              this.isLoading = false;
+            },
+          );
       }
-      else
-      {
+      else {
         alert("form submited")
         this.restService.post(API.main.account, data).subscribe({
           next: (response: any) => {
@@ -278,24 +276,22 @@ export class AccountsComponent implements OnInit {
           },
           error: (error) => {
             this.isLoading = false;
-            if(error.status == 500)
-            {
+            if (error.status == 500) {
               this.notifService.showError('Something Went Wrong! Try Again Later');
             }
-            else{
+            else {
               this.notifService.showError(error.error.message);
             }
           },
         });
       }
     }
-    else{
+    else {
       markFormGroupAsDirty(this.form);
     }
   }
 
-  onCancel()
-  {
+  onCancel() {
     this.contactComposeCanvas.close();
   }
 
@@ -316,9 +312,8 @@ export class AccountsComponent implements OnInit {
     );
   };
 
-  selectaccount(account:any)
-  {
-  
+  selectaccount(account: any) {
+
     this.selectedaccounts = account;
     this.router.navigate(['account', account.id])
     this.getActiveaccounts(account.id);

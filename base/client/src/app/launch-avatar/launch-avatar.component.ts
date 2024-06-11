@@ -209,4 +209,9 @@ export class LaunchAvatarComponent implements OnInit {
     localStorage.removeItem('training_status')
     localStorage.removeItem('training_message')
   }
+
+
+
+
+
 }
