@@ -80,6 +80,7 @@ export class AccountsComponent implements OnInit {
     notes: new FormControl(''),
     leadSource: new FormControl(''),
     status: new FormControl(''),
+    isabm: new FormControl(false)
   });
 
   //Delete Modal
@@ -113,6 +114,9 @@ export class AccountsComponent implements OnInit {
     return this.form.get('photoURL') as FormControl;
   }
 
+  get isabm(): FormControl {
+    return this.form.get('isabm') as FormControl;
+  }
   get accountName(): FormControl {
     return this.form.get('accountName') as FormControl;
   }

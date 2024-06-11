@@ -132,11 +132,11 @@
     </app-account-card>
     }
     @empty {
-      <div class="card">
-        <div class="card-body text-center">
-          <h4 class="text-muted">No accounts found</h4>
-        </div>
+    <div class="card">
+      <div class="card-body text-center">
+        <h4 class="text-muted">No accounts found</h4>
       </div>
+    </div>
     }
     <div class="my-auto">
       <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
@@ -208,12 +208,13 @@
       <advanced-input [label]="'Country'" [type]="'text'" [placeholder]="'country'" [size]="'md'" [control]="country"
         [isDisabled]="isLoading"></advanced-input>
     </div>
-    <div class="form-group mb-3">
-      <advanced-input [label]="'Website (URL)'" [type]="'url'" [placeholder]="'website'" [size]="'md'"
-        [control]="website" [isDisabled]="isLoading"></advanced-input>
-    </div>
+
     <div class="form-group mb-3">
       <advanced-input [label]="'Notes'" [type]="'textarea'" [placeholder]="'notes'" [size]="'md'" [control]="notes"
+        [isDisabled]="isLoading"></advanced-input>
+    </div>
+    <div class="form-group mb-3">
+      <advanced-input [label]="'IS ABM'" [type]="'checkbox'" [placeholder]="'website'" [size]="'md'" [control]="isabm"
         [isDisabled]="isLoading"></advanced-input>
     </div>
     <div class="d-flex gap-3 justify-content-end">
