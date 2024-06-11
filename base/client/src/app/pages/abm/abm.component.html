@@ -16,6 +16,13 @@
       </button> -->
     </app-abm-card>
     }
+    @empty {
+      <div class="card">
+        <div class="card-body text-center">
+          <h4 class="text-muted">No accounts found</h4>
+        </div>
+      </div>
+    }
     <div class="my-auto">
       <app-pagination [totalPages]="totalItems" [limit]="limit" (pageChanged)="onPageChange($event)" />
     </div>

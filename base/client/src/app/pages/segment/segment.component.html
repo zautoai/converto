@@ -10,41 +10,77 @@
         <div class="row justify-content-md-center p-4">
           <div class="col-6">
             <div style="border-radius: 5px; height: 70vh" class="border p-4">
-              <div class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100">
+              <div
+                class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100"
+              >
                 <h4 class="fs-md-6">
                   <i class="fa-regular fa-object-group"></i> Segment Category
                 </h4>
-                <button type="button" class="btn btn-outline-primary mt-3 mt-md-0" data-bs-toggle="modal"
-                  data-bs-target="#exampleModal">
-                  <div class="d-flex align-items-center justify-content-between">
-                    <i class="fe fe-plus"></i><span class="d-lg-block d-none">
-                      Create Segment Category</span>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary mt-3 mt-md-0"
+                  (click)="opensegmentcategory()"
+                >
+                  <div
+                    class="d-flex align-items-center justify-content-between"
+                  >
+                    <i class="fe fe-plus"></i
+                    ><span class="d-lg-block d-none">
+                      Create Segment Category</span
+                    >
                   </div>
                 </button>
               </div>
               <div style="overflow-x: auto; height: 60vh" class="mt-3">
-                <div *ngFor="let segment of submittedData" (click)="selectSegment(segment)">
-                  <div style="border-radius: 5px; cursor: pointer" class="mt-2 border p-2 mt-4">
+                <div
+                  *ngFor="let segment of submittedData"
+                  (click)="selectSegment(segment)"
+                >
+                  <div
+                    style="border-radius: 5px; cursor: pointer"
+                    class="mt-2 border p-2 mt-4"
+                  >
                     <div>
                       <span class="fw-4 w-100 d-flex justify-content-between">
                         <strong>{{ segment.name }}</strong>
                         <div>
-                          <button type="button" (click)="deletesegmentgroup(segment)">
-                            <i style="color: rgb(183, 183, 183)" class="fa fa-trash-o delete"></i>
+                          <button
+                            type="button"
+                            (click)="deletesegmentgroup(segment)"
+                          >
+                            <i
+                              style="color: rgb(183, 183, 183)"
+                              class="fa fa-trash-o delete"
+                            ></i>
                           </button>
-                          <button (click)="populateselect(segment)" type="button" data-bs-toggle="modal"
-                            data-bs-target="#exampleModal4">
-                            <i style="color: rgb(183, 183, 183)" class="fa fa-edit update"></i>
+                          <button
+                            (click)="populateselect(segment)"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#exampleModal4"
+                          >
+                            <i
+                              style="color: rgb(183, 183, 183)"
+                              class="fa fa-edit update"
+                            ></i>
                           </button>
                         </div>
                       </span>
                     </div>
                     <div class="d-flex w-100 justify-content-between mt-2">
-                      <span class="truncate" data-toggle="tooltip" data-placement="top" [title]="segment.description">
+                      <span
+                        class="truncate"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        [title]="segment.description"
+                      >
                         {{ segment.description }}
                       </span>
-                      <div style="height: 20px; width: 20px; border-radius: 50%"
-                        [ngStyle]="{ 'background-color': segment.color }" class="color-circle border"></div>
+                      <div
+                        style="height: 20px; width: 20px; border-radius: 50%"
+                        [ngStyle]="{ 'background-color': segment.color }"
+                        class="color-circle border"
+                      ></div>
                     </div>
                   </div>
                 </div>
@@ -53,11 +89,18 @@
           </div>
           <div class="col-6">
             <div style="border-radius: 5px; height: 70vh" class="border p-4">
-              <div class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100">
+              <div
+                class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100"
+              >
                 <h4><i class="fa-regular fa-object-ungroup"></i> Segment</h4>
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
-                  data-bs-target="#exampleModal1">
-                  <div class="d-flex align-items-center justify-content-between">
+                <button
+                  type="button"
+                  class="btn btn-outline-primary"
+                  (click)="opensegment()"
+                > 
+                  <div
+                    class="d-flex align-items-center justify-content-between"
+                  >
                     <i class="fe fe-plus"></i>
                     <span class="d-lg-block d-none">Create Segment</span>
                   </div>
@@ -66,21 +109,37 @@
               <div style="overflow-x: auto; height: 60vh" class="mt-3">
                 <div *ngIf="!displaySegment" class="p-2 mt-2">
                   <h4 class="text-danger">No Segment Category Selected</h4>
-                  <p>Please select a Segment Category to display the Segments within that category.</p>
+                  <p>
+                    Please select a Segment Category to display the Segments
+                    within that category.
+                  </p>
                 </div>
-                <div *ngFor="let segment of displaySegment" class="mt-2 border p-2 mt-2"
-                  style="border-radius: 5px; cursor: pointer">
+                <div
+                  *ngFor="let segment of displaySegment"
+                  class="mt-2 border p-2 mt-2"
+                  style="border-radius: 5px; cursor: pointer"
+                >
                   <div class="fw-4 w-100 d-flex justify-content-between">
                     <h6 class="fw-4">
                       <strong>{{ segment.name }}</strong>
                     </h6>
                     <div>
                       <button (click)="deletedeletesegment(segment)">
-                        <i style="color: rgb(183, 183, 183)" class="fa fa-trash-o delete"></i>
+                        <i
+                          style="color: rgb(183, 183, 183)"
+                          class="fa fa-trash-o delete"
+                        ></i>
                       </button>
-                      <button (click)="populateFormForUpdate(segment)" type="button" data-bs-toggle="modal"
-                        data-bs-target="#exampleModal3">
-                        <i style="color: rgb(183, 183, 183)" class="fa fa-edit update"></i>
+                      <button
+                        (click)="populateFormForUpdate(segment)"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#exampleModal3"
+                      >
+                        <i
+                          style="color: rgb(183, 183, 183)"
+                          class="fa fa-edit update"
+                        ></i>
                       </button>
                     </div>
                   </div>
@@ -99,10 +158,133 @@
     </div>
   </div>
 </div>
+
+
+<app-advance-offcanvas #segmentOffCanvas heading="{{ isEdit ? 'Edit' : 'Create' }} form">
+  <form [formGroup]="segment" (ngSubmit)="oncreatesegmente()" >
+    <div class="form-group mb-3">
+      <advanced-input
+        [label]="'Name'"
+        [type]="'text'"
+        [placeholder]="'Name'"
+        [size]="'md'"
+        [control]="name"
+        [isDisabled]="isLoading"
+        [errorMessages]="errorMessages.title"
+      ></advanced-input>
+    </div>
+    <div class="form-group mb-3">
+      <advanced-input
+        [label]="'Description'"
+        [type]="'text'"
+        [placeholder]="'Description'"
+        [size]="'md'"
+        [control]="description"
+        [isDisabled]="isLoading"
+        [errorMessages]="errorMessages.title"
+      ></advanced-input>
+    </div>
+    <div class="card">
+      <div class="card-body p-2">
+        <div class="form-group mb-3">
+          <advanced-input
+            [label]="'Segment'"
+            [type]="'select'"
+            [placeholder]="'--- Select segment ---'"
+            [size]="'md'"
+         
+            [isDisabled]="isLoading"
+          >
+            @for (segment of submittedData; track $index) {
+              <option [value]="segment.id">{{ segment.name }}</option>
+            }
+          </advanced-input>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-3 justify-content-end">
+      <advanced-button
+        label="{{ isEdit ? 'Update' : 'Create' }}"
+        [size]="'md'"
+        [classes]="'w-100'"
+        [type]="'submit'"
+        [isLoading]="isLoading"
+      ></advanced-button>
+      <advanced-button
+        label="Cancel"
+        [size]="'md'"
+        [classes]="'w-100'"
+        [type]="'button'"
+        [color]="'outline-primary'"
+        [isLoading]="isLoading"
+        (onClick)="closeComposeCanvas()"
+      ></advanced-button>
+    </div>
+  </form>
+</app-advance-offcanvas>
+
+
+<app-advance-offcanvas #segmentCategoryOffCanvas heading="{{ isEdit ? 'Edit' : 'Create' }} form">
+  <form [formGroup]="segmentGroup" (ngSubmit)="onCreateSegmentCategory()" >
+    <div class="form-group mb-3">
+      <advanced-input
+        [label]="'Name'"
+        [type]="'text'"
+        [placeholder]="'Name'"
+        [size]="'md'"
+        [control]="name"
+        [isDisabled]="isLoading"
+        [errorMessages]="errorMessages.title"
+      ></advanced-input>
+    </div>
+    <div class="form-group mb-3">
+      <advanced-input
+        [label]="'Description'"
+        [type]="'text'"
+        [placeholder]="'Description'"
+        [size]="'md'"
+        [control]="description"
+        [isDisabled]="isLoading"
+        [errorMessages]="errorMessages.title"
+      ></advanced-input>
+    </div>
+  
+    <div class="mb-3 color-picker-container">
+      <label for="color" class="form-label">Color:</label>
+      <input id="color" class="form-control color-input" type="color" formControlName="color" />
+    </div>
+
+    <div class="d-flex gap-3 justify-content-end">
+      <advanced-button
+        label="{{ isEdit ? 'Update' : 'Create' }}"
+        [size]="'md'"
+        [classes]="'w-100'"
+        [type]="'submit'"
+        [isLoading]="isLoading"
+      ></advanced-button>
+      <advanced-button
+        label="Cancel"
+        [size]="'md'"
+        [classes]="'w-100'"
+        [type]="'button'"
+        [color]="'outline-primary'"
+        [isLoading]="isLoading"
+        (onClick)="closeComposeCanvas()"
+      ></advanced-button>
+    </div>
+  </form>
+</app-advance-offcanvas>
+
+
+
+
+
+
 <!-- Button trigger modal -->
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -137,11 +319,11 @@
       </form>
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- -------------model2 ---------------- -->
 
-<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -173,11 +355,11 @@
             </select>
           </div>
 
-          <!-- <div class="mb-3 text-center">
+          <div class="mb-3 text-center">
             <label for="primary_color" class="form-label">Primary color</label>
             <ngx-colors ngx-colors-trigger [(ngModel)]="avatarStyle.primaryColor"
           ></ngx-colors>
-          </div> -->
+          </div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
@@ -187,11 +369,11 @@
       </form>
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- ==========modal3update----------------------------- -->
 
-<div class="modal fade" id="exampleModal3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="exampleModal3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -221,13 +403,13 @@
               </option>
             </select>
           </div>
-          <!-- <div class="mb-3 text-center">
+          <div class="mb-3 text-center">
             <label for="primary_color" class="form-label">Primary color</label>
             <ngx-colors
               ngx-colors-trigger
               [(ngModel)]="avatarStyle.primaryColor"
             ></ngx-colors>
-          </div> -->
+          </div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
@@ -237,10 +419,10 @@
       </form>
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- -------------------modal4 update------------------>
-<div class="modal fade" id="exampleModal4" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="exampleModal4" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -275,7 +457,7 @@
       </form>
     </div>
   </div>
-</div>
+</div> -->
 
 <!-- Button trigger modal -->
 

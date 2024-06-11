@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { AvatarStyle } from '../customise-avatar/customise-avatar/customise-avatar.component';
+import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
+import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
 
 export interface avatarStyle {
   primaryColor: string;
@@ -14,46 +16,92 @@ export interface avatarStyle {
 }
 
 
-
 @Component({
   selector: 'app-segment',
   templateUrl: './segment.component.html',
   styleUrl: './segment.component.scss',
 })
+
 export class SegmentComponent implements OnInit {
+  @ViewChild("segmentCategoryOffCanvas") segmentCategoryOffCanvas!: AdvanceOffcanvasComponent;
+  @ViewChild("segmentOffCanvas") segmentOffCanvas!: AdvanceOffcanvasComponent;
+ 
+  segmentGroup:FormGroup=new FormGroup({
+    name:new FormControl("",[Validators.required]),
+    description:new FormControl(""),
+    color:new FormControl("",[Validators.required]),
+  })
+
   submittedData: any[] = [];
   submittedDatasegments: any[] = [];
   selectedSegmentID: any;
   selectedSegmentIDgrp: any;
-
-  segmentGroup: FormGroup;
+  isEdit: boolean = false;
   segments: FormGroup;
   segment: any;
   displaySegment: any = null
   displaySegmentCategory: any = null
+  
+  isLoading:boolean = false
 
+  errorMessages = {
+    title: {
+      required: 'Title is required',
+      minlength: 'Title must be at least 3 characters long',
+      maxlength: 'Title must be less than 50 characters long',
+    },
+  };
   constructor(
     private formBuilder: FormBuilder,
     private restService: RestService,
     private notifService: NotificationService,
     private sweetAlertService: SweetAlertService,
   ) {
-    this.segmentGroup = this.formBuilder.group({
-      name: [''],
-      description: [''],
-      id: [''],
-      color: [''],
-    });
+    
 
     this.segments = this.formBuilder.group({
       name: [''],
       description: [''],
-      segmentCategoryId: [''],
+      segmentCategoryId: [null],
     });
   }
   ngOnInit(): void {
     this.getsegments();
     this.getSegmentgroup();
+  }
+
+
+  get name():FormControl{
+    return this.segmentGroup.get('name') as FormControl;
+  }
+
+  get description():FormControl{
+    return this.segmentGroup.get('description') as FormControl;
+  }
+  get color():FormControl{
+    return this.segmentGroup.get('color') as FormControl;
+  }
+
+  
+
+  
+
+  closeComposeCanvas(){
+    this.segmentCategoryOffCanvas.close();
+    this.segmentOffCanvas.close();
+    
+  }
+
+  opensegment() {
+    this.isEdit = false;
+    // this.form.reset();
+    this.segmentOffCanvas.open();
+  }
+
+  opensegmentcategory() {
+    this.isEdit = false;
+    // this.form.reset();
+    this.segmentCategoryOffCanvas.open();
   }
 
 
@@ -64,16 +112,13 @@ export class SegmentComponent implements OnInit {
   }
 
   onCreateSegmentCategory() {
-    const name = this.segmentGroup.value.name || '';
-    const description = this.segmentGroup.value.description || '';
-    const color = this.segmentGroup.value.color || '';
-    console.log(color);
+    
+    
+    
     if (this.segmentGroup.valid) {
-      const data = {
-        name: name,
-        description: description,
-        color: color
-      };
+      const data = this.segmentGroup.value;
+      console.log(data);
+      
       this.restService.post(API.main.segmentCategory, data).subscribe({
         next: (response: any) => {
           this.segmentGroup.reset();
@@ -85,6 +130,11 @@ export class SegmentComponent implements OnInit {
         },
       });
     }
+    else {
+      markFormGroupAsDirty(this.segmentGroup);
+      this.isLoading = false;
+    }
+
   }
 
   getSegmentgroup(): void {
@@ -168,19 +218,12 @@ export class SegmentComponent implements OnInit {
   }
 
   oncreatesegmente() {
-    const name = this.segments.value.name || '';
-    const description = this.segments.value.description || '';
-    const segmentCategoryId = this.segments.value.segmentCategoryId || '';
     if (this.segments.valid) {
-      const data = {
-        name,
-        description,
-        segmentCategoryId
-      };
+      const data = this.segments.value;
+      console.log(data);
 
       this.restService.post(API.main.segment, data).subscribe({
         next: (response: any) => {
-
           this.notifService.showSuccess('Segment Created Successfully.');
           this.getsegments();
           this.segments.reset();
@@ -189,6 +232,10 @@ export class SegmentComponent implements OnInit {
           console.error(error);
         },
       });
+    }
+    else {
+      markFormGroupAsDirty(this.segments);
+      this.isLoading = false;
     }
   }
 
