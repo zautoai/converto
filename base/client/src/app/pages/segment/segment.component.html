@@ -54,8 +54,14 @@
             <div style="border-radius: 5px; height: 70vh" class="border p-4">
               <div class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100">
                 <h4><i class="fa-regular fa-object-ungroup"></i> Segment</h4>
-                <button type="button" class="btn btn-outline-primary" (click)="opensegment()">
-                  <div class="d-flex align-items-center justify-content-between">
+                <button
+                  type="button"
+                  class="btn btn-outline-primary"
+                  (click)="opensegment()"
+                >
+                  <div
+                    class="d-flex align-items-center justify-content-between"
+                  >
                     <i class="fe fe-plus"></i>
                     <span class="d-lg-block d-none">Create Segment</span>
                   </div>
@@ -101,20 +107,43 @@
   </div>
 </div>
 
-
-<app-advance-offcanvas #segmentOffCanvas heading="{{ isEdit ? 'Edit' : 'Create' }} form">
-  <form [formGroup]="segment" (ngSubmit)="oncreatesegmente()">
+<app-advance-offcanvas
+  #segmentOffCanvas
+  heading="{{ isEdit ? 'Edit' : 'Create' }} form"
+>
+{{ isLoading | json }}
+  <form [formGroup]="segments" (ngSubmit)="onSubmitSegment()">
     <div class="form-group mb-3">
-      <advanced-input [label]="'Name'" [type]="'text'" [placeholder]="'Name'" [size]="'md'" [control]="name"
-        [isDisabled]="isLoading" [errorMessages]="errorMessages.title"></advanced-input>
+      <advanced-input
+        [label]="'Name'"
+        [type]="'text'"
+        [placeholder]="'Name'"
+        [size]="'md'"
+        [isDisabled]="isLoading"
+        [control]="segmentName"
+        [errorMessages]="errorMessages.title"
+      ></advanced-input>
     </div>
     <div class="form-group mb-3">
-      <advanced-input [label]="'Description'" [type]="'text'" [placeholder]="'Description'" [size]="'md'"
-        [control]="description" [isDisabled]="isLoading" [errorMessages]="errorMessages.title"></advanced-input>
+      <advanced-input
+        [label]="'Description'"
+        [type]="'text'"
+        [placeholder]="'Description'"
+        [size]="'md'"
+        [isDisabled]="isLoading"
+        [control]="segmentdescription"
+        [errorMessages]="errorMessages.title"
+      ></advanced-input>
     </div>
     <div class="form-group mb-3">
-      <advanced-input [label]="'Segment Category'" [type]="'select'" [placeholder]="'--- Select segment ---'"
-        [size]="'md'" [isDisabled]="isLoading">
+      <advanced-input
+        [label]="'Segment Category'"
+        [type]="'select'"
+        [placeholder]="'--- Select segment ---'"
+        [size]="'md'"
+        [control]="segmentCategoryId"
+        [isDisabled]="isLoading"
+      >
         <option *ngFor="let segment of submittedData" [value]="segment.id">
           {{ segment.name }}
         </option>
@@ -129,9 +158,11 @@
   </form>
 </app-advance-offcanvas>
 
-
-<app-advance-offcanvas #segmentCategoryOffCanvas heading="{{ isEdit ? 'Edit' : 'Create' }} form">
-  <form [formGroup]="segmentGroup" (ngSubmit)="onCreateSegmentCategory()">
+<app-advance-offcanvas
+  #segmentCategoryOffCanvas
+  heading="{{ isEdit ? 'Edit' : 'Create' }} form"
+>
+  <form [formGroup]="segmentGroup" (ngSubmit)="onSubmitSegmentCategory()">
     <div class="form-group mb-3">
       <advanced-input [label]="'Name'" [type]="'text'" [placeholder]="'Name'" [size]="'md'" [control]="name"
         [isDisabled]="isLoading" [errorMessages]="errorMessages.title"></advanced-input>
@@ -141,9 +172,15 @@
         [control]="description" [isDisabled]="isLoading" [errorMessages]="errorMessages.title"></advanced-input>
     </div>
 
+
     <div class="mb-3 color-picker-container">
       <label for="color" class="form-label">Color:</label>
-      <input id="color" class="form-control color-input" type="color" formControlName="color" />
+      <input
+        id="color"
+        class="form-control color-input"
+        type="color"
+        formControlName="color"
+      />
     </div>
 
     <div class="d-flex gap-3 justify-content-end">
@@ -154,11 +191,6 @@
     </div>
   </form>
 </app-advance-offcanvas>
-
-
-
-
-
 
 <!-- Button trigger modal -->
 

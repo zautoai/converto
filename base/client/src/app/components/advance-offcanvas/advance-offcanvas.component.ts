@@ -7,6 +7,9 @@ import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
   styleUrl: './advance-offcanvas.component.scss'
 })
 export class AdvanceOffcanvasComponent {
+  dismiss() {
+    throw new Error('Method not implemented.');
+  }
 
   @Input() heading :string = 'Offcanvas Title'
   @Input() size:'sm' | 'md' | 'lg' | 'xl' | 'xxl' = 'md'
