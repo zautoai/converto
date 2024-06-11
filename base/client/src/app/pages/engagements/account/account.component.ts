@@ -343,4 +343,3 @@ confirmDelete = (data: any) => {
     this.getAccounts()
   }
 }
-
