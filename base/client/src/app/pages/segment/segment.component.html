@@ -97,7 +97,7 @@
                   type="button"
                   class="btn btn-outline-primary"
                   (click)="opensegment()"
-                > 
+                >
                   <div
                     class="d-flex align-items-center justify-content-between"
                   >
@@ -159,9 +159,12 @@
   </div>
 </div>
 
-
-<app-advance-offcanvas #segmentOffCanvas heading="{{ isEdit ? 'Edit' : 'Create' }} form">
-  <form [formGroup]="segments" (ngSubmit)="oncreatesegmente()">
+<app-advance-offcanvas
+  #segmentOffCanvas
+  heading="{{ isEdit ? 'Edit' : 'Create' }} form"
+>
+{{ isLoading | json }}
+  <form [formGroup]="segments" (ngSubmit)="onSubmitSegment()">
     <div class="form-group mb-3">
       <advanced-input
         [label]="'Name'"
@@ -169,6 +172,7 @@
         [placeholder]="'Name'"
         [size]="'md'"
         [isDisabled]="isLoading"
+        [control]="segmentName"
         [errorMessages]="errorMessages.title"
       ></advanced-input>
     </div>
@@ -179,6 +183,7 @@
         [placeholder]="'Description'"
         [size]="'md'"
         [isDisabled]="isLoading"
+        [control]="segmentdescription"
         [errorMessages]="errorMessages.title"
       ></advanced-input>
     </div>
@@ -188,6 +193,7 @@
         [type]="'select'"
         [placeholder]="'--- Select segment ---'"
         [size]="'md'"
+        [control]="segmentCategoryId"
         [isDisabled]="isLoading"
       >
         <option *ngFor="let segment of submittedData" [value]="segment.id">
@@ -213,12 +219,14 @@
         (onClick)="closeComposeCanvas()"
       ></advanced-button>
     </div>
-  </form>  
+  </form>
 </app-advance-offcanvas>
 
-
-<app-advance-offcanvas #segmentCategoryOffCanvas heading="{{ isEdit ? 'Edit' : 'Create' }} form">
-  <form [formGroup]="segmentGroup" (ngSubmit)="onCreateSegmentCategory()" >
+<app-advance-offcanvas
+  #segmentCategoryOffCanvas
+  heading="{{ isEdit ? 'Edit' : 'Create' }} form"
+>
+  <form [formGroup]="segmentGroup" (ngSubmit)="onSubmitSegmentCategory()">
     <div class="form-group mb-3">
       <advanced-input
         [label]="'Name'"
@@ -241,10 +249,15 @@
         [errorMessages]="errorMessages.title"
       ></advanced-input>
     </div>
-  
+
     <div class="mb-3 color-picker-container">
       <label for="color" class="form-label">Color:</label>
-      <input id="color" class="form-control color-input" type="color" formControlName="color" />
+      <input
+        id="color"
+        class="form-control color-input"
+        type="color"
+        formControlName="color"
+      />
     </div>
 
     <div class="d-flex gap-3 justify-content-end">
@@ -267,11 +280,6 @@
     </div>
   </form>
 </app-advance-offcanvas>
-
-
-
-
-
 
 <!-- Button trigger modal -->
 

@@ -32,9 +32,9 @@ export class SegmentComponent implements OnInit {
     color:new FormControl("",[Validators.required]),
   })
   segments: FormGroup = new FormGroup({
-    name: new FormControl('',[Validators.required]),
-    description: new FormControl(''),
-    segmentCategoryId: new FormControl('',[Validators.required]),
+    name: new FormControl("",[Validators.required]),
+    description: new FormControl(""),
+    segmentCategoryId: new FormControl(null,[Validators.required]),
   })
 
   submittedData: any[] = [];
@@ -91,12 +91,12 @@ export class SegmentComponent implements OnInit {
     return this.segments.get('segmentCategoryId') as FormControl;
   }
   
-
-  
-
   closeComposeCanvas(){
     this.segmentCategoryOffCanvas.close();
     this.segmentOffCanvas.close();
+    this.segmentGroup.reset();  // Reset form on close
+    this.segments.reset();  // Reset form on close
+    this.isEdit = false;
     
   }
 
@@ -148,8 +148,7 @@ export class SegmentComponent implements OnInit {
   getSegmentgroup(): void {
     this.restService.getAll(API.main.segmentCategory).subscribe({
       next: (response: any) => {
-        this.submittedData = response.data;
-
+        this.submittedData = response.data;        
       },
       error: (error) => {
         console.error(error);
@@ -201,6 +200,8 @@ export class SegmentComponent implements OnInit {
       color: segment.color
     });
     this.selectedSegmentIDgrp = segment.id;
+    this.isEdit = true;
+    this.segmentCategoryOffCanvas.open();
   }
   updatesegmentgrp() {
     const updatedData = this.segmentGroup.value;
@@ -214,6 +215,8 @@ export class SegmentComponent implements OnInit {
             );
             this.getSegmentgroup();
             this.segmentGroup.reset();
+            this.segmentCategoryOffCanvas.close();  // Close offcanvas after update
+            this.isEdit = false;
           },
           (error) => {
             console.error(error);
@@ -225,24 +228,28 @@ export class SegmentComponent implements OnInit {
     }
   }
 
-  oncreatesegmente() {
+  oncreatesegment() {
+    console.log(this.segments.value);
+    
     if (this.segments.valid) {
       const data = this.segments.value;
-      console.log(data); // Add this line to check if the form data is correct
+      console.log(data); 
   
       this.restService.post(API.main.segment, data).subscribe({
         next: (response: any) => {
           this.notifService.showSuccess('Segment Created Successfully.');
           this.getsegments();
-          this.segments.reset(); // Reset the form after successful submission
-          this.segmentOffCanvas.close(); // Close the off-canvas form after submission
+          this.segments.reset(); 
+          this.segmentOffCanvas.close(); 
         },
         error: (error) => {
           console.error(error);
-          this.notifService.showError('Error creating segment.'); // Show an error message
+          this.notifService.showError('Error creating segment.');
         },
       });
     } else {
+      console.log("called");
+      
       markFormGroupAsDirty(this.segments);
       this.isLoading = false;
     }
@@ -294,6 +301,79 @@ export class SegmentComponent implements OnInit {
     );
   };
 
+  onSubmitSegmentCategory() {
+    if (this.segmentGroup.valid) {
+      const data = this.segmentGroup.value;
+      console.log(data);
+      this.isLoading = true;
+      if (this.isEdit) {
+        this.restService.patch(API.main.segmentCategory, this.selectedSegmentIDgrp, data)
+          .subscribe((response: any) => {
+            this.getSegmentgroup();
+            this.segmentGroup.reset();
+            this.notifService.showSuccess("Segment category updated.");
+            this.selectedSegmentIDgrp = response.id;
+            this.isLoading = false;
+          }, (error) => {
+            this.isLoading = false;
+            console.log(error);
+          });
+      } else {
+        this.restService.post(API.main.segmentCategory, data)
+          .subscribe((response: any) => {
+            this.getSegmentgroup();
+            this.segmentGroup.reset();
+            this.notifService.showSuccess("New segment category created.");
+            this.isLoading = false;
+          }, (error) => {
+            this.notifService.showError(error.error.message);
+            console.log(error);
+            this.isLoading = false;
+          });
+      }
+    } else {
+      markFormGroupAsDirty(this.segmentGroup);
+      this.isLoading = false;
+    }
+  }
+
+  onSubmitSegment() {
+    if (this.segments.valid) {
+      const data = this.segments.value;
+      console.log(data);
+      this.isLoading = true;
+      if (this.isEdit) {
+        this.restService.patch(API.main.segment, this.selectedSegmentID, data)
+          .subscribe((response: any) => {
+            this.getsegments();
+            this.segments.reset();
+            this.notifService.showSuccess("Segment updated.");
+            this.selectedSegmentID = response.id;
+            this.isLoading = false;
+          }, (error) => {
+            this.isLoading = false;
+            console.log(error);
+          });
+      } else {
+        this.restService.post(API.main.segment, data)
+          .subscribe((response: any) => {
+            this.getsegments();
+            this.segments.reset();
+            this.notifService.showSuccess("New segment created.");
+            this.isLoading = false;
+          }, (error) => {
+            this.notifService.showError(error.error.message);
+            console.log(error);
+            this.isLoading = false;
+          });
+      }
+    } else {
+      markFormGroupAsDirty(this.segments);
+      this.isLoading = false;
+    }
+  }
+  
+  
 
 
   populateFormForUpdate(segment: any) {
@@ -305,6 +385,8 @@ export class SegmentComponent implements OnInit {
       id: segment.id,
     });
     this.selectedSegmentID = segment.id;
+    this.isEdit = true;
+    this.segmentOffCanvas.open();
   }
 
   updatesegment() {
@@ -316,6 +398,9 @@ export class SegmentComponent implements OnInit {
         (response: any) => {
           this.notifService.showSuccess('Segment Group Updated Successfully.');
           this.getsegments();
+          this.segments.reset();
+          this.segmentOffCanvas.close();  // Close offcanvas after update
+          this.isEdit = false; 
         },
         (error) => {
           console.error(error);
