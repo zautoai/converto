@@ -249,7 +249,7 @@ export class AccountsComponent implements OnInit {
 
       this.isLoading = true;
       if (this.isEdit) {
-        this.restService.patch(API.main.account, this.selectedaccounts.id, this.form.value)
+        this.restService.patch(API.main.account, this.selectedaccounts.id, data) // Ensure to use 'data' instead of 'this.form.value'
           .subscribe(
             (response: any) => {
               this.notifService.showSuccess('Account Updated Successfully.');
@@ -260,8 +260,7 @@ export class AccountsComponent implements OnInit {
             (error) => {
               if (error.status == 500) {
                 this.notifService.showError('Something Went Wrong! Try Again Later');
-              }
-              else {
+              } else {
                 this.notifService.showError(error.error.message);
               }
               this.isLoading = false;
@@ -282,15 +281,13 @@ export class AccountsComponent implements OnInit {
             this.isLoading = false;
             if (error.status == 500) {
               this.notifService.showError('Something Went Wrong! Try Again Later');
-            }
-            else {
+            } else {
               this.notifService.showError(error.error.message);
             }
           },
         });
       }
-    }
-    else {
+    } else {
       markFormGroupAsDirty(this.form);
     }
   }
@@ -328,4 +325,3 @@ export class AccountsComponent implements OnInit {
     this.getAccounts()
   }
 }
-
