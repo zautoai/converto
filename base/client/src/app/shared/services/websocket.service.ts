@@ -29,7 +29,7 @@ export class WebsocketService {
   private registeredEvents: Set<string> = new Set<string>();
 
   constructor() {
-
+    this.connectSocket();
   }
 
   connectSocket() {
@@ -37,8 +37,12 @@ export class WebsocketService {
       this.socket = io(API.rootURL, {
         extraHeaders: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+        },
       });
+      if(this.socket.connected)
+      {
+        console.log("Socket connected");
+      }
       this.registerEvent();
     }
   }
@@ -53,6 +57,7 @@ export class WebsocketService {
 
   listenAgentUpdateEvent(agentId: string) {
     const event = `${agentId}_avatarStatusUpdate`;
+    console.log(event);
     this.socket.on(event, (data) => {
       this.agentStatusEventSubject.next(data);
     });

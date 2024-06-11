@@ -83,7 +83,7 @@ export class SocketGateway
 
     this.server.on('disconnect', (socket) => {
       console.log(socket.id, 'Disconnected.');
-    });
+    });    
 
     this.redisSubscriber.subscribe('leadfound', (err, count) => {
       if (err) {
@@ -129,7 +129,7 @@ export class SocketGateway
         console.error('Failed to subscribe: %s', err.message);
       } else {
         console.log(
-          `Subscribed successfully! This client is currently subscribed to ${count} channels.`,
+          `Subscribed successfully! This client is currently subscribed to  avatarStatusUpdate ${count} channels.`,
         );
       }
     });

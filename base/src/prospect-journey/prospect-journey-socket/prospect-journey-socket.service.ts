@@ -20,14 +20,9 @@ export class ProspectJourneySocketService extends BaseService{
         if(orgId)
         {
             const org = await this.getOrg(orgId);
-            if(!org){
-                this.disconnect(socket);
+            if(org){
+                socket.on('prospectAction', (data) => this.handleProspectAction(socket, data))
             }
-            socket.on('prospectAction', (data) => this.handleProspectAction(socket, data))
-        }
-        else
-        {
-            this.disconnect(socket);
         }
     }
 
@@ -84,8 +79,10 @@ export class ProspectJourneySocketService extends BaseService{
     {
         try
         {
-            const orgId = this.getOrgId(socket);        
-            await this.prospectJourneyService.create({orgId,data});
+            const orgId = this.getOrgId(socket);   
+            if(orgId){
+                await this.prospectJourneyService.create({orgId,data});
+            }     
         }
         catch(err)
         {

@@ -65,6 +65,9 @@ export class LaunchAvatarComponent implements OnInit {
     private avatarService: AvatarService,
     private notifiService: NotificationService
   ) {
+  }
+  
+  ngOnInit(): void {
     this.avatarService.avatarEvent$.subscribe((data: any) => {
       if (data) {
         this.avatar = data;
@@ -79,19 +82,18 @@ export class LaunchAvatarComponent implements OnInit {
       
       this.avatar.status = data.status;
       this.avatar.message = data.message;
+      
       if (data.status != 'TRAININGFAILED') {
         this.trainingProgress += 20;
-      }
-      this.setTrainingProgress(data?.status, data?.message, this.trainingProgress);
-      if (data.status == 'ACTIVE') {
-        this.clearTrainingProgress();
+        }
+        this.setTrainingProgress(data?.status, data?.message, this.trainingProgress);
+        console.log(this.avatar);
+        if (data.status == 'ACTIVE') {
+          this.clearTrainingProgress();
         this.router.navigate(['/dashboard']);
         this.setupService.markSetupCompleted();
       }
     });
-  }
-
-  ngOnInit(): void {
     this.avatarName.valueChanges.pipe(debounceTime(1000)).subscribe(value => {
       this.checkAvatarName(value);
     });
@@ -135,6 +137,8 @@ export class LaunchAvatarComponent implements OnInit {
       this.restService.post(API.main.launchAvatar, data)
         .subscribe((response: any) => {
           this.avatarService.setAvatarData(response);
+          this.registerStatusEvent(response?.id);
+          this.avatar = response;
         }, (error) => {
           this.notifiService.showError(error.error.message);
           console.log(error);
