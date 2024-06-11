@@ -26,9 +26,9 @@ export class LaunchAvatarComponent implements OnInit {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
   avatar!: Avatar;
   launchForm: FormGroup = new FormGroup({
-    companyName: new FormControl('',[Validators.required,Validators.minLength(3)]),
-    companySite: new FormControl('',[Validators.required, Validators.pattern('https?://.+')]),
-    displayName: new FormControl('',[Validators.required])
+    companyName: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    companySite: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
+    displayName: new FormControl('', [Validators.required])
   });
   errorMessages = {
     companyName: {
@@ -66,7 +66,7 @@ export class LaunchAvatarComponent implements OnInit {
     private notifiService: NotificationService
   ) {
   }
-  
+
   ngOnInit(): void {
     this.avatarService.avatarEvent$.subscribe((data: any) => {
       if (data) {
@@ -79,17 +79,17 @@ export class LaunchAvatarComponent implements OnInit {
     });
     this.socketService.agentStatusEvent$.subscribe((data: any) => {
       console.log(data);
-      
+
       this.avatar.status = data.status;
       this.avatar.message = data.message;
-      
+
       if (data.status != 'TRAININGFAILED') {
         this.trainingProgress += 20;
-        }
-        this.setTrainingProgress(data?.status, data?.message, this.trainingProgress);
-        console.log(this.avatar);
-        if (data.status == 'ACTIVE') {
-          this.clearTrainingProgress();
+      }
+      this.setTrainingProgress(data?.status, data?.message, this.trainingProgress);
+      console.log(this.avatar);
+      if (data.status == 'ACTIVE') {
+        this.clearTrainingProgress();
         this.router.navigate(['/dashboard']);
         this.setupService.markSetupCompleted();
       }
@@ -104,18 +104,18 @@ export class LaunchAvatarComponent implements OnInit {
     return this.launchForm.get('companyName') as FormControl;
   }
 
-  get siteUrl():FormControl {
+  get siteUrl(): FormControl {
     return this.launchForm.get('companySite') as FormControl;
   }
 
-  get avatarName():FormControl {
+  get avatarName(): FormControl {
     return this.launchForm.get('displayName') as FormControl;
   }
 
   startProcess(): void {
     const interval = setInterval(() => {
       if (this.currentStep < this.steps.length) {
-        const isFailed = Math.random() < 0.3; 
+        const isFailed = Math.random() < 0.3;
         this.steps[this.currentStep].status = isFailed ? 'failed' : 'completed';
         this.currentStep++;
       } else {
