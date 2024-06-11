@@ -58,6 +58,7 @@ export class SegmentComponent implements OnInit {
 
 
   selectSegment(segment: any) {
+
     this.displaySegmentCategory = segment
     this.handleDisplaySegment(segment)
   }

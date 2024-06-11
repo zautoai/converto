@@ -6,45 +6,22 @@
                     <h3 class="text-center">Setup</h3>
                     <form [formGroup]="launchForm" (ngSubmit)="onAvatarCreate()">
                         <div class="form-group mb-3">
-                            <advanced-input 
-                            [label]="'Company name'" 
-                            [type]="'text'" 
-                            [placeholder]="'Company name'" 
-                            [size]="'md'"
-                            [control]="companyName" 
-                            [isDisabled]="isLoading" 
-                            [errorMessages]="errorMessages.companyName"
-                            ></advanced-input>
+                            <advanced-input [label]="'Company name'" [type]="'text'" [placeholder]="'Company name'"
+                                [size]="'md'" [control]="companyName" [isDisabled]="isLoading"
+                                [errorMessages]="errorMessages.companyName"></advanced-input>
                         </div>
                         <div class="form-group mb-3">
-                            <advanced-input 
-                            [label]="'Site url'" 
-                            [type]="'text'" 
-                            [placeholder]="'Site url'" 
-                            [size]="'md'"
-                            [control]="siteUrl" 
-                            [isDisabled]="isLoading" 
-                            [errorMessages]="errorMessages.siteUrl"
-                            ></advanced-input>
+                            <advanced-input [label]="'Site url'" [type]="'text'" [placeholder]="'Site url'"
+                                [size]="'md'" [control]="siteUrl" [isDisabled]="isLoading"
+                                [errorMessages]="errorMessages.siteUrl"></advanced-input>
                         </div>
                         <div class="form-group mb-3">
-                            <advanced-input 
-                            [label]="'Agent name'" 
-                            [type]="'text'" 
-                            [placeholder]="'Agent name'" 
-                            [size]="'md'"
-                            [control]="avatarName" 
-                            [isDisabled]="isLoading" 
-                            [errorMessages]="errorMessages.avatarName"
-                            ></advanced-input>
+                            <advanced-input [label]="'Agent name'" [type]="'text'" [placeholder]="'Agent name'"
+                                [size]="'md'" [control]="avatarName" [isDisabled]="isLoading"
+                                [errorMessages]="errorMessages.avatarName"></advanced-input>
                         </div>
-                        <advanced-button 
-                        label="Launch" 
-                        [size]="'md'" 
-                        [classes]="'w-100'" 
-                        [type]="'submit'"
-                        [isLoading]="isLoading"
-                        ></advanced-button>
+                        <advanced-button label="Launch" [size]="'md'" [classes]="'w-100'" [type]="'submit'"
+                            [isLoading]="isLoading"></advanced-button>
                     </form>
                 </div>
             </div>
@@ -92,5 +69,5 @@
             </div> -->
         </div>
     </div>
-    
+
 </div>
