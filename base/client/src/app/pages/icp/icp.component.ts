@@ -1,8 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { error } from 'console';
-import { response } from 'express';
 import { forkJoin } from 'rxjs';
 import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from 'src/app/shared/services/notification.service';
@@ -39,13 +37,11 @@ export class IcpComponent {
     this.getIcps();
   }
 
-
-
   getIcps(): void {
     this.restService.getAll(API.main.icp).subscribe({
       next: (response: any) => {
         this.icpdata = response.data;
-        console.log("icpdata", this.icpdata)
+        console.log("icpdata", this.icpdata);
       },
       error: (error) => {
         console.error(error);
@@ -61,23 +57,21 @@ export class IcpComponent {
     this.router.navigate(['/icp/edit', data.id]);
   }
 
-  handleDelete(data: any): any {
+  handleDelete(data: any): void {
     this.restService.delete(API.main.icp, data.id).subscribe(
       (response: any) => {
         this.getIcps();
-        this.notifService.showSuccess("deleted");
-      }, (error) => {
-
+        this.notifService.showSuccess("Deleted");
+      },
+      (error) => {
+        console.error(error);
+        this.notifService.showError(error.error.message);
       }
-    )
-
-
-
+    );
   }
 
-  delete = (data: any) => {
+  delete(data: any): void {
     this.user = data;
-
     this.sweetAlertService.warning(
       'Delete ICP',
       'Are you sure you want to delete?',
@@ -86,11 +80,11 @@ export class IcpComponent {
         if (confirm.isConfirmed) {
           this.confirmDelete(data);
         }
-      },
+      }
     );
-  };
+  }
 
-  confirmDelete = (data: any) => {
+  confirmDelete(data: any): void {
     this.restService.delete(API.main.icp, data.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('ICP Deleted Successfully.');
@@ -100,19 +94,19 @@ export class IcpComponent {
       (error) => {
         console.error(error);
         this.notifService.showError(error.error.message);
-      },
+      }
     );
-  };
+  }
 
-  closeModal = () => {
+  closeModal(): void {
     this.user = {};
     this.isEdit = false;
     this.modalService.dismissAll();
-  };
+  }
 
-  handleView(data: any): any {
+  handleView(data: any): void {
     this.selectedData = data;
-    console.log(this.selectedData)
+    console.log(this.selectedData);
     this.offcanvasService.open(this.viewIcpOffcanvas, {
       position: 'end',
       backdrop: 'static',
@@ -120,7 +114,4 @@ export class IcpComponent {
       animation: true,
     });
   }
-
 }
-
-
