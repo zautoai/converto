@@ -217,10 +217,22 @@ export class AccountsComponent implements OnInit {
   openUpdateContact(contact: any) {
     this.selectedaccounts = contact; 
     this.form.reset();
-    this.form.patchValue(contact)
+    
+    // Ensure companySize and annualRevenue are converted to strings
+    const contactWithStringFields = {
+      ...contact,
+      companySize: contact.companySize?.toString(),
+      annualRevenue: contact.annualRevenue?.toString()
+    };
+    this.form.patchValue(contactWithStringFields);
+  
     this.isEdit = true;
     this.contactComposeCanvas.open();
   }
+  
+  
+  
+  
 
   openViewContact(data: any) {
     this.selectedData = data;
@@ -229,8 +241,7 @@ export class AccountsComponent implements OnInit {
   }
 
   onSubmit() {
-    if(this.form.valid)
-    {
+    if (this.form.valid) {
       console.log("1st stage success")
       const formData: { [key: string]: string | null } = this.form.value;
       const data = Object.entries(formData)
@@ -240,34 +251,38 @@ export class AccountsComponent implements OnInit {
             acc[key] = value;
           }
           return acc;
-        }, {} as { [key: string]: string });      
-
-      this.isLoading = true;
-      if(this.isEdit)
-      {
-        this.restService.patch(API.main.account, this.selectedaccounts.id, this.form.value)
-        .subscribe(
-          (response: any) => {
-            this.notifService.showSuccess('Account Updated Successfully.');
-            this.getAccounts();
-            this.isLoading = false;
-            this.contactComposeCanvas.close();
-          },
-          (error) => {
-            if(error.status == 500)
-            {
-              this.notifService.showError('Something Went Wrong! Try Again Later');
-            }
-            else{
-              this.notifService.showError(error.error.message);
-            }
-            this.isLoading = false;
-          },
-        );
+        }, {} as { [key: string]: string | number });
+  
+      // Convert companySize and annualRevenue to numbers if they are not undefined
+      if (data['companySize'] !== undefined) {
+        data['companySize'] = Number(data['companySize']);
       }
-      else
-      {
-        alert("form submited")
+  
+      if (data['annualRevenue'] !== undefined) {
+        data['annualRevenue'] = Number(data['annualRevenue']);
+      }
+  
+      this.isLoading = true;
+      if (this.isEdit) {
+        this.restService.patch(API.main.account, this.selectedaccounts.id, data) // Ensure to use 'data' instead of 'this.form.value'
+          .subscribe(
+            (response: any) => {
+              this.notifService.showSuccess('Account Updated Successfully.');
+              this.getAccounts();
+              this.isLoading = false;
+              this.contactComposeCanvas.close();
+            },
+            (error) => {
+              if (error.status == 500) {
+                this.notifService.showError('Something Went Wrong! Try Again Later');
+              } else {
+                this.notifService.showError(error.error.message);
+              }
+              this.isLoading = false;
+            },
+          );
+      } else {
+        alert("form submitted")
         this.restService.post(API.main.account, data).subscribe({
           next: (response: any) => {
             this.notifService.showSuccess('Account Added Successfully.');
@@ -278,21 +293,19 @@ export class AccountsComponent implements OnInit {
           },
           error: (error) => {
             this.isLoading = false;
-            if(error.status == 500)
-            {
+            if (error.status == 500) {
               this.notifService.showError('Something Went Wrong! Try Again Later');
-            }
-            else{
+            } else {
               this.notifService.showError(error.error.message);
             }
           },
         });
       }
-    }
-    else{
+    } else {
       markFormGroupAsDirty(this.form);
     }
   }
+  
 
   onCancel()
   {
@@ -301,20 +314,21 @@ export class AccountsComponent implements OnInit {
 
   delete(data: any) {
     this.deleteModal.open(data)
-  }
+}
 
-  confirmDelete = (data: any) => {
-    this.restService.delete(API.main.contact, data.id).subscribe(
-      (response: any) => {
-        this.notifService.showSuccess('Accounts Deleted Successfully.');
-        this.getAccounts()
-      },
-      (error) => {
-        console.error(error);
-        this.notifService.showError(error.error.message);
-      },
+confirmDelete = (data: any) => {
+    this.restService.delete(API.main.account, data.id).subscribe(
+        (response: any) => {
+            this.notifService.showSuccess('Account Deleted Successfully.');
+            this.getAccounts()
+        },
+        (error) => {
+            console.error(error);
+            this.notifService.showError(error.error.message);
+        },
     );
-  };
+};
+
 
   selectaccount(account:any)
   {
