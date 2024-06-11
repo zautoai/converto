@@ -9,6 +9,7 @@ import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
 import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
+import * as validator from 'validator';
 
 @Component({
   selector: 'app-stages',
@@ -169,12 +170,10 @@ export class StagesComponent implements OnInit {
   }
 
 
-
   form: FormGroup = new FormGroup({
-    name: new FormControl(''),
-    instruction: new FormControl(''),
-  })
-
+    name: new FormControl('', [Validators.required]),
+    instruction: new FormControl('', [Validators.required]),
+  });
   get name(): FormControl {
     return this.form.get('name') as FormControl;
   }

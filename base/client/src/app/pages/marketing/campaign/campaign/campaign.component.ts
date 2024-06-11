@@ -41,6 +41,7 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     isabm:new FormControl(false),
     accountId: new FormControl(null),
   });
+  
   errorMessages = {
     title: {
       required: 'Title is required',
@@ -282,7 +283,6 @@ export class CampaignComponent implements OnInit,AfterViewInit {
     if (this.campaignForm.valid) {
       const data = this.campaignForm.value;
       console.log(data);
-      
       this.isLoading = true;
       if(this.isEdit)
       {
