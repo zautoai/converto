@@ -265,7 +265,7 @@ export class AccountsComponent implements OnInit {
           );
       }
       else {
-        alert("form submited")
+
         this.restService.post(API.main.account, data).subscribe({
           next: (response: any) => {
             this.notifService.showSuccess('Account Added Successfully.');
