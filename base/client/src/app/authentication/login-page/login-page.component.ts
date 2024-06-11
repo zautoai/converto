@@ -101,6 +101,7 @@ export class LoginPageComponent implements OnInit {
     }
     else {
       markFormGroupAsDirty(this.loginForm);
+      this.isLoading = false;
     }
   }
 

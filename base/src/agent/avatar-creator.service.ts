@@ -292,7 +292,7 @@ export class AvatarCreatorService extends BaseService {
 
     emitEvent(id: string, data: any) {
         const eventName = `avatarStatusUpdate`;
-        //this.socketClient.emit(eventName, data);
+        // this.socketClient.emit(eventName, data);
         this.redisPublisher.publish(eventName, JSON.stringify(data));
         console.log('AvatarCreator: Emitting Event', id, data);
     }
