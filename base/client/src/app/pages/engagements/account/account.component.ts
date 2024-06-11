@@ -35,7 +35,7 @@ export class AccountsComponent implements OnInit {
   @ViewChild('viewContactOffcanvas') viewContactOffcanvas: ElementRef | undefined;
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
 
-  isLoading:boolean = false;
+  isLoading: boolean = false;
   selectedaccounts: any;
   isEdit: boolean = false;
   showDescription: boolean = true;
@@ -46,20 +46,20 @@ export class AccountsComponent implements OnInit {
   selectedData: any = '';
   limit = 5;
   totalItems: number = 0;
-  accountList: any=[];
+  accountList: any = [];
 
   errorMessages = {
     // firstName: {
     //   required: 'First name is required',
     // },
- 
+
     email: {
       required: 'Email is required',
       email: 'Please enter a valid email address',
     },
   };
-    
-  form:FormGroup = new FormGroup({
+
+  form: FormGroup = new FormGroup({
     photoURL: new FormControl(''),
     accountName: new FormControl(''),
     // firstName: new FormControl('',[Validators.required]),
@@ -67,10 +67,10 @@ export class AccountsComponent implements OnInit {
     jobTitle: new FormControl(''),
     organizationName: new FormControl(''),
     email: new FormControl('', [Validators.required, Validators.email]),
-    annualRevenue:new FormControl(''),
-    companySize:new FormControl(''),
+    annualRevenue: new FormControl(''),
+    companySize: new FormControl(''),
     phone: new FormControl(''),
-    industry:new FormControl(''),
+    industry: new FormControl(''),
     address: new FormControl(''),
     city: new FormControl(''),
     state: new FormControl(''),
@@ -80,12 +80,13 @@ export class AccountsComponent implements OnInit {
     notes: new FormControl(''),
     leadSource: new FormControl(''),
     status: new FormControl(''),
+    isabm: new FormControl(false)
   });
 
   //Delete Modal
   @ViewChild(AdvancedModalsComponent) deleteModal!: AdvancedModalsComponent;
- 
-  
+
+
 
 
   constructor(
@@ -95,7 +96,7 @@ export class AccountsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
   ) {
-    
+
   }
 
   ngOnInit(): void {
@@ -113,6 +114,9 @@ export class AccountsComponent implements OnInit {
     return this.form.get('photoURL') as FormControl;
   }
 
+  get isabm(): FormControl {
+    return this.form.get('isabm') as FormControl;
+  }
   get accountName(): FormControl {
     return this.form.get('accountName') as FormControl;
   }
@@ -132,7 +136,7 @@ export class AccountsComponent implements OnInit {
   get address(): FormControl {
     return this.form.get('address') as FormControl;
   }
-  get  industry(): FormControl {
+  get industry(): FormControl {
     return this.form.get('industry') as FormControl;
   }
 
@@ -174,9 +178,9 @@ export class AccountsComponent implements OnInit {
     return this.form.get('status') as FormControl;
   }
 
-  getActiveaccounts(id:string){
+  getActiveaccounts(id: string) {
     this.selectedaccounts = null;
-    if(!id || id == 'all') {
+    if (!id || id == 'all') {
       return;
     }
     this.restService.get(API.main.account, id).subscribe(
@@ -197,8 +201,8 @@ export class AccountsComponent implements OnInit {
         (response: any) => {
           this.accountList = response.data;
           this.totalItems = response.total
-          console.log("accounts",this.accountList)
-          console.log("accountname",this.accountName)
+          console.log("accounts", this.accountList)
+          console.log("accountname", this.accountName)
         },
         (error) => {
           console.error(error);
@@ -213,26 +217,14 @@ export class AccountsComponent implements OnInit {
     this.selectedaccounts = null;
     this.contactComposeCanvas.open();
   }
-  
+
   openUpdateContact(contact: any) {
-    this.selectedaccounts = contact; 
+    this.selectedaccounts = contact;
     this.form.reset();
-    
-    // Ensure companySize and annualRevenue are converted to strings
-    const contactWithStringFields = {
-      ...contact,
-      companySize: contact.companySize?.toString(),
-      annualRevenue: contact.annualRevenue?.toString()
-    };
-    this.form.patchValue(contactWithStringFields);
-  
+    this.form.patchValue(contact)
     this.isEdit = true;
     this.contactComposeCanvas.open();
   }
-  
-  
-  
-  
 
   openViewContact(data: any) {
     this.selectedData = data;
@@ -251,17 +243,10 @@ export class AccountsComponent implements OnInit {
             acc[key] = value;
           }
           return acc;
-        }, {} as { [key: string]: string | number });
-  
-      // Convert companySize and annualRevenue to numbers if they are not undefined
-      if (data['companySize'] !== undefined) {
-        data['companySize'] = Number(data['companySize']);
-      }
-  
-      if (data['annualRevenue'] !== undefined) {
-        data['annualRevenue'] = Number(data['annualRevenue']);
-      }
-  
+        }, {} as { [key: string]: string });
+
+
+
       this.isLoading = true;
       if (this.isEdit) {
         this.restService.patch(API.main.account, this.selectedaccounts.id, data) // Ensure to use 'data' instead of 'this.form.value'
@@ -281,8 +266,9 @@ export class AccountsComponent implements OnInit {
               this.isLoading = false;
             },
           );
-      } else {
-        alert("form submitted")
+      }
+      else {
+
         this.restService.post(API.main.account, data).subscribe({
           next: (response: any) => {
             this.notifService.showSuccess('Account Added Successfully.');
@@ -305,34 +291,30 @@ export class AccountsComponent implements OnInit {
       markFormGroupAsDirty(this.form);
     }
   }
-  
 
-  onCancel()
-  {
+  onCancel() {
     this.contactComposeCanvas.close();
   }
 
   delete(data: any) {
     this.deleteModal.open(data)
-}
+  }
 
-confirmDelete = (data: any) => {
-    this.restService.delete(API.main.account, data.id).subscribe(
-        (response: any) => {
-            this.notifService.showSuccess('Account Deleted Successfully.');
-            this.getAccounts()
-        },
-        (error) => {
-            console.error(error);
-            this.notifService.showError(error.error.message);
-        },
+  confirmDelete = (data: any) => {
+    this.restService.delete(API.main.contact, data.id).subscribe(
+      (response: any) => {
+        this.notifService.showSuccess('Accounts Deleted Successfully.');
+        this.getAccounts()
+      },
+      (error) => {
+        console.error(error);
+        this.notifService.showError(error.error.message);
+      },
     );
-};
+  };
 
+  selectaccount(account: any) {
 
-  selectaccount(account:any)
-  {
-  
     this.selectedaccounts = account;
     this.router.navigate(['account', account.id])
     this.getActiveaccounts(account.id);
