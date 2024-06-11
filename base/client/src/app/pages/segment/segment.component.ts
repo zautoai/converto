@@ -25,11 +25,11 @@ export interface avatarStyle {
 export class SegmentComponent implements OnInit {
   @ViewChild("segmentCategoryOffCanvas") segmentCategoryOffCanvas!: AdvanceOffcanvasComponent;
   @ViewChild("segmentOffCanvas") segmentOffCanvas!: AdvanceOffcanvasComponent;
- 
-  segmentGroup:FormGroup=new FormGroup({
-    name:new FormControl("",[Validators.required]),
-    description:new FormControl(""),
-    color:new FormControl("",[Validators.required]),
+
+  segmentGroup: FormGroup = new FormGroup({
+    name: new FormControl("", [Validators.required]),
+    description: new FormControl(""),
+    color: new FormControl("", [Validators.required]),
   })
   segments: FormGroup = new FormGroup({
     name: new FormControl("",[Validators.required]),
@@ -45,8 +45,8 @@ export class SegmentComponent implements OnInit {
   segment: any;
   displaySegment: any = null
   displaySegmentCategory: any = null
-  
-  isLoading:boolean = false
+
+  isLoading: boolean = false
 
   errorMessages = {
     title: {
@@ -61,7 +61,14 @@ export class SegmentComponent implements OnInit {
     private notifService: NotificationService,
     private sweetAlertService: SweetAlertService,
   ) {
-  
+
+
+    this.segments = this.formBuilder.group({
+      name: [''],
+      description: [''],
+      segmentCategoryId: [null],
+    });
+
   }
   ngOnInit(): void {
     this.getsegments();
@@ -69,25 +76,25 @@ export class SegmentComponent implements OnInit {
   }
 
 
-  get name():FormControl{
+  get name(): FormControl {
     return this.segmentGroup.get('name') as FormControl;
   }
 
-  get description():FormControl{
+  get description(): FormControl {
     return this.segmentGroup.get('description') as FormControl;
   }
-  get color():FormControl{
+  get color(): FormControl {
     return this.segmentGroup.get('color') as FormControl;
   }
 
-  get segmentName():FormControl{
+  get segmentName(): FormControl {
     return this.segments.get('name') as FormControl;
   }
 
-  get segmentdescription():FormControl{
+  get segmentdescription(): FormControl {
     return this.segments.get('description') as FormControl;
   }
-  get segmentCategoryId():FormControl{
+  get segmentCategoryId(): FormControl {
     return this.segments.get('segmentCategoryId') as FormControl;
   }
   
@@ -120,13 +127,13 @@ export class SegmentComponent implements OnInit {
   }
 
   onCreateSegmentCategory() {
-    
-    
-    
+
+
+
     if (this.segmentGroup.valid) {
       const data = this.segmentGroup.value;
       console.log(data);
-      
+
       this.restService.post(API.main.segmentCategory, data).subscribe({
         next: (response: any) => {
           this.segmentGroup.reset();
@@ -254,7 +261,7 @@ export class SegmentComponent implements OnInit {
       this.isLoading = false;
     }
   }
-  
+
 
   getsegments(): void {
     this.restService.getAll(API.main.segment).subscribe({

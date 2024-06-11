@@ -11,7 +11,7 @@
                                 [errorMessages]="errorMessages.companyName"></advanced-input>
                         </div>
                         <div class="form-group mb-3">
-                            <advanced-input [label]="'Site url'" [type]="'text'" [placeholder]="'Site url'"
+                            <advanced-input [label]="'Site url'" [type]="'text'" [placeholder]="'https://example.com/'"
                                 [size]="'md'" [control]="siteUrl" [isDisabled]="isLoading"
                                 [errorMessages]="errorMessages.siteUrl"></advanced-input>
                         </div>
@@ -25,13 +25,18 @@
                     </form>
                 </div>
             </div>
-            <div class="card" *ngIf="avatar">
-                <div class="card-body">
-                    <div class="spinner-border spinner-border-sm me-1" style="width: 1rem; height: 1rem;" role="status">
-                        <span class="visually-hidden">{{avatar.message}}</span>
+            <div class="card shadow-sm border-0" *ngIf="avatar">
+                <div class="card-body d-flex align-items-center">
+                    <div class="spinner-border text-primary me-3" role="status" *ngIf="avatar.status === 'loading'">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div>
+
+                        <p class="card-text text-muted mb-0">{{ avatar.status }}</p>
                     </div>
                 </div>
             </div>
+
             <!-- <div class="card shadow" *ngIf="false">
                 <div class="card-body status_card position-relative">
                     <div class="progress_card">
