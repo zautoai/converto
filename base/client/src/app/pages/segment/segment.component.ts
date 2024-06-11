@@ -31,13 +31,17 @@ export class SegmentComponent implements OnInit {
     description: new FormControl(""),
     color: new FormControl("", [Validators.required]),
   })
+  segments: FormGroup = new FormGroup({
+    name: new FormControl('', [Validators.required]),
+    description: new FormControl(''),
+    segmentCategoryId: new FormControl('', [Validators.required]),
+  })
 
   submittedData: any[] = [];
   submittedDatasegments: any[] = [];
   selectedSegmentID: any;
   selectedSegmentIDgrp: any;
   isEdit: boolean = false;
-  segments: FormGroup;
   segment: any;
   displaySegment: any = null
   displaySegmentCategory: any = null
@@ -64,6 +68,7 @@ export class SegmentComponent implements OnInit {
       description: [''],
       segmentCategoryId: [null],
     });
+
   }
   ngOnInit(): void {
     this.getsegments();
@@ -82,6 +87,16 @@ export class SegmentComponent implements OnInit {
     return this.segmentGroup.get('color') as FormControl;
   }
 
+  get segmentName(): FormControl {
+    return this.segments.get('name') as FormControl;
+  }
+
+  get segmentdescription(): FormControl {
+    return this.segments.get('description') as FormControl;
+  }
+  get segmentCategoryId(): FormControl {
+    return this.segments.get('segmentCategoryId') as FormControl;
+  }
 
 
 
@@ -220,24 +235,26 @@ export class SegmentComponent implements OnInit {
   oncreatesegmente() {
     if (this.segments.valid) {
       const data = this.segments.value;
-      console.log(data);
+      console.log(data); // Add this line to check if the form data is correct
 
       this.restService.post(API.main.segment, data).subscribe({
         next: (response: any) => {
           this.notifService.showSuccess('Segment Created Successfully.');
           this.getsegments();
-          this.segments.reset();
+          this.segments.reset(); // Reset the form after successful submission
+          this.segmentOffCanvas.close(); // Close the off-canvas form after submission
         },
         error: (error) => {
           console.error(error);
+          this.notifService.showError('Error creating segment.'); // Show an error message
         },
       });
-    }
-    else {
+    } else {
       markFormGroupAsDirty(this.segments);
       this.isLoading = false;
     }
   }
+
 
   getsegments(): void {
     this.restService.getAll(API.main.segment).subscribe({
