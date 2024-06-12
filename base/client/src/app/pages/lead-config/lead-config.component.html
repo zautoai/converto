@@ -1,8 +1,8 @@
 <div class="card mt-3">
   <div class="card-header d-flex align-items-center">
     <h6 class="card-title"><i class="fa-solid fa-sliders"></i> Lead settings</h6>
-    <div class="ms-auto d-flex justify-content-end"> <button class="btn btn-primary btn-sm me-2" *ngIf="canEdit"
-        [disabled]="isUpdateing">
+    <div class="ms-auto d-flex justify-content-end">
+      <button class="btn btn-primary btn-sm me-2" *ngIf="canEdit" [disabled]="isUpdateing" (click)="submit()">
         <i class="zmdi zmdi-spinner text-white status-loader" *ngIf="isUpdateing"></i>
         {{ isUpdateing ? 'Updating' : 'Save changes' }}
       </button>
@@ -16,14 +16,15 @@
           <li *ngFor="let field of fields; let i = index">
             <div class="field mb-2 d-flex justify-content-between">
               <span>{{field}}</span>
-              <a href="javascript:void(0)" (click)="deleteField(i)" *ngIf="canEdit && !isUpdateing"><i
-                  class="fa fa-trash text-dark"></i></a>
+              <a href="javascript:void(0)" (click)="deleteField(i)" *ngIf="canEdit && !isUpdateing">
+                <i class="fa fa-trash text-dark"></i>
+              </a>
             </div>
           </li>
           <li *ngIf="canEdit && !isUpdateing">
             <form (ngSubmit)="addField()">
-              <div class="input-group justify-content-end"> <input type="text" class="form-control"
-                  placeholder="Field name" name="newField" [(ngModel)]="newField">
+              <div class="input-group justify-content-end">
+                <input type="text" class="form-control" placeholder="Field name" name="newField" [(ngModel)]="newField">
                 <button class="btn btn-outline-primary" (click)="addField()">
                   <i class="fa fa-plus"></i>
                 </button>

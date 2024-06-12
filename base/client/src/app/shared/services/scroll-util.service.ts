@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { ElementRef, Injectable } from '@angular/core';
 import { Observable, fromEvent } from 'rxjs';
 import { map, pairwise, filter } from 'rxjs/operators';
 
@@ -6,6 +6,9 @@ import { map, pairwise, filter } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ScrollUtilService {
+  setScrollContainer(scrollContainer: ElementRef<any>) {
+    throw new Error('Method not implemented.');
+  }
 
   constructor() { }
 
