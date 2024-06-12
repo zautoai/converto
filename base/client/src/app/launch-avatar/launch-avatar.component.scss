@@ -1,0 +1,142 @@
+.status_card
+{
+    height: 18rem;
+    display: flex;
+    align-items: center;
+    .progress_card
+    {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        top: 50%;
+        left: 0;
+        transform: translate(-25%, -50%);
+        height: 75%;
+        width: 40%;
+        border-radius: 15px;
+        background: linear-gradient(to right, #da8cff, #9a55ff) !important;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15)
+    }
+    .card_detail
+    {
+        margin-left: 35%;
+    }
+}
+
+
+.status-loader {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media screen and (max-width: 600px)
+{
+    .status_card
+    {
+        height: auto;
+        text-align: center;
+        .progress_card
+        {
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 50%;
+            width: 70%;
+        }
+        .card_detail
+        {
+            margin: auto; 
+            margin-top: 30%;
+        }
+    }
+}
+.card {
+    border-radius: 10px;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .progress {
+    height: 1.5rem;
+  }
+  
+  .card-title {
+    margin-bottom: 0.5rem;
+  }
+  
+  .card-text {
+    font-size: 0.875rem;
+  }
+  .card-training {
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    width: 300px;
+  }
+  
+  .training-info {
+    flex: 1;
+  }
+  
+  .training-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .avatar-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+  }
+  
+  .status-indicator.success {
+    background-color: #4caf50;
+  }
+  
+  .status-indicator.warning {
+    background-color: #ff9800;
+  }
+  
+  .status-indicator.error {
+    background-color: #f44336;
+  }
+  .card-training {
+    margin-bottom: 1.5rem;
+  }
+  
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  .card-text {
+    font-size: 0.875rem;
+  }
+  
+  .progress {
+    height: 1rem;
+  }
+  
+  .progress-bar {
+    background-color: #007bff;
+  }
+  

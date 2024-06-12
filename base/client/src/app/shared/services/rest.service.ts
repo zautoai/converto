@@ -8,6 +8,9 @@ import { API } from '../../config/endpoint.config';
     providedIn: 'root'
   })
 export class RestService {
+  getById(segmentCategory: string, id: any) {
+    throw new Error('Method not implemented.');
+  }
 
   constructor(private http: HttpClient) {
   }

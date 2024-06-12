@@ -1,20 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientManager } from 'src/prisma/prismaClientManager.service';
 import { CrmMappingDto } from '../../external-crm/dto/crm-mapping.dto';
-import { Queue } from 'bull';
-import { InjectQueue } from '@nestjs/bull';
 
 @Injectable()
 export class MappingService {
 
     constructor(
         private readonly prismaClientManager: PrismaClientManager,
-    ){}
+    ) { }
 
-    async getMappingById(orgId:string,id: string){
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+    async getMappingById(orgId: string, id: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const mapping = await prisma.crmMapping.findUnique({
                 where: {
                     id
@@ -22,16 +19,18 @@ export class MappingService {
             });
             return mapping;
         }
-        catch(e)
-        {
+        catch (e) {
             throw e;
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId);
         }
     }
 
-    async getMappingsByCrmName(orgId:string, crmName: string,object_type:string){
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+    async getMappingsByCrmName(orgId: string, crmName: string, object_type: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const mappings = await prisma.crmMapping.findMany({
                 where: {
                     crmName,
@@ -40,16 +39,18 @@ export class MappingService {
             });
             return mappings;
         }
-        catch(e)
-        {
+        catch (e) {
             throw e;
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId);
         }
     }
 
-    async getMappingsBycrmNameAndObjectType(orgId:string, crmName: string, objectType: string){
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+    async getMappingsBycrmNameAndObjectType(orgId: string, crmName: string, objectType: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const mappings = await prisma.crmMapping.findMany({
                 where: {
                     crmName,
@@ -58,16 +59,18 @@ export class MappingService {
             });
             return mappings;
         }
-        catch(e)
-        {
+        catch (e) {
             throw e;
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId);
         }
     }
 
-    async getMappingsByObjectType(orgId:string, objectType: string){
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+    async getMappingsByObjectType(orgId: string, objectType: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const mappings = await prisma.crmMapping.findMany({
                 where: {
                     objectType
@@ -75,16 +78,18 @@ export class MappingService {
             });
             return mappings;
         }
-        catch(e)
-        {
+        catch (e) {
             throw e;
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId);
         }
     }
 
-    async getMappingByCrmNameAndObjectTypeAndField(orgId:string, crmName: string, objectType: string, fieldName: string){
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+    async getMappingByCrmNameAndObjectTypeAndField(orgId: string, crmName: string, objectType: string, fieldName: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const mapping = await prisma.crmMapping.findFirst({
                 where: {
                     crmName,
@@ -94,50 +99,56 @@ export class MappingService {
             });
             return mapping;
         }
-        catch(e)
-        {
+        catch (e) {
             throw e;
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId);
         }
     }
 
-    async createMapping(orgId:string, crmMappingDto: CrmMappingDto){
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+    async createMapping(orgId: string, crmMappingDto: CrmMappingDto) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const mapping = await prisma.crmMapping.create({
-                data:crmMappingDto
+                data: crmMappingDto
             });
 
             return mapping;
         }
-        catch(e)
-        {
+        catch (e) {
             throw e;
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId);
         }
     }
 
-    async updateMapping(orgId:string, id: string, crmMappingDto: CrmMappingDto){
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+    async updateMapping(orgId: string, id: string, crmMappingDto: CrmMappingDto) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const mapping = await prisma.crmMapping.update({
                 where: {
                     id
                 },
-                data:crmMappingDto
+                data: crmMappingDto
             });
             return mapping;
         }
-        catch(e)
-        {
+        catch (e) {
             throw e;
+        }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId);
         }
     }
 
-    async deleteMapping(orgId:string, id: string){
-        try
-        {
-            const prisma = await this.prismaClientManager.getClient(orgId);
+    async deleteMapping(orgId: string, id: string) {
+        const prisma = await this.prismaClientManager.getClient(orgId);
+        try {
             const mapping = await prisma.crmMapping.delete({
                 where: {
                     id
@@ -145,25 +156,28 @@ export class MappingService {
             });
             return mapping;
         }
-        catch(e)
-        {
+        catch (e) {
             throw e;
         }
+        finally {
+            prisma.$disconnect()
+            await this.prismaClientManager.disconnectClient(orgId);
+        }
     }
 
-    async handleMapping(orgId: string, crmName: string, objectType:string,data: any): Promise<any> {
+    async handleMapping(orgId: string, crmName: string, objectType: string, data: any): Promise<any> {
         const mappings = await this.getMappingsBycrmNameAndObjectType(orgId, crmName, objectType);
-        let mappedData = {}; 
-        for(const mapping of mappings) {
+        let mappedData = {};
+        for (const mapping of mappings) {
             const externalCRMFieldName = mapping.externalCRMFieldName;
             const fieldName = mapping.fieldName;
-            if(externalCRMFieldName == null || data[fieldName] == null) continue;
-            mappedData[externalCRMFieldName] = data[fieldName]; 
+            if (externalCRMFieldName == null || data[fieldName] == null) continue;
+            mappedData[externalCRMFieldName] = data[fieldName];
         }
-        return mappedData;       
+        return mappedData;
     }
 
-    async handleReverseMapping(orgId: string, crmName: string, objectType:string, mappedData: any): Promise<any> {
+    async handleReverseMapping(orgId: string, crmName: string, objectType: string, mappedData: any): Promise<any> {
         const reverseMappings = await this.getMappingsBycrmNameAndObjectType(orgId, crmName, objectType);
         let originalData = {};
         for (const reverseMapping of reverseMappings) {

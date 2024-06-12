@@ -1,12 +1,12 @@
-import { Component, ViewChild, ElementRef, AfterViewInit, OnInit } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, ViewChild, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { API } from 'src/app/config/endpoint.config';
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { PaginationData } from 'src/app/common/intefaces';
+import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
+import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
+import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
 
 @Component({
   selector: 'app-team',
@@ -15,46 +15,70 @@ import { PaginationData } from 'src/app/common/intefaces';
 })
 
 export class TeamComponent implements OnInit {
-  @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
-  @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
-  @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
+  @ViewChild(AdvanceOffcanvasComponent) teamComposeOffcanvas!: AdvanceOffcanvasComponent;
+  @ViewChild(AdvancedModalsComponent) deleteFormModal!: AdvancedModalsComponent;
 
   user: any= {};
-  userList : any= [];
+  usersData : any= null;
   selectedUser : any = undefined;
   isEdit: boolean = false;
   totalPages: number = 1;
   limit = 5;
 
-  userForm: FormGroup;
-  errorFeedback:any = {name:"",email:"",password:""};
+  form: FormGroup = new FormGroup({
+    name: new FormControl('', [Validators.required,Validators.minLength(3)]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required,Validators.minLength(3)]),
+  });
+
+  errorMessages = {
+    name: {
+      required: 'Name is required',
+      minlength: 'Name must be at least 3 characters long',
+      maxlength: 'Name must be less than 50 characters long',
+    },
+    email: {
+      required: 'Email is required',
+      email: 'Email is not valid',
+    },
+    password: {
+      required: 'Password is required',
+      minlength: 'Password must be at least 3 characters long',
+      maxlength: 'Password must be less than 50 characters long',
+    },
+  }
+
   totalItems: number = 0;
   currentPage:number = 1;
   itemPerPage:number = 10;
 
+  isLoading:boolean = false;
+
   constructor(
-    private modalService: NgbModal, 
     private notifService: NotificationService,
-    private restService:RestService,
-    private offcanvasService:NgbOffcanvas,
-    private formBuilder: FormBuilder,
-    private sweetAlertService: SweetAlertService,
-    ) { 
-      this.userForm =this.formBuilder.group({
-        name:['',Validators.required],
-        email:['',[Validators.required,Validators.email]],
-        password:['',Validators.required],
-      });
-    }
+    private restService:RestService) {}
   
   ngOnInit(): void {
    this.getUsers();
   }
 
+  get name():FormControl {
+    return this.form.get('name') as FormControl;
+  }
+
+  get email():FormControl {
+    return this.form.get('email') as FormControl;
+  }
+
+  get password():FormControl {
+    return this.form.get('password') as FormControl;
+  }
+
   getUsers = () => {
-    this.restService.get(API.main.orgUser,`?limit=${this.itemPerPage}&page=${this.currentPage}`)
+    this.restService.get(API.main.user,`?limit=${this.itemPerPage}&page=${this.currentPage}`)
     .subscribe((response:any)=>{
-      this.userList = response;
+      this.usersData = response;
+      this.usersData.data = this.usersData.data.filter((user:any) => user.role.name == 'user');
     },(error)=>{
       console.log(error)
       this.notifService.showError(error.error.message);
@@ -62,136 +86,85 @@ export class TeamComponent implements OnInit {
   }
 
   openCreateUser () {
-    
-    this.userForm.reset();
-    this.resetErrorFeedback();
-    this.offcanvasService.open(this.createUserOffcanvas,{
-      position:'end',
-      backdrop:'static',
-      panelClass:'visible',
-      animation: true,
-    });
-  }
-
-  onCreateuserSubmit(){
-
-    this.resetErrorFeedback();
-    const name = this.userForm.value.name || "";
-    const email = this.userForm.value.email || "";
-    const password = this.userForm.value.password || "";
-
-    if(this.userForm.valid)
-    {
-      const data = {
-        name: name,
-        email: email,
-        password: password
-      }
-      this.restService.post(API.main.orgUser,data)
-      .subscribe({next: (response: any) => {
-          console.log(response);
-         
-          this.offcanvasService.dismiss();
-          this.notifService.showSuccess('User Added Successfully.');
-          this.getUsers();
-      }, error: (error) => {
-        console.error(error);
-        this.notifService.showError(error.error.message);
-      }})
-    }
-    else
-    {
-      if(name.length <= 0)
-      {
-        this.errorFeedback.name = "Name required."
-      }
-      if(email.length <= 0)
-      {
-        this.errorFeedback.email = "Email required."
-      }
-      if(password.length <= 0)
-      {
-        this.errorFeedback.password = "password required."
-      }
-    }
-
+    this.isEdit = false;
+    this.user = {};
+    this.form.reset();
+    this.teamComposeOffcanvas.open();
   }
 
   openUpdateUser(user: any) {
+    this.isEdit = true;
     this.user = user;
-    this.userForm.reset();
-    this.resetErrorFeedback();
-    this.userForm.patchValue(user);
-    this.offcanvasService.open(this.updateUserOffcanvas,{
-      position:'end',
-      backdrop:'static',
-      panelClass:'visible',
-      animation: true,
-    });
+    this.form.reset();
+    this.form.patchValue(user);
+    this.form.removeControl('password'); 
+    this.teamComposeOffcanvas.open();
   }
-  
-  onUpdateuserSubmit(){  
-    if(this.user)
-    {
-      const name = this.userForm.value.name || this.user.name || "";
-      const email = this.userForm.value.email || this.user.email || "";
-      const password = this.userForm.value.password || this.user.password || "";
-      // this.user.rolesId = this.user.role.id;
-      const data = {
-        name: name,
-        email: email,
-        password: password,
-      };
-      
-      this.restService.patch(API.main.orgUser,this.user.id,data)
-      .subscribe((response: any) => {
-        this.offcanvasService.dismiss();
-        this.notifService.showSuccess('User Updated Successfully.');
-        this.user = null;
-        this.getUsers();
-      },(error) => {
-        console.error(error);
-        this.notifService.showError(error.error.message);
-      })
-    }
+
+  openDeleteForm(entity:any){
+    this.deleteFormModal.open(entity);
   }
+
   onPageChanged(data:PaginationData){
     this.currentPage=data.page;
     this.limit=data.limit
     this.getUsers()
   }
 
-  delete = (user: any) => {
-    this.user = user;
-    // this.modalService.open(this.deleteModal,{centered:true});
-    this.sweetAlertService.warning("Delete user","Are you sure you want to delete ?",['Delete','Cancel'],(confirm:any)=>{
-      if(confirm.isConfirmed)
+  onSubmit(){
+    if(this.form.valid){
+      this.isLoading = true;
+      if(this.isEdit)
       {
-        this.confirmDelete();
+        const data = this.form.value;
+        this.restService.patch(API.main.user,this.user.id,data)
+        .subscribe((response: any) => {
+          this.teamComposeOffcanvas.close();
+          this.notifService.showSuccess('User Updated Successfully.');
+          this.user = null;
+          this.getUsers();
+          this.isLoading = false;
+        },(error) => {
+          console.error(error);
+          this.notifService.showError(error.error.message);
+          this.isLoading = false;
+        })
       }
-    });
+      else
+      {
+        const data = this.form.value;
+        this.restService.post(API.main.user,data)
+        .subscribe({next: (response: any) => {     
+            this.teamComposeOffcanvas.close();    
+            this.notifService.showSuccess('User Added Successfully.');
+            this.getUsers();
+            this.isLoading = false;
+        }, error: (error) => {
+          console.error(error);
+          this.notifService.showError(error.error.message);
+          this.isLoading = false;
+        }})
+      }
+    }
+    else
+    {
+      markFormGroupAsDirty(this.form);
+      this.isLoading = false;
+    }
   }
 
-  onSubmit = (userForm: any) => {
-    this.modalService.dismissAll();
-    this.notifService.showSuccess('User Added Successfully');
-  }
-
-  closeModal = () => {  
-    this.user = {};
-    this.isEdit = false;
-    this.modalService.dismissAll();
-  }
-
-  confirmDelete = () => {
-    this.restService.delete(API.main.orgUser,this.user.id)
+  onDeleteSubmit(entity:any){
+    this.isLoading = false;
+    console.log(entity);
+    this.restService.delete(API.main.user,entity.id)
     .subscribe((response: any) => {
       this.notifService.showSuccess('User Deleted Successfully.');
       this.getUsers()
-      this.closeModal();
+      this.isLoading = false;
     },(error) => {
       console.error(error);
       this.notifService.showError(error.error.message);
+      this.isLoading = false;
     })
   }
 
@@ -200,14 +173,9 @@ export class TeamComponent implements OnInit {
     this.currentPage = event.page;
     this.getUsers();
   }
-  
 
-  resetErrorFeedback()
-  {
-    let keys = Object.keys(this.errorFeedback);
-    for (let key of keys) {
-      this.errorFeedback[key] = "";
-      
-    }
+  closeComposeCanvas(){
+    this.teamComposeOffcanvas.close();
   }
+  
 }

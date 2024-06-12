@@ -13,32 +13,40 @@ import { CalendarObsorverService } from './services/calendar-obsorver.service';
 import { StarterGeneratorService } from './services/starters-generator.service';
 import { MapperService } from './services/mapper.service';
 import { ContactsModule } from 'src/contacts/contacts.module';
+import { IntentScoreGeneratorService } from './services/intentscore-generator.service';
+import { MicroservicesModule } from 'src/microservices/microservices.module';
+import { IcpScoreGenerator } from './services/icp-score-generator.service';
+import { Icp } from 'src/icp/entities/icp.entity';
 
 @Module({
   imports: [
-    LlmModule, 
-    PrismaModule, 
-    HelpersModule, 
+    LlmModule,
+    PrismaModule,
+    HelpersModule,
     CommonModule,
+    MicroservicesModule
   ],
   providers: [
-    LeadObsorverService, 
+    LeadObsorverService,
     SummarizerService,
-    PageGreeterService, 
+    PageGreeterService,
     CTACreatorService,
     CTASelectorService,
     EndOfConversationService,
     CalendarObsorverService,
     StarterGeneratorService,
-    MapperService
+    MapperService,
+    IntentScoreGeneratorService,
+    IcpScoreGenerator
   ],
   exports: [
     SummarizerService,
     PageGreeterService,
     CTACreatorService,
     StarterGeneratorService,
-    MapperService
+    MapperService,
+    IntentScoreGeneratorService,
+    IcpScoreGenerator
   ]
 })
-export class AssistantsModule {}
- 
+export class AssistantsModule { }

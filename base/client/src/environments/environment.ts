@@ -4,11 +4,11 @@
 
 export const environment = {
   production: false,
-  // apiRoot: 'http://192.168.1.11:3000/',
-  // baseUrl: 'http://192.168.1.11:3000/',
-  apiRoot: 'http://localhost:3000/',
-  baseUrl: 'http://localhost:3000/',
-  zauto_bot_url:'https://bot.zautoai.com/'
+  apiRoot: 'http://192.168.1.17:3000/',
+  baseUrl: 'http://192.168.1.17:3000/',
+  // apiRoot: 'http://localhost:3000/',
+  // baseUrl: 'http://localhost:3000/',
+  zauto_bot_url: 'https://bot.zautoai.com/'
 };
 /*
  * For easier debugging in development mode, you can import the following file

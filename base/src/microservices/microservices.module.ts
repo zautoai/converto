@@ -9,6 +9,9 @@ import { AccountBasedMarketingMicroService } from './crm_service/account-based-m
 import { EnrichmentMicroService } from './crm_service/enrichment.service';
 import { ExternalCrmMicroService } from './crm_service/external-crm.service';
 import { StartupMicroService } from './crm_service/startup.service';
+import { SegmentMicroService } from './crm_service/segment.service';
+import { SegmentCategoryMicroService } from './crm_service/segment-category.service';
+import { IcpMicroService } from './crm_service/icp.service';
 
 @Module({
   imports: [ConfigModule.forRoot()],
@@ -35,7 +38,10 @@ import { StartupMicroService } from './crm_service/startup.service';
     AccountBasedMarketingMicroService,
     EnrichmentMicroService,
     ExternalCrmMicroService,
-    StartupMicroService
+    SegmentMicroService,
+    SegmentCategoryMicroService,
+    StartupMicroService,
+    IcpMicroService
   ],
   exports: [
     ContactService,
@@ -45,7 +51,10 @@ import { StartupMicroService } from './crm_service/startup.service';
     AccountBasedMarketingMicroService,
     EnrichmentMicroService,
     ExternalCrmMicroService,
-    StartupMicroService
+    SegmentMicroService,
+    SegmentCategoryMicroService,
+    StartupMicroService,
+    IcpMicroService
   ],
 })
 export class MicroservicesModule { }

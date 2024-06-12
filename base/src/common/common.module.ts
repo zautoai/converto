@@ -13,6 +13,8 @@ import { HashingService } from './services/hashing.service';
 import { SmtpService } from './services/smtp.service';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtTokenService } from './services/jwt-token.service';
+import { OrganizationsModule } from 'src/organizations/organizations.module';
+import { SubdomainGuard } from './guard/subdomain/subdomain.guard';
 
 @Module({
   imports: [
@@ -35,8 +37,10 @@ import { JwtTokenService } from './services/jwt-token.service';
     HashingService,
     SmtpService,
     JwtTokenService,
+    SubdomainGuard
   ],
   exports: [
+    SubdomainGuard,
     LoggingMiddleware,
     WebClientService,
     EmailService,

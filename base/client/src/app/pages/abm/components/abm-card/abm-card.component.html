@@ -1,0 +1,36 @@
+<div class="card abm-card" [ngClass]="{'active': isActive}" (click)="onClickHandler()">
+    <div class="card-body row">
+        <div class="col-3 d-flex align-items-center">
+            <img [src]="abm?.photoUrl || '../../../../../assets/images/users/default-user.png'" alt="avatar"
+                class="avatar avatar-lg bg-warning rounded-circle me-3">
+            <div>
+                <h5 class="mb-1">{{abm?.accountName}} {{abm?.lastName}}</h5>
+                <h6 class="text-muted mb-2">{{abm?.organizationName}}</h6>
+            </div>
+        </div>
+        <div class="col-3">
+            <p class="mb-1"><strong><i class="fa-regular fa-envelope"></i></strong> {{abm?.email}}</p>
+            <p class="mb-1"><strong><i class="fa-solid fa-location-dot"></i></strong> {{abm?.country}}
+                <!-- <span
+                    class="flag-icon flag-icon-{{ getCountryFlagClass(abm?.country) }}"></span></p> -->
+        </div>
+        <div class="col-3 d-flex align-items-center gap-5">
+            <span class="m-0 badge rounded-pill bg-primary " ngbTooltip="Intent score" [openDelay]="300"><i
+                    class="fa-solid fa-chart-line"></i> 45</span>
+            <span class="m-0 badge rounded-pill bg-primary " ngbTooltip="Lead score" [openDelay]="300"><i
+                    class="fa-solid fa-trophy"></i> 78</span>
+            <span class="m-0 badge bg-success rounded-pill " ngbTooltip="ICP status" [openDelay]="300">ICP
+                Fit</span>
+        </div>
+        <div class="col-3 d-flex align-items-center justify-content-end" style="margin-left: 500px;">
+            <div ngbDropdown class="dropdown option-dropdown">
+                <button ngbDropdownToggle class="btn btn-link text-primary p-0 fs-6">
+                    <i class="fa fa-ellipsis-v"></i>
+                </button>
+                <div ngbDropdownMenu class="dropdown-menu dropdown-menu-right" style="max-width: 10px;">
+                    <ng-content></ng-content>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

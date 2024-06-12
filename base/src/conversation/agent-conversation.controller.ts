@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Query, Req, UnauthorizedException } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -9,6 +9,7 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { Conversation } from './entities/conversation.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ZautoRequest } from 'src/common/models/request.model';
 
 
 @ApiTags('Conversations')
@@ -25,7 +26,15 @@ export class AgentConversationController {
   @ApiResponse({
     type: ResponseDTO<Conversation>
   })
-  async findAllById(@Param('agentId') agentId: string, @Query() paginationDto: PaginationDto) {
-    return await this.conversationService.findAllByagentId(agentId, paginationDto);
+  async findAllById(@Param('agentId') agentId: string, @Query() paginationDto: PaginationDto, @Req() request: ZautoRequest) {
+    if(request.user && request.user.orgId)
+    {
+      const orgId = request.user.orgId;
+      return await this.conversationService.findAll({orgId,data:paginationDto});
+    }
+    else
+    {
+      throw new UnauthorizedException('You are not authorized to access this resource')
+    }
   } 
 }

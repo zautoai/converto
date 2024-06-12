@@ -10,4 +10,9 @@ export class StartupMicroserviceController {
     async syncOrganizations() {
         return this.startupService.syncOrganizations();
     }
+
+    @MessagePattern({ cmd: 'SYNC_SINGLE_ORGANIZATION' })
+    async syncSingleOrganization(data: { orgId: string }) {
+        return await this.startupService.syncSingleOrganization(data.orgId);
+    }
 }

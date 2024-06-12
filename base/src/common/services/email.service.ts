@@ -52,7 +52,7 @@ export class EmailService {
         "clip.lat",
     ];
 
-    constructor() {        
+    constructor() {
     }
 
     getVerificationLink(verification: Verification) {
@@ -77,14 +77,14 @@ export class EmailService {
             subject: (verification.type == VerificationType.VERIFYEMAIL) ? 'Welcome to ZautoAI' : 'Reset Account Password',
             html: template
         };
-        console.log(template)
+        // console.log(template)
         try {
             const result = await SendGrid.send(message);
             console.log(result)
-        } catch(error) {
+        } catch (error) {
             console.log(error)
         }
-        
+
     }
 
     async sendSignupAleartMail(signupMailDto: SignupMailDto) {
@@ -100,12 +100,11 @@ export class EmailService {
             subject: 'Signup Aleart',
             html: template
         };
-        console.log(template)
+        // console.log(template)
         const result = await SendGrid.send(message);
     }
 
-    async validateEmailDomain(email:string):Promise<boolean> 
-    {
+    async validateEmailDomain(email: string): Promise<boolean> {
         // check if email is valid
         if (!email.includes('@')) return false;
 
@@ -115,12 +114,13 @@ export class EmailService {
 
         try {
             // ping check
-            const pingResponse = await axios.head(`https://${domain}`);
-            const isPingValid = pingResponse.status >= 200 && pingResponse.status < 300;
-            if (!isPingValid) return false;
+            // const pingResponse = await axios.head(`https://${domain}`);
+            // const isPingValid = pingResponse.status >= 200 && pingResponse.status < 300;
+            // if (!isPingValid) return false;
             // API check
-            const isDisposable = await this.validateEmailWithAPI(email);
-            return isDisposable;
+            // const isDisposable = await this.validateEmailWithAPI(email);
+            // return isDisposable;
+            return true;
         } catch (error) {
             return false;
         }

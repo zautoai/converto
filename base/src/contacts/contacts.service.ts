@@ -16,7 +16,7 @@ export class ContactsService extends BaseService {
     );
   }
 
-  async findAll(orgId: string, filterDto: FilterDto) {
+  async findAll(orgId: string, filterDto?: FilterDto) {
     return this.handleException(
       await this.contactService.getContacts(orgId, filterDto),
     );
@@ -50,5 +50,17 @@ export class ContactsService extends BaseService {
     return this.handleException(
       await this.contactService.createCustomField(orgId, createFieldDto),
     );
+  }
+
+  async getContactsByConversation(orgId: string, id: string) {
+    return this.handleException(
+      await this.contactService.getContactsByConversation(orgId, id)
+    )
+  }
+
+  async getContactsByDate(orgId: string, startDate: Date, endDate: Date) {
+    return this.handleException(
+      await this.contactService.getContactsByDate(orgId, startDate, endDate)
+    )
   }
 }

@@ -13,9 +13,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { leadscomponent } from './leads/leads.component';
-import { CampaignComponent } from './campaign/campaign/campaign.component';
-import { StatsComponent } from './campaign/stats/stats.component';
-import { VisitorsComponent } from './visitors/visitors.component';
 import { StagesComponent } from './stages/stages.component';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { CallToActionComponent } from './call-to-action/call-to-action.component';
@@ -24,7 +21,6 @@ import { SMTPConfigComponent } from './smtpconfig/smtpconfig.component';
 import { SitesComponent } from './sites/sites.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { TeamComponent } from './teams/team.component';
-import { LaunchAvatarComponent } from './launch-avatar/launch-avatar.component';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { SettingsComponent } from './zautosettings/settings/settings.component';
 import { LeadConfigComponent } from './lead-config/lead-config.component';
@@ -49,39 +45,42 @@ import { WlcomeCardComponent } from './dashboard/widgets/wlcome-card/wlcome-card
 import { CounterFormatPipe } from './dashboard/widgets/pipe/CounterFormat.pipe';
 import { ProgressCardComponent } from './dashboard/widgets/progress-card/progress-card.component';
 import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
-import { AccountsComponent } from './account/account.component';
-import { FormBuilderComponent } from './form-builder/form-builder.component';
+
+
 import { PluginCardComponent } from './plugins/plugin-card/plugin-card.component';
 import { PluginsComponent } from './plugins/plugins.component';
 import { CrmContactMappingComponent } from './plugins/crm-mapping/crm-contact-mapping/crm-contact-mapping.component';
 import { CrmCompanyMappingComponent } from './plugins/crm-mapping/crm-company-mapping/crm-company-mapping.component';
-import { ContactsComponent } from './contacts/contacts.component';
 import { CalendarScheduleComponent } from './plugins/calendar-schedule/calendar-schedule.component';
 import { AbmComponent } from './abm/abm.component';
 import { AccountviewComponent } from './accountview/accountview.component';
 import { ContactviewComponent } from './contactview/contactview.component';
 import { SegmentComponent } from './segment/segment.component';
 import { PlatformLinkModule } from './platform-link/platform-link.module';
+import { IcpComponent } from './icp/icp.component';
+import { IcpCreatorComponent } from './icp-creator/icp-creator.component';
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { IcpviewComponent } from './icpview/icpview.component';
+import { ChannelengagementComponent } from './dashboard/widgets/channelengagement/channelengagement.component';
+import { ComponentsModule } from '../components/components.module';
+import { AbmCardComponent } from './abm/components/abm-card/abm-card.component';
+import { AbmCardPreviewComponent } from './abm/components/abm-card-preview/abm-card-preview.component';
+import { AbmviewComponent } from './abmview/abmview.component';
+
 @NgModule({
   declarations: [
     ZautoDashboardComponent,
-    AccountsComponent,
-    FormBuilderComponent,
     conversationcomponent,
     ChatContainerComponent,
     SummaryContainerComponent,
     AbmComponent,
     leadscomponent,
-    CampaignComponent,
-    StatsComponent,
-    VisitorsComponent,
     StagesComponent,
     CallToActionComponent,
     PlatformsComponent,
     SMTPConfigComponent,
     SitesComponent,
     TeamComponent,
-    LaunchAvatarComponent,
     SettingsComponent,
     LeadConfigComponent,
     CustomiseAvatarComponent,
@@ -106,11 +105,17 @@ import { PlatformLinkModule } from './platform-link/platform-link.module';
     PluginCardComponent,
     CrmContactMappingComponent,
     CrmCompanyMappingComponent,
-    ContactsComponent,
     CalendarScheduleComponent,
     AccountviewComponent,
     ContactviewComponent,
-    SegmentComponent
+    SegmentComponent,
+    IcpComponent,
+    IcpCreatorComponent,
+    IcpviewComponent,
+    ChannelengagementComponent,
+    AbmCardComponent,
+    AbmCardPreviewComponent,
+    AbmviewComponent,
   ],
   imports: [
     PlatformLinkModule,
@@ -134,7 +139,9 @@ import { PlatformLinkModule } from './platform-link/platform-link.module';
     NgxColorsModule,
     NgApexchartsModule,
     NgbProgressbarModule,
-    NgbNavModule
+    NgbNavModule,
+    NgbAccordionModule,
+    ComponentsModule
   ],
 })
-export class PagesModule {}
+export class PagesModule { }

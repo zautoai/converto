@@ -1,17 +1,22 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateOrganizationDto } from './create-organization.dto';
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateOrganizationDto extends PartialType(CreateOrganizationDto) {
     @Transform(({ value }) => value)
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    name: string;
+    name?: string;
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    siteUrl: string;
+    siteUrl?: string;
+
+    @ApiProperty()
+    @IsOptional()
+    @IsString()
+    emails:string[];
 }

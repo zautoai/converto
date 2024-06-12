@@ -10,9 +10,8 @@ import { EnrichmentModule } from './enrichment/enrichment.module';
 import { CommonModule } from './common/common.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { BullBoardModule } from '@bull-board/nestjs';
-import {} from '@bull-board/api';
+import { } from '@bull-board/api';
 import { ExpressAdapter } from '@bull-board/express';
-import { SecureExchangeModule } from './secure-exchange/secure-exchange.module';
 import { RedisModule } from './redis/redis.module';
 import { FormBuilderModule } from './form-builder/form-builder.module';
 import { AccountsModule } from './accounts/accounts.module';
@@ -21,6 +20,9 @@ import { CustomFieldsModule } from './custom-fields/custom-fields.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MicroservicesModule } from './microservices/microservices.module';
 import { ExternalCrmModule } from './external-crm/external-crm.module';
+import { SegmentsModule } from './segments/segments.module';
+import { SegmentCategoryModule } from './segment-category/segment-category.module';
+import { IcpModule } from './icp/icp.module';
 
 @Module({
   imports: [
@@ -39,7 +41,6 @@ import { ExternalCrmModule } from './external-crm/external-crm.module';
     TagsModule,
     EnrichmentModule,
     ContactsModule,
-    SecureExchangeModule,
     RedisModule,
     FormBuilderModule,
     AccountsModule,
@@ -47,8 +48,11 @@ import { ExternalCrmModule } from './external-crm/external-crm.module';
     CustomFieldsModule,
     MicroservicesModule,
     ExternalCrmModule,
+    SegmentsModule,
+    SegmentCategoryModule,
+    IcpModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -21,6 +21,11 @@
 // @import '~bootstrap/scss/bootstrap';
 
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 body:not(.horizontal-hover) .slide-menu.open {
   display: block !important;
 }
@@ -2220,3 +2225,5 @@ ngx-dropzone-preview {
 {
    width: 40%;
 }
+
+

@@ -32,170 +32,214 @@ export class AccountsService {
 
   async create(orgId: string, createAccountDto: CreateAccountDto) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const existingAccount = await prisma.account.findFirst({
-      where: {
-        accountName: createAccountDto.accountName,
-      },
-    });
-    if (existingAccount) {
-      throw new BadRequestException('Account already exists');
-    }
-    const account = await prisma.account.create({
-      data: createAccountDto,
-    });
     try {
-      // push to external crm
-      await this.externalCRMService.createCompany(orgId, account);
+      const existingAccount = await prisma.account.findFirst({
+        where: {
+          accountName: createAccountDto.accountName,
+        },
+      });
+      if (existingAccount) {
+        throw new BadRequestException('Account already exists');
+      }
+      const account = await prisma.account.create({
+        data: createAccountDto,
+      });
+      try {
+        // push to external crm
+        await this.externalCRMService.createCompany(orgId, account);
+      }
+      catch (err) {
+        this.logger.error(err);
+      }
+      return {
+        code: 200,
+        message: 'Account created successfully',
+        data: account,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    catch (err) {
-      this.logger.error(err);
-    }
-    return {
-      code: 200,
-      message: 'Account created successfully',
-      data: account,
-    };
   }
 
   async findAll(orgId: string, filterDto: FilterDto) {
     const { page, limit, sort, searchTerm } = filterDto;
     const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const accounts = await prisma.account.findMany({
-      where: {
-        ...(searchTerm
-          ? {
-            OR: [
-              { accountName: { contains: searchTerm } },
-              { website: { contains: searchTerm } },
-              { phone: { contains: searchTerm } },
-              { email: { contains: searchTerm } },
-              { address: { contains: searchTerm } },
-              { notes: { contains: searchTerm } },
-              { source: { contains: searchTerm } },
-              { status: { contains: searchTerm } },
-              { industry: { contains: searchTerm } },
-            ],
-          }
-          : {}),
-      },
-      take: limit,
-      skip: skip,
-      orderBy: {
-        createdAt: sort,
-      },
-    });
-    const total = await prisma.account.count({
-      where: {
-        ...(searchTerm
-          ? {
-            OR: [
-              { accountName: { contains: searchTerm } },
-              { website: { contains: searchTerm } },
-              { phone: { contains: searchTerm } },
-              { email: { contains: searchTerm } },
-              { address: { contains: searchTerm } },
-              { notes: { contains: searchTerm } },
-              { source: { contains: searchTerm } },
-              { status: { contains: searchTerm } },
-              { industry: { contains: searchTerm } },
-            ],
-          }
-          : {}),
-      },
-    });
+    try {
+      const accounts = await prisma.account.findMany({
+        where: {
+          ...(searchTerm
+            ? {
+              OR: [
+                { accountName: { contains: searchTerm } },
+                { website: { contains: searchTerm } },
+                { phone: { contains: searchTerm } },
+                { email: { contains: searchTerm } },
+                { address: { contains: searchTerm } },
+                { notes: { contains: searchTerm } },
+                { source: { contains: searchTerm } },
+                { status: { contains: searchTerm } },
+                { industry: { contains: searchTerm } },
+              ],
+            }
+            : {}),
+        },
+        include: { Contact: true },
+        take: limit,
+        skip: skip,
+        orderBy: {
+          createdAt: sort,
+        },
+      });
+      const total = await prisma.account.count({
+        where: {
+          ...(searchTerm
+            ? {
+              OR: [
+                { accountName: { contains: searchTerm } },
+                { website: { contains: searchTerm } },
+                { phone: { contains: searchTerm } },
+                { email: { contains: searchTerm } },
+                { address: { contains: searchTerm } },
+                { notes: { contains: searchTerm } },
+                { source: { contains: searchTerm } },
+                { status: { contains: searchTerm } },
+                { industry: { contains: searchTerm } },
+              ],
+            }
+            : {}),
+        },
+      });
 
-    return {
-      code: 200,
-      message: 'Accounts fetched successfully',
-      data: accounts,
-      page: page,
-      total: total,
-    };
+      return {
+        code: 200,
+        message: 'Accounts fetched successfully',
+        data: accounts,
+        page: page,
+        total: total,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 
   async findOne(orgId: string, id: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const account = await prisma.account.findFirst({
-      where: {
-        id,
-      },
-    });
+    try {
+      const account = await prisma.account.findFirst({
+        where: {
+          id,
+        },
+        include: { Contact: true },
+      });
 
-    if (!account) {
-      throw new NotFoundException('Account not found');
+      if (!account) {
+        throw new NotFoundException('Account not found');
+      }
+      return {
+        code: 200,
+        message: 'Account fetched successfully',
+        data: account,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    return {
-      code: 200,
-      message: 'Account fetched successfully',
-      data: account,
-    };
   }
 
   async getAccountByDomain(orgId: string, accountName: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const account = await prisma.account.findFirst({
-      where: {
-        accountName,
-      },
-    });
-    if (!account) {
-      throw new NotFoundException('Account not found');
+    try {
+      const account = await prisma.account.findFirst({
+        where: {
+          accountName,
+        },
+      });
+      if (!account) {
+        throw new NotFoundException('Account not found');
+      }
+      return account;
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    return account;
   }
 
 
   async update(orgId: string, id: string, updateAccountDto: UpdateAccountDto) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const existingAccount = await this.findOne(orgId, id);
-    if (!existingAccount.data) {
-      throw new NotFoundException('Contact not found');
+    try {
+      const existingAccount = await this.findOne(orgId, id);
+      if (!existingAccount.data) {
+        throw new NotFoundException('Contact not found');
+      }
+      await this.findOne(orgId, id);
+      const account = await prisma.account.update({
+        where: { id },
+        data: updateAccountDto,
+      });
+      // try {
+      //   const existingCrmAccount = await this.externalCRMService.getCompanyByName(orgId, existingAccount.data.accountName);
+      //   if (existingCrmAccount) {
+      //     this.externalCRMService.updateContact(orgId, existingCrmAccount.hs_object_id, updateAccountDto);
+      //   }
+      // }
+      // catch (err) {
+      //   this.logger.error(err);
+      // }
+      return {
+        code: 200,
+        message: 'Account updated successfully',
+        data: account,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    await this.findOne(orgId, id);
-    const account = await prisma.account.update({
-      where: { id },
-      data: updateAccountDto,
-    });
-    // try {
-    //   const existingCrmAccount = await this.externalCRMService.getCompanyByName(orgId, existingAccount.data.accountName);
-    //   if (existingCrmAccount) {
-    //     this.externalCRMService.updateContact(orgId, existingCrmAccount.hs_object_id, updateAccountDto);
-    //   }
-    // }
-    // catch (err) {
-    //   this.logger.error(err);
-    // }
-    return {
-      code: 200,
-      message: 'Account updated successfully',
-      data: account,
-    };
   }
 
   async remove(orgId: string, id: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const existingAccount = await this.findOne(orgId, id);
-    if (!existingAccount.data) {
-      throw new NotFoundException('Contact not found');
-    }
-    await this.findOne(orgId, id);
-    await prisma.account.delete({
-      where: { id },
-    });
     try {
-      const existingCrmAccount = await this.externalCRMService.getCompanyByName(orgId, existingAccount.data.accountName);
-      if (existingCrmAccount) {
-        await this.externalCRMService.deleteCompany(orgId, existingCrmAccount.hs_object_id);
+      const existingAccount = await this.findOne(orgId, id);
+      if (!existingAccount.data) {
+        throw new NotFoundException('Contact not found');
       }
+      await this.findOne(orgId, id);
+      await prisma.account.delete({
+        where: { id },
+      });
+      try {
+        const existingCrmAccount = await this.externalCRMService.getCompanyByName(orgId, existingAccount.data.accountName);
+        if (existingCrmAccount) {
+          await this.externalCRMService.deleteCompany(orgId, existingCrmAccount.hs_object_id);
+        }
+      }
+      catch (err) {
+        this.logger.error(err);
+      }
+      return {
+        code: 200,
+        message: 'Account deleted successfully',
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
     }
-    catch (err) {
-      this.logger.error(err);
-    }
-    return {
-      code: 200,
-      message: 'Account deleted successfully',
-    };
   }
 
   async getAccountFields(orgId: string) {
@@ -252,9 +296,9 @@ export class AccountsService {
 
 
   async hasMapping(orgId: string): Promise<Boolean> {
+    const prisma = await this.prismaClientManager.getClient(orgId);
     try {
       const crmName = await this.externalCRMService.getActiveCRM(orgId);
-      const prisma = await this.prismaClientManager.getClient(orgId);
       const contacts = await prisma.crmMapping.count({
         where: {
           crmName,
@@ -265,6 +309,10 @@ export class AccountsService {
     }
     catch (e) {
       return false;
+    }
+    finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
     }
   }
 
@@ -421,21 +469,48 @@ export class AccountsService {
       throw new InternalServerErrorException(
         'Error while fetching ABM',
       );
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
     }
   }
 
   async getAbmById(orgId: string, id: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
-    const abm = await prisma.account.findUnique({
-      where: {
-        id,
-      },
-    });
+    try {
+      const abm = await prisma.account.findUnique({
+        where: {
+          id,
+        },
+      });
 
-    return {
-      code: 200,
-      message: 'ABM fetched successfully',
-      data: abm,
-    };
+      return {
+        code: 200,
+        message: 'ABM fetched successfully',
+        data: abm,
+      };
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
+  }
+
+  async getAccountByName(orgId: string, name: string) {
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    try {
+      const account = await prisma.account.findFirst({
+        where: {
+          accountName: name
+        }
+      })
+      return account
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
   }
 }

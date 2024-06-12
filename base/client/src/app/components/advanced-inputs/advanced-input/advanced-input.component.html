@@ -1,0 +1,61 @@
+@if(type !== 'checkbox'){
+    <label class="form-label" [for]="id">{{ label }}
+        <span *ngIf="isRequired" class="text-danger">*</span>
+        <span *ngIf="badgeText" class="badge bg-primary p-1 ms-1">{{badgeText}}</span>
+    </label>
+}
+<div class="">
+    @switch (type) {
+    @case ('textarea') {
+    <textarea class="form-control form-control-{{size}}" [placeholder]="placeholder"
+        [ngClass]="{ 'is-invalid': showIsInvalid && control.dirty && control.invalid, 'is-valid': showIsValid && control.valid,'border-end-0': toggleVisibility }"
+        [formControl]="control" [rows]="rows" [id]="id"></textarea>
+    <div class="invalid-feedback">
+        {{ getErrorMessage() }}
+    </div>
+    }
+    @case ('select') {
+    <select class="form-select form-select-{{size}}"
+        [ngClass]="{ 'is-invalid': showIsInvalid && control.dirty && control.invalid, 'is-valid': showIsValid && control.valid,'border-end-0': toggleVisibility }"
+        [formControl]="control" [id]="id">
+        @if (placeholder) {
+        <option [value]="null" [disabled]="true">{{placeholder}}</option>
+        }
+        <ng-content></ng-content>
+    </select>
+    <div class="invalid-feedback">
+        {{ getErrorMessage() }}
+    </div>
+    }
+    @case ('checkbox') {
+        <div class="form-check">
+            <label class="custom-control custom-checkbox" [for]="id">
+                <input type="checkbox" class="custom-control-input"
+                    [ngClass]="{ 'is-invalid': showIsInvalid && control.dirty && control.invalid }"
+                    [formControl]="control" [id]="id">
+                <span class="custom-control-label">{{ label }}</span>
+            </label>
+        </div>
+    }
+    @default {
+    @if(type ==='password')
+    {
+        <input [type]="show ? 'text' : type" class="form-control form-control-{{size}}" [placeholder]="placeholder"
+            [ngClass]="{ 'is-invalid': showIsInvalid && control.dirty && control.invalid, 'is-valid': showIsValid && control.valid,'border-end-0': toggleVisibility }"
+            [formControl]="control" [id]="id">
+        <div class="invalid-feedback">
+            {{ getErrorMessage() }}
+        </div>
+    }
+    @else
+    {
+    <input [type]="show ? 'text' : type" class="form-control form-control-{{size}}" [placeholder]="placeholder"
+        [ngClass]="{ 'is-invalid': showIsInvalid && control.dirty && control.invalid, 'is-valid': showIsValid && control.valid,'border-end-0': toggleVisibility }"
+        [formControl]="control" [id]="id">
+    <div class="invalid-feedback">
+        {{ getErrorMessage() }}
+    </div>
+    }
+    }
+    }
+</div>

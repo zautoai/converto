@@ -6,43 +6,37 @@ import { SchemaManagerService } from "./schema-manager.service";
 @Controller('schema-manager')
 export class SchemaManagerMicroserviceController {
 
-    constructor(private readonly schemaManagerService: SchemaManagerService) {}
+    constructor(private readonly schemaManagerService: SchemaManagerService) { }
 
-    @MessagePattern({cmd:"CREATE_SCHEMA"})
+    @MessagePattern({ cmd: "CREATE_SCHEMA" })
     async createSchema(data: any) {
-        try
-        {
+        try {
             const rollback = () => {
                 // this.schemaManagerService.delete(data.orgId);
             };
-            return await this.schemaManagerService.create({orgId: data.orgId, name: data.name },rollback);
+            return await this.schemaManagerService.create(data.orgId, rollback);
         }
-        catch(error)
-        {
+        catch (error) {
             return error.response || error;
         }
     }
 
-    @MessagePattern({cmd:"MIGRATE_SCHEMA"})
+    @MessagePattern({ cmd: "MIGRATE_SCHEMA" })
     async migrateSchema(data: any) {
-        try
-        {
+        try {
             return await this.schemaManagerService.migrate(data.orgId);
         }
-        catch(error)
-        {
+        catch (error) {
             return error.response || error;
         }
     }
 
-    @MessagePattern({cmd:"DELETE_SCHEMA"})
+    @MessagePattern({ cmd: "DELETE_SCHEMA" })
     async deleteSchema(data: any) {
-        try
-        {
+        try {
             return await this.schemaManagerService.delete(data.orgId);
         }
-        catch(error)
-        {
+        catch (error) {
             return error.response || error;
         }
     }

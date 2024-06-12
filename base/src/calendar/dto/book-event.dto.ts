@@ -4,11 +4,6 @@ import { IsDate, IsNotEmpty, IsOptional, IsString } from "class-validator";
 export class BookEventDto {
 
     @ApiProperty({required: true})
-    @IsNotEmpty()
-    @IsString()
-    convoId: string;
-
-    @ApiProperty({required: true})
     @IsOptional()
     @IsString()
     title?: string;

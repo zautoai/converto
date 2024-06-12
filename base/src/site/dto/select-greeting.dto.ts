@@ -2,18 +2,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 
 
-export class SelectGreetingDto{
+export class SelectGreetingDto {
 
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    orgId: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    agentId: string;
-  
     @ApiProperty()
     @IsNotEmpty()
     @IsString()

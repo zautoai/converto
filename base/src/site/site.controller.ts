@@ -13,7 +13,6 @@ import { ZautoRequest } from 'src/common/models/request.model';
 import { Roles } from 'src/auth/roles.decorator';
 import { SYSTEM_CONST } from 'src/common/constants/system.constants';
 import { RolesGuard } from 'src/auth/roles.guard';
-import { UsageService } from 'src/account/usage.service';
 import { SelectGreetingDto } from './dto/select-greeting.dto';
 
 
@@ -24,14 +23,15 @@ import { SelectGreetingDto } from './dto/select-greeting.dto';
 @Controller('api/sites')
 export class SiteController {
   constructor(private readonly siteService: SiteService,
-    private readonly websraperService: WebScraperService,
-    private readonly usageService: UsageService) {}
+    private readonly websraperService: WebScraperService) { }
 
   @Post()
   @ApiBody({ type: CreateSiteDto })
-  @ApiCreatedResponse({type: Site})
-  create(@Body() createSiteDto: CreateSiteDto) {
-    return this.siteService.create(createSiteDto);
+  @ApiCreatedResponse({ type: Site })
+  create(@Body() createSiteDto: CreateSiteDto, @Req() request: ZautoRequest) {
+    const orgId = request.user.orgId;
+
+    return this.siteService.create({ orgId, data: createSiteDto });
   }
 
   // @Get()
@@ -45,34 +45,34 @@ export class SiteController {
   // }
 
 
-    @Get()
-    @ApiQuery({ name: 'page', description: 'Page number.', required: false })
-    @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
-    @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @ApiBearerAuth()
-    @ApiOkResponse({
-      type: ResponseDTO<Site>
-    })
-    async findAll(@Query() paginationDto: PaginationDto,@Req() zautoRequest: ZautoRequest)
-    {
-        if(zautoRequest.user && zautoRequest.user.org)
-        {
-            const orgId = zautoRequest.user.org.id;
-            return await this.siteService.findAllByOrg(orgId,paginationDto);
-        }
-        else
-        {
-            throw new UnauthorizedException("Unauthorised access.")
-        }
+  @Get()
+  @ApiQuery({ name: 'page', description: 'Page number.', required: false })
+  @ApiQuery({ name: 'limit', description: 'Number of records in a page.', required: false })
+  @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    type: ResponseDTO<Site>
+  })
+  async findAll(@Query() paginationDto: PaginationDto, @Req() zautoRequest: ZautoRequest) {
+
+    if (zautoRequest.user && zautoRequest.user.orgId) {
+      const orgId = zautoRequest.user.orgId;
+      return await this.siteService.findAll({ orgId, data: paginationDto });
     }
+    else {
+      throw new UnauthorizedException("Unauthorised access.")
+    }
+  }
 
   @Get(':id')
   @ApiOkResponse({
     type: Site
   })
-  async findOne(@Param('id') id: string) {
-    return await this.siteService.findOne(id);
+  async findOne(@Param('id') id: string, @Req() zautoRequest: ZautoRequest) {
+    const orgId = zautoRequest.user.orgId;
+
+    return await this.siteService.findOne({ orgId, data: { id } });
   }
 
   @Patch(':id')
@@ -80,22 +80,25 @@ export class SiteController {
   @ApiOkResponse({
     type: Site
   })
-  async update(@Param('id') id: string, @Body() updateSiteDto: UpdateSiteDto) {
-    return await this.siteService.update(id, updateSiteDto);
+  async update(@Param('id') id: string, @Body() updateSiteDto: UpdateSiteDto, @Req() zautoRequest: ZautoRequest) {
+    const orgId = zautoRequest.user.orgId;
+
+    return await this.siteService.update({ orgId, data: updateSiteDto, id });
   }
 
   @Delete(':id')
   @ApiNoContentResponse()
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
-    return await this.siteService.remove(id);
+  async remove(@Param('id') id: string, @Req() zautoRequest: ZautoRequest) {
+    const orgId = zautoRequest.user.orgId;
+    return await this.siteService.remove({ orgId, data: { id } });
   }
 
   @Post("links")
   @ApiBody({ type: ScrapLinksDto })
-  @ApiCreatedResponse({type: ScrapLinksDto})
+  @ApiCreatedResponse({ type: ScrapLinksDto })
   async fetchURLs(@Body() scrapLinksDto: ScrapLinksDto) {
-    if(this.isValidUrl(scrapLinksDto.rootUrl)) {
+    if (this.isValidUrl(scrapLinksDto.rootUrl)) {
       const links = await this.siteService.getLinks(scrapLinksDto.rootUrl);
       return {
         links: links,
@@ -108,15 +111,9 @@ export class SiteController {
   @Post("process")
   @ApiBody({ type: ScrapMultipleDto })
   @ApiCreatedResponse()
-  async processURLs(@Body() scrapMultipleDto: ScrapMultipleDto,@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
-    const siteUsage = await this.usageService.getSiteCount(orgId);
-    const remainingSite = siteUsage.maxCount - siteUsage.count;
-    if(remainingSite <= 0)
-    {
-      throw new NotAcceptableException(`Remaining site ${remainingSite}`)
-    }
-    return await this.siteService.trainAvatar(orgId,scrapMultipleDto);
+  async processURLs(@Body() scrapMultipleDto: ScrapMultipleDto, @Req() zautoRequest: ZautoRequest) {
+    const orgId = zautoRequest.user.orgId;
+    return await this.siteService.trainAvatar({ orgId, data: scrapMultipleDto });
   }
 
   isValidUrl(url: string) {
@@ -130,29 +127,23 @@ export class SiteController {
 
   @Post('generate')
   @ApiOkResponse()
-  async generatePageGreeting(@Req() req: ZautoRequest)
-  {
-    if(req.user && req.user.org)
-    {
-        return await this.siteService.generateGreeting(req.user.org.id);
+  async generatePageGreeting(@Req() req: ZautoRequest) {
+    if (req.user && req.user.orgId) {
+      return await this.siteService.generateGreeting(req.user.orgId);
     }
-    else
-    {
-        throw new UnauthorizedException("Unauthorised access.");
+    else {
+      throw new UnauthorizedException("Unauthorised access.");
     }
   }
 
   @Post('select')
   @ApiOkResponse()
-  async selectGeneratedGreetings(@Body() selectGreetingDto: SelectGreetingDto[],@Req() req: ZautoRequest)
-  {
-    if(req.user && req.user.org)
-    {
-        return await this.siteService.selectGeneratedGreetings(req.user.org.id,selectGreetingDto);
+  async selectGeneratedGreetings(@Body() selectGreetingDto: SelectGreetingDto[], @Req() req: ZautoRequest) {
+    if (req.user && req.user.orgId) {
+      return await this.siteService.selectGeneratedGreetings({ orgId: req.user.orgId, data: selectGreetingDto });
     }
-    else
-    {
-        throw new UnauthorizedException("Unauthorised access.");
+    else {
+      throw new UnauthorizedException("Unauthorised access.");
     }
   }
 }

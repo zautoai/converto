@@ -1,38 +1,41 @@
 {
-    "name": "converto",
-    "version": "0.0.1",
-    "description": "markops",
-    "author": "zauto.ai team",
-    "private": true,
-    "license": "UNLICENSED",
-    "scripts": {
-        "start": "npm-run-all --parallel start:base start:crm && echo All start scripts ran successfully!",
-        "start:base": "cd base && npm start",
-        "start:crm": "cd crm && npm start",
-        "test": "npm-run-all --parallel test:base test:crm && echo All test scripts ran successfully!",
-        "test:base": "cd base && npm test",
-        "test:crm": "cd crm && npm test",
-        "lint": "npm-run-all --parallel lint:base lint:crm && echo All lint scripts ran successfully!",
-        "lint:base": "cd base && npm run lint",
-        "lint:crm": "cd crm && npm run lint",
-        "dev": "npm-run-all --parallel dev:base dev:crm && echo All dev scripts ran successfully!",
-        "dev:base": "cd base && npm run start:dev",
-        "dev:crm": "cd crm && npm run start:dev",
-        "debug": "npm-run-all --parallel debug:base debug:crm && echo All debug scripts ran successfully!",
-        "debug:base": "cd base && npm run start:debug",
-        "debug:crm": "cd crm && npm run start:debug",
-        "build:base": "cd base && npm run build",
-        "build:crm": "cd crm && npm run build",
-        "build": "npm run build:base && npm run build:crm"
-    },
-    "workspaces": [
-        "base/*",
-        "crm/*"
-    ],
-    "devDependencies": {
-        "npm-run-all": "^4.1.5"
-    },
-    "dependencies": {
-        "debug": "^4.3.4"
-    }
+	"name": "converto",
+	"version": "0.0.1",
+	"description": "markops",
+	"author": "zauto.ai team",
+	"private": true,
+	"license": "UNLICENSED",
+	"scripts": {
+		"install:all": "npm install --workspaces",
+		"db-push:all": "npm run db-push --workspaces",
+		"start": "npm-run-all --parallel start:base start:crm && echo All start scripts ran successfully!",
+		"start:base": "cd base && npm start",
+		"start:crm": "cd crm && npm start",
+		"test": "npm-run-all --parallel test:base test:crm && echo All test scripts ran successfully!",
+		"test:base": "cd base && npm test",
+		"test:crm": "cd crm && npm test",
+		"lint": "npm-run-all --parallel lint:base lint:crm && echo All lint scripts ran successfully!",
+		"lint:base": "cd base && npm run lint",
+		"lint:crm": "cd crm && npm run lint",
+		"dev": "npm-run-all --parallel dev:base dev:crm && echo All dev scripts ran successfully!",
+		"dev:base": "cd base && npm run start:dev",
+		"dev:crm": "cd crm && npm run start:dev",
+		"debug": "npm-run-all --parallel debug:base debug:crm && echo All debug scripts ran successfully!",
+		"debug:base": "cd base && npm run start:debug",
+		"debug:crm": "cd crm && npm run start:debug",
+		"build:base": "cd base && npm run build",
+		"build:crm": "cd crm && npm run build",
+		"build": "npm run build:base && npm run build:crm"
+	},
+	"workspaces": [
+		"base/*",
+		"crm/*"
+	],
+	"devDependencies": {
+		"npm-run-all": "^4.1.5"
+	},
+	"dependencies": {
+		"@nestjs/swagger": "^7.3.1",
+		"debug": "^4.3.4"
+	}
 }

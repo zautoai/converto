@@ -1,12 +1,10 @@
-
 <div class="card shadow mt-3">
     <div class="card-header d-flex justify-content-between">
         <h4 class="card-title"><span class="fe fe-check-circle"></span> Call to Action</h4>
         <div>
             <div ngbDropdown class="d-inline-block">
-                <a href="javascript:void(0)" class="text-muted" id="dropdownBasic1"
-                ngbDropdownToggle>
-                    <button class="btn btn-outline-primary btn-sm" >New CTA</button>
+                <a href="javascript:void(0)" class="text-muted" id="dropdownBasic1" ngbDropdownToggle>
+                    <button class="btn btn-outline-primary btn-sm">New CTA</button>
                 </a>
                 <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
                     <button ngbDropdownItem (click)="openCreateCta()">
@@ -24,15 +22,14 @@
                 <ul class="scroll-container-v  vh-100" #scrollContainer>
                     <ng-container *ngIf="!ctaList.data">
                         <li>
-                          <ngx-skeleton-loader count="5" [theme]="{'border-radius': '0', height: '50px'}"></ngx-skeleton-loader>
+                            <ngx-skeleton-loader count="5"
+                                [theme]="{'border-radius': '0', height: '50px'}"></ngx-skeleton-loader>
                         </li>
                     </ng-container>
                     <ng-container *ngIf="ctaList.data">
-                        <li *ngFor="let item of ctaList.data" 
-                        class="zauto-card"
-                        (click)="selectCta(item)" 
-                        [ngClass]="{'active':(selectedCta && selectedCta?.id == item?.id)}">
-                            <div >
+                        <li *ngFor="let item of ctaList.data" class="zauto-card" (click)="selectCta(item)"
+                            [ngClass]="{'active':(selectedCta && selectedCta?.id == item?.id)}">
+                            <div>
                                 {{item?.name}}
                             </div>
                         </li>
@@ -44,13 +41,12 @@
                     <div class="p-2">
                         <div class="d-flex justify-content-end">
                             <div ngbDropdown class="d-inline-block">
-                                <a href="javascript:void(0)" class="text-muted" id="dropdownBasic1"
-                                    ngbDropdownToggle>
+                                <a href="javascript:void(0)" class="text-muted" id="dropdownBasic1" ngbDropdownToggle>
                                     <i class="fe fe-more-horizontal"></i>
                                 </a>
                                 <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                                    <button ngbDropdownItem (click)="openUpdateCta()"><i
-                                            class="fa fa-edit"></i> Edit</button>
+                                    <button ngbDropdownItem (click)="openUpdateCta()"><i class="fa fa-edit"></i>
+                                        Edit</button>
                                     <div class="dropdown-divider"></div>
                                     <button ngbDropdownItem class="text-danger" (click)="openDeleteCta()">
                                         <i class="fa fa-trash"></i>
@@ -82,7 +78,7 @@
                 </ng-container>
                 <ng-container *ngIf="!selectedCta">
                     <div class="h-100 d-flex justify-content-center align-items-center">
-                      <span class="text-muted">Select CTA for more details</span>
+                        <span class="text-muted">Select CTA for more details</span>
                     </div>
                 </ng-container>
             </div>
@@ -101,30 +97,27 @@
             <form [formGroup]="ctaForm" (ngSubmit)="onCreateSubmit()">
                 <div class="form-group mb-3">
                     <label for="name">Name</label>
-                    <input type="text" id="name" name="name" 
-                    class="form-control" placeholder="Name" formControlName="name"
-                    [ngClass]="{'is-invalid':isFieldValid('name') || errorFeedback.name.length > 0}"
-                    >
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Name"
+                        formControlName="name"
+                        [ngClass]="{'is-invalid':isFieldValid('name') || errorFeedback.name.length > 0}">
                     <div class="invalid-feedback">
                         {{errorFeedback.name}}
                     </div>
                 </div>
                 <div class="form-group mb-3">
                     <label for="description">Description</label>
-                    <textarea name="description" id="description" rows="5" 
-                    class="form-control" placeholder="Description" formControlName="description"
-                    [ngClass]="{'is-invalid':isFieldValid('description') || errorFeedback.description.length > 0}"
-                    ></textarea>
+                    <textarea name="description" id="description" rows="5" class="form-control"
+                        placeholder="Description" formControlName="description"
+                        [ngClass]="{'is-invalid':isFieldValid('description') || errorFeedback.description.length > 0}"></textarea>
                     <div class="invalid-feedback">
                         {{errorFeedback.desc}}
                     </div>
                 </div>
                 <div class="form-group mb-3">
                     <label for="link">Link</label>
-                    <input type="text" id="link" name="link" 
-                    class="form-control" placeholder="link URL" formControlName="link"
-                    [ngClass]="{'is-invalid':isFieldValid('link') || errorFeedback.link.length > 0}"
-                    >
+                    <input type="text" id="link" name="link" class="form-control" placeholder="link URL"
+                        formControlName="link"
+                        [ngClass]="{'is-invalid':isFieldValid('link') || errorFeedback.link.length > 0}">
                     <div class="invalid-feedback">
                         {{errorFeedback.link}}
                     </div>
@@ -132,7 +125,7 @@
                 <div class="form-group mb-3">
                     <label for="type">Type</label>
                     <select id="type" name="type" class="form-control" placeholder="CTA type" formControlName="type"
-                    [ngClass]="{'is-invalid':isFieldValid('type') || errorFeedback.type.length > 0}">
+                        [ngClass]="{'is-invalid':isFieldValid('type') || errorFeedback.type.length > 0}">
                         <option *ngFor="let ctaType of ctaTypes" [value]="ctaType.value">{{ctaType.value}}</option>
                     </select>
                     <div class="invalid-feedback">
@@ -156,30 +149,27 @@
             <form [formGroup]="ctaForm" (ngSubmit)="onUpdateSubmit()">
                 <div class="form-group mb-3">
                     <label for="name">Name</label>
-                    <input type="text" id="name" name="name" 
-                    class="form-control" placeholder="Name" formControlName="name"
-                    [ngClass]="{'is-invalid':isFieldValid('name') || errorFeedback.name.length > 0}"
-                    >
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Name"
+                        formControlName="name"
+                        [ngClass]="{'is-invalid':isFieldValid('name') || errorFeedback.name.length > 0}">
                     <div class="invalid-feedback">
                         {{errorFeedback.name}}
                     </div>
                 </div>
                 <div class="form-group mb-3">
                     <label for="description">Description</label>
-                    <textarea name="description" id="description" rows="5" 
-                    class="form-control" placeholder="Description" formControlName="description"
-                    [ngClass]="{'is-invalid':isFieldValid('description') || errorFeedback.description.length > 0}"
-                    ></textarea>
+                    <textarea name="description" id="description" rows="5" class="form-control"
+                        placeholder="Description" formControlName="description"
+                        [ngClass]="{'is-invalid':isFieldValid('description') || errorFeedback.description.length > 0}"></textarea>
                     <div class="invalid-feedback">
                         {{errorFeedback.desc}}
                     </div>
                 </div>
                 <div class="form-group mb-3">
                     <label for="link">Link</label>
-                    <input type="text" id="link" name="link" 
-                    class="form-control" placeholder="link URL" formControlName="link"
-                    [ngClass]="{'is-invalid':isFieldValid('link') || errorFeedback.link.length > 0}"
-                    >
+                    <input type="text" id="link" name="link" class="form-control" placeholder="link URL"
+                        formControlName="link"
+                        [ngClass]="{'is-invalid':isFieldValid('link') || errorFeedback.link.length > 0}">
                     <div class="invalid-feedback">
                         {{errorFeedback.link}}
                     </div>
@@ -187,7 +177,7 @@
                 <div class="form-group mb-3">
                     <label for="type">Type</label>
                     <select id="type" name="type" class="form-control" placeholder="CTA type" formControlName="type"
-                    [ngClass]="{'is-invalid':isFieldValid('type') || errorFeedback.type.length > 0}">
+                        [ngClass]="{'is-invalid':isFieldValid('type') || errorFeedback.type.length > 0}">
                         <option *ngFor="let ctaType of ctaTypes" [value]="ctaType.value">{{ctaType.value}}</option>
                     </select>
                     <div class="invalid-feedback">
@@ -218,9 +208,9 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-2 py-auto">
-                                        <label class="custom-control custom-checkbox mb-0 align-middle" >
-                                            <input type="checkbox" name="lead-only"
-                                              class="custom-control-input" (click)="selectFromGenerated(cta)">
+                                        <label class="custom-control custom-checkbox mb-0 align-middle">
+                                            <input type="checkbox" name="lead-only" class="custom-control-input"
+                                                (click)="selectFromGenerated(cta)">
                                             <span class="custom-control-label"></span>
                                         </label>
                                     </div>
@@ -236,11 +226,43 @@
                 </ul>
                 <div class="">
                     <div class="d-flex justify-content-end">
-                        <button class="btn btn-outline-primary w-100 me-2" (click)="offcanvas.dismiss()"><i class="fa fa-times"></i> Close</button>
-                        <button class="btn btn-primary w-100" (click)="submitSelectCTAS()"><i class="fa fa-plus"></i> Add</button>
+                        <button class="btn btn-outline-primary w-100 me-2" (click)="offcanvas.dismiss()"><i
+                                class="fa fa-times"></i> Close</button>
+                        <button class="btn btn-primary w-100" (click)="submitSelectCTAS()"><i class="fa fa-plus"></i>
+                            Add</button>
                     </div>
                 </div>
             </ng-container>
         </ng-scrollbar>
     </div>
 </ng-template>
+<app-advance-offcanvas heading="{{ isEdit ? 'Edit' : 'Create'}} CTA">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="row">
+
+            <div class="form-group mb-3">
+                <advanced-input [label]="'Name'" [type]="'text'" [placeholder]="'Stage'" [size]="'md'" [control]="name"
+                    [isDisabled]="isLoading"></advanced-input>
+            </div>
+            <div class="form-group mb-3">
+                <advanced-input [label]="'Description'" [type]="'text'" [placeholder]="'Description'" [size]="'md'"
+                    [control]=" description" [isDisabled]="isLoading"></advanced-input>
+            </div>
+            <div class="form-group mb-3">
+                <advanced-input [label]="'Link'" [type]="'text'" [placeholder]="'Link'" [size]="'md'" [control]="link"
+                    [isDisabled]="isLoading"></advanced-input>
+            </div>
+            <div class="form-group mb-3">
+                <advanced-input [label]="'Instruction'" [type]="'text'" [placeholder]="'Instruction'" [size]="'md'"
+                    [control]="type" [isDisabled]="isLoading"></advanced-input>
+            </div>
+        </div>
+        <div class="d-flex gap-3 justify-content-end">
+            <advanced-button label="{{ isEdit ? 'Update' : 'Create'}}" [size]="'md'" [classes]="'w-100'"
+                [type]="'submit'" [isLoading]="isLoading"></advanced-button>
+
+            <advanced-button label="Cancel" [size]="'md'" [classes]="'w-100'" [type]="'button'"
+                [color]="'outline-primary'" [isLoading]="isLoading" (onClick)="onCancel()"></advanced-button>
+        </div>
+    </form>
+</app-advance-offcanvas>

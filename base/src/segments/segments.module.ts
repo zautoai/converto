@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { SegmentsService } from './segments.service';
 import { SegmentsController } from './segments.controller';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { MicroservicesModule } from 'src/microservices/microservices.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [MicroservicesModule],
   controllers: [SegmentsController],
   providers: [SegmentsService],
+  exports: [SegmentsService]
 })
 export class SegmentsModule { }

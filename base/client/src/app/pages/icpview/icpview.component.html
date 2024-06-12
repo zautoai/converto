@@ -1,0 +1,16 @@
+<div class="icp-card-container">
+  <h2>Ideal Customer Profiles</h2>
+  <div class="icp-card" *ngFor="let icp of icps">
+    <div class="icp-card-header">
+      <h3>Ideal Customer Profile</h3>
+    </div>
+    <div class="icp-card-body">
+      <div class="icp-summary">
+        <p>Industry: {{ icp.industry }}</p>
+        <p>Company Size: {{ icp.companySize }}</p>
+        <button class="icp-details-toggle">View Details</button>
+      </div>
+      <div class="icp-details hidden"></div>
+    </div>
+  </div>
+</div>

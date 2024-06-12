@@ -9,19 +9,24 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 import {  HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgHttpLoaderModule } from 'ng-http-loader';
+import { LaunchAvatarComponent } from './launch-avatar/launch-avatar.component';
+import { ComponentsModule } from './components/components.module';
 
 
 
 @NgModule({
   declarations:[
     AppComponent,
+    LaunchAvatarComponent
   ],
   imports: [
   CommonModule,
   BrowserModule,
   HttpClientModule,
+  ReactiveFormsModule,
+  ComponentsModule,
   AppRoutingModule,
     SharedModule,
     NgbModule,

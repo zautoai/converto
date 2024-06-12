@@ -1,12 +1,12 @@
 import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { NgbModal, NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
+import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
 import { API } from 'src/app/config/endpoint.config';
-import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { RestService } from 'src/app/shared/services/rest.service';
-import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
+import { AbmCardComponent } from './components/abm-card/abm-card.component';
 
 @Component({
   selector: 'app-abm',
@@ -14,56 +14,36 @@ import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
   styleUrl: './abm.component.scss'
 })
 export class AbmComponent {
+
+  openViewContact(abm: any) {
+    this.router.navigate(['abm/view-abm', abm.id])
+  }
+
   @ViewChild('createUserOffcanvas') createUserOffcanvas: ElementRef | undefined;
   @ViewChild('updateUserOffcanvas') updateUserOffcanvas: ElementRef | undefined;
-  @ViewChild('viewUserOffcanvas') viewUserOffcanvas: ElementRef | undefined;
   @ViewChild('deleteModal') deleteModal: ElementRef | undefined;
 
-  user: any = {};
-  userList: any = [];
-  selectedUser: any = undefined;
-  isEdit: boolean = false;
-  Form: FormGroup;
-  errorFeedback: any = { title: '', describe: '' };
+  abm: any = {};
   currentPage: number = 0;
   limit: number = 5;
-  submittedData: any[] = [];
+  abmList: any[] = [];
   selectedData: any = null;
   totalItems: number = 0;
+  isEdit: boolean = false;
+  isLoading: boolean = false;
+  selectedabm: any
 
+
+  @ViewChild('viewcanvas') viewcanvas!: AdvanceOffcanvasComponent
+  @ViewChild('composeCanva') composeCanva!: AdvanceOffcanvasComponent
   constructor(
-    private avatarService: AvatarService,
-    private modalService: NgbModal,
     private notifService: NotificationService,
     private restService: RestService,
     private offcanvasService: NgbOffcanvas,
-    private formBuilder: FormBuilder,
-    private sweetAlertService: SweetAlertService,
     private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
-  ) {
-    this.Form = new FormGroup({
-      parentAccountId:new FormControl(),
-      photoUrl: new FormControl(),
-      accountName:new FormControl(),
-      industry: new FormControl(),
-      companySize: new FormControl(),
-      annualRevenue: new FormControl(),
-      accountType: new FormControl(),
-      website: new FormControl(),
-      address: new FormControl(),
-      city: new FormControl(),
-      state: new FormControl(),
-      zip: new FormControl(),
-      country: new FormControl(),
-      phone: new FormControl(),
-      email: new FormControl(),
-      socialMedia: new FormControl(),
-      notes: new FormControl(),
-      source: new FormControl(),
-      status: new FormControl(),
-    });
-  }
+    private router: Router,
+  ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -74,12 +54,40 @@ export class AbmComponent {
     });
   }
 
+  errorMessages = {
+    accountName: {
+      required: 'Email is required'
+    }
+  };
+
+  abmForm: FormGroup = new FormGroup({
+    accountName: new FormControl(null, [Validators.required]),
+    industry: new FormControl(),
+    companySize: new FormControl(),
+    annualRevenue: new FormControl(),
+    accountType: new FormControl(),
+    website: new FormControl(),
+    address: new FormControl(),
+    city: new FormControl(),
+    state: new FormControl(),
+    zip: new FormControl(),
+    country: new FormControl(),
+    phone: new FormControl(),
+    email: new FormControl(),
+    socialMedia: new FormControl(),
+    notes: new FormControl(),
+    source: new FormControl(),
+    status: new FormControl(),
+  });
+
+
+
   getAccounts(): void {
     this.restService
       .get(API.main.abm, `?limit=${this.limit}&page=${this.currentPage}`)
       .subscribe(
         (response: any) => {
-          this.submittedData = response.data;
+          this.abmList = response.data;
           this.totalItems = response.total
         },
         (error) => {
@@ -88,33 +96,13 @@ export class AbmComponent {
         },
       );
   }
-
-
   openCreateUser() {
-    this.Form.reset();
-    this.resetErrorFeedback();
-    this.offcanvasService.open(this.createUserOffcanvas, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
   }
   openViewUser(data: any) {
-    this.selectedData = data;
-    this.Form.reset();
-    this.resetErrorFeedback();
-    this.offcanvasService.open(this.viewUserOffcanvas, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
   }
 
   onCreateuserSubmit() {
-    this.resetErrorFeedback();
-    const formData: { [key: string]: string | null } = this.Form.value;
+    const formData: { [key: string]: string | null } = this.abmForm.value;
 
     const data = Object.entries(formData)
       .filter(([_, value]) => value !== null)
@@ -142,185 +130,20 @@ export class AbmComponent {
   }
 
   openUpdateUser(data: any) {
-    this.user = data; // Store the selected user data
-    this.Form.reset();
 
-    this.Form.get('parentAccountId')?.setValue(data?.parentAccountId);
-    this.Form.get('accountName')?.setValue(data?.accountName);
-    this.Form.get('industry')?.setValue(data?.industry);
-    this.Form.get('companySize')?.setValue(data?.companySize);
-    this.Form.get('annualRevenue')?.setValue(data?.annualRevenue);
-    this.Form.get('accountType')?.setValue(data?.accountType);
-    this.Form.get('website')?.setValue(data?.website);
-    this.Form.get('address')?.setValue(data?.address);
-    this.Form.get('city')?.setValue(data?.city);
-    this.Form.get('state')?.setValue(data?.state);
-    this.Form.get('zip')?.setValue(data?.zip);
-    this.Form.get('country')?.setValue(data?.country);
-    this.Form.get('phone')?.setValue(data?.phone);
-    this.Form.get('email')?.setValue(data?.email);
-    this.Form.get('socialMedia')?.setValue(data?.socialMedia);
-    this.Form.get('notes')?.setValue(data?.notes);
-    this.Form.get('source')?.setValue(data?.source);
-    this.Form.get('status')?.setValue(data?.status);
-
-
-    this.resetErrorFeedback();
-    this.offcanvasService.open(this.updateUserOffcanvas, {
-      position: 'end',
-      backdrop: 'static',
-      panelClass: 'visible',
-      animation: true,
-    });
   }
 
   onUpdateuserSubmit(): void {
-    const updateAccountFields: any[] = [];
-    if (this.Form.get('accountName')?.value) {
-      updateAccountFields.push({
-        label: 'Account Name',
-        value: this.Form.value.accountName,
-      });
-    }
-    if (this.Form.get('industry')?.value) {
-      updateAccountFields.push({
-        label: 'Industry',
-        value: this.Form.value.industry,
-      });
-    }
-    if (this.Form.get('companySize')?.value) {
-      updateAccountFields.push({
-        label: 'Company Size',
-        value: this.Form.value.companySize,
-      });
-    }
-    if (this.Form.get('annualRevenue')?.value) {
-      updateAccountFields.push({
-        label: 'Annual Revenue',
-        value: this.Form.value.annualRevenue,
-      });
-    }
-    if (this.Form.get('accountType')?.value) {
-      updateAccountFields.push({
-        label: 'AccountType',
-        value: this.Form.value.accountType,
-      });
-    }
-    if (this.Form.get('website')?.value) {
-      updateAccountFields.push({
-        label: 'Website',
-        value: this.Form.value.website,
-      });
-    }
-    if (this.Form.get('address')?.value) {
-      updateAccountFields.push({
-        label: 'Address',
-        value: this.Form.value.address,
-      });
-    }
-    if (this.Form.get('city')?.value) {
-      updateAccountFields.push({
-        label: 'City',
-        value: this.Form.value.city,
-      });
-    }
-    if (this.Form.get('state')?.value) {
-      updateAccountFields.push({
-        label: 'state',
-        value: this.Form.value.state,
-      });
-    }
-    if (this.Form.get('zip')?.value) {
-      updateAccountFields.push({
-        label: 'Zip',
-        value: this.Form.value.zip,
-      });
-    }
-    if (this.Form.get('country')?.value) {
-      updateAccountFields.push({
-        label: 'Country',
-        value: this.Form.value.country,
-      });
-    }
-    if (this.Form.get('phone')?.value) {
-      updateAccountFields.push({
-        label: 'Phone',
-        value: this.Form.value.phone,
-      });
-    }
 
-    if (this.Form.get('socialMedia')?.value) {
-      updateAccountFields.push({
-        label: 'SocialMedia',
-        value: this.Form.value.socialMedia,
-      });
-    }
-    if (this.Form.get('notes')?.value) {
-      updateAccountFields.push({
-        label: 'Notes',
-        value: this.Form.value.notes,
-      });
-    }
-    if (this.Form.get('source')?.value) {
-      updateAccountFields.push({
-        label: 'Source',
-        value: this.Form.value.source,
-      });
-    }
-    if (this.Form.get('status')?.value) {
-      updateAccountFields.push({
-        label: 'Status',
-        value: this.Form.value.status,
-      });
-    }
-    if (this.Form.valid) {
-      const updatedAccountData = {
-        accountName: this.Form.value.accountName,
-        email: this.Form.value.email,
-        phone: this.Form.value.phone,
-        updateAccountFields,
-      };
-      this.restService
-        .patch(API.main.account, this.user.id, this.Form.value)
-        .subscribe(
-          (response: any) => {
-            this.notifService.showSuccess('Account Updated Successfully.');
-            this.getAccounts();
-          },
-          (error) => {
-            console.error(error);
-            this.notifService.showError(
-              'Something Went Wrong! Try Again Later',
-            );
-          },
-        );
-      this.offcanvasService.dismiss();
-      this.Form.reset();
-    } else {
-      this.Form.markAllAsTouched();
-    }
   }
 
 
   delete = (data: any) => {
-    this.user = data;
 
-    this.sweetAlertService.warning(
-      'Delete user',
-      'Are you sure you want to delete ?',
-      ['Delete', 'Cancel'],
-      (confirm: any) => {
-        if (confirm.isConfirmed) {
-          this.confirmDelete(data);
-        }
-      },
-    );
   };
 
   closeModal = () => {
-    this.user = {};
-    this.isEdit = false;
-    this.modalService.dismissAll();
+
   };
 
   confirmDelete = (data: any) => {
@@ -342,15 +165,95 @@ export class AbmComponent {
     this.getAccounts();
   }
 
-  resetErrorFeedback() {
-    let keys = Object.keys(this.errorFeedback);
-    for (let key of keys) {
-      this.errorFeedback[key] = '';
-    }
+  get form() {
+    return this.abmForm.controls;
   }
-  preventDefault(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      event.preventDefault();
+
+  get accountName() {
+    return this.abmForm.get('accountName') as FormControl;
+  }
+
+  get email() {
+    return this.abmForm.get('email') as FormControl;
+  }
+
+  get phone() {
+    return this.abmForm.get('phone') as FormControl;
+  }
+
+  get accountType() {
+    return this.abmForm.get('accountType') as FormControl;
+  }
+
+  get status() {
+    return this.abmForm.get('status') as FormControl;
+  }
+
+  get notes() {
+    return this.abmForm.get('notes') as FormControl;
+  }
+
+  get source() {
+    return this.abmForm.get('source') as FormControl;
+  }
+
+  get industry() {
+    return this.abmForm.get('industry') as FormControl;
+  }
+
+  get companySize() {
+    return this.abmForm.get('companySize') as FormControl;
+  }
+
+  get annualRevenue() {
+    return this.abmForm.get('annualRevenue') as FormControl;
+  }
+
+  get website() {
+    return this.abmForm.get('website') as FormControl;
+  }
+
+  get address() {
+    return this.abmForm.get('address') as FormControl;
+  }
+
+  get city() {
+    return this.abmForm.get('city') as FormControl;
+  }
+
+  get state() {
+    return this.abmForm.get('state') as FormControl;
+  }
+
+  get zip() {
+    return this.abmForm.get('zip') as FormControl;
+  }
+
+  get country() {
+    return this.abmForm.get('country') as FormControl;
+  }
+
+  get socialMedia() {
+    return this.abmForm.get('socialMedia') as FormControl;
+  }
+  selectabm(abm: any) {
+    this.selectedabm = abm;
+    this.router.navigate(['abm', abm.id])
+    this.getActiveAbm(abm.id)
+  }
+  getActiveAbm(id: string) {
+    this.selectedabm = null;
+    if (!id || id == 'all') {
+      return;
     }
+    this.restService.get(API.main.account, id).subscribe(
+      (response: any) => {
+        this.selectedabm = response.data;
+      },
+      (error) => {
+        console.error(error);
+        this.notifService.showError(error.error.message);
+      },
+    );
   }
 }

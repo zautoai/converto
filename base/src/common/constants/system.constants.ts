@@ -1,5 +1,5 @@
 
-export const DEFAULT_SCHEMA_NAME = 'base';
+export const DEFAULT_SCHEMA_NAME = 'public';
 export const SYSTEM_CONST = {
     DEFALT_ROLE :'user',
     ADMIN_ROLE: 'admin',
@@ -24,3 +24,15 @@ export const EMBEDDING_PROVIDER_SBERT="SBERT"
 export const EMBEDDING_PROVIDER_OPENAI="OPENAI"
 
 export const DEFAULT_SECRET_KEY="dNL4BMDRaYfvVzPxiGpHGKXaTAsG7n7dqFIlq7I3skKTsknstU"
+
+export const DEFALT_ROLES = [
+    {
+        name: 'admin'
+    },
+    {
+        name: 'user'
+    },
+    {
+        name: 'superadmin'
+    }
+]

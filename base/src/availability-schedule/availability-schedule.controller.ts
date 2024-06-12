@@ -15,62 +15,60 @@ export class AvailabilityScheduleController {
 
     constructor(
         private readonly scheduleService: AvailabilityScheduleService,
-    ){}
+    ) { }
 
     @Post()
-    async create(@Body() createScheduleDto:CreateScheduleDto,@Req() request: ZautoRequest)
-    {
-        if(request.user && request.user.org)
-        {
-            createScheduleDto.orgId = request.user.org.id;
-            return await this.scheduleService.create(createScheduleDto);
+    async create(@Body() createScheduleDto: CreateScheduleDto, @Req() request: ZautoRequest) {
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            return await this.scheduleService.create({ orgId, data: createScheduleDto });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.")
         }
     }
 
     @Get()
-    async findOne(@Req() request: ZautoRequest)
-    {
-        if(request.user && request.user.org)
-        {
-            const orgId = request.user.org.id;
-            return await this.scheduleService.findByOrg(orgId);
+    async findOne(@Req() request: ZautoRequest) {
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            return await this.scheduleService.findAll(orgId);
         }
-        else
-        {
+        else {
+            throw new UnauthorizedException("Unauthorised access.")
+        }
+    }
+
+    @Get(':scheduleId')
+    async findOneById(@Param('scheduleId') scheduleId: string, @Req() request: ZautoRequest) {
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            return await this.scheduleService.findOne(orgId,scheduleId);
+        }
+        else {
             throw new UnauthorizedException("Unauthorised access.")
         }
     }
 
     @Patch(':scheduleId')
-    async update(@Param('scheduleId') scheduleId: string,@Body() updateScheduleDto: UpdateScheduleDto,@Req() request: ZautoRequest)
-    {
-        if(request.user && request.user.org)
-        {
-            const orgId = request.user.org.id;
-            updateScheduleDto.orgId = orgId;
-            return await this.scheduleService.update(scheduleId,updateScheduleDto);
+    async update(@Param('scheduleId') scheduleId: string, @Body() updateScheduleDto: UpdateScheduleDto, @Req() request: ZautoRequest) {
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            return await this.scheduleService.update({ orgId, id: scheduleId, data: updateScheduleDto });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.")
         }
     }
 
 
     @Delete(':scheduleId')
-    async delete(@Query('scheduleId') scheduleId: string,@Req() request: ZautoRequest)
-    {
-        if(request.user && request.user.org)
-        {
-            const orgId = request.user.org.id;
-            return await this.scheduleService.delete(scheduleId);
+    async delete(@Query('scheduleId') scheduleId: string, @Req() request: ZautoRequest) {
+        if (request.user && request.user.orgId) {
+            const orgId = request.user.orgId;
+            return await this.scheduleService.delete({ orgId, data: { id: scheduleId } });
         }
-        else
-        {
+        else {
             throw new UnauthorizedException("Unauthorised access.")
         }
     }

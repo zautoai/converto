@@ -37,7 +37,7 @@ export class CreateAccountDto {
     @ApiProperty({ required: false, enum: accountType })
     @IsEnum(accountType)
     @IsOptional()
-    accountType?: accountType = accountType.CUSTOMER;
+    accountType?: accountType = accountType.PROSPECT;
 
     @ApiProperty({ required: false })
     @IsString()
@@ -107,30 +107,30 @@ export class CreateAccountDto {
     @ApiProperty({ required: false })
     @IsArray()
     @IsOptional()
-    decisionMakers: string[]
+    decisionMakers?: string[]
 
     @ApiProperty({ required: false })
     @IsArray()
     @IsOptional()
-    painPoints: string[]
+    painPoints?: string[]
 
     @ApiProperty({ required: false })
     @IsArray()
     @IsOptional()
-    campaigns: string[]
+    campaigns?: string[]
 
     @ApiProperty({ required: false })
     @IsArray()
     @IsOptional()
-    teamMembers: string[]
+    teamMembers?: string[]
 
     @ApiProperty({ required: false })
     @IsString()
     @IsOptional()
-    buyingStage: string
+    buyingStage?: string
 
     @ApiProperty({ required: false })
     @IsBoolean()
     @IsOptional()
-    isabm: boolean
+    isabm?: boolean
 }

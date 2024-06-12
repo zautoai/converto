@@ -7,18 +7,19 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { CustomFieldsModule } from 'src/custom-fields/custom-fields.module';
 import { ContactMicroserviceController } from './contacts.micro.controller';
 import { ExternalCrmModule } from 'src/external-crm/external-crm.module';
+import { AccountsModule } from 'src/accounts/accounts.module';
 
 @Module({
   imports: [
-    CommonModule, 
-    EnrichmentModule, 
-    PrismaModule, 
+    CommonModule,
+    EnrichmentModule,
+    PrismaModule,
     CustomFieldsModule,
     ExternalCrmModule,
- 
+    AccountsModule
   ],
   controllers: [ContactsController, ContactMicroserviceController],
   providers: [ContactsService],
   exports: [ContactsService],
 })
-export class ContactsModule {}
+export class ContactsModule { }

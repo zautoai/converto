@@ -50,10 +50,7 @@ export class OpenAIService implements LLMServiceIntf {
             const totalRequest = chatHistory.map(item => item.content).join('');
             const inputTokens = totalRequest.length/4;
             console.log('Input Tokens: ' + inputTokens)
-            const messages = [];
-            if(prompt) {
-                messages.push({ role: 'system', content: prompt })
-            }
+            const messages = []; 
             messages.push(...chatHistory)
             console.log("Request is: ", messages)
             const chatCompletion = await this.openai.chat.completions.create({

@@ -67,6 +67,10 @@ model Contact {
   notes                    String?
   leadSource               String?
   status                   String?
+  conversationId           String?
+  visitorId                String?
+  accountId                String?
+  account                  Account?                  @relation(fields: [accountId], references: [id])
   createdAt                DateTime                  @default(now())
   modifiedAt               DateTime                  @updatedAt
   contactTag               ContactTag[]
@@ -168,6 +172,7 @@ model Account {
   modifiedAt      DateTime    @updatedAt
   parentAccount   Account?    @relation("ParentAccount", fields: [parentAccountId], references: [id])
   subAccounts     Account[]   @relation("ParentAccount")
+  Contact         Contact[]
 }
 
 model AccountBasedMarketingTarget {
@@ -199,4 +204,45 @@ model CrmMapping {
   modifiedAt            DateTime @updatedAt
 
   @@unique([objectType, fieldName, externalCRMObjectType, externalCRMFieldName])
+}
+
+model SegmentCategory {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  color       String?   @default("#ffffff")
+  createdAt   DateTime  @default(now())
+  modifiedAt  DateTime  @updatedAt
+  Segement    Segment[]
+}
+
+model Segment {
+  id                String          @id @default(uuid())
+  name              String
+  description       String?
+  segmentCategory   SegmentCategory @relation(fields: [segmentCategoryId], references: [id], onDelete: Cascade)
+  segmentCategoryId String
+  createdAt         DateTime        @default(now())
+  modifiedAt        DateTime        @updatedAt
+  IcpMap            IcpMap[]
+}
+
+model Icp {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  score       Int
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @updatedAt
+  IcpMap      IcpMap[]
+}
+
+model IcpMap {
+  id         String   @id @default(uuid())
+  icpId      String
+  icp        Icp      @relation(fields: [icpId], references: [id], onDelete: Cascade)
+  segmentId  String
+  segment    Segment  @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @updatedAt
 }

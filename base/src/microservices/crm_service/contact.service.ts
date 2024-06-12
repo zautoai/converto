@@ -10,7 +10,7 @@ export class ContactService extends BaseService {
     super();
   }
 
-  async getContacts(orgId: string, filterDto: FilterDto) {
+  async getContacts(orgId: string, filterDto?: FilterDto) {
     try {
       return this.CRMClient.send(
         { cmd: 'GET_CONTACTS' },
@@ -93,6 +93,30 @@ export class ContactService extends BaseService {
     } catch (error) {
       this.logger.error(`Error while creating custom field: ${error.message}`);
       throw error;
+    }
+  }
+
+  async getContactsByConversation(orgId: string, id: string) {
+    try {
+      return this.CRMClient.send(
+        { cmd: 'GET_CONTACTS_FOR_CONVERSATION' },
+        { orgId, conversationId: id },
+      ).toPromise();
+    } catch (error) {
+      this.logger.error(`Error while fetching contact: ${error.message}`);
+      return error;
+    }
+  }
+
+  async getContactsByDate(orgId: string, startDate: Date, endDate: Date) {
+    try {
+      return this.CRMClient.send(
+        { cmd: 'GET_CONTACTS_BY_DATE' },
+        { orgId, startDate, endDate },
+      ).toPromise();
+    } catch (error) {
+      this.logger.error(`Error while fetching contact: ${error.message}`);
+      return error;
     }
   }
 }

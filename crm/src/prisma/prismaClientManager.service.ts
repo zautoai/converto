@@ -61,6 +61,15 @@ export class PrismaClientManager implements OnModuleDestroy {
     return result[0].exists;
   }
 
+  async disconnectClient(orgId: string) {
+    const client = this.clients[orgId];
+    if (client) {
+      await client.$disconnect();
+      delete this.clients[orgId];
+    }
+    this.logger.log(`#Disconnected schema '${orgId}'`);
+  }
+
   async onModuleDestroy() {
     await Promise.all(
       Object.values(this.clients).map((client) => client.$disconnect()),

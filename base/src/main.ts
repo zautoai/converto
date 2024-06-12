@@ -36,19 +36,21 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe({whitelist: true, transform: true}));
   
     app.enableCors({
-      origin: ['http://localhost:3000','http://localhost:4200'], // Replace with your frontend's origin
+      origin: true, // Replace with your frontend's origin
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true,
     });
   
     //Swagger Docs
     const config = new DocumentBuilder()
-      .setTitle('ZautoAI API')
-      .setDescription('ZautoAI API')
-      .setVersion('1.0')
-      .addTag('ZautoAI')
-      .addBearerAuth()
-      .build();
+    .setTitle('ZautoAI API')
+    .setDescription('ZautoAI API')
+    .setVersion('1.0')
+    .addTag('ZautoAI')
+    .addBearerAuth()
+    .addApiKey({ type: 'apiKey', name: 'x-tenant-id', in: 'header' },'x-tenant-id')
+    .build()
+
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('docs', app, document);
     await app.startAllMicroservices();

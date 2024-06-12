@@ -1,12 +1,15 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RestService } from 'src/app/shared/services/rest.service';
 import { API } from 'src/app/config/endpoint.config';
 import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { AvatarService } from 'src/app/shared/services/avatar.service';
+import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
+import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
+import * as validator from 'validator';
 
 @Component({
   selector: 'app-stages',
@@ -18,32 +21,28 @@ export class StagesComponent implements OnInit {
   angetId: any = undefined;
   stageList: any = [];
   selectedStage: any = null;
+  isEdit: boolean = false;
+  isLoading: boolean = false
 
-  stageForm: FormGroup;
   errorFeedback: any = { name: "", instruction: "" };
 
-  showAvatarSettings:boolean = false;
-
+  showAvatarSettings: boolean = false;
+  @ViewChild(AdvanceOffcanvasComponent) contactComposeCanvas!: AdvanceOffcanvasComponent;
   @ViewChild('createStageOffcanvas') createStageModal: ElementRef | any;
   @ViewChild('editStageOffcanvas') editStageModal: ElementRef | any;
   @ViewChild('deleteStageModal') deleteStageModal: ElementRef | any;
 
   constructor(
     private restService: RestService,
+    private changeDetectorRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     private modalService: NgbModal,
     private formBuilder: FormBuilder,
     private notifService: NotificationService,
-    private offcanvasService:NgbOffcanvas,
-    private avatarService:AvatarService
+    private offcanvasService: NgbOffcanvas,
+    private avatarService: AvatarService
   ) {
-    this.stageForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      instruction: ['', Validators.required],
-    });
-    this.avatarService.avatarEvent$.subscribe((data:any)=>{
-      this.angetId = data?.id;
-    });
+
   }
 
   ngOnInit(): void {
@@ -69,29 +68,21 @@ export class StagesComponent implements OnInit {
 
   openCreateStage() {
     this.resetErrorFeedback();
-    this.stageForm.reset();
-    this.offcanvasService.open(this.createStageModal,{
-      position:'end',
-      backdrop:'static',
-      panelClass:'visible',
-      animation: true,
-    });
+
+    this.contactComposeCanvas.open();
+  }
+  openEditStage(stage: any) {
+    this.selectedStage = stage;
+    this.form.reset();
+    this.form.patchValue(stage)
+    this.isEdit = true;
+    this.contactComposeCanvas.open();
   }
 
-  openEditStage() {
-    this.resetErrorFeedback();
-    this.stageForm.reset();
-    this.stageForm.patchValue(this.selectedStage);
-    this.offcanvasService.open(this.editStageModal,{
-      position:'end',
-      backdrop:'static',
-      panelClass:'visible',
-      animation: true,
-    });
-  }
+
 
   openDeleteStage() {
-    this.stageForm.reset();
+
     this.modalService.open(this.deleteStageModal, { centered: true, size: 'md' });
   }
 
@@ -99,76 +90,7 @@ export class StagesComponent implements OnInit {
     this.modalService.dismissAll();
   }
 
-  onCreateStageSubmit() {
-    this.resetErrorFeedback();
-    const name: string = this.stageForm.value.name || "";
-    const instruction: string = this.stageForm.value.instruction || "";
 
-    if (this.stageForm.valid) {
-      const sequence = this.getNextSequence();
-      const data = {
-        name,
-        instruction,
-        sequence,
-      };
-
-      const endpoint = API.main.agentStages.replace(':agentId', this.angetId);
-      this.restService.post(endpoint, data)
-        .subscribe((response: any) => {
-          this.getStages();
-          this.offcanvasService.dismiss();
-          this.stageForm.reset();
-          this.notifService.showSuccess("New stage added.");
-        }, (error) => {
-          console.log(error);
-        });
-    }
-    else {
-      if (name.length <= 0) {
-        this.errorFeedback.name = "Name required."
-      }
-      if (instruction.length <= 0) {
-        this.errorFeedback.instruction = "Instruction required."
-      }
-    }
-  }
-
-  onEditStageSubmit() {
-    this.resetErrorFeedback();
-    const name: string = this.stageForm.value.name || "";
-    const instruction: string = this.stageForm.value.instruction || "";
-
-    if (this.stageForm.valid) {
-      // const sequence = this.getNextSequence();
-      const sequence = this.getNextSequence();
-      const data = {
-        name,
-        instruction,
-        // sequence,
-      };
-      // console.log("DEBUG STAGE:",data);
-      
-      // return;
-      this.restService.patch(API.main.stages, this.selectedStage.id, data)
-        .subscribe((response: any) => {
-          this.getStages();
-          this.offcanvasService.dismiss();
-          this.stageForm.reset();
-          this.notifService.showSuccess("Stage updated.");
-          this.selectedStage = response;
-        }, (error) => {
-          console.log(error);
-        });
-    }
-    else {
-      if (name.length <= 0) {
-        this.errorFeedback.name = "Name required."
-      }
-      if (instruction.length <= 0) {
-        this.errorFeedback.instruction = "Instruction required."
-      }
-    }
-  }
 
   onDeleteStageSubmit() {
     if (this.selectedStage && this.angetId) {
@@ -205,32 +127,26 @@ export class StagesComponent implements OnInit {
     }
   }
 
-  onUpdateSequence()
-  {
-    const data = {stages:this.stageList};
-    const endpoint = API.main.agentStages.replace(':agentId',this.angetId);
-    this.restService.post(endpoint+'/sequence',data)
-    .subscribe((response:any)=>{
-      this.getStages();
-      this.selectedStage = null;
-    },(error)=>{
-      console.log(error);
-    });
+  onUpdateSequence() {
+    const data = { stages: this.stageList };
+    const endpoint = API.main.agentStages.replace(':agentId', this.angetId);
+    this.restService.post(endpoint + '/sequence', data)
+      .subscribe((response: any) => {
+        this.getStages();
+        this.selectedStage = null;
+      }, (error) => {
+        console.log(error);
+      });
   }
 
-  sortStages()
-  {
-    const sortedArray = this.stageList.slice().sort((a:any, b:any) => {
+  sortStages() {
+    const sortedArray = this.stageList.slice().sort((a: any, b: any) => {
       return a.sequence - b.sequence;
     });
     this.stageList = sortedArray;
   }
 
 
-  isFieldValid(fieldName: string): boolean {
-    const control = this.stageForm.get(fieldName)!;
-    return control.invalid && control.dirty;
-  }
 
   resetErrorFeedback() {
     let keys = Object.keys(this.errorFeedback);
@@ -248,8 +164,84 @@ export class StagesComponent implements OnInit {
     return nextSequence;
   }
 
-  toggleAvatarSettings(){
+  toggleAvatarSettings() {
     this.showAvatarSettings = !this.showAvatarSettings;
     this.selectedStage = null;
   }
+
+
+  form: FormGroup = new FormGroup({
+    name: new FormControl('', [Validators.required]),
+    instruction: new FormControl('', [Validators.required]),
+  });
+  get name(): FormControl {
+    return this.form.get('name') as FormControl;
+  }
+  get instruction(): FormControl {
+    return this.form.get('instruction') as FormControl;
+  }
+  onCancel() {
+    this.contactComposeCanvas.close();
+  }
+  onSubmit() {
+    if (this.form.valid) {
+      const formData: { [key: string]: string | null } = this.form.value;
+      const data = Object.entries(formData)
+        .filter(([_, value]) => value !== null)
+        .reduce((acc, [key, value]) => {
+          if (value !== null) {
+            acc[key] = value;
+          }
+          return acc;
+        }, {} as { [key: string]: string });
+
+      this.isLoading = true;
+      if (this.isEdit) {
+        this.restService.patch(API.main.agent, this.angetId, this.form.value)
+          .subscribe(
+            (response: any) => {
+              this.notifService.showSuccess('Account Updated Successfully.');
+              this.getStages();
+              this.isLoading = false;
+              this.contactComposeCanvas.close();
+            },
+            (error) => {
+              if (error.status == 500) {
+                this.notifService.showError('Something Went Wrong! Try Again Later');
+              }
+              else {
+                this.notifService.showError(error.error.message);
+              }
+              this.isLoading = false;
+            },
+          );
+      }
+      else {
+        const endpoint = API.main.agentStages.replace(':agentId', this.angetId);
+        this.restService.post(endpoint, data).subscribe({
+          next: (response: any) => {
+            this.notifService.showSuccess('Stages Added Successfully.');
+            this.getStages();
+            this.changeDetectorRef.detectChanges();
+            this.isLoading = false;
+            this.contactComposeCanvas.close();
+          },
+          error: (error) => {
+            this.isLoading = false;
+            if (error.status == 500) {
+              this.notifService.showError('Something Went Wrong! Try Again Later');
+            }
+            else {
+              this.notifService.showError(error.error.message);
+            }
+          },
+        });
+      }
+    }
+    else {
+      markFormGroupAsDirty(this.form);
+    }
+  }
+
+
 }

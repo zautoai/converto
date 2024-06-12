@@ -13,7 +13,7 @@ export class SummarizerService {
 
     constructor(private readonly llmService: LlmService,
         private readonly prisma: PrismaService) {
-        
+
         this.redisSubscriber = new Redis({
             host: process.env.REDIS_IP,
             port: parseInt(process.env.REDIS_PORT, 10) || 6379,
@@ -25,21 +25,23 @@ export class SummarizerService {
     onModuleInit() {
         this.redisSubscriber.subscribe('findStages', (err, count) => {
             if (err) {
-              console.error('Failed to subscribe: %s', err.message);
+                console.error('Failed to subscribe: %s', err.message);
             } else {
-              console.log(`Subscribed successfully! This client is currently subscribed to ${count} channels.`);
+                console.log(`Subscribed successfully! This client is currently subscribed to ${count} channels.`);
             }
-          });
-        
+        });
+
         // Handle incoming messages
         this.redisSubscriber.on('message', async (channel, message) => {
             const payload = JSON.parse(message);
             const id = payload.id;
             const conversation = await this.prisma.conversation.findUnique({
-                include: { Lead: true, agent: true, messages: {
-                    where: { type : 'TEXT'},
-                    orderBy: { createdAt: 'asc' },
-                }}, where: {id}
+                include: {
+                    messages: {
+                        where: { type: 'TEXT' },
+                        orderBy: { createdAt: 'asc' },
+                    }
+                }, where: { id }
             });
             if (conversation) {
                 const lastMessageOn = conversation.messages[conversation.messages.length - 1]?.modifiedAt.getTime();
@@ -47,17 +49,17 @@ export class SummarizerService {
                     const result = await this.getStageAnalysis(conversation);
                 }
             }
-            
-          });
+
+        });
     }
 
     extractJsonFromMarkdown(mdContent: string) {
         // Regular expression to match a JSON block within Markdown
         const jsonRegex = /```json([\s\S]*?)```/;
-    
+
         // Extract JSON string
         const match = mdContent.match(jsonRegex);
-        
+
         if (match && match[1]) {
             // Clean up whitespace and parse JSON
             try {
@@ -71,14 +73,14 @@ export class SummarizerService {
             console.error('No JSON content found');
             return null;
         }
-      }
+    }
 
     async getStageAnalysis(conversation: any) {
         try {
             let summarizerPrompt = SUMMARIZER_PROMPT;
             const customerName = conversation.Lead?.name ? conversation.Lead.name : 'Anonymous Customer';
             const messages = []
-            for(let message of conversation.messages) {
+            for (let message of conversation.messages) {
                 messages.push({
                     role: message.role == 'assistant' ? conversation.agent.displayName : customerName,
                     content: message.content
@@ -90,39 +92,40 @@ export class SummarizerService {
             ${JSON.stringify(messages)}`;
 
             const promptMesssage = [
-                {role: 'system', content: summarizerPrompt},
-                {role: 'user', content: content}
+                { role: 'system', content: summarizerPrompt },
+                { role: 'user', content: content }
             ];
             const result = await this.llmService.chat(promptMesssage);
             let summaryJson = undefined;
-            if(result.content.includes('```json')) {
+            if (result.content.includes('```json')) {
                 summaryJson = this.extractJsonFromMarkdown(result.content);
             } else {
                 summaryJson = JSON.parse(result.content);
             }
 
-            if(summaryJson) {
+            if (summaryJson) {
                 let taskList = '';
-                if(Array.isArray(summaryJson.taskList)) {
-                    for(let [index, task] of summaryJson.taskList.entries()) {
+                if (Array.isArray(summaryJson.taskList)) {
+                    for (let [index, task] of summaryJson.taskList.entries()) {
                         taskList += `${index + 1}. ${task}\n`;
                     }
                 } else {
                     taskList = summaryJson.taskList;
                 }
-                
-                return await this.prisma.conversation.update({where: {id: conversation.id}, 
+
+                return await this.prisma.conversation.update({
+                    where: { id: conversation.id },
                     data: {
-                        summary: summaryJson.summary, 
-                        sentimental: Sentimental[summaryJson.sentimental.toUpperCase()], 
+                        summary: summaryJson.summary,
+                        sentimental: Sentimental[summaryJson.sentimental.toUpperCase()],
                         taskList: taskList,
                         potentialLevel: summaryJson.potentialLevel,
                         summaryUpdatedAt: new Date()
                     }
                 });
             }
-            
-        } catch(error) {
+
+        } catch (error) {
             console.log(error)
         }
     }

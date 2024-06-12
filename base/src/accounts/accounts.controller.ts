@@ -36,7 +36,7 @@ export class AccountsController {
     @Req() request: ZautoRequest,
   ) {
 
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -45,7 +45,7 @@ export class AccountsController {
 
   @Get()
   async findAll(@Query() filterDto: FilterDto, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -54,7 +54,7 @@ export class AccountsController {
 
   @Get('fields')
   async getFields(@Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -63,7 +63,7 @@ export class AccountsController {
 
   @Get('abm')
   async getABM(@Req() request: ZautoRequest, @Query() filterDto: FilterDto) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -72,7 +72,7 @@ export class AccountsController {
 
   @Get('abm/:id')
   async getABMById(@Req() request: ZautoRequest, @Param('id') id: string) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -81,7 +81,7 @@ export class AccountsController {
 
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -94,7 +94,7 @@ export class AccountsController {
     @Body() updateAccountDto: UpdateAccountDto,
     @Req() request: ZautoRequest,
   ) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
@@ -103,7 +103,7 @@ export class AccountsController {
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Req() request: ZautoRequest) {
-    const orgId = request.user.org.id;
+    const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');
     }
