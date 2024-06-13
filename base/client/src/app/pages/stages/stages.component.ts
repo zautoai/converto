@@ -174,6 +174,7 @@ export class StagesComponent implements OnInit {
     name: new FormControl('', [Validators.required]),
     instruction: new FormControl('', [Validators.required]),
   });
+
   get name(): FormControl {
     return this.form.get('name') as FormControl;
   }
@@ -201,9 +202,14 @@ export class StagesComponent implements OnInit {
           .subscribe(
             (response: any) => {
               this.notifService.showSuccess('Account Updated Successfully.');
+              console.log('Form value before reset:', this.form.value);
+              this.form.reset()
+
               this.getStages();
               this.isLoading = false;
               this.contactComposeCanvas.close();
+              this.form.controls['instruction'].reset();
+
             },
             (error) => {
               if (error.status == 500) {
