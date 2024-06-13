@@ -14,6 +14,7 @@ export class CreateStageDto {
     instruction: string;
 
     @ApiProperty()
+    @IsOptional()
     @IsNumber()
-    sequence: number;
+    sequence?: number;
 }

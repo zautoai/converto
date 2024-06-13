@@ -78,19 +78,31 @@ export class StageService extends BaseService {
             await this.closeConnection(orgId);
         }
     }
-
     async create(serviceParams: ServiceParams<CreateStageDto>) {
         const { orgId, data: createStageDto } = serviceParams;
         const prisma = await this.getPrismaClient(orgId);
         try {
-            const stageData = await prisma.stage.create({ data: createStageDto });
+            // Fetch the highest sequence number from existing stages
+            const highestSequenceStage = await prisma.stage.findFirst({
+                orderBy: { sequence: 'desc' },
+            });
+            const highestSequence = highestSequenceStage ? highestSequenceStage.sequence : 0;
+    
+            // Set the sequence number for the new stage
+            createStageDto.sequence = highestSequence + 1;
+    
+            const stageData = await prisma.stage.create({ data: {
+                instruction:createStageDto.instruction,
+                name:createStageDto.name,
+                sequence:createStageDto.sequence
+            } });
             const agent = await prisma.agent.findFirst();
             if (agent) {
                 const agentPrompt = await this.promptService.findByAgent(orgId, agent.id);
                 const prompt = await this.promptService.getAssistantPrompt(orgId, agent);
                 console.log(agentPrompt);
                 console.log(prompt);
-
+    
                 await this.promptService.update({ orgId, id: agentPrompt.id, data: { type: 'system', text: prompt } });
                 console.log("Step 3");
             }
@@ -98,17 +110,17 @@ export class StageService extends BaseService {
         }
         catch (error) {
             if (error instanceof PrismaClientKnownRequestError && error.code == 'P2002') {
-                throw new ConflictException("This Stage already exist for this agent");
-            } 
-            else {
+                throw new ConflictException("This Stage already exists for this agent");
+            } else {
                 throw new BadRequestException(error);
             }
         }
         finally {
-            prisma.$disconnect()
+            prisma.$disconnect();
             await this.closeConnection(orgId);
         }
     }
+    
 
     async update(serviceParams: ServiceParams<UpdateStageDto>) {
         const { orgId, data: updateStageDto, id } = serviceParams;
@@ -151,8 +163,23 @@ export class StageService extends BaseService {
         try {
             const existingStage = await prisma.stage.findUnique({ where: { id } });
             if (existingStage && existingStage.canEdit) {
+                const sequence = existingStage.sequence;
                 const stageData = await prisma.stage.delete({ where: { id } });
-
+    
+                // Update sequence numbers of stages that follow the deleted stage
+                await prisma.stage.updateMany({
+                    where: {
+                        sequence: {
+                            gt: sequence,
+                        },
+                    },
+                    data: {
+                        sequence: {
+                            decrement: 1,
+                        },
+                    },
+                });
+    
                 const agent = await prisma.agent.findFirst();
                 if (agent) {
                     const agentPrompt = await this.promptService.findByAgent(orgId, agent.id);
@@ -162,20 +189,17 @@ export class StageService extends BaseService {
                 return stageData;
             } else if (!existingStage.canEdit) {
                 throw new BadRequestException(`Stage ${existingStage.name} is not editable`);
-            }
-            else {
+            } else {
                 throw new NotFoundException(`Stage not found with id ${id}`);
             }
-        }
-        catch (err) {
+        } catch (err) {
             throw err;
-        }
-        finally {
-            prisma.$disconnect()
+        } finally {
+            prisma.$disconnect();
             await this.closeConnection(orgId);
         }
     }
-
+    
     async updateSquence(serviceParams: ServiceParams<{ updateSquence: any }>) {
         const { orgId, data } = serviceParams;
         const { updateSquence } = data;
