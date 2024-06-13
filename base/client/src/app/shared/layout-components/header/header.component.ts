@@ -1,4 +1,4 @@
-import { Component, OnInit,ViewChild,ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../services/auth.service';
@@ -20,57 +20,57 @@ import { GLOBAL_IMAGES } from 'src/app/config/image.config';
 export class HeaderComponent implements OnInit {
   GLOBAL_IMAGES = GLOBAL_IMAGES;
   public isCollapsed = true;
-  public bots:any = [];
-  botPresent =0
-  selectedBot:any;
+  public bots: any = [];
+  botPresent = 0
+  selectedBot: any;
 
-  userData:any;
+  userData: any;
 
-  newPassword:string = "";
-  confirmPassword:string = "";
+  newPassword: string = "";
+  confirmPassword: string = "";
 
-  @ViewChild('changeProfileModal') changeProfileModal : ElementRef | undefined;
-  @ViewChild('changePasswordModal') changePasswordModal : ElementRef | undefined;
+  @ViewChild('changeProfileModal') changeProfileModal: ElementRef | undefined;
+  @ViewChild('changePasswordModal') changePasswordModal: ElementRef | undefined;
 
   constructor(
     private layoutService: LayoutService,
     public navServices: NavService,
     private modalService: NgbModal,
-    public SwitcherService : SwitcherService,
+    public SwitcherService: SwitcherService,
     private router: Router,
-    private auth : AuthService,
-    private botservice:BotService,
-    private restService:RestService,
-    private notifService:NotificationService,
-    private avatarService:AvatarService,
-  ){
+    private auth: AuthService,
+    private botservice: BotService,
+    private restService: RestService,
+    private notifService: NotificationService,
+    private avatarService: AvatarService,
+  ) {
 
-    this.auth.event$.subscribe(data=>{
+    this.auth.event$.subscribe(data => {
       this.userData = this.auth.getUser();
     });
     let path = this.router.url;
-    if(path.includes('agents')) {
+    if (path.includes('agents')) {
       this.restService.getAll(API.main.agent)
-      .subscribe((response:any)=>{
-        this.bots = response.data;      
-      },(error)=>{
-        console.log(error);
-      });
-    } 
+        .subscribe((response: any) => {
+          this.bots = response.data;
+        }, (error) => {
+          console.log(error);
+        });
+    }
   }
 
-  totalMoney:any = 0
+  totalMoney: any = 0
   totalLength = 1
   delectFunction = false
-  getdelectData:any
+  getdelectData: any
 
   selectedImage: File | any = null;
   previewUrl: string | ArrayBuffer | any = null;
 
-  passwordErrorText:string = "";
+  passwordErrorText: string = "";
 
-  price(){
-    
+  price() {
+
   }
 
 
@@ -79,27 +79,27 @@ export class HeaderComponent implements OnInit {
       this.items = menuItems;
     });
     // To clear and close the search field by clicking on body
-    document.querySelector('.main-content')?.addEventListener('click',()=>{
+    document.querySelector('.main-content')?.addEventListener('click', () => {
       this.clearSearch();
     })
     this.text = '';
-    
+
     this.userData = this.auth.getUser();
 
     const agentId = this.navServices.getAgentIdFromUrl();
     this.selectedBot = agentId;
-   
+
   }
 
-  
+
   toggleSidebar() {
     this.navServices.collapseSidebar = !this.navServices.collapseSidebar;
     document.querySelector("body")?.classList.toggle("sidenav-toggled", this.navServices.collapseSidebar);
-}
+  }
 
 
-  open(content:any) {
-    this.modalService.open(content, {backdrop : 'static' , windowClass : 'modalCusSty', size: 'lg' })
+  open(content: any) {
+    this.modalService.open(content, { backdrop: 'static', windowClass: 'modalCusSty', size: 'lg' })
   }
 
   toggleSwitcher() {
@@ -119,42 +119,42 @@ export class HeaderComponent implements OnInit {
 
   // Search
   public menuItems!: Menu[];
-    public items!: Menu[];
-    public text!: string;
-    public SearchResultEmpty:boolean = false;
+  public items!: Menu[];
+  public text!: string;
+  public SearchResultEmpty: boolean = false;
 
 
 
   Search(searchText: any) {
     if (!searchText) return this.menuItems = [];
     // items array which stores the elements
-    let items:any[] = [];
+    let items: any[] = [];
     // Converting the text to lower case by using toLowerCase() and trim() used to remove the spaces from starting and ending
     searchText = searchText.toLowerCase().trim();
-    this.items.filter((menuItems:any) => {
+    this.items.filter((menuItems: any) => {
       // checking whether menuItems having title property, if there was no title property it will return
       if (!menuItems?.title) return false;
       //  checking wheteher menuitems type is text or string and checking the titles of menuitems
       if (menuItems.type === 'link' && menuItems.title.toLowerCase().includes(searchText)) {
         // Converting the menuitems title to lowercase and checking whether title is starting with same text of searchText
-        if( menuItems.title.toLowerCase().startsWith(searchText)){// If you want to get all the data with matching to letter entered remove this line(condition and leave items.push(menuItems))
+        if (menuItems.title.toLowerCase().startsWith(searchText)) {// If you want to get all the data with matching to letter entered remove this line(condition and leave items.push(menuItems))
           // If both are matching then the code is pushed to items array
           items.push(menuItems);
         }
       }
       //  checking whether the menuItems having children property or not if there was no children the return
       if (!menuItems.children) return false;
-      menuItems.children.filter((subItems:any) => {
+      menuItems.children.filter((subItems: any) => {
         if (subItems.type === 'link' && subItems.title.toLowerCase().includes(searchText)) {
-          if( subItems.title.toLowerCase().startsWith(searchText)){         // If you want to get all the data with matching to letter entered remove this line(condition and leave items.push(subItems))
+          if (subItems.title.toLowerCase().startsWith(searchText)) {         // If you want to get all the data with matching to letter entered remove this line(condition and leave items.push(subItems))
             items.push(subItems);
           }
 
         }
         if (!subItems.children) return false;
-        subItems.children.filter((subSubItems:any) => {
+        subItems.children.filter((subSubItems: any) => {
           if (subSubItems.title.toLowerCase().includes(searchText)) {
-            if( subSubItems.title.toLowerCase().startsWith(searchText)){// If you want to get all the data with matching to letter entered remove this line(condition and leave items.push(subSubItems))
+            if (subSubItems.title.toLowerCase().startsWith(searchText)) {// If you want to get all the data with matching to letter entered remove this line(condition and leave items.push(subSubItems))
               items.push(subSubItems);
             }
           }
@@ -164,17 +164,17 @@ export class HeaderComponent implements OnInit {
       return this.menuItems = items;
     });
     // Used to show the No search result found box if the length of the items is 0
-    if(!items.length){
+    if (!items.length) {
       this.SearchResultEmpty = true;
     }
-    else{
+    else {
       this.SearchResultEmpty = false;
     }
     return;
   }
 
-   //  Used to clear previous search result
-   clearSearch() {
+  //  Used to clear previous search result
+  clearSearch() {
     this.text = '';
     this.menuItems = [];
     this.SearchResultEmpty = false;
@@ -182,28 +182,24 @@ export class HeaderComponent implements OnInit {
   }
   onBotChange(id: any) {
     let url = 'agents/' + id + "/agent";
-    this.router.navigateByUrl(url);    
+    this.router.navigateByUrl(url);
   }
 
-  changeProfile()
-  {
-    this.modalService.open(this.changeProfileModal,{centered:true,backdrop:'static'});
+  changeProfile() {
+    this.modalService.open(this.changeProfileModal, { centered: true, backdrop: 'static' });
   }
 
-  changePassword()
-  {
-    this.modalService.open(this.changePasswordModal,{centered:true,backdrop:'static'});
+  changePassword() {
+    this.modalService.open(this.changePasswordModal, { centered: true, backdrop: 'static' });
   }
 
-  closeModal()
-  {
+  closeModal() {
     this.selectedImage = null;
     this.previewUrl = null;
     this.modalService.dismissAll();
   }
 
-  onImageSelected(event: any)
-  {
+  onImageSelected(event: any) {
     const file: File = event.target.files[0];
     if (file) {
       this.selectedImage = file;
@@ -214,58 +210,50 @@ export class HeaderComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     }
-    
+
   }
 
-  onChangeProfileSubmit()
-  {
-    if(this.selectedImage)
-    {
+  onChangeProfileSubmit() {
+    if (this.selectedImage) {
       const formData = new FormData();
-      formData.append('file',this.selectedImage,this.selectedImage.name);
-      this.restService.uploadFile(API.main.orgUser+'/profilePic',formData)
-      .subscribe((response:any)=>{
-        this.closeModal();
-        const newImgUrl = response.file.path;
-        this.notifService.showSuccess("Profile picture changed!");
-        if(newImgUrl)
-        {
-          this.auth.updateUser('imgUrl',newImgUrl);
-        }
-      },(error)=>{
-        console.log(error);
-      });
-    }
-  }
-
-  onChangePassword()
-  {
-    this.passwordErrorText = "";
-    if(this.newPassword.length > 0 && this.confirmPassword.length > 0 && this.userData) 
-    {
-      if((this.newPassword === this.confirmPassword))
-      {
-        const data = {password:this.newPassword};
-
-        this.restService.patch(API.main.orgUser,this.userData.id,data)
-        .subscribe((response:any)=>{
-          this.modalService.dismissAll();
-          this.notifService.showSuccess("Password updated successfully.");
-          this.newPassword = "";
-          this.confirmPassword = "";
-        },(error)=>{
+      formData.append('file', this.selectedImage, this.selectedImage.name);
+      this.restService.uploadFile(API.main.orgUser + '/profilePic', formData)
+        .subscribe((response: any) => {
+          this.closeModal();
+          const newImgUrl = response.file.path;
+          this.notifService.showSuccess("Profile picture changed!");
+          if (newImgUrl) {
+            this.auth.updateUser('imgUrl', newImgUrl);
+          }
+        }, (error) => {
           console.log(error);
         });
-      } 
-      else
-      {
-        this.passwordErrorText = "Confirm password does not match";
-      }   
     }
   }
 
-  getAvatarUrl()
-  {
+  onChangePassword() {
+    this.passwordErrorText = "";
+    if (this.newPassword.length > 0 && this.confirmPassword.length > 0 && this.userData) {
+      if ((this.newPassword === this.confirmPassword)) {
+        const data = { password: this.newPassword };
+
+        this.restService.patch(API.main.orgUser, this.userData.id, data)
+          .subscribe((response: any) => {
+            this.modalService.dismissAll();
+            this.notifService.showSuccess("Password updated successfully.");
+            this.newPassword = "";
+            this.confirmPassword = "";
+          }, (error) => {
+            console.log(error);
+          });
+      }
+      else {
+        this.passwordErrorText = "Confirm password does not match";
+      }
+    }
+  }
+
+  getAvatarUrl() {
     const url = API.baseUrl + "/zautobot?botid=" + this.avatarService.getAvatarId();
     return url;
   }
