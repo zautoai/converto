@@ -112,7 +112,6 @@
   </div>
 </div>
 
-
 <ng-template #generateCTAOffcanvas let-offcanvas>
   <div class="offcanvas-header">
     <h4 class="offcanvas-title">
@@ -186,15 +185,15 @@
   </div>
 </ng-template>
 <app-advance-offcanvas heading="{{ isEdit ? 'Edit' : 'Create' }} CTA">
-  <form [formGroup]="form" (ngSubmit)="onCreateSubmit()">
+  <form [formGroup]="ctaForm" (ngSubmit)="onCreateSubmit()">
     <div class="row">
       <div class="form-group mb-3">
         <advanced-input
           [label]="'Name'"
           [type]="'text'"
           [placeholder]="'Stage'"
-          [size]="'md'"
           [control]="name"
+          [size]="'md'"
           [isDisabled]="isLoading"
         ></advanced-input>
       </div>
@@ -202,9 +201,9 @@
         <advanced-input
           [label]="'Description'"
           [type]="'text'"
+          [control]="description"
           [placeholder]="'Description'"
           [size]="'md'"
-          [control]="description"
           [isDisabled]="isLoading"
         ></advanced-input>
       </div>
@@ -212,21 +211,26 @@
         <advanced-input
           [label]="'Link'"
           [type]="'text'"
+          [control]="link"
           [placeholder]="'Link'"
           [size]="'md'"
-          [control]="link"
           [isDisabled]="isLoading"
         ></advanced-input>
       </div>
       <div class="form-group mb-3">
         <advanced-input
-          [label]="'Instruction'"
-          [type]="'text'"
-          [placeholder]="'Instruction'"
-          [size]="'md'"
+          [label]="'Type'"
+          [type]="'select'"
           [control]="type"
+          [placeholder]="'Select type'"
+          [size]="'md'"
           [isDisabled]="isLoading"
-        ></advanced-input>
+        >
+          <option *ngFor="let ctaType of ctaTypes" [value]="ctaType.value">
+            {{ ctaType.name }}
+          </option>
+          ></advanced-input
+        >
       </div>
     </div>
     <div class="d-flex gap-3 justify-content-end">

@@ -9,23 +9,18 @@ import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 import { ScrollUtilService } from 'src/app/shared/services/scroll-util.service';
 import { updateDataList } from 'src/app/common/utils';
 import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
-
+import { log } from 'console';
 @Component({
   selector: 'app-call-to-action',
   templateUrl: './call-to-action.component.html',
   styleUrls: ['./call-to-action.component.scss']
 })
 export class CallToActionComponent implements OnInit, AfterViewInit {
-onGenerateSubmit() {
-throw new Error('Method not implemented.');
-}
-
   @ViewChild(AdvanceOffcanvasComponent) CtaComposeCanvas!: AdvanceOffcanvasComponent;
   @ViewChild('createCTAOffcanvas', { static: false }) createCTAOffcanvas: ElementRef | any;
   @ViewChild('updateCTAOffcanvas', { static: false }) updateCTAOffcanvas: ElementRef | any;
   @ViewChild('generateCTAOffcanvas', { static: false }) generateCTAOffcanvas: ElementRef | any;
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-
   ctaList: any = [];
   selectedCta: any = null;
   ctaForm: FormGroup;
@@ -34,11 +29,9 @@ throw new Error('Method not implemented.');
   itemPerPage: number = 25;
   isEdit: boolean = false;
   isLoading: boolean = false;
-
   isGeneratingCTA: boolean = false;
   generatedCTAS: any = [];
   selectedCtas: any = [];
-
   ctaTypes = [
     {
       name: 'CTA',
@@ -53,7 +46,6 @@ throw new Error('Method not implemented.');
       value: 'CALENDAR',
     }
   ];
-
   constructor(
     private router: ActivatedRoute,
     private route: Router,
@@ -64,22 +56,18 @@ throw new Error('Method not implemented.');
     private sweetAlertService: SweetAlertService,
     private scrollService: ScrollUtilService
   ) {
-
     this.ctaForm = this.formBuilder.group({
       name: ['', Validators.required],
       description: ['', Validators.required],
       link: [''],
-      type: ['', Validators.required],
+      type: [null, Validators.required],
     });
   }
-
   ngOnInit(): void {
     this.getAllCta();
   }
-
   ngAfterViewInit(): void {
     const containerElement = this.scrollContainer.nativeElement;
-
     this.scrollService.containerReachedBottom(containerElement)
       .subscribe({
         next: (reachedBottom) => {
@@ -95,9 +83,7 @@ throw new Error('Method not implemented.');
           }
         }
       });
-
   }
-
   getAllCta() {
     const pagination = { page: this.currentPage, limit: this.itemPerPage };
     let queryParams: any = { ...this.router.snapshot.queryParams, ...pagination };
@@ -115,78 +101,36 @@ throw new Error('Method not implemented.');
       }
     });
   }
-
   openCreateCta() {
     this.resetErrorFeedback();
     this.ctaForm.reset();
+    this.type.setValue(null)
     this.CtaComposeCanvas.open()
   }
-
   onCreateSubmit() {
-    if (this.ctaForm.valid) {
-        const data = this.ctaForm.value;
-        console.log(data);
-        this.isLoading = true;
-
-        if (this.isEdit) {
-          const pathParam = 'your-path-param-value';
-            this.restService.patch(`${API.main.cta}`,pathParam,data)
-                .subscribe({
-                    next: (response: any) => {
-                        this.getAllCta();
-                        this.ctaForm.reset();
-                        this.notifService.showSuccess("Call to action updated.");
-                        this.isLoading = false;
-                    },
-                    error: (error: any) => {
-                        this.notifService.showError(error.error.message || 'Error updating Call to action.');
-                        console.log(error);
-                        this.isLoading = false;
-                    }
-                });
-        } else {
-            this.restService.post(API.main.cta, data)
-                .subscribe({
-                    next: (response: any) => {
-                        this.getAllCta();
-                        this.ctaForm.reset();
-                        this.notifService.showSuccess("New Call to action created.");
-                        this.isLoading = false;
-                    },
-                    error: (error: any) => {
-                        this.notifService.showError(error.error.message || 'Error creating Call to action.');
-                        console.log(error);
-                        this.isLoading = false;
-                    }
-                });
+    this.resetErrorFeedback();
+    const data=this.form.value 
+    console.log(data) 
+      this.restService.post(API.main.cta, data).subscribe({
+        next: (response: any) => {
+          this.notifService.showSuccess("New Call to action created");
+          this.ctaForm.reset();
+          this.resetErrorFeedback();
+          this.offcanvasService.dismiss();
+          this.getAllCta();
+        },
+        error: (error: any) => {
+          this.notifService.showError(error.error.message);
         }
-    } else {
-        this.markFormGroupAsDirty(this.ctaForm);
-        this.isLoading = false;
-    }
-}
-
-
-// Utility function to mark form controls as dirty
-markFormGroupAsDirty(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach(key => {
-        const control = formGroup.get(key);
-        if (control instanceof FormControl) {
-            control.markAsDirty();
-            control.updateValueAndValidity();
-        } else if (control instanceof FormGroup) {
-            this.markFormGroupAsDirty(control);
-        }
-    });
-}
-
+      });
+   
+   
+  }
   openUpdateCta() {
     if (this.selectedCta) {
       this.resetErrorFeedback();
       this.ctaForm.reset();
-
       this.ctaForm.patchValue(this.selectedCta);
-
       this.offcanvasService.open(this.updateCTAOffcanvas, {
         position: 'end',
         backdrop: 'static',
@@ -195,14 +139,12 @@ markFormGroupAsDirty(formGroup: FormGroup) {
       });
     }
   }
-
   onUpdateSubmit() {
     this.resetErrorFeedback();
     const name: string = this.ctaForm.value.name || "";
     const description: string = this.ctaForm.value.description || "";
     const link: string = this.ctaForm.value.link || "";
     const type: string = this.ctaForm.value.type || "";
-
     if (this.ctaForm.valid) {
       const data = { name, description, link, type };
       const entpoint = API.main.cta;
@@ -218,7 +160,6 @@ markFormGroupAsDirty(formGroup: FormGroup) {
           this.notifService.showError(error.error.message);
         }
       });
-
     }
     else {
       if (name.length <= 0) {
@@ -232,7 +173,6 @@ markFormGroupAsDirty(formGroup: FormGroup) {
       }
     }
   }
-
   openDeleteCta() {
     this.sweetAlertService.warning("Delete CTA", "Are you sure you want to delete ?", ['Delete', 'Cancel'], (confirm: any) => {
       if (confirm.isConfirmed) {
@@ -240,7 +180,6 @@ markFormGroupAsDirty(formGroup: FormGroup) {
       }
     });
   }
-
   onDeleteSubmit() {
     if (this.selectedCta) {
       const entpoint = API.main.cta;
@@ -256,7 +195,6 @@ markFormGroupAsDirty(formGroup: FormGroup) {
       });
     }
   }
-
   openGenerateCta() {
     this.resetErrorFeedback();
     this.ctaForm.reset();
@@ -268,7 +206,6 @@ markFormGroupAsDirty(formGroup: FormGroup) {
     });
     this.generateCTAS();
   }
-
   generateCTAS() {
     this.isGeneratingCTA = true;
     this.restService.post(API.main.cta + "/generate", {})
@@ -281,13 +218,11 @@ markFormGroupAsDirty(formGroup: FormGroup) {
         this.notifService.showError(error.error.message);
       })
   }
-
   selectCta(item: any) {
     const queryParams = this.router.snapshot.queryParams;
     this.route.navigate(['/call-to-action', item?.id], { queryParams: queryParams });
     this.getSelectedCta(item?.id);
   }
-
   getSelectedCta(id: string) {
     this.restService.get(API.main.cta, id).subscribe({
       next: (response: any) => {
@@ -298,19 +233,16 @@ markFormGroupAsDirty(formGroup: FormGroup) {
       }
     });
   }
-
   isFieldValid(fieldName: string): boolean {
     const control = this.ctaForm.get(fieldName)!;
     return control.invalid && control.dirty;
   }
-
   resetErrorFeedback() {
     let keys = Object.keys(this.errorFeedback);
     for (let key of keys) {
       this.errorFeedback[key] = "";
     }
   }
-
   objectToQueryString(obj: { [key: string]: any }): string {
     const queryString = Object.keys(obj)
       .map(key => {
@@ -322,14 +254,11 @@ markFormGroupAsDirty(formGroup: FormGroup) {
       })
       .filter(Boolean)
       .join('&');
-
     return queryString;
   }
-
   onListScrolledBottom() {
     const totalCount = this.ctaList?.total;
     const itemPerPage = this.itemPerPage;
-
     if (totalCount && itemPerPage) {
       const maxPage = Math.ceil(totalCount / itemPerPage);
       if (this.currentPage < maxPage) {
@@ -340,7 +269,6 @@ markFormGroupAsDirty(formGroup: FormGroup) {
       console.error('Total count or items per page not available');
     }
   }
-
   selectFromGenerated(cta: any) {
     if (!this.selectedCtas.includes(cta)) {
       this.selectedCtas.push(cta);
@@ -350,7 +278,6 @@ markFormGroupAsDirty(formGroup: FormGroup) {
       this.selectedCtas.splice(index, 1);
     }
   }
-
   submitSelectCTAS() {
     if (this.selectedCtas.length > 0) {
       const data = [...this.selectedCtas];
@@ -367,35 +294,26 @@ markFormGroupAsDirty(formGroup: FormGroup) {
         })
     }
   }
-
   form: FormGroup = new FormGroup({
-
     name: new FormControl('', [Validators.required,]),
     description: new FormControl('', [Validators.required,]),
     link: new FormControl('', [Validators.required,]),
     type: new FormControl('', [Validators.required,]),
-
   })
-
   get name(): FormControl {
     return this.form.get('name') as FormControl
   }
   get description(): FormControl {
     return this.form.get("description") as FormControl
   }
-
   get link(): FormControl {
     return this.form.get("link") as FormControl
   }
   get type(): FormControl {
     return this.form.get("type") as FormControl
   }
-
-
-
   onSubmit() {
-    
+    throw new Error('Method not implemented.');
   }
   onCancel() { }
-
 }

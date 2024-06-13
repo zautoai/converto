@@ -30,7 +30,7 @@ export const API = {
     campaign: 'api/campaigns',
     agentCampaign: 'api/:agentId/campaigns',
     stages: 'api/stages',
-    agentStages: 'api/:agentId/stages',
+    agentStages: 'api/stages',
     dashboard: 'api/dashboards',
     launchAvatar: 'api/agents/launchAvatar',
     usage: 'api/account/usage',

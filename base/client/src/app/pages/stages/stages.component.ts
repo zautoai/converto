@@ -217,7 +217,7 @@ export class StagesComponent implements OnInit {
           );
       }
       else {
-        const endpoint = API.main.agentStages.replace(':agentId', this.angetId);
+        const endpoint = API.main.agentStages
         this.restService.post(endpoint, data).subscribe({
           next: (response: any) => {
             this.notifService.showSuccess('Stages Added Successfully.');
