@@ -1,268 +1,252 @@
 <div class="card shadow mt-3">
-    <div class="card-header d-flex justify-content-between">
-        <h4 class="card-title"><span class="fe fe-check-circle"></span> Call to Action</h4>
-        <div>
-            <div ngbDropdown class="d-inline-block">
-                <a href="javascript:void(0)" class="text-muted" id="dropdownBasic1" ngbDropdownToggle>
-                    <button class="btn btn-outline-primary btn-sm">New CTA</button>
+  <div class="card-header d-flex justify-content-between">
+    <h4 class="card-title">
+      <span class="fe fe-check-circle"></span> Call to Action
+    </h4>
+    <div>
+      <div ngbDropdown class="d-inline-block">
+        <a
+          href="javascript:void(0)"
+          class="text-muted"
+          id="dropdownBasic1"
+          ngbDropdownToggle
+        >
+          <button class="btn btn-outline-primary btn-sm">New CTA</button>
+        </a>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+          <button ngbDropdownItem (click)="openCreateCta()">Create</button>
+          <div class="dropdown-divider"></div>
+          <button ngbDropdownItem (click)="openGenerateCta()">Generate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="row">
+      <div class="col-3 border-end pe-0">
+        <ul class="scroll-container-v vh-100" #scrollContainer>
+          <ng-container *ngIf="!ctaList.data">
+            <li>
+              <ngx-skeleton-loader
+                count="5"
+                [theme]="{ 'border-radius': '0', height: '50px' }"
+              ></ngx-skeleton-loader>
+            </li>
+          </ng-container>
+          <ng-container *ngIf="ctaList.data">
+            <li
+              *ngFor="let item of ctaList.data"
+              class="zauto-card"
+              (click)="selectCta(item)"
+              [ngClass]="{ active: selectedCta && selectedCta?.id == item?.id }"
+            >
+              <div>
+                {{ item?.name }}
+              </div>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+      <div class="col-9 m-0">
+        <ng-container *ngIf="selectedCta">
+          <div class="p-2">
+            <div class="d-flex justify-content-end">
+              <div ngbDropdown class="d-inline-block">
+                <a
+                  href="javascript:void(0)"
+                  class="text-muted"
+                  id="dropdownBasic1"
+                  ngbDropdownToggle
+                >
+                  <i class="fe fe-more-horizontal"></i>
                 </a>
                 <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                    <button ngbDropdownItem (click)="openCreateCta()">
-                        Create</button>
-                    <div class="dropdown-divider"></div>
-                    <button ngbDropdownItem (click)="openGenerateCta()">
-                        Generate</button>
+                  <button ngbDropdownItem (click)="openUpdateCta()">
+                    <i class="fa fa-edit"></i> Edit
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button
+                    ngbDropdownItem
+                    class="text-danger"
+                    (click)="openDeleteCta()"
+                  >
+                    <i class="fa fa-trash"></i>
+                    Delete
+                  </button>
                 </div>
+              </div>
             </div>
-        </div>
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <td><b>Name :</b></td>
+                  <td>{{ selectedCta?.name }}</td>
+                </tr>
+                <tr>
+                  <td><b>Description :</b></td>
+                  <td>{{ selectedCta?.description }}</td>
+                </tr>
+                <tr>
+                  <td><b>Type :</b></td>
+                  <td>{{ selectedCta?.type }}</td>
+                </tr>
+                <tr>
+                  <td><b>Link :</b></td>
+                  <td>
+                    <a href="{{ selectedCta?.link }}" target="_blank">{{
+                      selectedCta?.link
+                    }}</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="!selectedCta">
+          <div class="h-100 d-flex justify-content-center align-items-center">
+            <span class="text-muted">Select CTA for more details</span>
+          </div>
+        </ng-container>
+      </div>
     </div>
-    <div class="card-body p-0">
-        <div class="row ">
-            <div class="col-3 border-end pe-0">
-                <ul class="scroll-container-v  vh-100" #scrollContainer>
-                    <ng-container *ngIf="!ctaList.data">
-                        <li>
-                            <ngx-skeleton-loader count="5"
-                                [theme]="{'border-radius': '0', height: '50px'}"></ngx-skeleton-loader>
-                        </li>
-                    </ng-container>
-                    <ng-container *ngIf="ctaList.data">
-                        <li *ngFor="let item of ctaList.data" class="zauto-card" (click)="selectCta(item)"
-                            [ngClass]="{'active':(selectedCta && selectedCta?.id == item?.id)}">
-                            <div>
-                                {{item?.name}}
-                            </div>
-                        </li>
-                    </ng-container>
-                </ul>
-            </div>
-            <div class="col-9 m-0 ">
-                <ng-container *ngIf="selectedCta">
-                    <div class="p-2">
-                        <div class="d-flex justify-content-end">
-                            <div ngbDropdown class="d-inline-block">
-                                <a href="javascript:void(0)" class="text-muted" id="dropdownBasic1" ngbDropdownToggle>
-                                    <i class="fe fe-more-horizontal"></i>
-                                </a>
-                                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-                                    <button ngbDropdownItem (click)="openUpdateCta()"><i class="fa fa-edit"></i>
-                                        Edit</button>
-                                    <div class="dropdown-divider"></div>
-                                    <button ngbDropdownItem class="text-danger" (click)="openDeleteCta()">
-                                        <i class="fa fa-trash"></i>
-                                        Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                        <table class="table table-borderless">
-                            <tbody>
-                                <tr>
-                                    <td><b>Name :</b> </td>
-                                    <td>{{selectedCta?.name}}</td>
-                                </tr>
-                                <tr>
-                                    <td><b>Description :</b> </td>
-                                    <td>{{selectedCta?.description}}</td>
-                                </tr>
-                                <tr>
-                                    <td><b>Type :</b> </td>
-                                    <td>{{selectedCta?.type}}</td>
-                                </tr>
-                                <tr>
-                                    <td><b>Link :</b> </td>
-                                    <td><a href="{{selectedCta?.link}}" target="_blank">{{selectedCta?.link}}</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </ng-container>
-                <ng-container *ngIf="!selectedCta">
-                    <div class="h-100 d-flex justify-content-center align-items-center">
-                        <span class="text-muted">Select CTA for more details</span>
-                    </div>
-                </ng-container>
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
-<ng-template #createCTAOffcanvas let-offcanvas>
-    <div class="offcanvas-header">
-        <h4 class="offcanvas-title"><i class="fe fe-check-circle"></i> Create CTA</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
-    </div>
-    <hr class="m-0">
-    <div class="offcanvas-body">
-        <ng-scrollbar>
-            <form [formGroup]="ctaForm" (ngSubmit)="onCreateSubmit()">
-                <div class="form-group mb-3">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" class="form-control" placeholder="Name"
-                        formControlName="name"
-                        [ngClass]="{'is-invalid':isFieldValid('name') || errorFeedback.name.length > 0}">
-                    <div class="invalid-feedback">
-                        {{errorFeedback.name}}
-                    </div>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="description">Description</label>
-                    <textarea name="description" id="description" rows="5" class="form-control"
-                        placeholder="Description" formControlName="description"
-                        [ngClass]="{'is-invalid':isFieldValid('description') || errorFeedback.description.length > 0}"></textarea>
-                    <div class="invalid-feedback">
-                        {{errorFeedback.desc}}
-                    </div>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="link">Link</label>
-                    <input type="text" id="link" name="link" class="form-control" placeholder="link URL"
-                        formControlName="link"
-                        [ngClass]="{'is-invalid':isFieldValid('link') || errorFeedback.link.length > 0}">
-                    <div class="invalid-feedback">
-                        {{errorFeedback.link}}
-                    </div>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="type">Type</label>
-                    <select id="type" name="type" class="form-control" placeholder="CTA type" formControlName="type"
-                        [ngClass]="{'is-invalid':isFieldValid('type') || errorFeedback.type.length > 0}">
-                        <option *ngFor="let ctaType of ctaTypes" [value]="ctaType.value">{{ctaType.value}}</option>
-                    </select>
-                    <div class="invalid-feedback">
-                        {{errorFeedback.type}}
-                    </div>
-                </div>
-                <button class="btn btn-block btn-primary">Create</button>
-            </form>
-        </ng-scrollbar>
-    </div>
-</ng-template>
-
-<ng-template #updateCTAOffcanvas let-offcanvas>
-    <div class="offcanvas-header">
-        <h4 class="offcanvas-title"><i class="fe fe-check-circle"></i> Update CTA</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
-    </div>
-    <hr class="m-0">
-    <div class="offcanvas-body">
-        <ng-scrollbar>
-            <form [formGroup]="ctaForm" (ngSubmit)="onUpdateSubmit()">
-                <div class="form-group mb-3">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" class="form-control" placeholder="Name"
-                        formControlName="name"
-                        [ngClass]="{'is-invalid':isFieldValid('name') || errorFeedback.name.length > 0}">
-                    <div class="invalid-feedback">
-                        {{errorFeedback.name}}
-                    </div>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="description">Description</label>
-                    <textarea name="description" id="description" rows="5" class="form-control"
-                        placeholder="Description" formControlName="description"
-                        [ngClass]="{'is-invalid':isFieldValid('description') || errorFeedback.description.length > 0}"></textarea>
-                    <div class="invalid-feedback">
-                        {{errorFeedback.desc}}
-                    </div>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="link">Link</label>
-                    <input type="text" id="link" name="link" class="form-control" placeholder="link URL"
-                        formControlName="link"
-                        [ngClass]="{'is-invalid':isFieldValid('link') || errorFeedback.link.length > 0}">
-                    <div class="invalid-feedback">
-                        {{errorFeedback.link}}
-                    </div>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="type">Type</label>
-                    <select id="type" name="type" class="form-control" placeholder="CTA type" formControlName="type"
-                        [ngClass]="{'is-invalid':isFieldValid('type') || errorFeedback.type.length > 0}">
-                        <option *ngFor="let ctaType of ctaTypes" [value]="ctaType.value">{{ctaType.value}}</option>
-                    </select>
-                    <div class="invalid-feedback">
-                        {{errorFeedback.link}}
-                    </div>
-                </div>
-                <button class="btn btn-block btn-primary">Save</button>
-            </form>
-        </ng-scrollbar>
-    </div>
-</ng-template>
 
 <ng-template #generateCTAOffcanvas let-offcanvas>
-    <div class="offcanvas-header">
-        <h4 class="offcanvas-title"><i class="fe fe-check-circle"></i> Generate CTA</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss()"></button>
-    </div>
-    <hr class="m-0">
-    <div class="offcanvas-body">
-        <ng-scrollbar>
-            <ng-container *ngIf="isGeneratingCTA">
-                <ngx-skeleton-loader count="3" [theme]="{'border-radius': '0', height: '100px'}"></ngx-skeleton-loader>
-            </ng-container>
-            <ng-container *ngIf="!isGeneratingCTA && generatedCTAS.length > 0">
-                <ul>
-                    <li *ngFor="let cta of generatedCTAS">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-2 py-auto">
-                                        <label class="custom-control custom-checkbox mb-0 align-middle">
-                                            <input type="checkbox" name="lead-only" class="custom-control-input"
-                                                (click)="selectFromGenerated(cta)">
-                                            <span class="custom-control-label"></span>
-                                        </label>
-                                    </div>
-                                    <div class="col-10">
-                                        <div><strong>{{cta?.label}}</strong></div>
-                                        <div class="text-muted">{{cta?.text}}</div>
-                                        <div><i class="fe fe-link"></i> <a href="{{cta?.link}}">{{cta?.link}}</a></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-                <div class="">
-                    <div class="d-flex justify-content-end">
-                        <button class="btn btn-outline-primary w-100 me-2" (click)="offcanvas.dismiss()"><i
-                                class="fa fa-times"></i> Close</button>
-                        <button class="btn btn-primary w-100" (click)="submitSelectCTAS()"><i class="fa fa-plus"></i>
-                            Add</button>
+  <div class="offcanvas-header">
+    <h4 class="offcanvas-title">
+      <i class="fe fe-check-circle"></i> Generate CTA
+    </h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="offcanvas.dismiss()"
+    ></button>
+  </div>
+  <hr class="m-0" />
+  <div class="offcanvas-body">
+    <ng-scrollbar>
+      <ng-container *ngIf="isGeneratingCTA">
+        <ngx-skeleton-loader
+          count="3"
+          [theme]="{ 'border-radius': '0', height: '100px' }"
+        ></ngx-skeleton-loader>
+      </ng-container>
+      <ng-container *ngIf="!isGeneratingCTA && generatedCTAS.length > 0">
+        <ul>
+          <li *ngFor="let cta of generatedCTAS">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-2 py-auto">
+                    <label
+                      class="custom-control custom-checkbox mb-0 align-middle"
+                    >
+                      <input
+                        type="checkbox"
+                        name="lead-only"
+                        class="custom-control-input"
+                        (click)="selectFromGenerated(cta)"
+                      />
+                      <span class="custom-control-label"></span>
+                    </label>
+                  </div>
+                  <div class="col-10">
+                    <div>
+                      <strong>{{ cta?.label }}</strong>
                     </div>
+                    <div class="text-muted">{{ cta?.text }}</div>
+                    <div>
+                      <i class="fe fe-link"></i>
+                      <a href="{{ cta?.link }}">{{ cta?.link }}</a>
+                    </div>
+                  </div>
                 </div>
-            </ng-container>
-        </ng-scrollbar>
-    </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+        <div class="">
+          <div class="d-flex justify-content-end">
+            <button
+              class="btn btn-outline-primary w-100 me-2"
+              (click)="offcanvas.dismiss()"
+            >
+              <i class="fa fa-times"></i> Close
+            </button>
+            <button class="btn btn-primary w-100" (click)="submitSelectCTAS()">
+              <i class="fa fa-plus"></i> Add
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </ng-scrollbar>
+  </div>
 </ng-template>
-<app-advance-offcanvas heading="{{ isEdit ? 'Edit' : 'Create'}} CTA">
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="row">
+<app-advance-offcanvas heading="{{ isEdit ? 'Edit' : 'Create' }} CTA">
+  <form [formGroup]="form" (ngSubmit)="onCreateSubmit()">
+    <div class="row">
+      <div class="form-group mb-3">
+        <advanced-input
+          [label]="'Name'"
+          [type]="'text'"
+          [placeholder]="'Stage'"
+          [size]="'md'"
+          [control]="name"
+          [isDisabled]="isLoading"
+        ></advanced-input>
+      </div>
+      <div class="form-group mb-3">
+        <advanced-input
+          [label]="'Description'"
+          [type]="'text'"
+          [placeholder]="'Description'"
+          [size]="'md'"
+          [control]="description"
+          [isDisabled]="isLoading"
+        ></advanced-input>
+      </div>
+      <div class="form-group mb-3">
+        <advanced-input
+          [label]="'Link'"
+          [type]="'text'"
+          [placeholder]="'Link'"
+          [size]="'md'"
+          [control]="link"
+          [isDisabled]="isLoading"
+        ></advanced-input>
+      </div>
+      <div class="form-group mb-3">
+        <advanced-input
+          [label]="'Instruction'"
+          [type]="'text'"
+          [placeholder]="'Instruction'"
+          [size]="'md'"
+          [control]="type"
+          [isDisabled]="isLoading"
+        ></advanced-input>
+      </div>
+    </div>
+    <div class="d-flex gap-3 justify-content-end">
+      <advanced-button
+        label="{{ isEdit ? 'Update' : 'Create' }}"
+        [size]="'md'"
+        [classes]="'w-100'"
+        [type]="'submit'"
+        [isLoading]="isLoading"
+      ></advanced-button>
 
-            <div class="form-group mb-3">
-                <advanced-input [label]="'Name'" [type]="'text'" [placeholder]="'Stage'" [size]="'md'" [control]="name"
-                    [isDisabled]="isLoading"></advanced-input>
-            </div>
-            <div class="form-group mb-3">
-                <advanced-input [label]="'Description'" [type]="'text'" [placeholder]="'Description'" [size]="'md'"
-                    [control]=" description" [isDisabled]="isLoading"></advanced-input>
-            </div>
-            <div class="form-group mb-3">
-                <advanced-input [label]="'Link'" [type]="'text'" [placeholder]="'Link'" [size]="'md'" [control]="link"
-                    [isDisabled]="isLoading"></advanced-input>
-            </div>
-            <div class="form-group mb-3">
-                <advanced-input [label]="'Instruction'" [type]="'text'" [placeholder]="'Instruction'" [size]="'md'"
-                    [control]="type" [isDisabled]="isLoading"></advanced-input>
-            </div>
-        </div>
-        <div class="d-flex gap-3 justify-content-end">
-            <advanced-button label="{{ isEdit ? 'Update' : 'Create'}}" [size]="'md'" [classes]="'w-100'"
-                [type]="'submit'" [isLoading]="isLoading"></advanced-button>
-
-            <advanced-button label="Cancel" [size]="'md'" [classes]="'w-100'" [type]="'button'"
-                [color]="'outline-primary'" [isLoading]="isLoading" (onClick)="onCancel()"></advanced-button>
-        </div>
-    </form>
+      <advanced-button
+        label="Cancel"
+        [size]="'md'"
+        [classes]="'w-100'"
+        [type]="'button'"
+        [color]="'outline-primary'"
+        [isLoading]="isLoading"
+        (onClick)="onCancel()"
+      ></advanced-button>
+    </div>
+  </form>
 </app-advance-offcanvas>

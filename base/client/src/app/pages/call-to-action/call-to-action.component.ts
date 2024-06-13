@@ -16,6 +16,9 @@ import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/
   styleUrls: ['./call-to-action.component.scss']
 })
 export class CallToActionComponent implements OnInit, AfterViewInit {
+onGenerateSubmit() {
+throw new Error('Method not implemented.');
+}
 
   @ViewChild(AdvanceOffcanvasComponent) CtaComposeCanvas!: AdvanceOffcanvasComponent;
   @ViewChild('createCTAOffcanvas', { static: false }) createCTAOffcanvas: ElementRef | any;
@@ -120,42 +123,62 @@ export class CallToActionComponent implements OnInit, AfterViewInit {
   }
 
   onCreateSubmit() {
-    this.resetErrorFeedback();
-    const name: string = this.ctaForm.value.name || "";
-    const description: string = this.ctaForm.value.description || "";
-    const link: string = this.ctaForm.value.link || "";
-    const type: string = this.ctaForm.value.type || "";
-
     if (this.ctaForm.valid) {
-      const data = { name, description, link, type };
-      const entpoint = API.main.cta;
-      this.restService.post(entpoint, data).subscribe({
-        next: (response: any) => {
-          this.notifService.showSuccess("New Call to action created");
-          this.ctaForm.reset();
-          this.resetErrorFeedback();
-          this.offcanvasService.dismiss();
-          this.getAllCta();
-        },
-        error: (error: any) => {
-          this.notifService.showError(error.error.message);
+        const data = this.ctaForm.value;
+        console.log(data);
+        this.isLoading = true;
+
+        if (this.isEdit) {
+          const pathParam = 'your-path-param-value';
+            this.restService.patch(`${API.main.cta}`,pathParam,data)
+                .subscribe({
+                    next: (response: any) => {
+                        this.getAllCta();
+                        this.ctaForm.reset();
+                        this.notifService.showSuccess("Call to action updated.");
+                        this.isLoading = false;
+                    },
+                    error: (error: any) => {
+                        this.notifService.showError(error.error.message || 'Error updating Call to action.');
+                        console.log(error);
+                        this.isLoading = false;
+                    }
+                });
+        } else {
+            this.restService.post(API.main.cta, data)
+                .subscribe({
+                    next: (response: any) => {
+                        this.getAllCta();
+                        this.ctaForm.reset();
+                        this.notifService.showSuccess("New Call to action created.");
+                        this.isLoading = false;
+                    },
+                    error: (error: any) => {
+                        this.notifService.showError(error.error.message || 'Error creating Call to action.');
+                        console.log(error);
+                        this.isLoading = false;
+                    }
+                });
         }
-      });
-
+    } else {
+        this.markFormGroupAsDirty(this.ctaForm);
+        this.isLoading = false;
     }
-    else {
-      if (name.length <= 0) {
-        this.errorFeedback.name = "Name required.";
-      }
-      if (description.length <= 0) {
-        this.errorFeedback.description = "Description required.";
-      }
-      if (link.length <= 0) {
-        this.errorFeedback.link = "Link required.";
-      }
-    }
+}
 
-  }
+
+// Utility function to mark form controls as dirty
+markFormGroupAsDirty(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach(key => {
+        const control = formGroup.get(key);
+        if (control instanceof FormControl) {
+            control.markAsDirty();
+            control.updateValueAndValidity();
+        } else if (control instanceof FormGroup) {
+            this.markFormGroupAsDirty(control);
+        }
+    });
+}
 
   openUpdateCta() {
     if (this.selectedCta) {
@@ -371,7 +394,7 @@ export class CallToActionComponent implements OnInit, AfterViewInit {
 
 
   onSubmit() {
-    throw new Error('Method not implemented.');
+    
   }
   onCancel() { }
 

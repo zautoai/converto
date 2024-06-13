@@ -111,7 +111,6 @@
   #segmentOffCanvas
   heading="{{ isEdit ? 'Edit' : 'Create' }} form"
 >
-{{ isLoading | json }}
   <form [formGroup]="segments" (ngSubmit)="onSubmitSegment()">
     <div class="form-group mb-3">
       <advanced-input

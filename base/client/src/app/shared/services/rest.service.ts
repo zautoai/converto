@@ -8,6 +8,12 @@ import { API } from '../../config/endpoint.config';
     providedIn: 'root'
   })
 export class RestService {
+  deleteData(arg0: string) {
+    throw new Error('Method not implemented.');
+  }
+  getData(list: any) {
+    throw new Error('Method not implemented.');
+  }
   getById(segmentCategory: string, id: any) {
     throw new Error('Method not implemented.');
   }
