@@ -10,9 +10,9 @@
                 </div>
             </div>
             <div class="d-flex justify-content-between p-3">
-                <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Intent score" [openDelay]="300"><i class="fa-solid fa-chart-line"></i> 45</span>
+                <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Intent score" [openDelay]="300"><i class="fa-solid fa-chart-line"></i> {{contact?.icpScore || 20}}</span>
                 <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Lead score" [openDelay]="300"><i class="fa-solid fa-trophy"></i> 78</span>
-                <span class="badge bg-success rounded-pill fs-6" ngbTooltip="ICP status" [openDelay]="300">ICP Fit</span>
+                <span class="badge bg-success rounded-pill fs-6" ngbTooltip="ICP status" [openDelay]="300">{{contact?.icpCategory ?"ICP "+contact?.icpCategory: "ICP UnFit"}}</span>
             </div>
             <div class="contact-info-cards w-100">
 

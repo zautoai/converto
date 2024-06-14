@@ -5,6 +5,8 @@ import { BullModule } from '@nestjs/bull';
 import { AgentModule } from 'src/agent/agent.module';
 import { IntentScoreProcessor } from './intent-score.processor';
 import { IntentScoringModule } from 'src/intent-scoring/intent-scoring.module';
+import { IcpModule } from 'src/icp/icp.module';
+import { IcpScoreProcessor } from './icp-score.processor';
 
 @Module({
   imports: [
@@ -14,10 +16,14 @@ import { IntentScoringModule } from 'src/intent-scoring/intent-scoring.module';
     BullModule.registerQueue({
       name: 'intent_score_queue',
     }),
+    BullModule.registerQueue({
+      name:'icp_score_queue'
+    }),
     IntentScoringModule,
+    IcpModule,
     AgentModule
   ],
-  exports: [QueueService, IntentScoreProcessor, QueueProcessor],
-  providers: [QueueService, IntentScoreProcessor,QueueProcessor]
+  exports: [QueueService, IntentScoreProcessor, QueueProcessor,IcpScoreProcessor],
+  providers: [QueueService, IntentScoreProcessor,QueueProcessor,IcpScoreProcessor]
 })
 export class WorkerModule { }

@@ -117,10 +117,6 @@ export class CreateContactDto {
     @IsString()
     accountId?: string;
 
-    @ApiProperty({ required: false, description: 'ICP score of the contact' })
-    @IsOptional()
-    @IsNumber()
-    icpScore?: number;
 
     async validate() {
         try {

@@ -24,7 +24,7 @@ export const API = {
     agentChat: 'api/agents/:agentId/chat/:convId',
     agentPrompt: 'api/agent-prompts',
     site: 'api/sites',
-    orgUser: 'api/organization/users',
+    orgUser: 'api/users',
     platform: 'api/platforms',
     orgPlatform: 'api/org-platforms',
     campaign: 'api/campaigns',

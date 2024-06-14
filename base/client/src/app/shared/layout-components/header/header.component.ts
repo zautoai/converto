@@ -203,15 +203,15 @@ export class HeaderComponent implements OnInit {
     const file: File = event.target.files[0];
     if (file) {
       this.selectedImage = file;
-
+  
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl = e.target?.result;
       };
       reader.readAsDataURL(file);
     }
-
   }
+  
 
   onChangeProfileSubmit() {
     if (this.selectedImage) {
