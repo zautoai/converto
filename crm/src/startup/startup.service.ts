@@ -111,9 +111,9 @@ export class StartupService implements OnModuleInit {
   }
 
   async syncDataFromCRM(orgId: string) {
-    this.contactService.syncExternalCrmToContacts(orgId);
+    // this.contactService.syncExternalCrmToContacts(orgId);
     this.contactService.syncContactsToExternalCrm(orgId);
-    this.accountService.syncExternalCrmToAccounts(orgId);
+    // this.accountService.syncExternalCrmToAccounts(orgId);
     this.accountService.syncAccountsToExternalCrm(orgId);
   }
 }

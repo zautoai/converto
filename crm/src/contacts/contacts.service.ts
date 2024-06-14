@@ -31,6 +31,8 @@ export class ContactsService {
 
   async getContacts(orgId: string, filterDto: FilterDto) {
     const { page, limit, sort, searchTerm } = filterDto;
+    console.log(page, limit, sort, searchTerm);
+    
     const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
     try {
@@ -101,6 +103,7 @@ export class ContactsService {
         total: total,
       };
     } catch (error) {
+      console.log(error);
       throw error
     } finally {
       prisma.$disconnect()
@@ -217,6 +220,7 @@ export class ContactsService {
         code: 201,
         success: true,
         message: 'Contact created successfully',
+        data: contact,
       };
     } catch (error) {
       throw error
@@ -253,7 +257,7 @@ export class ContactsService {
         { _defaultFields: {}, _customFields: {} },
       );
 
-      await prisma.contact.update({
+      const updatedContact=await prisma.contact.update({
         where: { id },
         data: {
           ..._defaultFields,
@@ -321,7 +325,7 @@ export class ContactsService {
         code: 200,
         success: true,
         message: 'Contact updated successfully',
-        data: updateContactDto,
+        data: updatedContact,
       };
     } catch (error) {
       throw error
