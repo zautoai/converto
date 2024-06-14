@@ -15,7 +15,7 @@
           <li *ngFor="let field of fields; let i = index">
             <div class="field mb-2 d-flex justify-content-between">
               <span>{{field}}</span>
-              <a href="javascript:void(0)" (click)="deleteField(i)" *ngIf="canEdit && !isUpdateing"><i
+              <a href="javascript:void(0)" (click)="confirmDelete(i)" *ngIf="canEdit && !isUpdateing"><i
                   class="fa fa-trash text-dark"></i></a>
             </div>
           </li>
