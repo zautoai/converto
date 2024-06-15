@@ -3,7 +3,7 @@ const avatarId = "{{avatarId}}";
 class API {
     static endpoint = {
         agent: "api/agents/",
-        leadAgent: 'api/agents/{{avatarId}}/chat/lead',
+        leadAgent: 'api/{{avatarId}}/leads',
         vote: 'api/conversations/message/',
         calendarDates: 'api/calendar/available-dates/{{avatarId}}',
         calendarSlots: 'api/calendar/available-slots/{{avatarId}}',
@@ -11,7 +11,7 @@ class API {
     };
 }
 
-let isStandalone = '{{standAloneFlag}}';
+let isStandalone = true;
 
 const ReactionType = {
     NULL: null,
@@ -203,33 +203,13 @@ class Utils {
 class RestClient {
     constructor(baseURL) {
         this.baseURL = baseURL;
-        this.tenantId = this.extractTenantId();
     }
 
-    extractTenantId() {
-        const hostname = window.location.hostname;
-        console.log(hostname);
-        if (hostname.includes('localhost')) {
-            const subdomain = hostname.split('.')[0];
-            console.log(subdomain);
-            return subdomain;
-        } else {
-            const subdomain = hostname.split('.')[0];
-            console.log(subdomain);
-            return subdomain;
-        }
-    }
     async get(endpoint, queryParams = {}) {
         const url = new URL(endpoint, this.baseURL);
         Object.keys(queryParams).forEach(key => url.searchParams.append(key, queryParams[key]));
         try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-tenant-id': this.tenantId
-                }
-            });
+            const response = await fetch(url);
             if (!response.ok) {
                 const errorData = await response.json();
                 throw errorData; // Throw the error object received from the server
@@ -247,8 +227,7 @@ class RestClient {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'x-tenant-id': this.tenantId
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
             });
@@ -268,9 +247,8 @@ class RestClient {
         try {
             const response = await fetch(url, {
                 method: 'PUT',
-                headers: {  
-                    'Content-Type': 'application/json',
-                    'x-tenant-id': this.tenantId
+                headers: {
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
             });
@@ -291,8 +269,7 @@ class RestClient {
             const response = await fetch(url, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'x-tenant-id': this.tenantId
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
             });
@@ -311,10 +288,7 @@ class RestClient {
         const url = new URL(endpoint, this.baseURL);
         try {
             const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'x-tenant-id': this.tenantId
-                }
+                method: 'DELETE'
             });
             if (!response.ok) {
                 const errorData = await response.json();
@@ -1286,8 +1260,8 @@ class MyChatBotUI extends ChatBotUI {
         // Create input group for name
         const inputGroupContainerName = this.createElement('div', { class: 'zauto-input-group' });
         const nameLabel = this.createElement('label');
-        nameLabel.textContent = 'Full Name';
-        const nameInput = this.createElement('input', { type: 'text', name: 'fullName', placeholder: 'Enter your name', required: true });
+        nameLabel.textContent = 'Name';
+        const nameInput = this.createElement('input', { type: 'text', name: 'name', placeholder: 'Enter your name', required: true });
     
         // Create input group for email
         const inputGroupContainerEmail = this.createElement('div', { class: 'zauto-input-group' });
@@ -1381,7 +1355,6 @@ class ChatBotLogic {
         this.history = [];
         this.eventEmitter = eventEmitter;
         this.restClient = new RestClient(this.apiUrl);
-        this.tenantId = this.extractTenantId();
 
         this.headers = {
             'Content-Type': 'application/json',
@@ -1389,8 +1362,7 @@ class ChatBotLogic {
         this.avatarData = null;
         this.socket = io(rootUrl, {
             query: {
-                "visitId": this.getVisit(),
-                "orgId": this.tenantId
+                "visitId": this.getVisit()
             }
         });
 
@@ -1568,12 +1540,6 @@ class ChatBotLogic {
 
     }
 
-    extractTenantId() {
-        const hostname = window.location.hostname;
-        const subdomain = hostname.split('.')[0];
-        return subdomain;
-    }
-
     getAvatar()
     {
         const queryParams = this.addReferrerToExistingQuery(document.referrer);
@@ -1601,7 +1567,6 @@ class ChatBotLogic {
                 agentId: this.avatarId,
                 visitorId: this.getVisitor(),
                 visitId: this.getVisit(),
-                orgId:this.tenantId,
                 chatMessage: {
                     messages: [
                         {
@@ -1665,7 +1630,6 @@ class ChatBotLogic {
         const payload = {
             agentId: this.avatarId,
             convId: this.convoId,
-            orgId:this.tenantId,
             chatMessage: {
                 messages: [
                     {
@@ -1713,7 +1677,6 @@ class ChatBotLogic {
         const payload = {
             agentId: this.avatarId,
             convId: this.convoId,
-            orgId:this.tenantId,
             url: currentUrl
         };
         this.socket.emit("navigate",payload);

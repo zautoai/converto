@@ -21,6 +21,7 @@ import { AssistantsModule } from 'src/assistants/assistants.module';
 import { SiteModule } from 'src/site/site.module';
 import { DemandGenModule } from 'src/demand-gen/demand-gen.module';
 import { TrackingService } from './tracking.service';
+import { ContactsModule } from 'src/contacts/contacts.module';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { TrackingService } from './tracking.service';
     StageModule,
     AssistantsModule,
     SiteModule,
-    DemandGenModule
+    DemandGenModule,
+    ContactsModule
   ],
   controllers: [AgentController, AgentChatController],
   providers: [AgentService, ChatService, AvatarCreatorService, AvatarQueueProcessor, AvatarQueueService, TrackingService],

@@ -1,13 +1,13 @@
-import { Controller, Get, Post, Body, Param, InternalServerErrorException, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { AgentService } from './agent.service';
-import { Agent } from './entities/agent.entity';
-import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { ChatMessage } from './dto/chat.dto';
-import { ConversationService } from 'src/conversation/conversation.service';
-import { ConversationType } from 'src/common/enums/enums';
-import { ChatService } from './agent-chat.service';
+import { Body, Controller, Get, Param, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
 import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
+import { ContactsService } from 'src/contacts/contacts.service';
+import { CreateContactDto } from 'src/contacts/dto/create-contact.dto';
+import { ConversationService } from 'src/conversation/conversation.service';
+import { ChatService } from './agent-chat.service';
+import { AgentService } from './agent.service';
+import { Agent } from './entities/agent.entity';
 
 
 @ApiTags('Agents')
@@ -16,7 +16,8 @@ export class AgentChatController {
   
   constructor(private readonly agentsService: AgentService,
     private readonly conversationService: ConversationService,
-    private readonly chatService: ChatService) {}
+    private readonly chatService: ChatService,
+    private contactService: ContactsService) {}
 
 
   // @Post()
@@ -80,7 +81,7 @@ export class AgentChatController {
   async fetchMessages(@Param('convId') conversationId: string, @Param('agentId') agentId: string, @Req() request: SubdomainRequest) {
     const orgId = request.orgId;
     const conversation = await this.conversationService.findOneNoSummay(orgId,conversationId);
-    if(conversation ) {
+    if(!conversation ) {
       throw new UnauthorizedException('You are not authorized to access this conversation.')
     }
     let history = await this.conversationService.getMessages(orgId,conversationId);
@@ -92,5 +93,17 @@ export class AgentChatController {
   //   this.conversationService.update(convId, {history: JSON.stringify(response.history)})
   // }
 
-
+  @Post('lead')
+  @UseGuards(SubdomainGuard)
+  async leadCapture(@Body() createLeadDto: CreateContactDto, @Req() request: SubdomainRequest)
+  {
+    const orgId = request.orgId;
+    if(createLeadDto.fullName){
+      const firstName = createLeadDto.fullName.split(' ')[0];
+      createLeadDto.firstName = firstName
+      createLeadDto.lastName = createLeadDto.fullName.split(' ').slice(1).join(' ')
+    }
+    const contact = await this.contactService.create(orgId,createLeadDto)
+    return contact
+  }
 }

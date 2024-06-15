@@ -1,22 +1,21 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotAcceptableException, NotFoundException } from '@nestjs/common';
-import { CreateAgentDto } from './dto/create-agent.dto';
-import { UpdateAgentDto } from './dto/update-agent.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { AgentPromptService } from 'src/agent-prompt/agent-prompt.service';
 import { ChromaDBService } from 'src/chroma/chroma-dbservice/chroma-db.service';
-import { StaticFileService } from 'src/common/services/static.service';
-import { Agent, AgentStatus } from './entities/agent.entity';
-import { S3Service } from 'src/common/services/s3.service';
-import { FileUtilService } from 'src/common/services/file-utility.service';
-import { LlmService } from 'src/llm/llm.service';
-import { StageService } from 'src/stage/stage.service';
-import { CreateAvatarDto } from './dto/create-avatar.dto';
-const { minify } = require('uglify-js');
-import * as fs from 'fs';
-import * as path from 'path';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ServiceParams } from 'src/common/models/service-param.model';
 import { BaseService } from 'src/common/services/base.service';
-import { readFile } from 'fs/promises';
+import { FileUtilService } from 'src/common/services/file-utility.service';
+import { S3Service } from 'src/common/services/s3.service';
+import { StaticFileService } from 'src/common/services/static.service';
+import { LlmService } from 'src/llm/llm.service';
+import { StageService } from 'src/stage/stage.service';
+import { CreateAgentDto } from './dto/create-agent.dto';
+import { CreateAvatarDto } from './dto/create-avatar.dto';
+import { UpdateAgentDto } from './dto/update-agent.dto';
+import { Agent, AgentStatus } from './entities/agent.entity';
+import * as fs from 'fs';
+import * as path from 'path';
+const { minify } = require('uglify-js');
 
 @Injectable()
 export class AgentService extends BaseService {
@@ -604,26 +603,41 @@ export class AgentService extends BaseService {
     }
   }
 
+
   // Generate embedding script for bot
-  async getEmbedding(orgId: string) {
-    const prisma = await this.getPrismaClient(orgId);
+  async getEmbedding(orgId:string,agentId: string,standalone: boolean = false) {
+
     try {
-      const agent = await prisma.agent.findFirst();
-      if (!agent) {
-        throw new NotFoundException('Agent not found');
-      }
-      const filePath = `./src/common/scripts/converto.deploy.js`;
-      let content = await readFile(filePath, 'utf-8');
-      content = content.replaceAll('{{API_ROOT_URL}}', process.env.HOST_URL);
-      content = content.replaceAll('{{ORG_ID}}', orgId);
-      return content;
+      let host = process.env.HOST_URL;
+
+        // Extract the protocol and domain from HOST_URL
+        const url = new URL(host);
+        const protocol = url.protocol; // will include the trailing ':'
+        const baseHost = url.host; // will include hostname and port if any
+
+        // Construct the full URL with orgId as subdomain
+        const fullHost = `${protocol}//${orgId}.${baseHost}`
+      
+      // const agent = await this.prisma.agent.findUnique({where:{id:agentId}}); 
+      // if(!agent)
+      // {
+      //   throw new NotFoundException();
+      // }
+      
+      const filePath = path.resolve(__dirname, '../../', 'public','assets','bot','js','zautobot_v2.js');
+      let jsCode = fs.readFileSync(filePath, 'utf8')
+      .replaceAll("{{avatarId}}",agentId)
+      .replaceAll("{{ApiUrl}}",fullHost + "/")
+      .replaceAll("{{BaseUrl}}",fullHost + "/")
+      .replaceAll("'{{standAloneFlag}}'",`${standalone}`)
+  
+      const options = {toplevel: true,};
+      const uglifiedCode = minify(jsCode,options).code;
+  
+      return uglifiedCode;
     }
     catch (error) {
       throw error;
-    }
-    finally {
-      prisma.$disconnect()
-      await this.closeConnection(orgId);
     }
   }
 
