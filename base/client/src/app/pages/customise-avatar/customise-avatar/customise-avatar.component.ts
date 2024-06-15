@@ -162,6 +162,9 @@ export class CustomiseAvatarComponent implements OnInit, AfterViewInit {
 
   getAgentDeploy(type: DeployScriptType) {
     const botId = this.avatarService.getAvatarId();
+    const currentURL = window.location.href;
+    const url = new URL(currentURL);
+    const tenantId = url.hostname.split('.')[0]; // Assuming subdomain is the tenant ID
 
     let script = "";
     if (type === DeployScriptType.BOTTOM_BAR) {
@@ -171,14 +174,10 @@ export class CustomiseAvatarComponent implements OnInit, AfterViewInit {
                 var rootElement = document.createElement("div");
                 rootElement.id = "zauto_root";
                 document.body.appendChild(rootElement);
-                
-                const currentURL = window.location.href;
-                const url = new URL(currentURL);
-                const tenantId = url.hostname.split('.')[0]; // Assuming subdomain is the tenant ID
 
-                fetch("${API.rootURL}api/agents/widget/standalone/${botId}.js", {
+                fetch("${API.rootURL}api/agents/widget/${botId}.js", {
                     headers: {
-                        'x-tenant-id': tenantId
+                        'x-tenant-id': '${tenantId}'
                     }
                 })
                 .then(response => {
@@ -203,5 +202,6 @@ export class CustomiseAvatarComponent implements OnInit, AfterViewInit {
 
     return script;
 }
+
 
 }

@@ -630,6 +630,8 @@ export class AgentService extends BaseService {
       .replaceAll("{{ApiUrl}}",fullHost + "/")
       .replaceAll("{{BaseUrl}}",fullHost + "/")
       .replaceAll("'{{standAloneFlag}}'",`${standalone}`)
+      .replaceAll("{{ORG_ID}}", orgId)
+      .replaceAll("{{API_ROOT_URL}}",fullHost)
   
       const options = {toplevel: true,};
       const uglifiedCode = minify(jsCode,options).code;

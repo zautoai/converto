@@ -203,22 +203,8 @@ class Utils {
 class RestClient {
     constructor(baseURL) {
         this.baseURL = baseURL;
-        this.tenantId = this.extractTenantId();
     }
 
-    extractTenantId() {
-        const hostname = window.location.hostname;
-        console.log(hostname);
-        if (hostname.includes('localhost')) {
-            const subdomain = hostname.split('.')[0];
-            console.log(subdomain);
-            return subdomain;
-        } else {
-            const subdomain = hostname.split('.')[0];
-            console.log(subdomain);
-            return subdomain;
-        }
-    }
     async get(endpoint, queryParams = {}) {
         const url = new URL(endpoint, this.baseURL);
         Object.keys(queryParams).forEach(key => url.searchParams.append(key, queryParams[key]));
@@ -227,7 +213,7 @@ class RestClient {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-tenant-id': this.tenantId
+                    'x-tenant-id': "{{ORG_ID}}"
                 }
             });
             if (!response.ok) {
@@ -248,7 +234,7 @@ class RestClient {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-tenant-id': this.tenantId
+                    'x-tenant-id': "{{ORG_ID}}"
                 },
                 body: JSON.stringify(data)
             });
@@ -270,7 +256,7 @@ class RestClient {
                 method: 'PUT',
                 headers: {  
                     'Content-Type': 'application/json',
-                    'x-tenant-id': this.tenantId
+                    'x-tenant-id': "{{ORG_ID}}"
                 },
                 body: JSON.stringify(data)
             });
@@ -292,7 +278,7 @@ class RestClient {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-tenant-id': this.tenantId
+                    'x-tenant-id': "{{ORG_ID}}"
                 },
                 body: JSON.stringify(data)
             });
@@ -313,7 +299,7 @@ class RestClient {
             const response = await fetch(url, {
                 method: 'DELETE',
                 headers: {
-                    'x-tenant-id': this.tenantId
+                    'x-tenant-id': "{{ORG_ID}}"
                 }
             });
             if (!response.ok) {
@@ -1381,7 +1367,6 @@ class ChatBotLogic {
         this.history = [];
         this.eventEmitter = eventEmitter;
         this.restClient = new RestClient(this.apiUrl);
-        this.tenantId = this.extractTenantId();
 
         this.headers = {
             'Content-Type': 'application/json',
@@ -1390,7 +1375,7 @@ class ChatBotLogic {
         this.socket = io(rootUrl, {
             query: {
                 "visitId": this.getVisit(),
-                "orgId": this.tenantId
+                "orgId": "{{ORG_ID}}"
             }
         });
 
@@ -1601,7 +1586,7 @@ class ChatBotLogic {
                 agentId: this.avatarId,
                 visitorId: this.getVisitor(),
                 visitId: this.getVisit(),
-                orgId:this.tenantId,
+                orgId:"{{ORG_ID}}",
                 chatMessage: {
                     messages: [
                         {
@@ -1665,7 +1650,7 @@ class ChatBotLogic {
         const payload = {
             agentId: this.avatarId,
             convId: this.convoId,
-            orgId:this.tenantId,
+            orgId:"{{ORG_ID}}",
             chatMessage: {
                 messages: [
                     {
@@ -1684,7 +1669,7 @@ class ChatBotLogic {
         {
             throw Error('convId missing');
         }
-        payload = {...payload, convId: this.convoId };
+        payload = {...payload, conversationId: this.convoId };
         let endpoint = `${this.apiUrl}${API.endpoint.leadAgent.replace('{{avatarId}}', this.avatarId)}`;
         this.restClient.post(endpoint,payload)
         .then(data => {
@@ -1713,7 +1698,7 @@ class ChatBotLogic {
         const payload = {
             agentId: this.avatarId,
             convId: this.convoId,
-            orgId:this.tenantId,
+            orgId:"{{ORG_ID}}",
             url: currentUrl
         };
         this.socket.emit("navigate",payload);
@@ -1788,7 +1773,10 @@ class ChatBotLogic {
 class WebsiteTracker {
     constructor(eventEmitter) {
         this.eventEmitter = eventEmitter;
+        this.maxScrollDepth = 0; // Initialize as a class property
+        this.actionHistory = []; // Initialize as a class property
         this.initializeTracking();
+        this.journeyTrackerInit();
     }
 
     trackButtonClick(event) {
@@ -1796,13 +1784,12 @@ class WebsiteTracker {
             type: event.target.tagName.toLowerCase(),
             text: event.target.textContent.trim(),
             id: event.target.id,
-            link:event.target.href || ''
+            link: event.target.href || ''
         };
-        this.eventEmitter.emit('sendTrackingData', {data:JSON.stringify(data)});
+        this.eventEmitter.emit('sendTrackingData', {data: JSON.stringify(data)});
     }
 
-    initializeTracking()
-    {
+    initializeTracking() {
         const buttons = document.querySelectorAll('button');
         buttons.forEach(button => {
             button.addEventListener('click', this.trackButtonClick.bind(this));
@@ -1812,7 +1799,140 @@ class WebsiteTracker {
             link.addEventListener('click', this.trackButtonClick.bind(this));
         });
     }
+
+    journeyTrackerInit() {
+        const apiRootUrl = '{{API_ROOT_URL}}';
+        const tenantId = "{{ORG_ID}}";
+        const currentPageUrl = window.location.origin + window.location.pathname;
+        const buttons = document.querySelectorAll('button');
+        const links = document.querySelectorAll('a');
+        let scrollTimeout;
+
+        const socket = io(apiRootUrl, {query: {orgId: tenantId}});
+        socket.on('connect', () => {
+            console.log('Socket connected for tracking');
+            this.handleActionHistory(socket);
+            this.createSession(apiRootUrl, tenantId, currentPageUrl, socket);
+        });
+
+        buttons.forEach(button => {
+            button.addEventListener('click', this.trackButtonClick.bind(this));
+        });
+        links.forEach(link => {
+            link.addEventListener('click', this.trackButtonClick.bind(this));
+        });
+
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => this.trackScrollDepth(socket, currentPageUrl), 100);
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (!this.getVisitId()) return;
+            const data = {
+                "visitId": this.getVisitId(),
+                "data": "",
+                "type": "PAGE_CLOSED",
+                "url": currentPageUrl
+            }
+            this.appendActionHistory(data);
+        });
+    }
+
+    handleActionHistory(socket) {
+        const actionStr = localStorage.getItem("prospectAction");
+        if (actionStr) {
+            const _actionHistory = JSON.parse(actionStr);
+            setTimeout(() => {
+                for (const action of _actionHistory) {
+                    socket.emit('prospectAction', action);
+                }
+            }, 500);
+        }
+        localStorage.removeItem("prospectAction");
+    }
+
+    createSession(apiRootUrl, tenantId, currentPageUrl, socket) {
+        const data = {};
+        const visitorId = this.getVisitorId();
+        fetch(`${apiRootUrl}/api/visitors?${(visitorId ? `visitorId=${visitorId}` : '')}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "x-tenant-id": tenantId
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to create session');
+            }
+            return response.json();
+        })
+        .then(responseData => {
+            console.log('Session created successfully');
+            console.log('Response Data:', responseData);
+            this.setVisitorId(responseData.visitorId);
+            this.setVisitId(responseData.visitId);
+            this.trackPageView(socket, currentPageUrl);
+        })
+        .catch(error => {
+            console.error('Error creating session:', error.message);
+        });
+    }
+
+    trackPageView(socket, currentPageUrl) {
+        if (!this.getVisitId()) return;
+        const data = {
+            "visitId": this.getVisitId(),
+            "type": "PAGE_VIEWED",
+            "url": currentPageUrl
+        }
+        socket.emit('prospectAction', data);
+    }
+
+    trackScrollDepth(socket, currentPageUrl) {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight;
+        const winHeight = window.innerHeight;
+        const currentScrollDepth = (scrollTop / (docHeight - winHeight)) * 100;
+        if (currentScrollDepth > this.maxScrollDepth) {
+            console.log(currentScrollDepth, this.maxScrollDepth);
+            this.maxScrollDepth = currentScrollDepth;
+            if (!this.getVisitId()) return;
+            const data = {
+                "visitId": this.getVisitId(),
+                "type": "PAGE_VIEWED",
+                "scrollDepth": Math.round(this.maxScrollDepth),
+                "url": currentPageUrl
+            }
+            socket.emit('prospectAction', data);
+        }
+    }
+
+    appendActionHistory(action) {
+        this.actionHistory.push(action);
+        localStorage.setItem("prospectAction", JSON.stringify(this.actionHistory));
+    }
+
+    getVisitorId() {
+        return localStorage.getItem("visitorId");
+    }
+
+    setVisitorId(id) {
+        localStorage.setItem("visitorId", id);
+    }
+
+    getVisitId() {
+        return localStorage.getItem("visitId");
+    }
+
+    setVisitId(id) {
+        localStorage.setItem("visitId", id);
+    }
 }
+
+
 
 function loadExternalResources(rootElementId, resourceList, callback) {
     const rootElement = document.getElementById(rootElementId);
