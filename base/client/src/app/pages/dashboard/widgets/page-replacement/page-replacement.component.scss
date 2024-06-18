@@ -1,0 +1,28 @@
+.box-container {
+    max-width:auto; /* Adjust the max-width as needed */
+    margin-left:5px;
+    padding: 20px; /* Add some padding */
+    border: 1px solid #ccc; /* Add a border */
+    border-radius: 8px; /* Add rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    background-color: #fff; /* Set background color */
+    margin-top: 35px;
+  }
+  
+  .box-title {
+    font-size: 1.5em; /* Adjust the font size */
+    margin-bottom: 20px; /* Space between title and table */
+    text-align: center; /* Center the title */
+  }
+  
+  .table-container {
+    overflow-x: auto; /* Add horizontal scroll if needed */
+    overflow-y: auto; /* Add vertical scroll if needed */
+
+  }
+  
+  .table-container table {
+    width: 100%;
+    margin-left: 12px;
+  }
+  

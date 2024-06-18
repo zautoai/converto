@@ -4,10 +4,10 @@
 
 export const environment = {
   production: false,
-  // apiRoot: 'http://192.168.1.15:3000/',
-  // baseUrl: 'http://192.168.1.15:3000/',
-  apiRoot: 'http://localhost:3000/',
-  baseUrl: 'http://localhost:3000/',
+  apiRoot: 'http://192.168.1.16:3000/',
+  baseUrl: 'http://192.168.1.16:3000/',
+  // apiRoot: 'http://localhost:3000/',
+  // baseUrl: 'http://localhost:3000/',
   zauto_bot_url: 'https://bot.zautoai.com/'
 };
 /*

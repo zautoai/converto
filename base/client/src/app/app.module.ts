@@ -16,10 +16,11 @@ import { ComponentsModule } from './components/components.module';
 
 
 
+
 @NgModule({
   declarations:[
     AppComponent,
-    LaunchAvatarComponent
+    LaunchAvatarComponent,
   ],
   imports: [
   CommonModule,

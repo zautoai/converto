@@ -118,8 +118,7 @@ export class DashChartComponent implements AfterViewInit {
         this.changeDetectorRef.detectChanges()
       }
     } else {
-      console.log(labels);
-      
+      console.log(labels);     
       console.error('Data or labels are null or empty.');
     }
   }

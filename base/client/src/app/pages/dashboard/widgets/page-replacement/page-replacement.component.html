@@ -1,0 +1,40 @@
+<div class="box-container">
+    <h2 class="box-title">PAGE ENHANCEMENT METRICS</h2>
+    <div class="table-container">
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <!-- Pages Column -->
+        <ng-container matColumnDef="pages">
+          <th mat-header-cell *matHeaderCellDef>PAGES</th>
+          <td mat-cell *matCellDef="let element"> {{element.pages}} </td>
+        </ng-container>
+  
+        <!-- Visits Column -->
+        <ng-container matColumnDef="visits">
+          <th mat-header-cell *matHeaderCellDef>VISITS</th>
+          <td mat-cell *matCellDef="let element"> {{element.visits}} </td>
+        </ng-container>
+  
+        <!-- CTR Column -->
+        <ng-container matColumnDef="ctr">
+          <th mat-header-cell *matHeaderCellDef>CTR</th>
+          <td mat-cell *matCellDef="let element"> {{element.ctr}} </td>
+        </ng-container>
+  
+        <!-- Average Time Spent Column -->
+        <ng-container matColumnDef="avgTimeSpent">
+          <th mat-header-cell *matHeaderCellDef>AVERAGE TIME SPENT</th>
+          <td mat-cell *matCellDef="let element"> {{element.avgTimeSpent}} </td>
+        </ng-container>
+  
+        <!-- Scroll Depth Column -->
+        <ng-container matColumnDef="scrollDepth">
+          <th mat-header-cell *matHeaderCellDef>SCROLL DEPTH</th>
+          <td mat-cell *matCellDef="let element"> {{element.scrollDepth}} </td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  </div>
+  

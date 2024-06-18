@@ -45,8 +45,6 @@ import { WlcomeCardComponent } from './dashboard/widgets/wlcome-card/wlcome-card
 import { CounterFormatPipe } from './dashboard/widgets/pipe/CounterFormat.pipe';
 import { ProgressCardComponent } from './dashboard/widgets/progress-card/progress-card.component';
 import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
-
-
 import { PluginCardComponent } from './plugins/plugin-card/plugin-card.component';
 import { PluginsComponent } from './plugins/plugins.component';
 import { CrmContactMappingComponent } from './plugins/crm-mapping/crm-contact-mapping/crm-contact-mapping.component';
@@ -66,9 +64,16 @@ import { ComponentsModule } from '../components/components.module';
 import { AbmCardComponent } from './abm/components/abm-card/abm-card.component';
 import { AbmCardPreviewComponent } from './abm/components/abm-card-preview/abm-card-preview.component';
 import { AbmviewComponent } from './abmview/abmview.component';
+import { ChannelImpressionComponent } from './dashboard/widgets/channel-impression/channel-impression.component';
+import { PageReplacementComponent } from './dashboard/widgets/page-replacement/page-replacement.component';
+import { MatTableModule } from '@angular/material/table'; // Correct import
+import { ChannelMetricsComponent } from './dashboard/widgets/channel-metrics/channel-metrics.component';
+import { PredictiveLeadComponent } from './dashboard/widgets/predictive-lead/predictive-lead.component';
+import { ScoringIntentComponent } from './dashboard/widgets/scoring-intent/scoring-intent.component';
 
 @NgModule({
   declarations: [
+    ChannelImpressionComponent,
     ZautoDashboardComponent,
     conversationcomponent,
     ChatContainerComponent,
@@ -116,6 +121,12 @@ import { AbmviewComponent } from './abmview/abmview.component';
     AbmCardComponent,
     AbmCardPreviewComponent,
     AbmviewComponent,
+    PageReplacementComponent,
+    ChannelengagementComponent,
+    ChannelMetricsComponent,
+    PredictiveLeadComponent,
+    ScoringIntentComponent,
+    
   ],
   imports: [
     PlatformLinkModule,
@@ -141,7 +152,8 @@ import { AbmviewComponent } from './abmview/abmview.component';
     NgbProgressbarModule,
     NgbNavModule,
     NgbAccordionModule,
-    ComponentsModule
+    ComponentsModule,
+    MatTableModule, // Correct import
   ],
 })
 export class PagesModule { }
