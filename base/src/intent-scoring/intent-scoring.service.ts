@@ -53,20 +53,30 @@ export class IntentScoringService extends BaseService implements OnModuleInit{
       {
         const result = await this.intentScoreGeneratorService.getIntentScore(JSON.stringify(rules),JSON.stringify(activities));
         const prisma = await this.getPrismaClient(orgId);
-        try
-        {
-          const updatedVisit = await prisma.visit.update({where:{id:visitId},data:{score:result?.score}});
-          const sumOfScore = await prisma.visit.aggregate({
+        try {
+          // Update the score for the specific visit
+          const updatedVisit = await prisma.visit.update({
+            where: { id: visitId },
+            data: { score: result?.score }
+          });
+        
+          // Get the total sum of scores and the count of visits for the visitor
+          const aggregateResult = await prisma.visit.aggregate({
             where: { visitorId: updatedVisit.visitorId },
             _sum: { score: true },
+            _count: { score: true }
           });
-          
+        
+          // Calculate the average score
+          const averageScore = aggregateResult._sum.score / aggregateResult._count.score;
+        
+          // Update the visitor's average score
           await prisma.visitor.update({
             where: { id: updatedVisit.visitorId },
-            data: { score: sumOfScore._sum.score },
+            data: { score: averageScore }
           });
-          
-        }
+        
+        } 
         catch(err)
         {
           console.log(err);

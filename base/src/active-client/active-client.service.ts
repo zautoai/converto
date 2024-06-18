@@ -101,7 +101,10 @@ export class ActiveClientService extends BaseService {
     async deleteByClient(orgId: string, clientId: string) {
         const prisma = await this.getPrismaClient(orgId);
         try {
-            return await prisma.activeClient.delete({ where: { clientId } });
+            const client = await prisma.activeClient.findUnique({ where: { clientId } })
+            if (client) {
+                return await prisma.activeClient.delete({ where: { clientId } });
+            }
         }
         catch (error) {
             console.log(error)

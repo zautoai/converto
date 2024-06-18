@@ -35,7 +35,7 @@ export class StartupService extends BaseService implements OnModuleInit {
 
     async executeOnStartup() {
         await this.applieMigration();
-        await this.createZautoOrg()
+        // await this.createZautoOrg()
         // await this.createDefaultRoles();
         //await this.resyncHelpers();
         await this.createFolders();

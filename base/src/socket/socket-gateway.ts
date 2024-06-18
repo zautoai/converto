@@ -332,6 +332,7 @@ export class SocketGateway
             clientId: client.id,
             convId: conversation.id,
             agentId: agent.id,
+            orgId: orgId,
           }),
         );
       } catch (error) {
@@ -968,6 +969,7 @@ export class SocketGateway
   }
 
   async getClientInfo(client: Socket) {
+    
     if (client.handshake.headers.authorization) {
       const token = client.handshake.headers.authorization;
       // Extract the token value if it's a Bearer token

@@ -5,6 +5,8 @@ import { BaseService } from 'src/common/services/base.service';
 import { IcpMicroService } from 'src/microservices/crm_service/icp.service';
 import { IcpScoreGenerator } from 'src/assistants/services/icp-score-generator.service';
 import { ContactService } from 'src/microservices/crm_service/contact.service';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class IcpService extends BaseService {
@@ -13,6 +15,7 @@ export class IcpService extends BaseService {
     private readonly icpService: IcpMicroService,
     private readonly icpScoreGenerator: IcpScoreGenerator,
     private readonly contactService: ContactService,
+    @InjectQueue('icp_score_queue') private readonly icpScoreQueue: Queue,
   ) {
     super();
   }
@@ -42,9 +45,16 @@ export class IcpService extends BaseService {
   }
 
   async update(orgId: string, id: string, updateIcpDto: UpdateIcpDto) {
-    return this.handleException(
-      await this.icpService.updateIcp(orgId, id, updateIcpDto),
-    );
+    try {
+      await this.handleException(
+        await this.icpService.updateIcp(orgId, id, updateIcpDto),
+      );
+      await this.addOrUpdateIcpScore(orgId);
+
+    }
+    catch (e) {
+      console.log(e);
+    }
   }
 
   async remove(orgId: string, id: string) {
@@ -54,7 +64,28 @@ export class IcpService extends BaseService {
   }
 
   async addOrUpdateIcpScore(orgId: string) {
-
+    try {
+      const limit = 10;
+      const response = (await this.handleException(
+        await this.contactService.getContacts(orgId,{limit,page:1}),
+      ))
+      let contacts=response.data; 
+      const total=response.total;
+      const totalPage=Math.ceil(total/limit)
+      let nextPage=2;
+      while(nextPage<=totalPage){
+        const _response = (await this.handleException(
+          await this.contactService.getContacts(orgId, {limit, page:nextPage}),
+        ))
+        contacts=contacts.concat(_response.data);
+        nextPage++
+      }
+      for (const contact of contacts) {
+        await this.icpScoreQueue.add('icp_score', { orgId, contact });
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async calculateIcpScore(orgId: string, contact: any) {

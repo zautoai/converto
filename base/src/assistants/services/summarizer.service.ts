@@ -83,11 +83,11 @@ export class SummarizerService {
             const messages = []
             for (let message of conversation.messages) {
                 messages.push({
-                    role: message.role == 'assistant' ? conversation.agent.displayName : customerName,
+                    role: message.role == 'assistant' ? conversation.agent?.displayName : customerName,
                     content: message.content
                 });
             }
-            const content = `BDR Name: ${conversation.agent.name}
+            const content = `BDR Name: ${conversation.agent?.name}
             Customer Name: ${customerName}
             Here is the chat conversation:
             ${JSON.stringify(messages)}`;
@@ -105,7 +105,7 @@ export class SummarizerService {
                     "potentialLevel": "high"
                 }`
             };
-            let summaryJson = undefined;
+            let summaryJson = undefined
             if (result.content.includes('```json')) {
                 summaryJson = this.extractJsonFromMarkdown(result.content);
             } else {

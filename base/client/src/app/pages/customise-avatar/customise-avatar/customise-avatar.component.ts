@@ -161,28 +161,47 @@ export class CustomiseAvatarComponent implements OnInit, AfterViewInit {
   deplymentType = DeployScriptType;
 
   getAgentDeploy(type: DeployScriptType) {
-    const botId = this.avatarService.getAvatarId()
+    const botId = this.avatarService.getAvatarId();
+    const currentURL = window.location.href;
+    const url = new URL(currentURL);
+    const tenantId = url.hostname.split('.')[0]; // Assuming subdomain is the tenant ID
 
     let script = "";
-    if (type == DeployScriptType.BOTTOM_BAR) {
-      script = `
-      <script type="text/javascript">
-        (function()
-        {
-            var rootElement = document.createElement("div");
-            rootElement.id = "zauto_root";
-            document.body.appendChild(rootElement);
-            d = document; 
-            s = d.createElement("script");     
-            s.async = 1;     
-            s.src = "${API.rootURL}api/agents/widget/${botId}.js";
-            d.getElementsByTagName("head")[0].appendChild(s);
-        })();
-      </script>
-      `
+    if (type === DeployScriptType.BOTTOM_BAR) {
+        script = `
+        <script type="text/javascript">
+            (function() {
+                var rootElement = document.createElement("div");
+                rootElement.id = "zauto_root";
+                document.body.appendChild(rootElement);
+
+                fetch("${API.rootURL}api/agents/widget/${botId}.js", {
+                    headers: {
+                        'x-tenant-id': '${tenantId}'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then(scriptContent => {
+                    var s = document.createElement("script");
+                    s.async = 1;
+                    s.text = scriptContent;
+                    document.getElementsByTagName("head")[0].appendChild(s);
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+            })();
+        </script>
+        `;
     }
 
     return script;
-  }
+}
+
 
 }

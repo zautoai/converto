@@ -152,9 +152,10 @@ export class CTASelectorService extends BaseService implements OnModuleInit {
       data: { types },
     } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
-    return prisma.callToAction.findMany({
+    const ctaList =await prisma.callToAction.findMany({
       where: { type: { in: types } },
     });
+    return ctaList;
   }
 
   async processContentForCTAs(

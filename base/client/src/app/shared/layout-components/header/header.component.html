@@ -151,7 +151,7 @@
   </div>
 </div>
 
-<!-- change profile pic modal -->
+<!-- Change Profile Modal -->
 <ng-template #changeProfileModal let-modal>
   <div class="modal-header">
     <h4><i class="zmdi zmdi-image"></i> Change profiles pic</h4>
@@ -162,28 +162,25 @@
         <div class="col-6">
           <div class="profile-pic-cover">
             <div *ngIf="userData">
-              <img src="{{ userData.imgUrl }}" alt="place in the modal" />
+              <img [src]="previewUrl || userData.imgUrl || GLOBAL_IMAGES.default_user" alt="Profile image" />
             </div>
           </div>
         </div>
         <div class="col-6 my-auto">
-          <label for="selectImg" class="btn btn-primary btn-block"><i class="fa fa-upload" aria-hidden="true"></i>
-            Select Image</label>
-          <input type="file" id="selectImg" accept="image/png, image/jpg, image/jpeg" (change)="onImageSelected($event)"
-            required />
+          <label for="selectImg" class="btn btn-primary btn-block">
+            <i class="fa fa-upload" aria-hidden="true"></i> Select Image
+          </label>
+          <input type="file" id="selectImg" accept="image/png, image/jpg, image/jpeg" (change)="onImageSelected($event)" required />
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline-primary" type="button" (click)="closeModal()">
-        Cancel
-      </button>
-      <button class="btn btn-primary" type="submit" [disabled]="!selectedImage">
-        Save
-      </button>
+      <button class="btn btn-outline-primary" type="button" (click)="closeModal()">Cancel</button>
+      <button class="btn btn-primary" type="submit" [disabled]="!selectedImage">Save</button>
     </div>
   </form>
 </ng-template>
+
 
 <ng-template #changePasswordModal let-modal>
   <div class="modal-header">

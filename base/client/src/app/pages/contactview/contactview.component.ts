@@ -17,8 +17,6 @@ export class ContactviewComponent {
   
   active = 1; 
 
-
-
   userId: string="";
   userData: any;
   selectedData: any;
