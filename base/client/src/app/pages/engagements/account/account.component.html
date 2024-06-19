@@ -154,28 +154,28 @@
       <div class="col-12">
         <div class="form-group mb-3">
           <advanced-input [label]="'Account Name'" [type]="'text'" [placeholder]="'Account Name'" [size]="'md'"
-            [control]="accountName" [isDisabled]="isLoading"></advanced-input>
+            [control]="accountName" [isDisabled]="isLoading" [errorMessages]="errorMessages.name"></advanced-input>
         </div>
       </div>
     </div>
     <div class="form-group mb-3">
       <advanced-input [label]="'Email'" [type]="'email'" [placeholder]="'email ID'" [size]="'md'" [control]="email"
-        [isDisabled]="isLoading" [errorMessages]="errorMessages.email"></advanced-input>
+        [isDisabled]="isLoading" ></advanced-input>
     </div>
     <div class="form-group mb-3">
       <advanced-input [label]="'Phone'" [type]="'tel'" [placeholder]="'phone number'" [size]="'md'" [control]="phone"
         [isDisabled]="isLoading"></advanced-input>
     </div>
     <div class="form-group mb-3">
-      <advanced-input [label]="'industry'" [type]="'text'" [placeholder]="'industry'" [size]="'md'" [control]="industry"
+      <advanced-input [label]="'Industry'" [type]="'text'" [placeholder]="'industry'" [size]="'md'" [control]="industry"
         [isDisabled]="isLoading"></advanced-input>
     </div>
     <div class="form-group mb-3">
-      <advanced-input [label]="'organisation'" [type]="'text'" [placeholder]="'organisation'" [size]="'md'"
+      <advanced-input [label]="'Organisation'" [type]="'text'" [placeholder]="'organisation'" [size]="'md'"
         [control]="industry" [isDisabled]="isLoading"></advanced-input>
     </div>
     <div class="form-group mb-3">
-      <advanced-input [label]="'website'" [type]="'text'" [placeholder]="'website'" [size]="'md'" [control]="website"
+      <advanced-input [label]="'Website'" [type]="'text'" [placeholder]="'website'" [size]="'md'" [control]="website"
         [isDisabled]="isLoading"></advanced-input>
     </div>
     <div class="form-group mb-3">

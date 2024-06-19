@@ -1,15 +1,14 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { RestService } from 'src/app/shared/services/rest.service';
-import { API } from 'src/app/config/endpoint.config';
-import { NotificationService } from 'src/app/shared/services/notification.service';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
-import { ScrollUtilService } from 'src/app/shared/services/scroll-util.service';
+import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { updateDataList } from 'src/app/common/utils';
 import { AdvanceOffcanvasComponent } from 'src/app/components/advance-offcanvas/advance-offcanvas.component';
-import { log } from 'console';
+import { API } from 'src/app/config/endpoint.config';
+import { NotificationService } from 'src/app/shared/services/notification.service';
+import { RestService } from 'src/app/shared/services/rest.service';
+import { ScrollUtilService } from 'src/app/shared/services/scroll-util.service';
+import { SweetAlertService } from 'src/app/shared/services/sweet-alart.service';
 @Component({
   selector: 'app-call-to-action',
   templateUrl: './call-to-action.component.html',
@@ -17,13 +16,10 @@ import { log } from 'console';
 })
 export class CallToActionComponent implements OnInit, AfterViewInit {
   @ViewChild(AdvanceOffcanvasComponent) CtaComposeCanvas!: AdvanceOffcanvasComponent;
-  @ViewChild('createCTAOffcanvas', { static: false }) createCTAOffcanvas: ElementRef | any;
-  @ViewChild('updateCTAOffcanvas', { static: false }) updateCTAOffcanvas: ElementRef | any;
   @ViewChild('generateCTAOffcanvas', { static: false }) generateCTAOffcanvas: ElementRef | any;
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
   ctaList: any = [];
   selectedCta: any = null;
-  ctaForm: FormGroup;
   errorFeedback: any = { name: "", description: "", link: "", type: "" };
   currentPage: number = 1;
   itemPerPage: number = 25;
@@ -46,22 +42,25 @@ export class CallToActionComponent implements OnInit, AfterViewInit {
       value: 'CALENDAR',
     }
   ];
+
+  ctaForm: FormGroup = new FormGroup({
+    name: new FormControl ('', [Validators.required]),
+    description: new FormControl ('',[Validators.required]),
+    link: new FormControl ('',[]),
+    type: new FormControl (null, [Validators.required]),
+  });
+
+
   constructor(
     private router: ActivatedRoute,
     private route: Router,
     private offcanvasService: NgbOffcanvas,
-    private formBuilder: FormBuilder,
     private restService: RestService,
     private notifService: NotificationService,
     private sweetAlertService: SweetAlertService,
     private scrollService: ScrollUtilService
   ) {
-    this.ctaForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      description: ['', Validators.required],
-      link: [''],
-      type: [null, Validators.required],
-    });
+    
   }
   ngOnInit(): void {
     this.getAllCta();
@@ -104,13 +103,13 @@ export class CallToActionComponent implements OnInit, AfterViewInit {
   openCreateCta() {
     this.resetErrorFeedback();
     this.ctaForm.reset();
+    this.isEdit = false;
     this.type.setValue(null)
     this.CtaComposeCanvas.open()
   }
   onCreateSubmit() {
     this.resetErrorFeedback();
-    const data=this.form.value 
-    console.log(data) 
+    const data=this.ctaForm.value 
       this.restService.post(API.main.cta, data).subscribe({
         next: (response: any) => {
           this.notifService.showSuccess("New Call to action created");
@@ -130,13 +129,11 @@ export class CallToActionComponent implements OnInit, AfterViewInit {
     if (this.selectedCta) {
       this.resetErrorFeedback();
       this.ctaForm.reset();
+      console.log(this.ctaForm.value);
       this.ctaForm.patchValue(this.selectedCta);
-      this.offcanvasService.open(this.updateCTAOffcanvas, {
-        position: 'end',
-        backdrop: 'static',
-        panelClass: 'visible',
-        animation: true,
-      });
+      console.log(this.ctaForm.value);
+      this.isEdit = true;
+      this.CtaComposeCanvas.open();
     }
   }
   onUpdateSubmit() {
@@ -294,26 +291,22 @@ export class CallToActionComponent implements OnInit, AfterViewInit {
         })
     }
   }
-  form: FormGroup = new FormGroup({
-    name: new FormControl('', [Validators.required,]),
-    description: new FormControl('', [Validators.required,]),
-    link: new FormControl('', [Validators.required,]),
-    type: new FormControl('', [Validators.required,]),
-  })
+
   get name(): FormControl {
-    return this.form.get('name') as FormControl
+    return this.ctaForm.get('name') as FormControl
   }
   get description(): FormControl {
-    return this.form.get("description") as FormControl
+    return this.ctaForm.get("description") as FormControl
   }
   get link(): FormControl {
-    return this.form.get("link") as FormControl
+    return this.ctaForm.get("link") as FormControl
   }
   get type(): FormControl {
-    return this.form.get("type") as FormControl
+    return this.ctaForm.get("type") as FormControl
   }
-  onSubmit() {
-    throw new Error('Method not implemented.');
+  onCancel() { 
+      this.offcanvasService.dismiss();
+      this.ctaForm.reset();
+      this.resetErrorFeedback();
   }
-  onCancel() { }
 }

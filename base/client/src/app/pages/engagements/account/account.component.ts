@@ -53,20 +53,19 @@ export class AccountsComponent implements OnInit {
     //   required: 'First name is required',
     // },
 
-    email: {
-      required: 'Email is required',
-      email: 'Please enter a valid email address',
+    name: {
+      required: 'Name is required',
     },
   };
 
   form: FormGroup = new FormGroup({
     photoURL: new FormControl(''),
-    accountName: new FormControl(''),
+    accountName: new FormControl('',[Validators.required]),
     // firstName: new FormControl('',[Validators.required]),
     // lastName: new FormControl('',[Validators.required]),
     jobTitle: new FormControl(''),
     organizationName: new FormControl(''),
-    email: new FormControl('', [Validators.required, Validators.email]),
+    email: new FormControl(''),
     annualRevenue: new FormControl(''),
     companySize: new FormControl(''),
     phone: new FormControl(''),
@@ -301,9 +300,10 @@ export class AccountsComponent implements OnInit {
   }
 
   confirmDelete = (data: any) => {
-    this.restService.delete(API.main.contact, data.id).subscribe(
+    this.restService.delete(API.main.account, data.id).subscribe(
       (response: any) => {
         this.notifService.showSuccess('Accounts Deleted Successfully.');
+        this.selectedaccounts=null
         this.getAccounts()
       },
       (error) => {

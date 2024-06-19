@@ -1669,7 +1669,8 @@ class ChatBotLogic {
         {
             throw Error('convId missing');
         }
-        payload = {...payload, conversationId: this.convoId };
+        const visitorId=localStorage.getItem("visitorId")
+        payload = {...payload, conversationId: this.convoId,visitorId };
         let endpoint = `${this.apiUrl}${API.endpoint.leadAgent.replace('{{avatarId}}', this.avatarId)}`;
         this.restClient.post(endpoint,payload)
         .then(data => {

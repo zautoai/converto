@@ -37,6 +37,9 @@ CREATE TYPE "ProspectActivityType" AS ENUM ('CTA_PERFORMED', 'PAGE_VIEWED', 'PAG
 -- CreateEnum
 CREATE TYPE "IntentType" AS ENUM ('POSITIVE', 'NEGATIVE');
 
+-- CreateEnum
+CREATE TYPE "IcpCategory" AS ENUM ('FIT', 'UNFIT', 'PARTIALLY_FIT');
+
 -- CreateTable
 CREATE TABLE "Role" (
     "id" TEXT NOT NULL,
@@ -386,6 +389,17 @@ CREATE TABLE "IntentScoring" (
     CONSTRAINT "IntentScoring_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "IcpScore" (
+    "id" TEXT NOT NULL,
+    "contactId" TEXT NOT NULL,
+    "score" INTEGER NOT NULL,
+    "category" "IcpCategory" NOT NULL,
+    "icpId" TEXT NOT NULL,
+
+    CONSTRAINT "IcpScore_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Role_name_key" ON "Role"("name");
 
@@ -418,9 +432,6 @@ CREATE INDEX "AgentId_agentFile_fkey" ON "AgentFile"("agentId");
 
 -- CreateIndex
 CREATE INDEX "Visitor_visitorId_fkey" ON "Visit"("visitorId");
-
--- CreateIndex
-CREATE INDEX "Visitor_campaignId_fkey" ON "Visit"("campaignId");
 
 -- CreateIndex
 CREATE INDEX "Visitor_source_key" ON "Visit"("source");
