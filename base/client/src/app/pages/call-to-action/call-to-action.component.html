@@ -185,7 +185,7 @@
   </div>
 </ng-template>
 <app-advance-offcanvas heading="{{ isEdit ? 'Edit' : 'Create' }} CTA">
-  <form [formGroup]="ctaForm" (ngSubmit)="onCreateSubmit()">
+  <form [formGroup]="ctaForm" (ngSubmit)="isEdit ? onUpdateSubmit():onCreateSubmit()">
     <div class="row">
       <div class="form-group mb-3">
         <advanced-input

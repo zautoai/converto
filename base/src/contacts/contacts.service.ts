@@ -16,7 +16,7 @@ export class ContactsService extends BaseService {
   }
 
   async create(orgId: string, createContactDto: any) {
-    const response=await this.handleException(
+    const response = await this.handleException(
       await this.contactService.createContact(orgId, createContactDto),
     );
     const contact = response.data;
@@ -26,32 +26,50 @@ export class ContactsService extends BaseService {
 
   async findAll(orgId: string, filterDto?: FilterDto) {
     try {
-      const response = (await this.handleException(
+      const response = await this.handleException(
         await this.contactService.getContacts(orgId, filterDto),
-      ))
-      const contacts=response.data;      
+      );
+      const contacts = response.data;
       const contactIds = contacts.map(contact => contact.id);
+      const visitorIds = contacts.map(contact => contact.visitorId).filter(id => id);
+      console.log(visitorIds);
+
       const prisma = await this.getPrismaClient(orgId);
-      const icpScores = await prisma.icpScore.findMany({ where: { contactId: { in: contactIds } } })
+
+      // Fetch icpScores for all contacts
+      const icpScores = await prisma.icpScore.findMany({
+        where: { contactId: { in: contactIds } }
+      });
       const icpScoreMap = new Map();
       icpScores.forEach(icpScore => {
         icpScoreMap.set(icpScore.contactId, icpScore);
       });
+
+      // Fetch visitor scores for all contacts with a visitorId
+      const visitors = await prisma.visitor.findMany({
+        where: { id: { in: visitorIds } },
+      });
+      const visitorScoreMap = new Map();
+      visitors.forEach(visitor => {
+        visitorScoreMap.set(visitor.id, visitor.score);
+      });
+
       const results = contacts.map(contact => ({
         ...contact,
         icpScore: icpScoreMap.get(contact.id)?.score ?? null,
         icpCategory: icpScoreMap.get(contact.id)?.category ?? null,
+        intentScore: contact.visitorId ? visitorScoreMap.get(contact.visitorId) ?? null : null,
       }));
 
       return {
         ...response,
         data: results,
       };
-    }
-    catch (err) {
+    } catch (err) {
       throw err;
     }
   }
+
 
   async findOne(orgId: string, id: string) {
     try {
@@ -63,23 +81,32 @@ export class ContactsService extends BaseService {
       const icpScore = await prisma.icpScore.findFirst({
         where: { contactId: contact.id },
       });
-      const result={
+      const visitorId = contact.visitorId
+      console.log(visitorId);
+      
+      if (visitorId) {
+        const visitor = await prisma.visitor.findUnique({
+          where: { id: visitorId },
+        });
+        contact.intentScore = visitor.score;
+      }
+      const result = {
         ...contact,
         icpScore: icpScore?.score ?? null,
         icpCategory: icpScore?.category ?? null
       }
       return {
         ...response,
-        data:result
+        data: result
       };
     } catch (err) {
       throw err;
     }
   }
-  
+
 
   async update(orgId: string, id: string, updateContactDto: any) {
-    const response=await this.handleException(
+    const response = await this.handleException(
       await this.contactService.updateContact(orgId, id, updateContactDto),
     );
     const contact = response.data;
