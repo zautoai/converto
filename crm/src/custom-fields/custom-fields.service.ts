@@ -32,7 +32,6 @@ export class CustomFieldsService {
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
-
   async update(orgId: string, id: string, updateFieldDto: UpdateFiledDto) {
     const prisma = await this.prismaClientManager.getClient(orgId);
     try {
