@@ -46,4 +46,4 @@ WORKDIR /usr/src/
 EXPOSE 3000
 
 # Start the app
-CMD [ "node", "app/main.js" , "run npx db push" ]
+CMD [ "node", "app/main.js" ]
