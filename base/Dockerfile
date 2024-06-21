@@ -11,7 +11,7 @@ RUN npm install -g npx --force
 # Production stage
 FROM ghcr.io/zautoai/node:20-alpine-prod
 
-# Set NODE_ENV to development (or production based on your environment)
+# Set NODE_ENV to development (or production based on your environment).
 ENV NODE_ENV=prod
 
 # Define arguments for environment variables.
