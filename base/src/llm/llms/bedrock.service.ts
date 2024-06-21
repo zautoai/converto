@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { BedrockRuntime, BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
-import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-node';
+
 
 @Injectable()
 export class BedrockService {
@@ -12,7 +12,7 @@ export class BedrockService {
         this.logger.log('BedrockRuntimeClient initialized.');
     }
 
-    async invokeBedrockModel(prompt, temperature) {
+    async invokeBedrockModel(prompt,) {
         const bedrock = new BedrockRuntime({
             credentials: {
                 accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -29,7 +29,7 @@ export class BedrockService {
                 {
                     role: "user",
                     content: [
-                        { type: "text", text: ` tell a human story    ${prompt}\n\nAssistant:\n` }
+                        { type: "text", text: `${prompt}` }
                     ]
                 }
             ],

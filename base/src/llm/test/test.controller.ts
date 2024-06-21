@@ -10,9 +10,9 @@ export class TestController {
 
     @Post('generate')
     @HttpCode(HttpStatus.OK)
-    async generateText(@Body('prompt') prompt: string, @Body('temperature') temperature: number): Promise<{ text: string }> {
+    async generateText(@Body('prompt') prompt: string): Promise<{ text: string }> {
         try {
-            const text = await this.bedrockService.invokeBedrockModel(prompt, temperature);
+            const text = await this.bedrockService.invokeBedrockModel(prompt,);
             return { text };
         } catch (error) {
             throw error;
