@@ -143,4 +143,10 @@ export class ContactsService extends BaseService {
       await this.contactService.getContactsByDate(orgId, startDate, endDate)
     )
   }
+
+  async getContactCount(orgId: string,startDate:string,endDate:string){
+    return this.handleException(
+      await this.contactService.getContactCount(orgId, startDate, endDate)
+    )
+  }
 }

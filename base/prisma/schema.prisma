@@ -454,3 +454,12 @@ model IcpScore {
   category  IcpCategory
   icpId     String
 }
+
+model Dashboard {
+  id                 String @id @default(uuid())
+  averageDealSize    Int    @default(0)
+  leadConversionRate Int    @default(0)
+  leadRetentionRate  Int    @default(0)
+  marketingCost      Int    @default(0)
+  salesCost          Int    @default(0)
+}

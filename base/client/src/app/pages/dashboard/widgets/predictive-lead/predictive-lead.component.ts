@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { ChartComponent } from 'ng-apexcharts';
 
 import {
@@ -28,13 +28,14 @@ export type ChartOptions = {
   templateUrl: './predictive-lead.component.html',
   styleUrls: ['./predictive-lead.component.scss']
 })
-export class PredictiveLeadComponent {
+export class PredictiveLeadComponent implements OnChanges{
+  @Input() predictiveLeadScores: any;
   @ViewChild("chart") chart: ChartComponent | undefined;
   public chartOptions: ChartOptions;
 
   constructor() {
     this.chartOptions = {
-      series: [44, 55, 13, 43, 22],
+      series: [],
       chart: {
         width: 380,
         type: "pie",
@@ -89,5 +90,15 @@ export class PredictiveLeadComponent {
         show: false // Disable the built-in legend
       }
     };
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['predictiveLeadScores'] && changes['predictiveLeadScores'].currentValue) {
+      this.updateChartOptions();
+    }
+  }
+
+  updateChartOptions(): void {
+    this.chartOptions.series = this.predictiveLeadScores;
   }
 }

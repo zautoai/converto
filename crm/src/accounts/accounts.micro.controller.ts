@@ -83,4 +83,13 @@ export class AccountsMicroController {
       return error.response || error;
     }
   }
+
+  @MessagePattern({cmd: 'GET_ACCOUNT_COUNT'})
+  async get_account_count(data: { orgId: string, startDate: string, endDate: string  }) {
+    try {
+      return await this.accountService.getAccountCount(data.orgId, data.startDate, data.endDate);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
 }

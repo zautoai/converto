@@ -43,4 +43,10 @@ export class AccountsService extends BaseService {
   async getABMById(orgId: string, id: string) {
     return this.handleException(await this.accountService.getAbmAccount(orgId, id));
   }
+
+  async getAccountCount(orgId: string,startDate:string,endDate:string){
+    return this.handleException(
+      await this.accountService.getAccountCount(orgId, startDate, endDate)
+    )
+  }
 }

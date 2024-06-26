@@ -1,597 +1,392 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { AgentStatus } from 'src/agent/entities/agent.entity';
-import { DateFilter } from 'src/common/enums/enums';
-import { PrismaClientManager } from 'src/prisma/prisma-client-manager.service';
-import { DashbaordDto } from './dto/dashboard.dto';
-import { Sql } from '@prisma/client/runtime/library';
-import { Prisma } from '@prisma/client';
-import { DEFAULT_SCHEMA_NAME } from 'src/common/constants/system.constants';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { BaseService } from 'src/common/services/base.service';
 import { ContactsService } from 'src/contacts/contacts.service';
-
+import { DashbaordDto } from './dto/dashboard.dto';
+import { AccountsService } from 'src/accounts/accounts.service';
+import { ProspecActivityType } from 'src/prospect-journey/dto/create-prospect-journey.dto'
+import { ContactService } from 'src/microservices/crm_service/contact.service';
+import { DashboardDataDto } from './dto/dashboardData.dto';
 @Injectable()
-export class DashboardService {
+export class DashboardService extends BaseService {
+
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly prismaClientManager: PrismaClientManager,
-    private contactsService: ContactsService
-  ) { }
-
-  async getAgentsCount(orgId: string) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
-
-    //   return await prisma.agent.count({
-    //     where: { status: { not: AgentStatus.DELETED } },
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }
-
-  async getUsersCount(orgId: string) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
-    //   return await prisma.user.count({ where: { orgId } });
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }
-
-  async getVisitorsCount(orgId: string, startDate?: Date, endDate?: Date) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
-
-    //   if (startDate && endDate) {
-    //     return await prisma.visitor.count({
-    //       where: {
-    //         createdAt: {
-    //           gte: new Date(startDate), // Greater than or equal to start date
-    //           lte: new Date(endDate), // Less than or equal to end date
-    //         },
-    //       },
-    //     });
-    //   } else {
-    //     const prisma = await this.prismaClientManager.getClient(orgId);
-    //     return await prisma.visitor.count();
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }
-
-  async getLeadsCount(orgId: string, startDate?: Date, endDate?: Date) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
-    //   if (startDate && endDate) {
-    //     const leads = await this.contactsService.getContactsByDate(orgId, startDate, endDate)
-    //     return leads.length;
-    //   } else {
-    //     const leads = await this.contactsService.findAll(orgId)
-    //     return leads.length;
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }
-
-  async getConversationCount(orgId: string, startDate?: Date, endDate?: Date) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
-
-    //   if (startDate && endDate) {
-    //     return await prisma.conversation.count({
-    //       where: {
-    //         createdAt: {
-    //           gte: new Date(startDate), // Greater than or equal to start date
-    //           lte: new Date(endDate), // Less than or equal to end date
-    //         },
-    //       },
-    //     });
-    //   } else {
-    //     return await prisma.conversation.count();
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }
-
-  async getCampaignCount(orgId: string, startDate?: Date, endDate?: Date) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
-    //   if (startDate && endDate) {
-    //     return await prisma.campaign.count({
-    //       where: {
-    //         startDate: {
-    //           gte: new Date(startDate), // Greater than or equal to start date
-    //           lte: new Date(endDate), // Less than or equal to end date
-    //         },
-    //       },
-    //     });
-    //   } else {
-    //     return await prisma.campaign.count();
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }
-
-  async getSitesCount(orgId: string) {
-    // const prisma = await this.prismaClientManager.getClient(orgId);
-
-    // try {
-    //   return await prisma.site.count();
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    private readonly contactsService: ContactsService,
+    private readonly accountsService: AccountsService,
+    private readonly contactService: ContactService,
+  ) {
+    super()
   }
 
 
-  getMessageCount(conversation: string) { }
-
-  async getMessagesCount(orgId: string) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
-
-    //   const conversations = await prisma.zautoMessage.count({
-    //     where: { role: 'assistant', type: 'TEXT' },
-    //   });
-    //   return conversations;
-    // } catch (error) {
-    //   console.log(error);
-    // }
+  async changeDashboardData(orgId: string, dashboardDataDto: DashboardDataDto) {
+    const prisma = await this.getPrismaClient(orgId)
+    try {
+      const dashboard = await prisma.dashboard.findFirst();
+      if (dashboard) {
+        await prisma.dashboard.update({
+          where: { id: dashboard.id },
+          data: dashboardDataDto
+        })
+      }
+      return;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await prisma.$disconnect()
+    }
   }
 
-  toDateString = (date) => {
-    // return date.toISOString().split('T')[0];
-  };
-
-  async getVisitCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
-
-    //   let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-
-    //   const _startDate = startDate;
-    //   const _endDate = endDate;
-    //   const result = await prisma.$queryRaw`
-    //         WITH
-    //             DATE_RANGE AS (
-    //                 SELECT
-    //                     GENERATE_SERIES(
-    //                         ${_startDate}::DATE,
-    //                         ${_endDate}::DATE,
-    //                         '1 day'::INTERVAL
-    //                     ) AS VISIT_DATE
-    //             )
-    //         SELECT
-    //             JSONB_BUILD_OBJECT(
-    //                 'labels',
-    //                 ARRAY_AGG(VISIT_DATE),
-    //                 'values',
-    //                 ARRAY_AGG(VISIT_COUNT)
-    //             ) AS RESULT
-    //         FROM
-    //             (
-    //                 SELECT
-    //                     DR.VISIT_DATE,
-    //                     CAST(COALESCE(COUNT(V.ID), 0) AS INT) AS VISIT_COUNT
-    //                 FROM
-    //                     DATE_RANGE DR
-    //                     LEFT JOIN "Visit" V ON DATE (V."createdAt") = DR.VISIT_DATE
-    //                     AND V."orgId" = ${orgId}
-    //                 WHERE
-    //                     DR.VISIT_DATE >= ${_startDate}
-    //                     AND DR.VISIT_DATE <= ${_endDate}
-    //                 GROUP BY
-    //                     DR.VISIT_DATE
-    //             ) AS SUBQUERY;
-
-    //         `;
-    //   if (result && result[0]) {
-    //     return result[0].result;
-    //   }
-    //   return {
-    //     labels: [],
-    //     values: [],
-    //   };
-    // } catch (error) {
-    //   console.log(error);
-    // }
+  async getDashboardData(orgId: string) {
+    const prisma = await this.getPrismaClient(orgId)
+    try {
+      const dashboard = await prisma.dashboard.findFirst();
+      return {
+        code: 200,
+        success: true,
+        message: 'Dashboard data fetched successfully',
+        data: dashboard
+      };
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await prisma.$disconnect()
+    }
   }
 
-  async getLeadCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
+  async getBottomWidget(orgId: string) {
+    try {
+     
+      const {startOfMonthISO, endOfMonthISO, startOfPreviousMonthISO, endOfPreviousMonthISO} = await this.getDates()
+      const currentMonthVisitCount = await this.getVisitCount(orgId, startOfMonthISO, endOfMonthISO);
+      const previousMonthVisitCount = await this.getVisitCount(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
+      const currentMonthContactCount = await this.getContactCount(orgId, startOfMonthISO, endOfMonthISO);
+      const previousMonthContactCount = await this.getContactCount(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
+      const currentMonthAccountCount = await this.getAccountCount(orgId, startOfMonthISO, endOfMonthISO);
+      const previousMonthAccountCount = await this.getAccountCount(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
 
-    //   let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-    //   const _startDate = startDate;
-    //   const _endDate = endDate;
-    //   const result = await prisma.$queryRaw`
-    //         WITH
-    //             DATE_RANGE AS (
-    //                 SELECT
-    //                     GENERATE_SERIES(
-    //                         ${_startDate}::DATE,
-    //                         ${_endDate}::DATE,
-    //                         '01 day'::INTERVAL
-    //                     ) AS LEAD_DATE
-    //             )
-    //         SELECT
-    //             JSONB_BUILD_OBJECT(
-    //                 'labels',
-    //                 ARRAY_AGG(LEAD_DATE),
-    //                 'values',
-    //                 ARRAY_AGG(LEAD_COUNT)
-    //             ) AS RESULT
-    //         FROM
-    //             (
-    //                 SELECT
-    //                     DR.LEAD_DATE,
-    //                     CAST(COALESCE(COUNT(L.ID), 0) AS INT) AS LEAD_COUNT
-    //                 FROM
-    //                     DATE_RANGE DR
-    //                     LEFT JOIN "Lead" L ON DATE (L."createdAt") = DR.LEAD_DATE
-    //                     AND L."convId" IS NOT NULL
-    //                     AND L."orgId" = ${orgId}
-    //                 WHERE
-    //                     DR.LEAD_DATE >= ${_startDate}
-    //                     AND DR.LEAD_DATE <= ${_endDate}
-    //                 GROUP BY
-    //                     DR.LEAD_DATE
-    //             ) AS SUBQUERY;
+      return {
+        code: 200,
+        success: true,
+        message: 'Contacts fetched successfully',
+        data: {
+          currentMonthVisitCount,
+          previousMonthVisitCount,
+          currentMonthContactCount,
+          previousMonthContactCount,
+          currentMonthAccountCount,
+          previousMonthAccountCount,
+        }
+      };
 
-    //         `;
-    //   if (result && result[0]) {
-    //     return result[0].result;
-    //   }
-    //   return {
-    //     labels: [],
-    //     values: [],
-    //   };
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    } catch (error) {
+      console.error('Error counting visits:', error);
+      throw error;
+    }
   }
 
-  async getConversationCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
+  async getVisitCount(orgId: string, startOfMonthISO: string, endOfMonthISO: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      // Query to count visits for the current month
+      const visitCount = await prisma.visit.count({
+        where: {
+          createdAt: {
+            gte: startOfMonthISO,
+            lte: endOfMonthISO,
+          },
+        },
+      });
 
-    //   let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-    //   const _startDate = startDate;
-    //   const _endDate = endDate;
-    //   const result = await prisma.$queryRaw`
-    //         WITH
-    //             DATE_RANGE AS (
-    //                 SELECT
-    //                     GENERATE_SERIES(
-    //                         ${_startDate}::DATE,
-    //                         ${_endDate}::DATE,
-    //                         '1 day'::INTERVAL
-    //                     ) AS CONVO_DATE
-    //             )
-    //         SELECT
-    //             JSONB_BUILD_OBJECT(
-    //                 'labels',
-    //                 ARRAY_AGG(CONVO_DATE),
-    //                 'values',
-    //                 ARRAY_AGG(CONVO_COUNT)
-    //             ) AS RESULT
-    //         FROM
-    //             (
-    //                 SELECT
-    //                     DR.CONVO_DATE,
-    //                     CAST(COALESCE(COUNT(C.ID), 0) AS INT) AS CONVO_COUNT
-    //                 FROM
-    //                     DATE_RANGE DR
-    //                     LEFT JOIN "Conversation" C ON DATE (C."createdAt") = DR.CONVO_DATE
-    //                     AND C."orgId" = ${orgId}
-    //                     AND C."isValid" = TRUE
-    //                 WHERE
-    //                     DR.CONVO_DATE >= ${_startDate}
-    //                     AND DR.CONVO_DATE <= ${_endDate}
-    //                 GROUP BY
-    //                     DR.CONVO_DATE
-    //                 ORDER BY
-    //                     DR.CONVO_DATE
-    //             ) AS SUBQUERY;
-
-    //         `;
-    //   if (result && result[0]) {
-    //     return result[0].result;
-    //   }
-    //   return {
-    //     labels: [],
-    //     values: [],
-    //   };
-    // } catch (error) {
-    //   console.log(error);
-    // }
+      return visitCount
+    } catch (error) {
+      console.error('Error counting visits:', error);
+      throw error;
+    } finally {
+      await prisma.$disconnect();
+    }
   }
 
-  async getCampaignCountByDate(orgId: string, dashbaordDto: DashbaordDto) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
-    //   let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-    //   const dateWiseConvo = await prisma.campaign.groupBy({
-    //     by: ['createdAt'],
-    //     _count: {
-    //       createdAt: true,
-    //     },
-    //     orderBy: {
-    //       _count: {
-    //         createdAt: 'desc',
-    //       },
-    //     },
-    //   });
-
-    //   const _dateWiseLead = {};
-
-    //   const currentDate = new Date(startDate);
-    //   const end = new Date(endDate);
-    //   while (currentDate <= end) {
-    //     _dateWiseLead[currentDate.toISOString().split('T')[0]] = 0;
-    //     currentDate.setDate(currentDate.getDate() + 1);
-    //   }
-
-    //   // Update counts for existing dates
-    //   for (let dateData of dateWiseConvo) {
-    //     const date = this.toDateString(dateData.createdAt);
-    //     if (_dateWiseLead.hasOwnProperty(date)) {
-    //       _dateWiseLead[date] += dateData._count.createdAt;
-    //     }
-    //   }
-
-    //   // Sort and format data for return
-    //   const sortedKeys = Object.keys(_dateWiseLead).sort((a, b) => {
-    //     return new Date(a).getTime() - new Date(b).getTime();
-    //   });
-    //   const labels = [];
-    //   const values = [];
-    //   for (let key of sortedKeys) {
-    //     labels.push(key);
-    //     values.push(_dateWiseLead[key]);
-    //   }
-
-    //   return {
-    //     labels: labels,
-    //     values: values,
-    //   };
-    // } catch (error) {
-    //   console.log(error);
-    // }
+  async getContactCount(orgId: string, startOfMonthISO: string, endOfMonthISO: string) {
+    return await this.contactsService.getContactCount(orgId, startOfMonthISO, endOfMonthISO)
   }
 
-  calculateDateRange(dashbaordDto: DashbaordDto): {
-    startDate: Date;
-    endDate: Date;
-  } {
-    return null
-    // const { dateFilter, startDate, endDate } = dashbaordDto;
-    // const now = new Date();
-    // let calculatedStartDate: Date;
-    // let calculatedEndDate: Date;
-
-    // switch (dateFilter) {
-    //   case DateFilter.THIS_MONTH:
-    //     calculatedStartDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    //     calculatedEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    //     break;
-    //   case DateFilter.LAST_MONTH:
-    //     const lastMonthYear =
-    //       now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-    //     const lastMonthMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
-    //     calculatedStartDate = new Date(lastMonthYear, lastMonthMonth, 1);
-    //     calculatedEndDate = new Date(now.getFullYear(), now.getMonth(), 0);
-    //     break;
-    //   case DateFilter.THIS_WEEK:
-    //     const today = now.getDay();
-    //     const diff = now.getDate() - today + (today === 0 ? -6 : 1);
-    //     calculatedStartDate = new Date(now.setDate(diff));
-    //     calculatedEndDate = new Date(calculatedStartDate); // Copy start date
-    //     calculatedEndDate.setDate(calculatedStartDate.getDate() + 6); // Add 6 days
-    //     calculatedEndDate.setHours(23, 59, 59, 999); // Set end time
-    //     break;
-    //   case DateFilter.BETWEEN:
-    //     if (!startDate || !endDate) {
-    //       throw new BadRequestException(
-    //         'Start date and end date are required for BETWEEN filter',
-    //       );
-    //     }
-    //     calculatedStartDate = new Date(startDate);
-    //     calculatedEndDate = new Date(endDate);
-    //     calculatedEndDate.setHours(23, 59, 59, 999);
-    //     break;
-    //   default:
-    //     throw new BadRequestException('Invalid filter');
-    // }
-
-    // // Formatting dates to string as per the specified format
-    // const startDateString =
-    //   calculatedStartDate.toISOString().slice(0, 10) + 'T00:00:00.000Z';
-    // const endDateString =
-    //   calculatedEndDate.toISOString().slice(0, 10) + 'T23:59:59.999Z';
-
-    // // Converting formatted strings back to Date objects
-    // const formattedStartDate = new Date(startDateString);
-    // const formattedEndDate = new Date(endDateString);
-
-    // return { startDate: formattedStartDate, endDate: formattedEndDate };
+  async getAccountCount(orgId: string, startOfMonthISO: string, endOfMonthISO: string) {
+    return await this.accountsService.getAccountCount(orgId, startOfMonthISO, endOfMonthISO)
   }
 
-  generateDateWiseData(startDate: Date, endDate: Date, data: any) {
-    // const _dateWiseData = {};
+  async getDates(){
+    const currentDate = new Date();
 
-    // const currentDate = new Date(startDate);
-    // const end = new Date(endDate);
-    // while (currentDate <= end) {
-    //   _dateWiseData[currentDate.toISOString().split('T')[0]] = [];
-    //   currentDate.setDate(currentDate.getDate() + 1);
-    // }
+    // Calculate start and end dates for the current month
+    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
-    // for (let item of data) {
-    //   const date = this.toDateString(item.createdAt);
-    //   if (_dateWiseData.hasOwnProperty(date)) {
-    //     _dateWiseData[date].push(item);
-    //   }
-    // }
+    // Calculate start and end dates for the previous month
+    const startOfPreviousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+    const endOfPreviousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
 
-    // const sortedKeys = Object.keys(_dateWiseData).sort((a, b) => {
-    //   return new Date(a).getTime() - new Date(b).getTime();
-    // });
+    // Convert dates to ISO strings
+    const startOfMonthISO = startOfMonth.toISOString();
+    const endOfMonthISO = endOfMonth.toISOString();
+    const startOfPreviousMonthISO = startOfPreviousMonth.toISOString();
+    const endOfPreviousMonthISO = endOfPreviousMonth.toISOString();
+    return {
+      startOfMonthISO,
+      endOfMonthISO,
+      startOfPreviousMonthISO,
+      endOfPreviousMonthISO
+    }
+  }
+  
+  async getTopWidget(orgId: string) {
+    try{
+      const {startOfMonthISO, endOfMonthISO, startOfPreviousMonthISO, endOfPreviousMonthISO} = await this.getDates()
 
-    // return {
-    //   dateWiseData: _dateWiseData,
-    //   sortedKeys: sortedKeys,
-    // };
+      const currentPVG = await this.calculatePVG(orgId, startOfMonthISO, endOfMonthISO);
+      const currentCAC = await this.calculateCAC(orgId, startOfMonthISO, endOfMonthISO);
+      const currentCPL = await this.calculateCPL(orgId, startOfMonthISO, endOfMonthISO);
+
+      const previousPVG = await this.calculatePVG(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
+      const previousCAC = await this.calculateCAC(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
+      const previousCPL = await this.calculateCPL(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
+
+      return {
+        code: 200,
+        success: true,
+        message: 'Top widget data fetched successfully',
+        data: {
+          currentPVG,
+          previousPVG,
+          currentCAC,
+          previousCAC,
+          currentCPL,
+          previousCPL
+        }
+      };
+    }catch(error){
+      console.log(error)
+    }
+}
+
+  async calculatePVG(orgId:string, startOfMonthISO: string, endOfMonthISO: string){
+      const prisma = await this.getPrismaClient(orgId)
+      try{
+        const dashboardData = await prisma.dashboard.findFirst();
+        if(!dashboardData){
+           return 0;
+        }
+        const { averageDealSize, leadConversionRate}=dashboardData
+        const totalLeads = await this.getContactCount(orgId,startOfMonthISO,endOfMonthISO);
+        const pipelineValue = totalLeads * averageDealSize * leadConversionRate;
+        return pipelineValue
+      } catch(error){
+
+      } finally{
+         await prisma.$disconnect()
+      }
   }
 
-  async getLeadCount(orgId: string, dashbaordDto: DashbaordDto) {
-    // const prisma = await this.prismaClientManager.getClient(orgId);
+  async calculateCAC(orgId:string,  startOfMonthISO: string, endOfMonthISO: string){
+    const prisma = await this.getPrismaClient(orgId)
+    try{
+      const dashboardData = await prisma.dashboard.findFirst();
+      if(!dashboardData){
+         return 0;
+      }
+      const { salesCost, marketingCost}=dashboardData
+      const totalLeads = await this.getContactCount(orgId,startOfMonthISO,endOfMonthISO);
+      if(totalLeads===0 || (salesCost===0 && marketingCost===0)){
+        return 0;
+      }
+      const cac = (marketingCost + salesCost) / totalLeads;
+      return cac
+    } catch(error){
 
-    // let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-    // const leads = await this.contactsService.getContactsByDate(orgId, startDate, endDate)
-    // const sourceCountMap = {};
-
-    // for (let lead of leads) {
-    //   const conversation = await this.prisma.conversation.findFirst({
-    //     where: { id: lead.conversationId },
-    //     include: { visit: { select: { source: true, campaignId: true } } }
-    //   })
-    //   if (lead && conversation) {
-    //     const { source } = conversation.visit;
-
-    //     if (!sourceCountMap[source]) {
-    //       sourceCountMap[source] = 0;
-    //     }
-    //     sourceCountMap[source] += 1;
-    //   }
-    // }
-
-    // const formattedData = Object.keys(sourceCountMap).map((source) => ({
-    //   source,
-    //   count: sourceCountMap[source],
-    // }));
-
-    // return formattedData;
+    } finally{
+       await prisma.$disconnect()
+    }
   }
 
-  async getCounts(orgId: string, dashbaordDto: DashbaordDto) {
-    // const visitorData = await this.getVisitCountByDate(orgId, dashbaordDto);
-    // const leadData = await this.getLeadCountByDate(orgId, dashbaordDto);
-    // const convoData = await this.getConversationCountByDate(
-    //   orgId,
-    //   dashbaordDto,
-    // );
-    // const campaignData = await this.getCampaignCountByDate(orgId, dashbaordDto);
+  async calculateCPL(orgId:string, startOfMonthISO: string, endOfMonthISO: string){
+    const prisma = await this.getPrismaClient(orgId)
+    try{
+      const dashboardData = await prisma.dashboard.findFirst();
+      if(!dashboardData){
+         return 0;
+      }
+      const { marketingCost}=dashboardData
+      const totalLeads = await this.getContactCount(orgId, startOfMonthISO, endOfMonthISO);
+      if(totalLeads===0 || marketingCost===0){
+        return 0;
+      }
+      const cplValue = marketingCost / totalLeads;
+      return cplValue
+    } catch(error){
 
-    // const visitorCount = visitorData.values.reduce(
-    //   (acc, curr) => acc + curr,
-    //   0,
-    // );
-    // const leadCount = leadData.values.reduce((acc, curr) => acc + curr, 0);
-    // const convoCount = convoData.values.reduce((acc, curr) => acc + curr, 0);
-    // const campaignCount = campaignData.values.reduce(
-    //   (acc, curr) => acc + curr,
-    //   0,
-    // );
-    // return {
-    //   visitorCount,
-    //   leadCount,
-    //   convoCount,
-    //   campaignCount,
-    // };
+    } finally{
+       await prisma.$disconnect()
+    }
   }
 
-  async getChart(orgId: string, dashbaordDto: DashbaordDto) {
-    // const leadData = await this.getLeadCountByDate(orgId, dashbaordDto);
-    // const visitorData = await this.getVisitCountByDate(orgId, dashbaordDto);
-    // const convoData = await this.getConversationCountByDate(
-    //   orgId,
-    //   dashbaordDto,
-    // );
-    // return {
-    //   visitorData,
-    //   convoData,
-    //   leadData,
-    //   labels: leadData.labels,
-    // };
+  async getPageEnhancementMetrics(orgId: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      let result = [];
+      const sites = await prisma.site.findMany({ select: { url: true } });
+      const siteMap = this.getPageNames(sites);
+      const prospectJourney = await prisma.prospectJourney.findMany({
+        where: {
+          OR: [
+            { type: ProspecActivityType.PAGE_VIEWED },
+            { type: ProspecActivityType.PAGE_CLOSED },
+            { type: ProspecActivityType.CTA_PERFORMED }
+          ]
+        }, select: { url: true, scrollDepth: true, timeSpend: true, type: true }
+      });
+      console.log(prospectJourney);
+
+      for (const site of sites) {
+
+      }
+    } catch (error) {
+      console.error('Error counting visits:', error);
+      throw error;
+    } finally {
+      await prisma.$disconnect();
+    }
   }
 
-  async getTopCampaigns(orgId: string, dashbaordDto: DashbaordDto) {
-    // try {
-    //   const prisma = await this.prismaClientManager.getClient(orgId);
+  formatPageName(pageName) {
+    // Replace dashes and underscores with spaces
+    let formattedName = pageName.replace(/[-_]/g, ' ');
 
-    //   let { startDate, endDate } = this.calculateDateRange(dashbaordDto);
-    //   const _startDate = startDate;
-    //   const _endDate = endDate;
+    // Capitalize the first letter of each word
+    formattedName = formattedName.replace(/\b\w/g, char => char.toUpperCase());
 
-    //   const top5Campaigns = await prisma.$queryRaw`
-    //             WITH CampaignCounts AS (
-    //                 SELECT
-    //                     C.ID,
-    //                     C.TITLE AS NAME,
-    //                     COALESCE(COUNT(DISTINCT V."id"), 0) AS VISITCOUNT,
-    //                     COALESCE(COUNT(DISTINCT CONV."id"), 0) AS CONVOCOUNT,
-    //                     COALESCE(COUNT(DISTINCT L."id"), 0) AS LEADCOUNT
-    //                 FROM
-    //                     "Campaign" C
-    //                     LEFT JOIN "Visit" V ON C.ID = V."campaignId" AND V."createdAt" >= ${_startDate} AND V."createdAt" <= ${_endDate}
-    //                     LEFT JOIN "Conversation" CONV ON C.ID = CONV."campaignId" AND CONV."isValid" = TRUE AND CONV."createdAt" >= ${_startDate} AND CONV."createdAt" <= ${_endDate}
-    //                     LEFT JOIN "Lead" L ON CONV.ID = L."convId" AND L."createdAt" >= ${_startDate} AND L."createdAt" <= ${_endDate}
-    //                 WHERE
-    //                     C."orgId" = ${orgId}
-    //                 GROUP BY
-    //                     C.ID,
-    //                     C.TITLE
-    //             )
-    //             SELECT
-    //                 NAME,
-    //                 CAST(VISITCOUNT AS INT),
-    //                 CAST(CONVOCOUNT AS INT),
-    //                 CAST(LEADCOUNT AS INT)
-    //             FROM
-    //                 CampaignCounts
-
-    //             UNION ALL
-
-    //             SELECT
-    //                 C.TITLE AS NAME,
-    //                 0 AS VISITCOUNT,
-    //                 0 AS CONVOCOUNT,
-    //                 0 AS LEADCOUNT
-    //             FROM
-    //                 "Campaign" C
-    //             WHERE
-    //                 NOT EXISTS (
-    //                     SELECT 1 FROM CampaignCounts
-    //                 )
-    //                 AND C."orgId" = ${orgId}
-    //             ORDER BY leadCount DESC, convoCount DESC, visitCount DESC
-    //             LIMIT 5
-
-    //         `;
-
-    //   return top5Campaigns;
-    // } catch (error) {
-    //   console.log(error);
-    //   throw new BadRequestException(error);
-    // }
+    return formattedName;
   }
 
-  calculateCampaignScore(campaign) {
-    //   const { leadCount, convoCount, visitCount } = campaign;
-    //   const leadWeight = 0.5;
-    //   const convoWeight = 0.3;
-    //   const visitWeight = 0.2;
+  getPageNames(sites) {
+    return sites.map(site => {
+      const url = new URL(site.url);
+      const path = url.pathname;
+      const rawPageName = path === '/' ? 'home' : path.split('/').pop().replace('.html', '');
 
-    //   // Calculate the score using the provided weights
-    //   const score =
-    //     leadCount * leadWeight +
-    //     convoCount * convoWeight +
-    //     visitCount * visitWeight;
+      const pageName = this.formatPageName(rawPageName);
 
-    //   return score;
+      return {
+        url: site.url,
+        pageName: pageName
+      };
+    });
+  }
+
+  async getPredictiveLeadScore(orgId: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    const result = [0, 0, 0, 0, 0]
+    const predictiveLeadScores = []
+    try {
+      const limit = 10;
+      const response = (await this.handleException(
+        await this.contactService.getContacts(orgId, { limit, page: 1 }),
+      ))
+      let contacts = response.data;
+      const total = response.total;
+      const totalPage = Math.ceil(total / limit)
+      let nextPage = 2;
+      while (nextPage <= totalPage) {
+        const _response = (await this.handleException(
+          await this.contactService.getContacts(orgId, { limit, page: nextPage }),
+        ))
+        contacts = contacts.concat(_response.data);
+        nextPage++
+      }
+      for (const contact of contacts) {
+        const icpScore = await prisma.icpScore.findFirst({ where: { contactId: contact.id } })
+        if (contact.visitorId) {
+          const visitor = await prisma.visitor.findUnique({ where: { id: contact.visitorId } })
+          if (icpScore?.score && visitor?.score) {
+            const average = (icpScore?.score + visitor?.score) / 2;
+            predictiveLeadScores.push(average)
+          } else if (icpScore?.score) {
+            const average = (icpScore?.score + 20) / 2;
+            predictiveLeadScores.push(average)
+          } else if (visitor?.score) {
+            const average = (visitor?.score + 20) / 2;
+            predictiveLeadScores.push(average)
+          }
+          else {
+            predictiveLeadScores.push(20)
+          }
+        } else {
+          if (icpScore?.score) {
+            const average = (icpScore?.score + 20) / 2;
+            predictiveLeadScores.push(average)
+          } else {
+            predictiveLeadScores.push(20)
+          }
+        }
+      }
+      for (const score of predictiveLeadScores) {
+        if (score >= 80) {
+          result[4]++
+        } else if (score >= 60) {
+          result[3]++
+        } else if (score >= 40) {
+          result[2]++
+        } else if (score >= 20) {
+          result[1]++
+        } else {
+          result[0]++
+        }
+      }
+      return {
+        code: 200,
+        success: true,
+        message: 'Intent scores fetched successfully',
+        data: result
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async getIntentScore(orgId: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const result = [0, 0, 0]
+      const intentScores = await prisma.visitor.findMany({ select: { score: true } })
+      const count = await prisma.visitor.count();
+      for (const score of intentScores) {
+        if (score.score >= 60) {
+          result[0]++
+        } else if (score.score >= 30) {
+          result[1]++
+        } else {
+          result[2]++
+        }
+      }
+      return {
+        code: 200,
+        success: true,
+        message: 'Intent scores fetched successfully',
+        data: result
+      }
+    } catch (error) {
+      console.error('Error counting visits:', error);
+      throw error;
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async getChannelEnhancementMetrics(orgId: string) {
+
+  }
+
+  async getPipelineValueGenerator(orgId: string) {
+
   }
 }

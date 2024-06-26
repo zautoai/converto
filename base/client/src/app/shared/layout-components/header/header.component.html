@@ -134,7 +134,9 @@
                   <a ngbDropdownItem class="dropdown-item" href="javascript:void(0)" (click)="changePassword()">
                     <i class="fe fe-lock me-2"></i> <span>Change password</span>
                   </a>
-
+                  <a ngbDropdownItem class="dropdown-item" href="javascript:void(0)" (click)="changeDashboardSetting()">
+                    <i class="fe fe-settings me-2"></i> <span>Dashboard Setting</span>
+                  </a>
                   <a ngbDropdownItem class="dropdown-item" href="javascript:void(0)" (click)="signout()">
                     <i class="fe fe-log-out me-2"></i> <span>Logout</span>
                   </a>
@@ -212,4 +214,82 @@
       </button>
     </div>
   </form>
+</ng-template>
+
+<ng-template #dashboardSettingModal let-modal>
+  <div class="modal-header">
+    <h4><i class="zmdi zmdi-lock"></i> Dashboard Setting</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+  </div>
+  <div class="modal-body">
+
+    <form [formGroup]="dashboardSettingForm" (ngSubmit)="onDashboardSettingSubmit()">
+          <div class="form-group mb-3">
+            <advanced-input 
+            [label]="'Average Deal Size'" 
+            [type]="'number'" 
+            [placeholder]="'Average Deal Size'" 
+            [size]="'sm'"
+            [control]="averageDealSize" 
+            [errorMessages]="errorMessage.averageDealSize"
+            ></advanced-input>
+          </div>
+          <div class="form-group mb-3">
+            <advanced-input 
+            [label]="'Lead Conversion Rate'" 
+            [type]="'number'" 
+            [placeholder]="'Lead Conversion Rate'" 
+            [size]="'sm'"
+            [control]="leadConversionRate" 
+            [errorMessages]="errorMessage.leadConversionRate"
+            ></advanced-input>
+        </div>
+      <div class="form-group mb-3">
+        <advanced-input 
+        [label]="'Lead Retention Rate'" 
+        [type]="'number'" 
+        [placeholder]="'Lead Retention Rate'" 
+        [size]="'sm'"
+        [control]="leadRetentionRate" 
+        [errorMessages]="errorMessage.leadRetentionRate"
+        ></advanced-input>
+      </div>
+      <div class="form-group mb-3">
+        <advanced-input 
+        [label]="'Marketing Cost'" 
+        [type]="'number'" 
+        [placeholder]="'Marketing Cost'" 
+        [size]="'sm'"
+        [control]="marketingCost" 
+        [errorMessages]="errorMessage.marketingCost"
+        ></advanced-input>
+      </div>
+      <div class="form-group mb-3">
+        <advanced-input 
+        [label]="'Sales Cost'" 
+        [type]="'number'" 
+        [placeholder]="'Sales Cost'" 
+        [size]="'sm'"
+        [control]="salesCost" 
+        [errorMessages]="errorMessage.salesCost"
+        ></advanced-input>
+      </div>
+      <div class="d-flex gap-3 justify-content-end">
+        <advanced-button 
+        label="Update" 
+        [size]="'md'" 
+        [classes]="'w-100'" 
+        [type]="'submit'"
+        ></advanced-button>
+        <advanced-button 
+        label="Cancel" 
+        [size]="'md'" 
+        [classes]="'w-100'" 
+        [type]="'button'"
+        [color]="'outline-primary'"
+        (onClick)="onCancel()"
+        ></advanced-button>
+    </div>
+    </form>
+  </div>
 </ng-template>

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { ChartComponent } from 'ng-apexcharts';
 
 import {
@@ -24,13 +24,14 @@ export type ChartOptions = {
   templateUrl: './scoring-intent.component.html',
   styleUrls: ['./scoring-intent.component.scss']
 })
-export class ScoringIntentComponent {
+export class ScoringIntentComponent implements OnChanges {
+  @Input() intentScores: any;
   @ViewChild('chart') chart: ChartComponent | undefined;
   public chartOptions: ChartOptions;
 
   constructor() {
     this.chartOptions = {
-      series: [44, 55, 13],
+      series: [],
       chart: {
         type: 'donut',
         height: 250, // Set the chart's height directly
@@ -77,5 +78,15 @@ export class ScoringIntentComponent {
         }
       }
     };
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['intentScores'] && changes['intentScores'].currentValue) {
+      this.updateChartOptions();
+    }
+  }
+
+  updateChartOptions(): void {
+    this.chartOptions.series = this.intentScores;
   }
 }

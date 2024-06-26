@@ -59,6 +59,7 @@ export class OrganizationsService extends BaseService {
         try {
           await this.schemaManager.create(organization.id, null);
           await this.createDefaultRoles(organization.id);
+          await this.createDashboardData(organization.id);
           await this.startupMicroService.syncSingleOrganization(organization.id)
           await this.createDefaultSegment(organization.id);
           await this.createDefaultIcp(organization.id);
@@ -224,4 +225,15 @@ export class OrganizationsService extends BaseService {
     await this.icpMicroService.createIcp(orgId, OUTBOUND);
   }
 
+  async createDashboardData(orgId:string){
+    const prisma = await this.getPrismaClient(orgId)
+    try{
+      await prisma.dashboard.create({});
+    } catch(error){
+      console.log(error);
+    } finally{
+      prisma.$disconnect()
+      await this.closeConnection(orgId);
+    }
+  }
 }

@@ -114,4 +114,13 @@ export class ContactMicroserviceController {
       return error.response || error;
     }
   }
+
+  @MessagePattern({ cmd: 'GET_CONTACT_COUNT'})
+  async get_contact_count(data: { orgId: string, startDate: string, endDate: string  }) {
+    try {
+      return await this.contactsService.getContactCount(data.orgId, data.startDate, data.endDate);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
 }

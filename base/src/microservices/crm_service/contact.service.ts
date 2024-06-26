@@ -119,4 +119,16 @@ export class ContactService extends BaseService {
       return error;
     }
   }
+
+  async getContactCount(orgId: string, startDate :string, endDate: string) {
+    try{
+      return this.CRMClient.send(
+        {cmd: 'GET_CONTACT_COUNT'},
+        {orgId, startDate, endDate}
+      ).toPromise();
+    }catch(error){
+      this.logger.error(`Error while fetching contact count: ${error.message}`);
+      return error;
+    }
+  }
 }

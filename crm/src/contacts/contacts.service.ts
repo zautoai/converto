@@ -683,4 +683,24 @@ export class ContactsService {
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
+
+  async getContactCount(orgId: string, startDate: string, endDate: string){
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    try {
+      const contactCount = await prisma.contact.count({
+        where: {
+          createdAt: {
+            gte: new Date(startDate),
+            lte: new Date(endDate)
+          }
+        }
+      });
+      return contactCount;
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
+  }
 }

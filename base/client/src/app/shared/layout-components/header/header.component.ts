@@ -11,6 +11,7 @@ import { RestService } from '../../services/rest.service';
 import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from '../../services/notification.service';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
@@ -25,12 +26,39 @@ export class HeaderComponent implements OnInit {
   selectedBot: any;
 
   userData: any;
-
   newPassword: string = "";
   confirmPassword: string = "";
 
+
+  errorMessage = {
+    averageDealSize : {
+      required : "Please enter average deal size"
+    },
+    leadConversionRate : {
+      required : "Please enter lead conversion rate"
+    },
+    leadRetentionRate : {
+      required : "Please enter lead retention rate"
+    },
+    marketingCost : {
+      required : "Please enter marketing cost"
+    },
+    salesCost : {
+      required : "Please enter sales cost"
+    }
+  }
+
+  dashboardSettingForm : FormGroup = new FormGroup({
+      averageDealSize : new FormControl(0,[Validators.required]),
+      leadConversionRate : new FormControl(0,[Validators.required]),
+      leadRetentionRate : new FormControl(0,[Validators.required]),
+      marketingCost : new FormControl(0,[Validators.required]),
+      salesCost : new FormControl(0,[Validators.required]),
+  });
+  
   @ViewChild('changeProfileModal') changeProfileModal: ElementRef | undefined;
   @ViewChild('changePasswordModal') changePasswordModal: ElementRef | undefined;
+  @ViewChild('dashboardSettingModal') dashboardSettingModal: ElementRef | undefined;
 
   constructor(
     private layoutService: LayoutService,
@@ -89,6 +117,7 @@ export class HeaderComponent implements OnInit {
     const agentId = this.navServices.getAgentIdFromUrl();
     this.selectedBot = agentId;
 
+    this.getDashboardData()
   }
 
 
@@ -193,10 +222,19 @@ export class HeaderComponent implements OnInit {
     this.modalService.open(this.changePasswordModal, { centered: true, backdrop: 'static' });
   }
 
+  changeDashboardSetting() {
+    this.modalService.open(this.dashboardSettingModal, { centered: true, backdrop: 'static' });
+  }
+
+  // To close the modal
   closeModal() {
     this.selectedImage = null;
     this.previewUrl = null;
     this.modalService.dismissAll();
+  }
+
+  onCancel(){
+    this.closeModal();
   }
 
   onImageSelected(event: any) {
@@ -253,9 +291,56 @@ export class HeaderComponent implements OnInit {
     }
   }
 
+  onDashboardSettingSubmit() {
+    if(this.dashboardSettingForm.valid){
+      for(let key in this.dashboardSettingForm.value){
+        this.dashboardSettingForm.value[key] = parseInt(this.dashboardSettingForm.value[key])
+      }
+      console.log(this.dashboardSettingForm.value);
+        this.restService.put(API.main.dashboard, "",this.dashboardSettingForm.value)
+        .subscribe((response: any) => {
+          this.closeModal();
+          this.notifService.showSuccess("Dashboard setting updated successfully.");
+        }, (error) => {
+          console.log(error);
+        });
+    }
+  }
+
+  getDashboardData(){
+    this.restService.getAll(API.main.dashboard)
+    .subscribe((response: any) => {
+      this.dashboardSettingForm.patchValue(response.data);
+    }, (error) => {
+      console.log(error);
+    });
+  }
+
+
+  // To get the avatar url
   getAvatarUrl() {
     const url = API.baseUrl + "/zautobot?botid=" + this.avatarService.getAvatarId();
     return url;
   }
 
+
+  get averageDealSize(): FormControl {
+    return this.dashboardSettingForm.get('averageDealSize') as FormControl;
+  }
+
+  get leadConversionRate(): FormControl {
+    return this.dashboardSettingForm.get('leadConversionRate') as FormControl;
+  }
+
+  get leadRetentionRate(): FormControl {
+    return this.dashboardSettingForm.get('leadRetentionRate') as FormControl;
+  }
+
+  get marketingCost(): FormControl {
+    return this.dashboardSettingForm.get('marketingCost') as FormControl;
+  }
+
+  get salesCost(): FormControl {
+    return this.dashboardSettingForm.get('salesCost') as FormControl;
+  }
 }

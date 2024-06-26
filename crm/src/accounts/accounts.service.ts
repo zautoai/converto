@@ -513,4 +513,24 @@ export class AccountsService {
       await this.prismaClientManager.disconnectClient(orgId)
     }
   }
+
+  async getAccountCount(orgId: string, startDate: string, endDate: string){
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    try {
+      const accountCount = await prisma.account.count({
+        where: {
+          createdAt: {
+            gte: new Date(startDate),
+            lte: new Date(endDate)
+          }
+        }
+      });
+      return accountCount;
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
+  }
 }

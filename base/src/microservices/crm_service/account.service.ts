@@ -113,5 +113,17 @@ export class AccountMicroService extends BaseService {
       throw err;
     }
   }
+
+  async getAccountCount(orgId: string, startDate :string, endDate: string) {
+    try{
+      return this.CRMClient.send(
+        {cmd: 'GET_ACCOUNT_COUNT'},
+        {orgId, startDate, endDate}
+      ).toPromise();
+    }catch(error){
+      this.logger.error(`Error while fetching account count: ${error.message}`);
+      return error;
+    }
+  }
 }
 
