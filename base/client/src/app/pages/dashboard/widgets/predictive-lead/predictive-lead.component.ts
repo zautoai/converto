@@ -31,6 +31,7 @@ export type ChartOptions = {
 export class PredictiveLeadComponent implements OnChanges{
   @Input() predictiveLeadScores: any;
   @ViewChild("chart") chart: ChartComponent | undefined;
+  isNull : boolean = false;
   public chartOptions: ChartOptions;
 
   constructor() {
@@ -98,7 +99,11 @@ export class PredictiveLeadComponent implements OnChanges{
     }
   }
 
-  updateChartOptions(): void {
-    this.chartOptions.series = this.predictiveLeadScores;
-  }
+  updateChartOptions(): void {   
+    this.isNull = this.predictiveLeadScores.every((score: number) => score === 0);
+    if (this.isNull) {
+      this.chartOptions.series = [];
+    } else {
+      this.chartOptions.series = this.predictiveLeadScores;
+    }  }
 }

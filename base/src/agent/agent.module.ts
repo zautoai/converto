@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AgentService } from './agent.service';
 import { AgentController } from './agent.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
@@ -40,8 +40,8 @@ import { ContactsModule } from 'src/contacts/contacts.module';
     CommonModule,
     OrganizationsModule,
     StageModule,
-    AssistantsModule,
-    SiteModule,
+    forwardRef(() => AssistantsModule),
+        SiteModule,
     DemandGenModule,
     ContactsModule
   ],

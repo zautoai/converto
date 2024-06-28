@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { SubdomainGuard } from 'src/common/guard/subdomain/subdomain.guard';
 import { SubdomainRequest } from 'src/common/models/subdomain-request.model';
@@ -95,13 +95,18 @@ export class AgentChatController {
 
   @Post('lead')
   @UseGuards(SubdomainGuard)
-  async leadCapture(@Body() createLeadDto: CreateContactDto, @Req() request: SubdomainRequest)
+  async leadCapture(@Body() createLeadDto: CreateContactDto,@Query('convId') convId:string, @Req() request: SubdomainRequest)
   {
     const orgId = request.orgId;
     if(createLeadDto.fullName){
       const firstName = createLeadDto.fullName.split(' ')[0];
       createLeadDto.firstName = firstName
       createLeadDto.lastName = createLeadDto.fullName.split(' ').slice(1).join(' ')
+    }
+    const existingContact = await this.contactService.getContactsByConversation(orgId,convId );
+    if(existingContact) {
+      const contact = await this.contactService.update(orgId, existingContact.id, createLeadDto)
+      return contact
     }
     const contact = await this.contactService.create(orgId,createLeadDto)
     return contact

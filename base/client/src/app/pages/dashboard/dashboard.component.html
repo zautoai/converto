@@ -2,46 +2,46 @@
   <app-wlcome-card [name]="authService.getUser().name">
     <div class="d-none d-lg-block">
       <div class="d-flex gap-2">
-        <!-- <select
-          name=""
-          id=""
-          class="form-select form-select-sm"
-          (change)="getDashboardData()"
-          [(ngModel)]="selectedDateFilter"
-        >
-          <option [value]="filter" *ngFor="let filter of dateFilter">
-            {{ removeUnderscore(filter) | titlecase }}
-          </option>
-        </select>
         <ng-container *ngIf="selectedDateFilter == DateFilter.BETWEEN">
           <input
             type="date"
             class="form-control form-control-sm"
             [(ngModel)]="startDate"
             [max]="endDate"
-            (change)="getDashboardData()"
+            (change)="onDateRangeChange()"
           />
           <input
             type="date"
             class="form-control form-control-sm"
-            (ngModel)]="endDate"
+            [(ngModel)]="endDate"
             [min]="startDate"
-            (change)="getDashboardData()"
+            (change)="onDateRangeChange()"
           />
-        </ng-container> -->
+        </ng-container>
+        <select
+          name=""
+          id=""
+          class="form-select form-select-sm"
+          (change)="onDateFilterChange()"
+          [(ngModel)]="selectedDateFilter"
+        >
+          <option [value]="filter.value" *ngFor="let filter of displayDateFilter">
+              {{removeUnderscore(filter.key)}}
+          </option>
+        </select>
       </div>
     </div>
   </app-wlcome-card>
-  <app-dash-card></app-dash-card>
+  <app-dash-card [selectedDateFilter]="selectedDateFilter" [startDate]="startDate" [endDate]="endDate"></app-dash-card>
   <app-channel-impression></app-channel-impression>
-  <app-page-replacement></app-page-replacement>
+  <app-page-replacement [selectedDateFilter]="selectedDateFilter" [startDate]="startDate" [endDate]="endDate"></app-page-replacement>
   <app-channel-metrics></app-channel-metrics>
   <div class="row">
     <div class="col-6">
-      <app-predictive-lead [predictiveLeadScores] = "predictiveLeadScores"></app-predictive-lead>
+      <app-predictive-lead [predictiveLeadScores]="predictiveLeadScores"></app-predictive-lead>
     </div>
     <div class="col-6">
-      <app-scoring-intent [intentScores] = "intentScores"></app-scoring-intent>
+      <app-scoring-intent [intentScores]="intentScores"></app-scoring-intent>
     </div>
   </div>
 </div>

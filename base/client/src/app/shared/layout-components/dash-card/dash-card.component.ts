@@ -1,14 +1,15 @@
-import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { DashCardType } from 'src/app/shared/data/dashboard/dashboardData';
 import { RestService } from '../../services/rest.service';
 import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from '../../services/notification.service';
+import { DateFilter } from 'src/app/common/enums';
 
 interface Widget {
   title: string;
   subtitle: string;
   currentValue: string;
-  pastMonth: string;
+  pastPeriod: string;
   icon?: string; // Optional property for the icon
   change?: string; // Optional property for the change percentage
   color?: string; // Optional property for the color
@@ -19,41 +20,41 @@ interface Widget {
   templateUrl: './dash-card.component.html',
   styleUrls: ['./dash-card.component.scss']
 })
-export class DashCardComponent implements OnInit {
+export class DashCardComponent implements OnInit, OnChanges {
 
-  constructor(    
+  constructor(
     private restService: RestService,
     private notifService: NotificationService,
-  ){}
+  ) { }
   ngOnInit(): void {
-    this.getBottomWidgetData()
-    this.getTopWidgetData()
+    this.getBottomWidget(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined)
+    this.getTopWidget(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined)
   }
 
-  type = DashCardType;
-  @Input() showLoader: boolean = false;
-  @Input() cardType: DashCardType = DashCardType.default;
-  @Input() title: string = "";
-  @Input() icon: string = "";
-  @Input() currentValue: number = 0;
-  @Input() maxValue: number = 0;
-  @Input() color: string = "primary";
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedDateFilter'] || changes['startDate'] || changes['endDate']) {
+      console.log(this.selectedDateFilter);
 
-  @ViewChild('myCanvas') myCanvas: ElementRef | any;
+      if (this.selectedDateFilter === DateFilter.BETWEEN && (!this.startDate || !this.endDate)) return
+      this.getBottomWidget(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined)
+      this.getTopWidget(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined);
+    }
+  }
+  @Input() selectedDateFilter: any = DateFilter.THIS_MONTH;
+  @Input() startDate: string = '';
+  @Input() endDate: string = '';
+  showLoader: boolean = false;
 
-  topWidgetsData : any = {}
-  bottomWidgetData : any = {};
-  
-  topWidgets: Widget[] =[
-    { title: 'Total PVG', subtitle: 'This month', currentValue: '$' + (this.topWidgetsData?.currentPVG?.toFixed(2) || '0'), pastMonth: 'Past month $'+(this.topWidgetsData?.previousPVG?.toFixed(2) || '0') },
-    { title: 'Total CAC', subtitle: 'This month', currentValue: '$'+ (this.topWidgetsData?.currentCAC?.toFixed(2) || '0'), pastMonth: 'Past month $'+(this.topWidgetsData?.previousCAC?.toFixed(2) || '0') },
-    { title: 'Total CPL', subtitle: 'This month', currentValue: '$'+ (this.topWidgetsData?.currentCPL?.toFixed(2) || '0'), pastMonth: 'Past month $'+(this.topWidgetsData?.previousCPL?.toFixed(2) || '0') }
+  topWidgets: Widget[] = [
+    { title: 'Total PVG', subtitle: '', currentValue: '$ 0', pastPeriod: '' },
+    { title: 'Total CAC', subtitle: '', currentValue: '$ 0', pastPeriod: '' },
+    { title: 'Total CPL', subtitle: '', currentValue: '$ 0', pastPeriod: '' }
   ]
 
   bottomWidgets: Widget[] = [
-    { title: 'Total visits', subtitle: 'This month', currentValue: this.bottomWidgetData?.currentMonthVisitCount || '0', pastMonth: 'Past month '+ ( this.bottomWidgetData?.previousMonthVisitCount || '0'), icon: 'user', ...this.calculateChange(this.bottomWidgetData?.currentMonthVisitCount || 0, this.bottomWidgetData?.previousMonthVisitCount || 0) },
-    { title: 'Total new Leads', subtitle: 'This month', currentValue:  this.bottomWidgetData?.currentMonthContactCount ||'0', pastMonth: 'Past month '+ ( this.bottomWidgetData?.previousMonthContactCount || '0'), icon: 'user', ...this.calculateChange(this.bottomWidgetData?.currentMonthContactCount || 0, this.bottomWidgetData?.previousMonthContactCount || 0) },
-    { title: 'Total new Accounts', subtitle: 'This month', currentValue:  this.bottomWidgetData?.currentMonthAccountCount ||'0', pastMonth: 'Past month '+ ( this.bottomWidgetData?.previousMonthAccountCount || '0'), icon: 'user', ...this.calculateChange(this.bottomWidgetData?.currentMonthAccountCount || 0, this.bottomWidgetData?.previousMonthAccountCount || 0) }
+    { title: 'Total visits', subtitle: '', currentValue: '0', pastPeriod: '', icon: 'eye' },
+    { title: 'Total new Leads', subtitle: '', currentValue: '0', pastPeriod: '', icon: 'user' },
+    { title: 'Total new Accounts', subtitle: '', currentValue: '0', pastPeriod: '', icon: 'briefcase' }
   ];
 
   getColor(color: string): any {
@@ -68,61 +69,43 @@ export class DashCardComponent implements OnInit {
     return colors[color];
   }
 
-  calculateChange(current: number, previous: number): { change: string, color: string } {
-    if (previous === 0) {
-      return { change: current === 0 ? '0%' : '+100%', color: 'success' };
-    }
-
-    if (current === 0) {
-      return { change: '-100%', color: 'danger' };
-    }
-
-    const isPositive = current >= previous;
-    const change = isPositive ? current - previous : previous - current;
-    const changePercentage = (change / previous) * 100;
-        
-    return {
-      change: `${isPositive ? '+' : '-'}${changePercentage.toFixed(2)}%`,
-      color: isPositive ? 'success' : 'danger'
-    };
+  getBottomWidget(dateFilter: string, range?: { start: string, end: string }) {
+    const params = range
+      ? `dateFilter=${dateFilter}&start=${range.start}&end=${range.end}`
+      : `dateFilter=${dateFilter}`;
+    this.showLoader = true;
+    this.restService.get(API.main.dashboard, `bottom-widget?${params}`)
+      .subscribe(
+        (response: any) => {
+          this.bottomWidgets = response.data
+          setTimeout(() => {
+            this.showLoader = false
+          }, 1000);
+        },
+        (error) => {
+          console.error(error);
+          this.notifService.showError(error.error.message);
+        },
+      );
   }
 
-  
-  getBottomWidgetData() {
-    this.restService.get(API.main.dashboard,'bottom-widget')
-    .subscribe(
-      (response: any) => {
-        this.bottomWidgetData = response.data;
-        this.bottomWidgets=[
-          { title: 'Total visits', subtitle: 'This month', currentValue: this.bottomWidgetData?.currentMonthVisitCount || '0', pastMonth: 'Past month '+ ( this.bottomWidgetData?.previousMonthVisitCount || '0'), icon: 'user', ...this.calculateChange(this.bottomWidgetData?.currentMonthVisitCount || 0, this.bottomWidgetData?.previousMonthVisitCount || 0) },
-          { title: 'Total new Leads', subtitle: 'This month', currentValue:  this.bottomWidgetData?.currentMonthContactCount ||'0', pastMonth: 'Past month '+ ( this.bottomWidgetData?.previousMonthContactCount || '0'), icon: 'user', ...this.calculateChange(this.bottomWidgetData?.currentMonthContactCount || 0, this.bottomWidgetData?.previousMonthContactCount || 0) },
-          { title: 'Total new Accounts', subtitle: 'This month', currentValue:  this.bottomWidgetData?.currentMonthAccountCount ||'0', pastMonth: 'Past month '+ ( this.bottomWidgetData?.previousMonthAccountCount || '0'), icon: 'user', ...this.calculateChange(this.bottomWidgetData?.currentMonthAccountCount || 0, this.bottomWidgetData?.previousMonthAccountCount || 0) }
-        ]
-      },
-      (error) => {
-        console.error(error);
-        this.notifService.showError(error.error.message);
-      },
-    );
-  }
-
-  getTopWidgetData() {
-    this.restService.get(API.main.dashboard, 'top-widget')
-    .subscribe(
-      (response: any) => {
-        this.topWidgetsData = response.data;
-        console.log(this.topWidgetsData);
-        
-        this.topWidgets=[
-          { title: 'Total PVG', subtitle: 'This month', currentValue: '$' + (this.topWidgetsData?.currentPVG?.toFixed(2) || '0'), pastMonth: 'Past month $'+(this.topWidgetsData?.previousPVG?.toFixed(2) || '0') },
-          { title: 'Total CAC', subtitle: 'This month', currentValue: '$'+ (this.topWidgetsData?.currentCAC?.toFixed(2) || '0'), pastMonth: 'Past month $'+(this.topWidgetsData?.previousCAC?.toFixed(2) || '0') },
-          { title: 'Total CPL', subtitle: 'This month', currentValue: '$'+ (this.topWidgetsData?.currentCPL?.toFixed(2) || '0'), pastMonth: 'Past month $'+(this.topWidgetsData?.previousCPL?.toFixed(2) || '0') }
-        ]
-      },
-      (error) => {
-        console.error(error);
-        this.notifService.showError(error.error.message);
-      },
-    );
+  getTopWidget(dateFilter: string, range?: { start: string, end: string }) {
+    const params = range
+      ? `dateFilter=${dateFilter}&start=${range.start}&end=${range.end}`
+      : `dateFilter=${dateFilter}`;
+    this.showLoader = true;
+    this.restService.get(API.main.dashboard, `top-widget?${params}`)
+      .subscribe(
+        (response: any) => {
+          this.topWidgets = response.data
+          setTimeout(() => {
+            this.showLoader = false
+          }, 1000);
+        },
+        (error) => {
+          console.error(error);
+          this.notifService.showError(error.error.message);
+        },
+      );
   }
 }

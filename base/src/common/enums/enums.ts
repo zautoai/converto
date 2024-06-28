@@ -47,8 +47,8 @@ export enum HttpMethod {
 
 export enum DateFilter {
   THIS_MONTH = 'this_month',
-  LAST_MONTH = 'last_month',
-  THIS_WEEK = 'this_week',
+  THIS_QUARTER = 'this_quarter',
+  THIS_YEAR = 'this_year',
   BETWEEN = 'between',
 }
 

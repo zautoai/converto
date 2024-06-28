@@ -373,6 +373,7 @@ export class SocketGateway
               clientId: client.id,
               content: conversation.message.content,
               agentId: message.agentId,
+              orgId: orgId,
             }),
           );
           this.redisPublisher.publish(
@@ -941,31 +942,8 @@ export class SocketGateway
   }
 
   async leadFromUserMessage(message, conversation) {
-    const orgId = message.orgId;
-    let content = message.chatMessage.messages[0].content;
-    const emailRegex = /([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
-    const phoneRegex =
-      /(\d{3}[-.\s]??\d{3}[-.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-.\s]??\d{4}|\d{3}[-.\s]??\d{4})/g;
-
-    const emails = content.match(emailRegex) || [];
-    const phoneNumbers = content.match(phoneRegex) || [];
-
-    if (emails.length > 0 || phoneNumbers.length > 0) {
-      const maskedContent = content.replace(emailRegex, 'XXXX@$2'); // Replace local part with 'XXXX'
-
-      if (maskedContent !== content) {
-        const emailStr = emails.join(',');
-        const phoneStr = phoneNumbers.join(',');
-
-        await this.contactsService.create(orgId, {
-          email: emailStr,
-          phone: phoneStr,
-        });
-
-        content = maskedContent;
-      }
-    }
-    return content;
+    // 
+    return false
   }
 
   async getClientInfo(client: Socket) {

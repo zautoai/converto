@@ -70,7 +70,7 @@ export class ContactsController {
   }
 
   @Get('date-range')
-  async getContactsByDateRange(@Req() request: ZautoRequest, @Query('startDate') startDate: Date, @Query('endDate') endDate: Date) {
+  async getContactsByDateRange(@Req() request: ZautoRequest, @Query('startDate') startDate: string, @Query('endDate') endDate: string) {
     const orgId = request.user.orgId;
     if (!orgId) {
       throw new UnauthorizedException('Org Id not found');

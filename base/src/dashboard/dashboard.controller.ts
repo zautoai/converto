@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Put, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ZautoRequest } from 'src/common/models/request.model';
 import { DashboardService } from './dashboard.service';
 import { DashboardDataDto } from './dto/dashboardData.dto';
+import { DateFilter } from 'src/common/enums/enums';
 
 
 @ApiTags('Dashboards')
@@ -32,67 +33,88 @@ export class DashboardController {
     }
 
     @Get('top-widget')
-    async getTopWidget(@Req() request: ZautoRequest) {
+    async getTopWidget(@Req() request: ZautoRequest, @Query('dateFilter') dateFilter: DateFilter, @Query('start') start?: string, @Query('end') end?: string) {
         const orgId = request.user.orgId;
         if (!orgId) {
             throw new UnauthorizedException('Org Id not found');
         }
-        return await this.dashboardService.getTopWidget(orgId);
+        if (!start || !end) {
+            return await this.dashboardService.getTopWidget(orgId, dateFilter);
+        }
+        return await this.dashboardService.getTopWidget(orgId, dateFilter, start, end);
     }
 
 
     @Get('bottom-widget')
-    async getBottomWidget(@Req() request: ZautoRequest) {
+    async getBottomWidget(@Req() request: ZautoRequest, @Query('dateFilter') dateFilter: DateFilter, @Query('start') start?: string, @Query('end') end?: string) {
         const orgId = request.user.orgId;
         if (!orgId) {
             throw new UnauthorizedException('Org Id not found');
         }
-        return await this.dashboardService.getBottomWidget(orgId);
+        if (!start || !end) {
+            return await this.dashboardService.getBottomWidget(orgId, dateFilter);
+        }
+        return await this.dashboardService.getBottomWidget(orgId, dateFilter, start, end);
     }
 
     @Get('page-enhancement-metrics')
-    async getPageEnhancementMetrics(@Req() request: ZautoRequest) {
+    async getPageEnhancementMetrics(@Req() request: ZautoRequest, @Query('dateFilter') dateFilter: string, @Query('start') start?: string, @Query('end') end?: string) {
         const orgId = request.user.orgId;
         if (!orgId) {
             throw new UnauthorizedException('Org Id not found');
         }
-        return await this.dashboardService.getPageEnhancementMetrics(orgId);
+        if (!start || !end) {
+            return await this.dashboardService.getPageEnhancementMetrics(orgId, dateFilter);
+        }
+        return await this.dashboardService.getPageEnhancementMetrics(orgId, dateFilter, start, end);
     }
 
     @Get('predictive-lead-score')
-    async getPredictiveLeadScore(@Req() request: ZautoRequest) {
+    async getPredictiveLeadScore(@Req() request: ZautoRequest, @Query('dateFilter') dateFilter: string, @Query('start') start?: string, @Query('end') end?: string) {
         const orgId = request.user.orgId;
         if (!orgId) {
             throw new UnauthorizedException('Org Id not found');
         }
-        return await this.dashboardService.getPredictiveLeadScore(orgId);
+        if (!start || !end) {
+            return await this.dashboardService.getPredictiveLeadScore(orgId, dateFilter);
+        }
+        return await this.dashboardService.getPredictiveLeadScore(orgId,dateFilter,start,end);
     }
 
     @Get('intent-score')
-    async getIntentScore(@Req() request: ZautoRequest) {
+    async getIntentScore(@Req() request: ZautoRequest, @Query('dateFilter') dateFilter: string, @Query('start') start?: string, @Query('end') end?: string) {
         const orgId = request.user.orgId;
         if (!orgId) {
             throw new UnauthorizedException('Org Id not found');
         }
-        return await this.dashboardService.getIntentScore(orgId);
+        if (!start || !end) {
+            return await this.dashboardService.getIntentScore(orgId, dateFilter);
+        }
+        return await this.dashboardService.getIntentScore(orgId, dateFilter, start, end);
     }
 
     @Get('channel-enhancement-metrics')
-    async getChannelEnhancementMetrics(@Req() request: ZautoRequest) {
+    async getChannelEnhancementMetrics(@Req() request: ZautoRequest, @Query('dateFilter') dateFilter: DateFilter, @Query('start') start?: string, @Query('end') end?: string) {
         const orgId = request.user.orgId;
         if (!orgId) {
             throw new UnauthorizedException('Org Id not found');
         }
-        return await this.dashboardService.getChannelEnhancementMetrics(orgId);
+        if (!start || !end) {
+            return await this.dashboardService.getChannelEnhancementMetrics(orgId, dateFilter);
+        }
+        return await this.dashboardService.getChannelEnhancementMetrics(orgId, dateFilter, start, end);
     }
 
     @Get('pipeline-value-generator')
-    async getPipelineValueGenerator(@Req() request: ZautoRequest) {
+    async getPipelineValueGenerator(@Req() request: ZautoRequest, @Query('dateFilter') dateFilter: DateFilter, @Query('start') start?: string, @Query('end') end?: string) {
         const orgId = request.user.orgId;
         if (!orgId) {
             throw new UnauthorizedException('Org Id not found');
         }
-        return await this.dashboardService.getPipelineValueGenerator(orgId);
+        if (!start || !end) {
+            return await this.dashboardService.getPipelineValueGenerator(orgId, dateFilter);
+        }
+        return await this.dashboardService.getPipelineValueGenerator(orgId, dateFilter, start, end);
     }
 }
 

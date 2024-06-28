@@ -3,7 +3,7 @@ const avatarId = "{{avatarId}}";
 class API {
     static endpoint = {
         agent: "api/agents/",
-        leadAgent: 'api/{{avatarId}}/leads',
+        leadAgent: 'api/agents/{{avatarId}}/chat/lead',
         vote: 'api/conversations/message/',
         calendarDates: 'api/calendar/available-dates/{{avatarId}}',
         calendarSlots: 'api/calendar/available-slots/{{avatarId}}',
@@ -11,7 +11,7 @@ class API {
     };
 }
 
-let isStandalone = true;
+let isStandalone = '{{standAloneFlag}}';
 
 const ReactionType = {
     NULL: null,
@@ -209,7 +209,13 @@ class RestClient {
         const url = new URL(endpoint, this.baseURL);
         Object.keys(queryParams).forEach(key => url.searchParams.append(key, queryParams[key]));
         try {
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-tenant-id': "{{ORG_ID}}"
+                }
+            });
             if (!response.ok) {
                 const errorData = await response.json();
                 throw errorData; // Throw the error object received from the server
@@ -227,7 +233,8 @@ class RestClient {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-tenant-id': "{{ORG_ID}}"
                 },
                 body: JSON.stringify(data)
             });
@@ -247,8 +254,9 @@ class RestClient {
         try {
             const response = await fetch(url, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
+                headers: {  
+                    'Content-Type': 'application/json',
+                    'x-tenant-id': "{{ORG_ID}}"
                 },
                 body: JSON.stringify(data)
             });
@@ -269,7 +277,8 @@ class RestClient {
             const response = await fetch(url, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-tenant-id': "{{ORG_ID}}"
                 },
                 body: JSON.stringify(data)
             });
@@ -288,7 +297,10 @@ class RestClient {
         const url = new URL(endpoint, this.baseURL);
         try {
             const response = await fetch(url, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'x-tenant-id': "{{ORG_ID}}"
+                }
             });
             if (!response.ok) {
                 const errorData = await response.json();
@@ -1260,8 +1272,8 @@ class MyChatBotUI extends ChatBotUI {
         // Create input group for name
         const inputGroupContainerName = this.createElement('div', { class: 'zauto-input-group' });
         const nameLabel = this.createElement('label');
-        nameLabel.textContent = 'Name';
-        const nameInput = this.createElement('input', { type: 'text', name: 'name', placeholder: 'Enter your name', required: true });
+        nameLabel.textContent = 'Full Name';
+        const nameInput = this.createElement('input', { type: 'text', name: 'fullName', placeholder: 'Enter your name', required: true });
     
         // Create input group for email
         const inputGroupContainerEmail = this.createElement('div', { class: 'zauto-input-group' });
@@ -1362,7 +1374,8 @@ class ChatBotLogic {
         this.avatarData = null;
         this.socket = io(rootUrl, {
             query: {
-                "visitId": this.getVisit()
+                "visitId": this.getVisit(),
+                "orgId": "{{ORG_ID}}"
             }
         });
 
@@ -1426,14 +1439,8 @@ class ChatBotLogic {
         });
         this.eventEmitter.on('leadFormSent',(leadData)=>{
             let payload = { };
-            if (leadData.content.type == 'info') {
-                const jsonData = {};
-                jsonData[leadData.fieldName] = leadData.leadFieldValue;
-                payload[leadData.content.type] = JSON.stringify(jsonData);
-            }
-            else {
-                payload[leadData.content.type] = leadData.leadFieldValue;
-            }
+            console.log(leadData);
+            payload[leadData.content.contactField.split(",")[0]] = leadData.leadFieldValue;
             function callback(error, res) {
                 if (error) {
                     console.log(error);
@@ -1513,6 +1520,7 @@ class ChatBotLogic {
                     this.eventEmitter.emit('ctaFormSubmitted', data);
                 }
             }
+            console.log("Data for Lead : ",data.formData);
             this.sendLead(data.formData, callback.bind(this));
         });
         setTimeout(() => {
@@ -1538,6 +1546,12 @@ class ChatBotLogic {
             });
         });
 
+    }
+
+    extractTenantId() {
+        const hostname = window.location.hostname;
+        const subdomain = hostname.split('.')[0];
+        return subdomain;
     }
 
     getAvatar()
@@ -1567,6 +1581,7 @@ class ChatBotLogic {
                 agentId: this.avatarId,
                 visitorId: this.getVisitor(),
                 visitId: this.getVisit(),
+                orgId:"{{ORG_ID}}",
                 chatMessage: {
                     messages: [
                         {
@@ -1630,6 +1645,7 @@ class ChatBotLogic {
         const payload = {
             agentId: this.avatarId,
             convId: this.convoId,
+            orgId:"{{ORG_ID}}",
             chatMessage: {
                 messages: [
                     {
@@ -1648,8 +1664,9 @@ class ChatBotLogic {
         {
             throw Error('convId missing');
         }
-        payload = {...payload, convId: this.convoId };
-        let endpoint = `${this.apiUrl}${API.endpoint.leadAgent.replace('{{avatarId}}', this.avatarId)}`;
+        const visitorId=localStorage.getItem("visitorId")
+        payload = {...payload, conversationId: this.convoId,visitorId };
+        let endpoint = `${this.apiUrl}${API.endpoint.leadAgent.replace('{{avatarId}}', this.avatarId)}?convId=${this.convoId}`;
         this.restClient.post(endpoint,payload)
         .then(data => {
             callback(null, data);
@@ -1677,6 +1694,7 @@ class ChatBotLogic {
         const payload = {
             agentId: this.avatarId,
             convId: this.convoId,
+            orgId:"{{ORG_ID}}",
             url: currentUrl
         };
         this.socket.emit("navigate",payload);
@@ -1751,7 +1769,10 @@ class ChatBotLogic {
 class WebsiteTracker {
     constructor(eventEmitter) {
         this.eventEmitter = eventEmitter;
+        this.maxScrollDepth = 0; // Initialize as a class property
+        this.actionHistory = []; // Initialize as a class property
         this.initializeTracking();
+        this.journeyTrackerInit();
     }
 
     trackButtonClick(event) {
@@ -1759,13 +1780,12 @@ class WebsiteTracker {
             type: event.target.tagName.toLowerCase(),
             text: event.target.textContent.trim(),
             id: event.target.id,
-            link:event.target.href || ''
+            link: event.target.href || ''
         };
-        this.eventEmitter.emit('sendTrackingData', {data:JSON.stringify(data)});
+        this.eventEmitter.emit('sendTrackingData', {data: JSON.stringify(data)});
     }
 
-    initializeTracking()
-    {
+    initializeTracking() {
         const buttons = document.querySelectorAll('button');
         buttons.forEach(button => {
             button.addEventListener('click', this.trackButtonClick.bind(this));
@@ -1775,7 +1795,140 @@ class WebsiteTracker {
             link.addEventListener('click', this.trackButtonClick.bind(this));
         });
     }
+
+    journeyTrackerInit() {
+        const apiRootUrl = '{{API_ROOT_URL}}';
+        const tenantId = "{{ORG_ID}}";
+        const currentPageUrl = window.location.origin + window.location.pathname;
+        const buttons = document.querySelectorAll('button');
+        const links = document.querySelectorAll('a');
+        let scrollTimeout;
+
+        const socket = io(apiRootUrl, {query: {orgId: tenantId}});
+        socket.on('connect', () => {
+            console.log('Socket connected for tracking');
+            this.handleActionHistory(socket);
+            this.createSession(apiRootUrl, tenantId, currentPageUrl, socket);
+        });
+
+        buttons.forEach(button => {
+            button.addEventListener('click', this.trackButtonClick.bind(this));
+        });
+        links.forEach(link => {
+            link.addEventListener('click', this.trackButtonClick.bind(this));
+        });
+
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => this.trackScrollDepth(socket, currentPageUrl), 100);
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (!this.getVisitId()) return;
+            const data = {
+                "visitId": this.getVisitId(),
+                "data": "",
+                "type": "PAGE_CLOSED",
+                "url": currentPageUrl
+            }
+            this.appendActionHistory(data);
+        });
+    }
+
+    handleActionHistory(socket) {
+        const actionStr = localStorage.getItem("prospectAction");
+        if (actionStr) {
+            const _actionHistory = JSON.parse(actionStr);
+            setTimeout(() => {
+                for (const action of _actionHistory) {
+                    socket.emit('prospectAction', action);
+                }
+            }, 500);
+        }
+        localStorage.removeItem("prospectAction");
+    }
+
+    createSession(apiRootUrl, tenantId, currentPageUrl, socket) {
+        const data = {};
+        const visitorId = this.getVisitorId();
+        fetch(`${apiRootUrl}/api/visitors?${(visitorId ? `visitorId=${visitorId}` : '')}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "x-tenant-id": tenantId
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to create session');
+            }
+            return response.json();
+        })
+        .then(responseData => {
+            console.log('Session created successfully');
+            console.log('Response Data:', responseData);
+            this.setVisitorId(responseData.visitorId);
+            this.setVisitId(responseData.visitId);
+            this.trackPageView(socket, currentPageUrl);
+        })
+        .catch(error => {
+            console.error('Error creating session:', error.message);
+        });
+    }
+
+    trackPageView(socket, currentPageUrl) {
+        if (!this.getVisitId()) return;
+        const data = {
+            "visitId": this.getVisitId(),
+            "type": "PAGE_VIEWED",
+            "url": currentPageUrl
+        }
+        socket.emit('prospectAction', data);
+    }
+
+    trackScrollDepth(socket, currentPageUrl) {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight;
+        const winHeight = window.innerHeight;
+        const currentScrollDepth = (scrollTop / (docHeight - winHeight)) * 100;
+        if (currentScrollDepth > this.maxScrollDepth) {
+            console.log(currentScrollDepth, this.maxScrollDepth);
+            this.maxScrollDepth = currentScrollDepth;
+            if (!this.getVisitId()) return;
+            const data = {
+                "visitId": this.getVisitId(),
+                "type": "PAGE_VIEWED",
+                "scrollDepth": Math.round(this.maxScrollDepth),
+                "url": currentPageUrl
+            }
+            socket.emit('prospectAction', data);
+        }
+    }
+
+    appendActionHistory(action) {
+        this.actionHistory.push(action);
+        localStorage.setItem("prospectAction", JSON.stringify(this.actionHistory));
+    }
+
+    getVisitorId() {
+        return localStorage.getItem("visitorId");
+    }
+
+    setVisitorId(id) {
+        localStorage.setItem("visitorId", id);
+    }
+
+    getVisitId() {
+        return localStorage.getItem("visitId");
+    }
+
+    setVisitId(id) {
+        localStorage.setItem("visitId", id);
+    }
 }
+
+
 
 function loadExternalResources(rootElementId, resourceList, callback) {
     const rootElement = document.getElementById(rootElementId);

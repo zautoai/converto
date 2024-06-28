@@ -319,7 +319,8 @@ export class HeaderComponent implements OnInit {
 
   // To get the avatar url
   getAvatarUrl() {
-    const url = API.baseUrl + "/zautobot?botid=" + this.avatarService.getAvatarId();
+    console.log(window.location.origin);
+    const url = window.location.origin + "/zautobot?botid=" + this.avatarService.getAvatarId();
     return url;
   }
 

@@ -1,52 +1,54 @@
-import { Module } from '@nestjs/common';
-import { LeadObsorverService } from './services/lead-obsorver.service';
-import { LlmModule } from 'src/llm/llm.module';
-import { PrismaModule } from 'src/prisma/prisma.module';
-import { SummarizerService } from './services/summarizer.service';
-import { PageGreeterService } from './services/page-greeters.service';
-import { HelpersModule } from 'src/helpers/helpers.module';
-import { CTACreatorService } from './services/cta-creator';
-import { CTASelectorService } from './services/cta-selector';
-import { CommonModule } from 'src/common/common.module';
-import { EndOfConversationService } from './services/endconversation.service';
-import { CalendarObsorverService } from './services/calendar-obsorver.service';
-import { StarterGeneratorService } from './services/starters-generator.service';
-import { MapperService } from './services/mapper.service';
-import { ContactsModule } from 'src/contacts/contacts.module';
-import { IntentScoreGeneratorService } from './services/intentscore-generator.service';
-import { MicroservicesModule } from 'src/microservices/microservices.module';
-import { IcpScoreGenerator } from './services/icp-score-generator.service';
-import { Icp } from 'src/icp/entities/icp.entity';
+  import { Module, forwardRef } from '@nestjs/common';
+  import { LeadObsorverService } from './services/lead-obsorver.service';
+  import { LlmModule } from 'src/llm/llm.module';
+  import { PrismaModule } from 'src/prisma/prisma.module';
+  import { SummarizerService } from './services/summarizer.service';
+  import { PageGreeterService } from './services/page-greeters.service';
+  import { HelpersModule } from 'src/helpers/helpers.module';
+  import { CTACreatorService } from './services/cta-creator';
+  import { CTASelectorService } from './services/cta-selector';
+  import { CommonModule } from 'src/common/common.module';
+  import { EndOfConversationService } from './services/endconversation.service';
+  import { CalendarObsorverService } from './services/calendar-obsorver.service';
+  import { StarterGeneratorService } from './services/starters-generator.service';
+  import { MapperService } from './services/mapper.service';
+  import { ContactsModule } from 'src/contacts/contacts.module';
+  import { IntentScoreGeneratorService } from './services/intentscore-generator.service';
+  import { MicroservicesModule } from 'src/microservices/microservices.module';
+  import { IcpScoreGenerator } from './services/icp-score-generator.service';
+  import { Icp } from 'src/icp/entities/icp.entity';
+  import { AgentModule } from 'src/agent/agent.module';
 
-@Module({
-  imports: [
-    LlmModule,
-    PrismaModule,
-    HelpersModule,
-    CommonModule,
-    MicroservicesModule
-  ],
-  providers: [
-    LeadObsorverService,
-    SummarizerService,
-    PageGreeterService,
-    CTACreatorService,
-    CTASelectorService,
-    EndOfConversationService,
-    CalendarObsorverService,
-    StarterGeneratorService,
-    MapperService,
-    IntentScoreGeneratorService,
-    IcpScoreGenerator
-  ],
-  exports: [
-    SummarizerService,
-    PageGreeterService,
-    CTACreatorService,
-    StarterGeneratorService,
-    MapperService,
-    IntentScoreGeneratorService,
-    IcpScoreGenerator
-  ]
-})
-export class AssistantsModule { }
+  @Module({
+    imports: [
+      LlmModule,
+      PrismaModule,
+      HelpersModule,
+      CommonModule,
+      MicroservicesModule,
+      forwardRef(() => AgentModule)
+    ],
+    providers: [
+      LeadObsorverService,
+      SummarizerService,
+      PageGreeterService,
+      CTACreatorService,
+      CTASelectorService,
+      EndOfConversationService,
+      CalendarObsorverService,
+      StarterGeneratorService,
+      MapperService,
+      IntentScoreGeneratorService,
+      IcpScoreGenerator
+    ],
+    exports: [
+      SummarizerService,
+      PageGreeterService,
+      CTACreatorService,
+      StarterGeneratorService,
+      MapperService,
+      IntentScoreGeneratorService,
+      IcpScoreGenerator
+    ]
+  })
+  export class AssistantsModule { }

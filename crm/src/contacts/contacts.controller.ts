@@ -74,7 +74,7 @@ export class ContactsController {
   @Get('date-range')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  async getContactsByDateRange(@Req() request: IRequest, @Query('startDate') startDate: Date, @Query('endDate') endDate: Date) {
+  async getContactsByDateRange(@Req() request: IRequest, @Query('startDate') startDate: string, @Query('endDate') endDate: string) {
     if (request.orgId) {
       return this.contactsService.getContactsByDate(request.orgId, startDate, endDate);
     } else {

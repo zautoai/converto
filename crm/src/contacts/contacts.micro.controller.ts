@@ -107,9 +107,9 @@ export class ContactMicroserviceController {
   }
 
   @MessagePattern({ cmd: 'GET_CONTACTS_BY_DATE' })
-  async get_contacts_by_date(data: { orgId: string, startDate: Date, endDate: Date }) {
+  async get_contacts_by_date(data: { orgId: string, startDate: string, endDate: string ,filterDto: FilterDto}) {
     try {
-      return await this.contactsService.getContactsByDate(data.orgId, data.startDate, data.endDate);
+      return await this.contactsService.getContactsByDate(data.orgId, data.startDate, data.endDate, data.filterDto);
     } catch (error) {
       return error.response || error;
     }

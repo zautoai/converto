@@ -55,7 +55,7 @@ model Contact {
   lastName                 String?
   jobTitle                 String?
   organizationName         String?
-  email                    String?                   @unique
+  email                    String?                   
   phone                    String?
   address                  String?
   city                     String?

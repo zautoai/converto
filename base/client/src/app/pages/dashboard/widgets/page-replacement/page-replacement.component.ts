@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
+import { DateFilter } from 'src/app/common/enums';
+import { API } from 'src/app/config/endpoint.config';
+import { RestService } from 'src/app/shared/services/rest.service';
 
 export interface PageMetrics {
   pages: string;
@@ -22,7 +25,40 @@ const ELEMENT_DATA: PageMetrics[] = [
   templateUrl: './page-replacement.component.html',
   styleUrls: ['./page-replacement.component.scss'],
 })
-export class PageReplacementComponent {
+export class PageReplacementComponent implements OnInit, OnChanges{
+
+  DateFilter : any = DateFilter;
+  @Input() selectedDateFilter: any = DateFilter.THIS_MONTH;
+  @Input() startDate: string = '';
+  @Input() endDate: string = '';
+
+
+  constructor(
+    private restService:RestService
+  ){}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedDateFilter'] || changes['startDate'] || changes['endDate']) {
+      if(this.selectedDateFilter === DateFilter.BETWEEN && (!this.startDate || !this.endDate)) return
+      this.getPageEnhancementMetrics(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined);
+    }
+  }
+
+  ngOnInit(): void {
+    this.getPageEnhancementMetrics(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined);
+  }
+
   displayedColumns: string[] = ['pages', 'visits', 'ctr', 'avgTimeSpent', 'scrollDepth'];
   dataSource = new MatTableDataSource<PageMetrics>(ELEMENT_DATA);
+
+  getPageEnhancementMetrics(dateFilter: string, range?: { start: string, end: string }){
+    const params = range 
+    ? `dateFilter=${dateFilter}&start=${range.start}&end=${range.end}` 
+    : `dateFilter=${dateFilter}`;
+    this.restService.get(API.main.dashboard,`page-enhancement-metrics?${params}`).subscribe((res:any)=>{
+      this.dataSource.data = res.data;
+      console.log(res.data);
+      
+    })
+  }
 }

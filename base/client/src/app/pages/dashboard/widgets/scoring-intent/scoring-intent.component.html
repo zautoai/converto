@@ -1,13 +1,25 @@
 <div class="container-box">
   <div id="chart">
-    <apx-chart
+    @if(!isNull){
+      <apx-chart
       [series]="chartOptions.series"
-      [chart]="chartOptions.chart"
-      [title]="chartOptions.title"
-      [colors]="chartOptions.colors"
-      [labels]="chartOptions.labels"
-      [dataLabels]="chartOptions.dataLabels"
-      [responsive]="chartOptions.responsive"
-    ></apx-chart>
+        [chart]="chartOptions.chart"
+        [title]="chartOptions.title"
+        [colors]="chartOptions.colors"
+        [labels]="chartOptions.labels"
+        [dataLabels]="chartOptions.dataLabels"
+        [responsive]="chartOptions.responsive"
+      ></apx-chart>
+    }
+    @else {
+      <div style="height: 245px;text-align: center;">
+        <div class="mt-3 mb-5" style="text-align: center;font-size: 16px;font-weight: normal;">
+          INTENT SCORING
+        </div>
+        <div class="mt-5">
+          No Data Found
+        </div>
+      </div>
+    }
   </div>
 </div>

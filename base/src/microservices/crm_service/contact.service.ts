@@ -108,11 +108,11 @@ export class ContactService extends BaseService {
     }
   }
 
-  async getContactsByDate(orgId: string, startDate: Date, endDate: Date) {
+  async getContactsByDate(orgId: string, startDate: string, endDate: string,filterDto?: FilterDto) {
     try {
       return this.CRMClient.send(
         { cmd: 'GET_CONTACTS_BY_DATE' },
-        { orgId, startDate, endDate },
+        { orgId, startDate, endDate, filterDto },
       ).toPromise();
     } catch (error) {
       this.logger.error(`Error while fetching contact: ${error.message}`);

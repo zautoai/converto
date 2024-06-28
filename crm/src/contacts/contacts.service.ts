@@ -31,7 +31,6 @@ export class ContactsService {
 
   async getContacts(orgId: string, filterDto: FilterDto) {
     const { page, limit, sort, searchTerm } = filterDto;
-    console.log(page, limit, sort, searchTerm);
     
     const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
@@ -166,13 +165,13 @@ export class ContactsService {
         },
         { _defaultFields: {}, _customFields: {} },
       );
-      const existingContact = await this.getContactByEmail(
-        orgId,
-        createContactDto.email,
-      );
-      if (existingContact) {
-        throw new BadRequestException('Contact already exists');
-      }
+      // const existingContact = await this.getContactByEmail(
+      //   orgId,
+      //   createContactDto.email,
+      // );
+      // if (existingContact) {
+      //   throw new BadRequestException('Contact already exists');
+      // }
       const contact = await prisma.contact.create({
         data: {
           ..._defaultFields,
@@ -633,26 +632,63 @@ export class ContactsService {
     }
   }
 
-  async getContactsByDate(orgId: string, startDate: Date, endDate: Date) {
+  async getContactsByDate(orgId: string, startDate: string, endDate: string, filterDto?: FilterDto) {
+    const { page = 1, limit = 10 } = filterDto 
+  
+    const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
+  
     try {
       const contacts = await prisma.contact.findMany({
         where: {
           createdAt: {
-            gte: startDate.toISOString(),
-            lte: endDate.toISOString()
+            gte: new Date(startDate),
+            lte: new Date(endDate)
+          }
+        },
+        take: limit,
+        skip: skip,
+        include: {
+          contactTag: { select: { tag: true } },
+          contactCustomFieldValues: {
+            select: { value: true, customField: true },
+          },
+          account: true
+        }
+      });
+  
+      const transformedContacts = contacts.map((contact) => ({
+        ...contact,
+        contactTag: contact.contactTag.map((ct) => ct.tag),
+      }));
+  
+      const total = await prisma.contact.count({
+        where: {
+          createdAt: {
+            gte: new Date(startDate),
+            lte: new Date(endDate)
           }
         }
       });
-      return contacts;
+  
+      return {
+        code: 200,
+        success: true,
+        message: 'Contacts fetched successfully',
+        data: transformedContacts,
+        page: page,
+        total: total,
+      };
     } catch (error) {
-      throw error
+      console.log(error);
+      throw error;
     } finally {
-      prisma.$disconnect()
-      await this.prismaClientManager.disconnectClient(orgId)
+      await prisma.$disconnect();
+      await this.prismaClientManager.disconnectClient(orgId);
     }
   }
-
+  
+  
   async handleAccountContactMap(orgId: string, contact: any) {
     if (!contact.organizationName) {
       return

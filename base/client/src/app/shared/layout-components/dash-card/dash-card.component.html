@@ -1,7 +1,7 @@
 <ng-container *ngIf="showLoader">
   <ngx-skeleton-loader
-    count="1"
-    [theme]="{ 'border-radius': '10px', height: '140px' }"
+    count="6"
+    [theme]="{ 'border-radius': '10px','margin-right':'22px', height: '200px' ,width : '300px' }"
   ></ngx-skeleton-loader>
 </ng-container>
 <ng-container *ngIf="!showLoader">
@@ -15,7 +15,7 @@
           <div class="current-value-container">
             <h3 class="number-font text-dark">{{ widget.currentValue }}</h3>
           </div>
-          <p class="card-text text-muted past-month">{{ widget.pastMonth }}</p>
+          <p class="card-text text-muted past-month">{{ widget.pastPeriod }}</p>
         </div>
       </div>
     </div>
@@ -31,7 +31,7 @@
           <p class="card-text text-muted change-text">
             <span class="text-{{ widget.color }}">{{ widget.change }}</span>
           </p>
-          <p class="card-text text-muted past-month">{{ widget.pastMonth }}</p>
+          <p class="card-text text-muted past-month">{{ widget.pastPeriod }}</p>
           <i class="fe fe-{{ widget.icon }} widget-icon"></i>
         </div>
       </div>

@@ -138,7 +138,7 @@ export class ContactsService extends BaseService {
     )
   }
 
-  async getContactsByDate(orgId: string, startDate: Date, endDate: Date) {
+  async getContactsByDate(orgId: string, startDate: string, endDate: string) {
     return this.handleException(
       await this.contactService.getContactsByDate(orgId, startDate, endDate)
     )

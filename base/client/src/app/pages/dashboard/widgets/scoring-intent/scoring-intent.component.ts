@@ -28,6 +28,7 @@ export class ScoringIntentComponent implements OnChanges {
   @Input() intentScores: any;
   @ViewChild('chart') chart: ChartComponent | undefined;
   public chartOptions: ChartOptions;
+  isNull: boolean = false;
 
   constructor() {
     this.chartOptions = {
@@ -55,10 +56,10 @@ export class ScoringIntentComponent implements OnChanges {
         },
       ],
       title: {
-        text: 'Intent Scoring',
+        text: 'INTENT SCORING',
         align: 'center', // Align the title to the left
         style: {
-          fontSize: '18px',
+          fontSize: '16px',
           fontWeight: 'normal'
         }
       },
@@ -87,6 +88,11 @@ export class ScoringIntentComponent implements OnChanges {
   }
 
   updateChartOptions(): void {
-    this.chartOptions.series = this.intentScores;
+    this.isNull = this.intentScores.every((score: number) => score === 0);
+    if (this.isNull) {
+      this.chartOptions.series = [];
+    } else {
+      this.chartOptions.series = this.intentScores;
+    }
   }
 }

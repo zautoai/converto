@@ -11,9 +11,9 @@ export enum HttpMethod {
 }
 
 export enum DateFilter {
-    LAST_MONTH = 'last_month',
     THIS_MONTH = 'this_month',
-    THIS_WEEK = 'this_week',
-    BETWEEN = 'between'
+    THIS_QUARTER = 'this_quarter',
+    THIS_YEAR = 'this_year',
+    BETWEEN = 'between',
 }
   

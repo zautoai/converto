@@ -27,29 +27,71 @@ export interface PercentageData {
 })
 export class ZautoDashboardComponent implements OnInit{
 
-  intentScores : any = [] 
-  predictiveLeadScores : any = []
+  intentScores: any = [];
+  predictiveLeadScores: any = [];
+  displayDateFilter: any = this.dateFilterFormator(DateFilter);
+  selectedDateFilter: any = DateFilter.THIS_MONTH;
+  startDate: string = '';
+  endDate: string = '';
+  DateFilter : any = DateFilter;
+
   constructor(
     public authService: AuthService,
-    private restService:RestService) { }
-
+    private restService: RestService
+  ) { }
 
   ngOnInit(): void {
-    this.getIntentScore()
-    this.getPredictiveLeadScores()
+    this.getDashboardData();
   }
 
-  getIntentScore(){
-    this.restService.get(API.main.dashboard,'intent-score').subscribe((res:any)=>{
+  removeUnderscore(str: string) {
+    return str.replace(/_/g, ' ');
+  }
+
+  dateFilterFormator(dateFilter: any) {
+    const result = [];
+    for (let key in dateFilter) {
+      result.push({
+        key: key,
+        value: dateFilter[key]
+      });
+    }
+    return result;
+  }
+
+  getDashboardData() {
+    this.getIntentScore(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined);
+    this.getPredictiveLeadScores(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined);
+  }
+
+  getIntentScore(dateFilter: string, range?: { start: string, end: string }) {
+    const params = range 
+      ? `dateFilter=${dateFilter}&start=${range.start}&end=${range.end}` 
+      : `dateFilter=${dateFilter}`;
+    this.restService.get(API.main.dashboard, `intent-score?${params}`).subscribe((res: any) => {
       this.intentScores = res.data;
-    })
+    });
+  }
+  
+  getPredictiveLeadScores(dateFilter: string, range?: { start: string, end: string }) {
+    const params = range 
+      ? `dateFilter=${dateFilter}&start=${range.start}&end=${range.end}` 
+      : `dateFilter=${dateFilter}`;
+    this.restService.get(API.main.dashboard, `predictive-lead-score?${params}`).subscribe((res: any) => {
+      this.predictiveLeadScores = res.data;      
+    });
+  }
+  
+  onDateFilterChange() {
+    if (this.selectedDateFilter !== DateFilter.BETWEEN) {
+      this.getDashboardData();
+    }    
   }
 
-
-  getPredictiveLeadScores(){
-    this.restService.get(API.main.dashboard, 'predictive-lead-score').subscribe((res:any)=>{
-      this.predictiveLeadScores = res.data;
-    })
+  onDateRangeChange() {
+    if (this.selectedDateFilter === DateFilter.BETWEEN && this.startDate && this.endDate) {      
+      this.getDashboardData();
+    }
   }
 }
 

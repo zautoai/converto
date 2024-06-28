@@ -6,8 +6,10 @@ import { AccountsService } from 'src/accounts/accounts.service';
 import { ProspecActivityType } from 'src/prospect-journey/dto/create-prospect-journey.dto'
 import { ContactService } from 'src/microservices/crm_service/contact.service';
 import { DashboardDataDto } from './dto/dashboardData.dto';
+import { getDate } from 'src/common/helpers/date.helper';
+import { DateFilter } from 'src/common/enums/enums';
 @Injectable()
-export class DashboardService extends BaseService {
+export class DashboardService extends BaseService implements OnModuleInit {
 
   constructor(
     private readonly contactsService: ContactsService,
@@ -17,6 +19,8 @@ export class DashboardService extends BaseService {
     super()
   }
 
+  onModuleInit() {
+  }
 
   async changeDashboardData(orgId: string, dashboardDataDto: DashboardDataDto) {
     const prisma = await this.getPrismaClient(orgId)
@@ -53,29 +57,37 @@ export class DashboardService extends BaseService {
     }
   }
 
-  async getBottomWidget(orgId: string) {
+  async getBottomWidget(orgId: string, dateFilter: DateFilter, start?: string, end?: string) {
     try {
-     
-      const {startOfMonthISO, endOfMonthISO, startOfPreviousMonthISO, endOfPreviousMonthISO} = await this.getDates()
-      const currentMonthVisitCount = await this.getVisitCount(orgId, startOfMonthISO, endOfMonthISO);
-      const previousMonthVisitCount = await this.getVisitCount(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
-      const currentMonthContactCount = await this.getContactCount(orgId, startOfMonthISO, endOfMonthISO);
-      const previousMonthContactCount = await this.getContactCount(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
-      const currentMonthAccountCount = await this.getAccountCount(orgId, startOfMonthISO, endOfMonthISO);
-      const previousMonthAccountCount = await this.getAccountCount(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
 
+      const date = getDate(dateFilter, { start, end });
+      const currentVisitCount = await this.getVisitCount(orgId, date.current.start, date.current.end);
+      const currentContactCount = await this.getContactCount(orgId, date.current.start, date.current.end);
+      const currentAccountCount = await this.getAccountCount(orgId, date.current.start, date.current.end);
+
+      let result = [
+        { title: 'Total visits', subtitle: this.getSubtitle(dateFilter), currentValue: currentVisitCount, icon: 'eye' },
+        { title: 'Total new Leads', subtitle: this.getSubtitle(dateFilter), currentValue: currentContactCount, icon: 'user' },
+        { title: 'Total new Accounts', subtitle: this.getSubtitle(dateFilter), currentValue: currentAccountCount, icon: 'briefcase' }
+      ]
+      if (dateFilter !== DateFilter.BETWEEN) {
+        const previousVisitCount = await this.getVisitCount(orgId, date.previous.start, date.previous.end);
+        const previousContactCount = await this.getContactCount(orgId, date.previous.start, date.previous.end);
+        const previousAccountCount = await this.getAccountCount(orgId, date.previous.start, date.previous.end);
+
+        result = result.map((item) => {
+          return {
+            ...item,
+            pastPeriod: `Past ${this.getPastPeriodName(dateFilter)} ${(this.getPreviousBottomValue(item.title, previousVisitCount, previousContactCount, previousAccountCount)?.toFixed(2) || '0')}`,
+            ...this.calculateChange(item.currentValue, (this.getPreviousBottomValue(item.title, previousVisitCount, previousContactCount, previousAccountCount) || 0))
+          }
+        })
+      }
       return {
         code: 200,
         success: true,
         message: 'Contacts fetched successfully',
-        data: {
-          currentMonthVisitCount,
-          previousMonthVisitCount,
-          currentMonthContactCount,
-          previousMonthContactCount,
-          currentMonthAccountCount,
-          previousMonthAccountCount,
-        }
+        data: result
       };
 
     } catch (error) {
@@ -114,140 +126,232 @@ export class DashboardService extends BaseService {
     return await this.accountsService.getAccountCount(orgId, startOfMonthISO, endOfMonthISO)
   }
 
-  async getDates(){
-    const currentDate = new Date();
-
-    // Calculate start and end dates for the current month
-    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-
-    // Calculate start and end dates for the previous month
-    const startOfPreviousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
-    const endOfPreviousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
-
-    // Convert dates to ISO strings
-    const startOfMonthISO = startOfMonth.toISOString();
-    const endOfMonthISO = endOfMonth.toISOString();
-    const startOfPreviousMonthISO = startOfPreviousMonth.toISOString();
-    const endOfPreviousMonthISO = endOfPreviousMonth.toISOString();
-    return {
-      startOfMonthISO,
-      endOfMonthISO,
-      startOfPreviousMonthISO,
-      endOfPreviousMonthISO
+  private calculateChange(current: number, previous: number): { change: string, color: string } {
+    if (previous === 0) {
+      return { change: current === 0 ? '0%' : '+100%', color: 'success' };
     }
+
+    if (current === 0) {
+      return { change: '-100%', color: 'danger' };
+    }
+
+    const isPositive = current >= previous;
+    const change = isPositive ? current - previous : previous - current;
+    const changePercentage = (change / previous) * 100;
+
+    return {
+      change: `${isPositive ? '+' : '-'}${changePercentage.toFixed(2)}%`,
+      color: isPositive ? 'success' : 'danger'
+    };
   }
-  
-  async getTopWidget(orgId: string) {
-    try{
-      const {startOfMonthISO, endOfMonthISO, startOfPreviousMonthISO, endOfPreviousMonthISO} = await this.getDates()
 
-      const currentPVG = await this.calculatePVG(orgId, startOfMonthISO, endOfMonthISO);
-      const currentCAC = await this.calculateCAC(orgId, startOfMonthISO, endOfMonthISO);
-      const currentCPL = await this.calculateCPL(orgId, startOfMonthISO, endOfMonthISO);
+  async getTopWidget(orgId: string, dateFilter: DateFilter, start?: string, end?: string) {
+    try {
+      const date = getDate(dateFilter, { start, end });
 
-      const previousPVG = await this.calculatePVG(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
-      const previousCAC = await this.calculateCAC(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
-      const previousCPL = await this.calculateCPL(orgId, startOfPreviousMonthISO, endOfPreviousMonthISO);
+      const currentPVG = await this.calculatePVG(orgId, date.current.start, date.current.end);
+      const currentCAC = await this.calculateCAC(orgId, date.current.start, date.current.end);
+      const currentCPL = await this.calculateCPL(orgId, date.current.start, date.current.end);
+
+      let result = [
+        { title: 'Total PVG', subtitle: this.getSubtitle(dateFilter), currentValue: '$' + (currentPVG?.toFixed(2) || '0') },
+        { title: 'Total CAC', subtitle: this.getSubtitle(dateFilter), currentValue: '$' + (currentCAC?.toFixed(2) || '0') },
+        { title: 'Total CPL', subtitle: this.getSubtitle(dateFilter), currentValue: '$' + (currentCPL?.toFixed(2) || '0') }
+      ];
+
+      // Only include past period if dateFilter is not BETWEEN
+      if (dateFilter !== DateFilter.BETWEEN) {
+        const previousPVG = await this.calculatePVG(orgId, date.previous.start, date.previous.end);
+        const previousCAC = await this.calculateCAC(orgId, date.previous.start, date.previous.end);
+        const previousCPL = await this.calculateCPL(orgId, date.previous.start, date.previous.end);
+
+        result = result.map(item => ({
+          ...item,
+          pastPeriod: `Past ${this.getPastPeriodName(dateFilter)} $${(this.getPreviousValue(item.title, previousPVG, previousCAC, previousCPL)?.toFixed(2) || '0')}`
+        }));
+      }
+      else {
+        result = result.map(item => ({
+          ...item,
+          pastPeriod: ''
+        }));
+      }
 
       return {
         code: 200,
         success: true,
         message: 'Top widget data fetched successfully',
-        data: {
-          currentPVG,
-          previousPVG,
-          currentCAC,
-          previousCAC,
-          currentCPL,
-          previousCPL
-        }
+        data: result
       };
-    }catch(error){
-      console.log(error)
+    } catch (error) {
+      console.error('Error fetching top widget data:', error);
+      throw error;
     }
-}
-
-  async calculatePVG(orgId:string, startOfMonthISO: string, endOfMonthISO: string){
-      const prisma = await this.getPrismaClient(orgId)
-      try{
-        const dashboardData = await prisma.dashboard.findFirst();
-        if(!dashboardData){
-           return 0;
-        }
-        const { averageDealSize, leadConversionRate}=dashboardData
-        const totalLeads = await this.getContactCount(orgId,startOfMonthISO,endOfMonthISO);
-        const pipelineValue = totalLeads * averageDealSize * leadConversionRate;
-        return pipelineValue
-      } catch(error){
-
-      } finally{
-         await prisma.$disconnect()
-      }
   }
 
-  async calculateCAC(orgId:string,  startOfMonthISO: string, endOfMonthISO: string){
+  private getSubtitle(dateFilter: DateFilter): string {
+    switch (dateFilter) {
+      case DateFilter.THIS_MONTH:
+        return 'This Month';
+      case DateFilter.THIS_QUARTER:
+        return 'This Quarter';
+      case DateFilter.THIS_YEAR:
+        return 'This Year';
+      case DateFilter.BETWEEN:
+        return 'Custom Range';
+      default:
+        return '';
+    }
+  }
+
+  private getPastPeriodName(dateFilter: DateFilter): string {
+    switch (dateFilter) {
+      case DateFilter.THIS_MONTH:
+      case DateFilter.BETWEEN:
+        return 'Month';
+      case DateFilter.THIS_QUARTER:
+        return 'Quarter';
+      case DateFilter.THIS_YEAR:
+        return 'Year';
+      default:
+        return 'Period';
+    }
+  }
+
+  private getPreviousValue(title: string, previousPVG?: number, previousCAC?: number, previousCPL?: number): number | undefined {
+    switch (title) {
+      case 'Total PVG':
+        return previousPVG;
+      case 'Total CAC':
+        return previousCAC;
+      case 'Total CPL':
+        return previousCPL;
+      default:
+        return undefined;
+    }
+  }
+
+  private getPreviousBottomValue(title: string, previousVisitCount?: number, previousContactCount?: number, previousAccountCount?: number): number | undefined {
+    switch (title) {
+      case 'Total visits':
+        return previousVisitCount;
+      case 'Total new Leads':
+        return previousContactCount;
+      case 'Total new Accounts':
+        return previousAccountCount;
+      default:
+        return undefined;
+    }
+  }
+
+  async calculatePVG(orgId: string, startOfMonthISO: string, endOfMonthISO: string) {
     const prisma = await this.getPrismaClient(orgId)
-    try{
+    try {
       const dashboardData = await prisma.dashboard.findFirst();
-      if(!dashboardData){
-         return 0;
+      if (!dashboardData) {
+        return 0;
       }
-      const { salesCost, marketingCost}=dashboardData
-      const totalLeads = await this.getContactCount(orgId,startOfMonthISO,endOfMonthISO);
-      if(totalLeads===0 || (salesCost===0 && marketingCost===0)){
+      const { averageDealSize, leadConversionRate } = dashboardData
+      const totalLeads = await this.getContactCount(orgId, startOfMonthISO, endOfMonthISO);
+      const pipelineValue = totalLeads * averageDealSize * leadConversionRate;
+      return pipelineValue
+    } catch (error) {
+
+    } finally {
+      await prisma.$disconnect()
+    }
+  }
+
+  async calculateCAC(orgId: string, startOfMonthISO: string, endOfMonthISO: string) {
+    const prisma = await this.getPrismaClient(orgId)
+    try {
+      const dashboardData = await prisma.dashboard.findFirst();
+      if (!dashboardData) {
+        return 0;
+      }
+      const { salesCost, marketingCost } = dashboardData
+      const totalLeads = await this.getContactCount(orgId, startOfMonthISO, endOfMonthISO);
+      if (totalLeads === 0 || (salesCost === 0 && marketingCost === 0)) {
         return 0;
       }
       const cac = (marketingCost + salesCost) / totalLeads;
       return cac
-    } catch(error){
+    } catch (error) {
 
-    } finally{
-       await prisma.$disconnect()
+    } finally {
+      await prisma.$disconnect()
     }
   }
 
-  async calculateCPL(orgId:string, startOfMonthISO: string, endOfMonthISO: string){
+  async calculateCPL(orgId: string, startOfMonthISO: string, endOfMonthISO: string) {
     const prisma = await this.getPrismaClient(orgId)
-    try{
+    try {
       const dashboardData = await prisma.dashboard.findFirst();
-      if(!dashboardData){
-         return 0;
+      if (!dashboardData) {
+        return 0;
       }
-      const { marketingCost}=dashboardData
+      const { marketingCost } = dashboardData
       const totalLeads = await this.getContactCount(orgId, startOfMonthISO, endOfMonthISO);
-      if(totalLeads===0 || marketingCost===0){
+      if (totalLeads === 0 || marketingCost === 0) {
         return 0;
       }
       const cplValue = marketingCost / totalLeads;
       return cplValue
-    } catch(error){
+    } catch (error) {
 
-    } finally{
-       await prisma.$disconnect()
+    } finally {
+      await prisma.$disconnect()
     }
   }
 
-  async getPageEnhancementMetrics(orgId: string) {
+  async getPageEnhancementMetrics(orgId: string, dateFilter: string, start?: string, end?: string) {
     const prisma = await this.getPrismaClient(orgId);
+    const date = getDate(dateFilter, { start, end })
+
     try {
-      let result = [];
-      const sites = await prisma.site.findMany({ select: { url: true } });
-      const siteMap = this.getPageNames(sites);
       const prospectJourney = await prisma.prospectJourney.findMany({
         where: {
-          OR: [
-            { type: ProspecActivityType.PAGE_VIEWED },
-            { type: ProspecActivityType.PAGE_CLOSED },
-            { type: ProspecActivityType.CTA_PERFORMED }
-          ]
-        }, select: { url: true, scrollDepth: true, timeSpend: true, type: true }
+          type: {
+            in: [
+              ProspecActivityType.PAGE_VIEWED,
+              ProspecActivityType.PAGE_CLOSED,
+              ProspecActivityType.CTA_PERFORMED
+            ]
+          },
+          createdAt: {
+            gte: date.current.start,
+            lte: date.current.end
+          },
+        },
+        select: { url: true, scrollDepth: true, timeSpend: true, type: true }
       });
-      console.log(prospectJourney);
 
-      for (const site of sites) {
+      const pages = prospectJourney.map(journey => new URL(journey.url));
+      const pagesNamesMap = await this.getPageNames(pages);
 
-      }
+      const result = pagesNamesMap.map(page => {
+        const journeys = prospectJourney.filter(journey => journey.url === page.url.href);
+        const totalJourneys = journeys.length;
+        const totalTimeSpent = journeys.reduce((total, journey) => total + journey.timeSpend, 0);
+        const totalScrollDepth = journeys.reduce((total, journey) => total + journey.scrollDepth, 0);
+        const ctaCount = journeys.filter(journey => journey.type === ProspecActivityType.CTA_PERFORMED).length;
+
+        return {
+          pages: page.pageName,
+          visits: totalJourneys,
+          avgTimeSpent: this.formatTime(totalTimeSpent / totalJourneys),
+          scrollDepth: (totalScrollDepth / totalJourneys).toFixed(2) + "%",
+          ctr: (ctaCount / totalJourneys) * 100
+        };
+      });
+
+      return {
+        code: 200,
+        success: true,
+        message: 'Page enhancement metrics fetched successfully',
+        data: result
+      };
+
     } catch (error) {
       console.error('Error counting visits:', error);
       throw error;
@@ -256,39 +360,43 @@ export class DashboardService extends BaseService {
     }
   }
 
-  formatPageName(pageName) {
-    // Replace dashes and underscores with spaces
-    let formattedName = pageName.replace(/[-_]/g, ' ');
+  formatTime(milliseconds) {
+    const totalSeconds = milliseconds / 1000;
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = (totalSeconds % 60).toFixed(2);
 
-    // Capitalize the first letter of each word
-    formattedName = formattedName.replace(/\b\w/g, char => char.toUpperCase());
-
-    return formattedName;
+    return `${h > 0 ? `${h}h ` : ''}${m > 0 ? `${m}m ` : ''}${s}s`.trim();
   }
 
-  getPageNames(sites) {
-    return sites.map(site => {
-      const url = new URL(site.url);
+  formatPageName(pageName) {
+    return pageName.replace(/[-_]/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+  }
+
+  async getPageNames(sites) {
+    const seenPageNames = new Set();
+
+    return sites.map(url => {
       const path = url.pathname;
       const rawPageName = path === '/' ? 'home' : path.split('/').pop().replace('.html', '');
+      const pageName = this.formatPageName(rawPageName) || 'Home';
 
-      const pageName = this.formatPageName(rawPageName);
-
-      return {
-        url: site.url,
-        pageName: pageName
-      };
-    });
+      if (seenPageNames.has(pageName)) return null;
+      seenPageNames.add(pageName);
+      return { url, pageName };
+    }).filter(Boolean);
   }
 
-  async getPredictiveLeadScore(orgId: string) {
+  async getPredictiveLeadScore(orgId: string, dateFilter: string, start?: string, end?: string) {
     const prisma = await this.getPrismaClient(orgId);
+    const date = getDate(dateFilter, { start, end })
+
     const result = [0, 0, 0, 0, 0]
     const predictiveLeadScores = []
     try {
       const limit = 10;
       const response = (await this.handleException(
-        await this.contactService.getContacts(orgId, { limit, page: 1 }),
+        await this.contactService.getContactsByDate(orgId, date.current.start, date.current.end, { limit, page: 1 }),
       ))
       let contacts = response.data;
       const total = response.total;
@@ -296,7 +404,7 @@ export class DashboardService extends BaseService {
       let nextPage = 2;
       while (nextPage <= totalPage) {
         const _response = (await this.handleException(
-          await this.contactService.getContacts(orgId, { limit, page: nextPage }),
+          await this.contactService.getContactsByDate(orgId, date.current.start, date.current.end, { limit, page: nextPage }),
         ))
         contacts = contacts.concat(_response.data);
         nextPage++
@@ -353,11 +461,20 @@ export class DashboardService extends BaseService {
     }
   }
 
-  async getIntentScore(orgId: string) {
+  async getIntentScore(orgId: string, dateFilter: string, start?: string, end?: string) {
     const prisma = await this.getPrismaClient(orgId);
+    const date = getDate(dateFilter, { start, end })
+
     try {
       const result = [0, 0, 0]
-      const intentScores = await prisma.visitor.findMany({ select: { score: true } })
+      const intentScores = await prisma.visitor.findMany({
+        where: {
+          createdAt: {
+            gte: date.current.start,
+            lte: date.current.end,
+          },
+        }, select: { score: true }
+      })
       const count = await prisma.visitor.count();
       for (const score of intentScores) {
         if (score.score >= 60) {
@@ -382,11 +499,11 @@ export class DashboardService extends BaseService {
     }
   }
 
-  async getChannelEnhancementMetrics(orgId: string) {
+  async getChannelEnhancementMetrics(orgId: string, dateFilter: string, start?: string, end?: string) {
 
   }
 
-  async getPipelineValueGenerator(orgId: string) {
+  async getPipelineValueGenerator(orgId: string, dateFilter: string, start?: string, end?: string) {
 
   }
 }
