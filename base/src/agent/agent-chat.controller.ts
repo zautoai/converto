@@ -13,11 +13,11 @@ import { Agent } from './entities/agent.entity';
 @ApiTags('Agents')
 @Controller('api/agents/:agentId/chat')
 export class AgentChatController {
-  
+
   constructor(private readonly agentsService: AgentService,
     private readonly conversationService: ConversationService,
     private readonly chatService: ChatService,
-    private contactService: ContactsService) {}
+    private contactService: ContactsService) { }
 
 
   // @Post()
@@ -27,7 +27,7 @@ export class AgentChatController {
   // @Body() chatMessage: ChatMessage, @Req() request: Request) {
   //   console.log(request)
   //   const agent = await this.agentsService.findOne(agentId);
-    
+
   //   const converationObj = {
   //     agentId: agentId,
   //     type: ConversationType.CHAT,
@@ -37,7 +37,7 @@ export class AgentChatController {
   //     const thread = await this.chatService.initChat()
   //     converationObj['threadId'] = thread.id
   //   }
-    
+
   //   const converation = await this.conversationService.create(converationObj, agent.orgId)
   //   if(converation) {
   //     return {
@@ -64,7 +64,7 @@ export class AgentChatController {
   //   }
   //   let history = JSON.parse(conversation.history);
   //   history.push(chatMessage.messages[0]);
-  
+
   //   const latestMessage = history.slice(1);
   //   // Get the last 4 objects from the remaining array
   //   const lastFourObjects = latestMessage.slice(-4);
@@ -76,15 +76,15 @@ export class AgentChatController {
   // }
 
   @Get(':convId')
-  @ApiCreatedResponse({type: Agent})
+  @ApiCreatedResponse({ type: Agent })
   @UseGuards(SubdomainGuard)
   async fetchMessages(@Param('convId') conversationId: string, @Param('agentId') agentId: string, @Req() request: SubdomainRequest) {
     const orgId = request.orgId;
-    const conversation = await this.conversationService.findOneNoSummay(orgId,conversationId);
-    if(!conversation ) {
+    const conversation = await this.conversationService.findOneNoSummay(orgId, conversationId);
+    if (!conversation) {
       throw new UnauthorizedException('You are not authorized to access this conversation.')
     }
-    let history = await this.conversationService.getMessages(orgId,conversationId);
+    let history = await this.conversationService.getMessages(orgId, conversationId);
     return history;
   }
 
@@ -95,20 +95,25 @@ export class AgentChatController {
 
   @Post('lead')
   @UseGuards(SubdomainGuard)
-  async leadCapture(@Body() createLeadDto: CreateContactDto,@Query('convId') convId:string, @Req() request: SubdomainRequest)
-  {
+  async leadCapture(@Body() createLeadDto: CreateContactDto, @Query('convId') convId: string, @Req() request: SubdomainRequest) {
     const orgId = request.orgId;
-    if(createLeadDto.fullName){
+    if (createLeadDto.fullName) {
       const firstName = createLeadDto.fullName.split(' ')[0];
       createLeadDto.firstName = firstName
       createLeadDto.lastName = createLeadDto.fullName.split(' ').slice(1).join(' ')
     }
-    const existingContact = await this.contactService.getContactsByConversation(orgId,convId );
-    if(existingContact) {
+    if(!createLeadDto.email && !createLeadDto.phone){
+      delete createLeadDto.visitId
+    }
+    const existingContact = await this.contactService.getContactsByConversation(orgId, convId);
+    if(existingContact?.visitId){
+      delete createLeadDto.visitId
+    }
+    if (existingContact) {
       const contact = await this.contactService.update(orgId, existingContact.id, createLeadDto)
       return contact
     }
-    const contact = await this.contactService.create(orgId,createLeadDto)
+    const contact = await this.contactService.create(orgId, createLeadDto)
     return contact
   }
 }

@@ -2,86 +2,98 @@
     <div class="card-body fixed-vh">
         @if(contact)
         {
-            <div class="mb-3 d-flex gap-3 align-items-center justify-content-start">
-                <img [src]="contact?.photoUrl || 'assets/images/users/default-user.png'" alt="avatar" class="avatar avatar-lg bg-warning rounded-circle me-3">
-                <div>
-                    <h3 class="mb-1">{{ contact?.firstName }} {{ contact?.lastName }}</h3>
-                    <h5 class="text-muted">{{ contact?.organizationName }}</h5>
-                </div>
+        <div class="mb-3 d-flex gap-3 align-items-center justify-content-start">
+            <img [src]="contact?.photoUrl || 'assets/images/users/default-user.png'" alt="avatar"
+                class="avatar avatar-lg bg-warning rounded-circle me-3">
+            <div>
+                <h3 class="mb-1">{{ contact?.firstName }} {{ contact?.lastName }}</h3>
+                <h5 class="text-muted">{{ contact?.organizationName }}</h5>
             </div>
-            <div class="d-flex justify-content-between p-3">
-                <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Icp score" [openDelay]="300"><i class="fa-solid fa-chart-line"></i> {{contact?.icpScore || 20}}</span>
-                <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Intent score" [openDelay]="300"><i class="fa-solid fa-trophy"></i> {{contact.intentScore || 20}}</span>
-                <span class="badge bg-success rounded-pill fs-6" ngbTooltip="ICP status" [openDelay]="300">{{contact?.icpCategory ?"ICP "+contact?.icpCategory: "ICP UnFit"}}</span>
+        </div>
+        <div class="d-flex justify-content-between p-3">
+            <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Icp score" [openDelay]="300"><i
+                    class="fa-solid fa-chart-line"></i> {{contact?.icpScore || 20}}</span>
+            <span class="badge rounded-pill bg-primary fs-6" ngbTooltip="Intent score" [openDelay]="300"><i
+                    class="fa-solid fa-trophy"></i> {{contact.intentScore || 20}}</span>
+            <span class="badge bg-success rounded-pill fs-6" ngbTooltip="ICP status"
+                [openDelay]="300">{{contact?.icpCategory ?"ICP "+contact?.icpCategory: "ICP UnFit"}}</span>
+        </div>
+        <div class="contact-info-cards w-100">
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>{{ contact?.jobTitle || '---'}}</span>
             </div>
-            <div class="contact-info-cards w-100">
-
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-briefcase"></i>
-                        <span>{{ contact?.jobTitle || '---'}}</span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-envelope"></i>
-                        <span>{{ contact?.email || '---'}}</span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-phone"></i>
-                        <span>{{ contact?.phone || '---'}}</span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-map-marker-alt"></i>
-                        <span>{{ contact?.address || '---'}}</span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-city"></i>
-                        <span>{{ contact?.city || '---'}}</span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-map"></i>
-                        <span>{{ contact?.state || '---'}}</span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-mail-bulk"></i>
-                        <span>{{ contact?.zip || '---'}}</span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-flag"></i>
-                        <span>{{ contact?.country || '---'}} <span class="flag-icon flag-icon-{{ getCountryFlagClass(contact?.country) }}"></span></span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-globe"></i>
-                        <span><a [href]="contact?.website" target="_blank">{{ contact?.website || '---'}}</a></span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-brands fa-linkedin"></i>
-                        <span><a [href]="contact?.socialMedia?.linkedin" target="_blank">{{ contact?.socialMedia?.linkedin || '---'}}</a></span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-brands fa-twitter"></i>
-                        <span><a [href]="contact?.socialMedia?.twitter" target="_blank">{{ contact?.socialMedia?.twitter || '---'}}</a></span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-brands fa-facebook"></i>
-                        <span><a  [href]="contact?.socialMedia?.facebook" target="_blank">{{ contact?.socialMedia?.facebook || '---'}}</a></span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-brands fa-instagram"></i>
-                        <span><a [href]="contact?.socialMedia?.instagram" target="_blank">{{ contact?.socialMedia?.instagram || '---'}}</a></span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-sticky-note"></i>
-                        <span>{{ contact?.notes || '---'}}</span>
-                    </div>
-                    <div class="info-card border rounded-3 text-truncate">
-                        <i class="fa-solid fa-bullhorn"></i>
-                        <span>{{ contact?.leadSource || '---'}}</span>
-                    </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-envelope"></i>
+                <span>{{ contact?.email || '---'}}</span>
             </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-phone"></i>
+                <span>{{ contact?.phone || '---'}}</span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-handshake"></i>
+                <span>{{ contact?.dealStatus || '---'}}</span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-map-marker-alt"></i>
+                <span>{{ contact?.address || '---'}}</span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-city"></i>
+                <span>{{ contact?.city || '---'}}</span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-map"></i>
+                <span>{{ contact?.state || '---'}}</span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-mail-bulk"></i>
+                <span>{{ contact?.zip || '---'}}</span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-flag"></i>
+                <span>{{ contact?.country || '---'}} <span
+                        class="flag-icon flag-icon-{{ getCountryFlagClass(contact?.country) }}"></span></span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-globe"></i>
+                <span><a [href]="contact?.website" target="_blank">{{ contact?.website || '---'}}</a></span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-brands fa-linkedin"></i>
+                <span><a [href]="contact?.socialMedia?.linkedin" target="_blank">{{ contact?.socialMedia?.linkedin ||
+                        '---'}}</a></span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-brands fa-twitter"></i>
+                <span><a [href]="contact?.socialMedia?.twitter" target="_blank">{{ contact?.socialMedia?.twitter ||
+                        '---'}}</a></span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-brands fa-facebook"></i>
+                <span><a [href]="contact?.socialMedia?.facebook" target="_blank">{{ contact?.socialMedia?.facebook ||
+                        '---'}}</a></span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-brands fa-instagram"></i>
+                <span><a [href]="contact?.socialMedia?.instagram" target="_blank">{{ contact?.socialMedia?.instagram ||
+                        '---'}}</a></span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-sticky-note"></i>
+                <span>{{ contact?.notes || '---'}}</span>
+            </div>
+            <div class="info-card border rounded-3 text-truncate">
+                <i class="fa-solid fa-bullhorn"></i>
+                <span>{{ contact?.leadSource || '---'}}</span>
+            </div>
+        </div>
         }
         @else {
-            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-                <h6 class="text-muted">Select contact</h6>
-            </div>
+        <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+            <h6 class="text-muted">Select contact</h6>
+        </div>
         }
     </div>
 </div>

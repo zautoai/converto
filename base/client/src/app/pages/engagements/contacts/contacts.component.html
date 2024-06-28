@@ -218,6 +218,18 @@
     </div>
     <div class="form-group mb-3">
       <advanced-input 
+      [label]="'Deal Status'" 
+      [type]="'select'" 
+      [size]="'md'"
+      [control]="dealStatus" 
+      [isDisabled]="isLoading" >
+      @for (dealStatus of dealStatusOption; track $index) {
+          <option [value]="dealStatus.value">{{dealStatus.key}}</option>
+      }
+  </advanced-input>
+    </div>
+    <div class="form-group mb-3">
+      <advanced-input 
       [label]="'Address'" 
       [type]="'textarea'" 
       [placeholder]="'address'" 

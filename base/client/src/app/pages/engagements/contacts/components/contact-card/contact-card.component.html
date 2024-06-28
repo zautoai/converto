@@ -9,11 +9,11 @@
             </div>
         </div>
         <div class="col-3">
-            <p class="mb-1"><strong><i class="fa-regular fa-envelope"></i></strong> {{contact?.email}}</p>
+            <p class="mb-1 text-truncate" ngbTooltip={{contact.email}}><strong><i class="fa-regular fa-envelope"></i></strong> {{contact?.email}}</p>
             <p class="mb-1"><strong><i class="fa-solid fa-location-dot"></i></strong> {{contact?.country}} <span
                     class="flag-icon flag-icon-{{ getCountryFlagClass(contact?.country) }}"></span></p>
         </div>
-        <div class="col-3 d-flex align-items-center gap-5">
+        <div class="col-3 d-flex align-items-center gap-3">
             <span class="m-0 badge rounded-pill bg-primary fs-6" ngbTooltip="Icp score" [openDelay]="300"><i
                     class="fa-solid fa-chart-line"></i> {{contact.icpScore || 20}}</span>
             <span class="m-0 badge rounded-pill bg-primary fs-6" ngbTooltip="Intent score" [openDelay]="300"><i

@@ -116,7 +116,12 @@ export class CreateContactDto {
     @IsOptional()
     @IsString()
     visitorId?: string;
-
+    
+    @ApiProperty({ required: false, description: 'Visitor Id from which the contact is created' })
+    @IsOptional()
+    @IsString()
+    visitId?: string;
+    
     @ApiProperty({ required: false, description: 'Account Id of the contact' })
     @IsOptional()
     @IsString()

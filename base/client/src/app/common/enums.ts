@@ -17,3 +17,8 @@ export enum DateFilter {
     BETWEEN = 'between',
 }
   
+export enum DealStatus {
+    OPPORTUNITY = 'OPPORTUNITY',
+    CLOSE_WON = 'CLOSE_WON',
+    CLOSE_LOSS = 'CLOSE_LOSS',
+}

@@ -47,6 +47,12 @@ model Tag {
   @@map("Tags")
 }
 
+enum DealStatus {
+  OPPORTUNITY
+  CLOSE_WON
+  CLOSE_LOSS
+}
+
 model Contact {
   id                       String                    @id @default(uuid())
   photoUrl                 String?
@@ -55,7 +61,7 @@ model Contact {
   lastName                 String?
   jobTitle                 String?
   organizationName         String?
-  email                    String?                   
+  email                    String?
   phone                    String?
   address                  String?
   city                     String?
@@ -69,6 +75,8 @@ model Contact {
   status                   String?
   conversationId           String?
   visitorId                String?
+  visitId                  String?
+  dealStatus               DealStatus                @default(OPPORTUNITY)
   accountId                String?
   account                  Account?                  @relation(fields: [accountId], references: [id])
   createdAt                DateTime                  @default(now())

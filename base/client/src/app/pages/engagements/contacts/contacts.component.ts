@@ -8,6 +8,7 @@ import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.u
 import { RestService } from 'src/app/shared/services/rest.service';
 import { NotificationService } from 'src/app/shared/services/notification.service';
 import { API } from 'src/app/config/endpoint.config';
+import { DealStatus } from 'src/app/common/enums';
 
 
 @Component({
@@ -22,7 +23,7 @@ export class ContactsComponent implements OnInit {
   @ViewChild('viewContactOffcanvas') viewContactOffcanvas: ElementRef | undefined;
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
 
-  isLoading:boolean = false;
+  isLoading: boolean = false;
   contactList: any = [];
   selectedContact: any = undefined;
   isEdit: boolean = false;
@@ -34,6 +35,7 @@ export class ContactsComponent implements OnInit {
   selectedData: any = '';
   limit = 5;
   totalItems: number = 0;
+  dealStatusOption: any = this.getDealStatus(DealStatus)
 
   errorMessages = {
     firstName: {
@@ -47,14 +49,15 @@ export class ContactsComponent implements OnInit {
       email: 'Please enter a valid email address',
     },
   };
-    
-  form:FormGroup = new FormGroup({
+
+  form: FormGroup = new FormGroup({
     photoURL: new FormControl(''),
     fullName: new FormControl(''),
-    firstName: new FormControl('',[Validators.required]),
-    lastName: new FormControl('',[Validators.required]),
+    firstName: new FormControl('', [Validators.required]),
+    lastName: new FormControl('', [Validators.required]),
     jobTitle: new FormControl(''),
     organizationName: new FormControl(''),
+    dealStatus: new FormControl(''),
     email: new FormControl('', [Validators.required, Validators.email]),
     phone: new FormControl(''),
     address: new FormControl(''),
@@ -79,7 +82,7 @@ export class ContactsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
   ) {
-    
+
   }
 
   ngOnInit(): void {
@@ -115,6 +118,10 @@ export class ContactsComponent implements OnInit {
 
   get organizationName(): FormControl {
     return this.form.get('organizationName') as FormControl;
+  }
+
+  get dealStatus(): FormControl {
+    return this.form.get('dealStatus') as FormControl;
   }
 
   get email(): FormControl {
@@ -161,9 +168,29 @@ export class ContactsComponent implements OnInit {
     return this.form.get('status') as FormControl;
   }
 
-  getActiveContact(id:string){
+
+  getDealStatus(dealStatusList: any) {
+    let result = []
+    for (let key in dealStatusList) {
+      result.push({
+        key: this.formatDealStatus(key),
+        value: dealStatusList[key]
+      })
+    }
+    return result
+  }
+
+  formatDealStatus(dealName: string) {
+    return dealName
+      .toLowerCase()
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  getActiveContact(id: string) {
     this.selectedContact = null;
-    if(!id || id == 'all') {
+    if (!id || id == 'all') {
       return;
     }
     this.restService.get(API.main.contact, id).subscribe(
@@ -198,9 +225,9 @@ export class ContactsComponent implements OnInit {
     this.selectedContact = null;
     this.contactComposeCanvas.open();
   }
-  
+
   openUpdateContact(contact: any) {
-    this.selectedContact = contact; 
+    this.selectedContact = contact;
     this.form.reset();
     this.form.patchValue(contact)
     this.isEdit = true;
@@ -214,8 +241,7 @@ export class ContactsComponent implements OnInit {
   }
 
   onSubmit() {
-    if(this.form.valid)
-    {
+    if (this.form.valid) {
       const formData: { [key: string]: string | null } = this.form.value;
       const data = Object.entries(formData)
         .filter(([_, value]) => value !== null)
@@ -224,33 +250,30 @@ export class ContactsComponent implements OnInit {
             acc[key] = value;
           }
           return acc;
-        }, {} as { [key: string]: string });      
+        }, {} as { [key: string]: string });
 
       this.isLoading = true;
-      if(this.isEdit)
-      {
+      if (this.isEdit) {
         this.restService.patch(API.main.contact, this.selectedContact.id, this.form.value)
-        .subscribe(
-          (response: any) => {
-            this.notifService.showSuccess('Account Updated Successfully.');
-            this.getContacts();
-            this.isLoading = false;
-            this.contactComposeCanvas.close();
-          },
-          (error) => {
-            if(error.status == 500)
-            {
-              this.notifService.showError('Something Went Wrong! Try Again Later');
-            }
-            else{
-              this.notifService.showError(error.error.message);
-            }
-            this.isLoading = false;
-          },
-        );
+          .subscribe(
+            (response: any) => {
+              this.notifService.showSuccess('Account Updated Successfully.');
+              this.getContacts();
+              this.isLoading = false;
+              this.contactComposeCanvas.close();
+            },
+            (error) => {
+              if (error.status == 500) {
+                this.notifService.showError('Something Went Wrong! Try Again Later');
+              }
+              else {
+                this.notifService.showError(error.error.message);
+              }
+              this.isLoading = false;
+            },
+          );
       }
-      else
-      {
+      else {
         this.restService.post(API.main.contact, data).subscribe({
           next: (response: any) => {
             this.notifService.showSuccess('Contact Added Successfully.');
@@ -261,24 +284,22 @@ export class ContactsComponent implements OnInit {
           },
           error: (error) => {
             this.isLoading = false;
-            if(error.status == 500)
-            {
+            if (error.status == 500) {
               this.notifService.showError('Something Went Wrong! Try Again Later');
             }
-            else{
+            else {
               this.notifService.showError(error.error.message);
             }
           },
         });
       }
     }
-    else{
+    else {
       markFormGroupAsDirty(this.form);
     }
   }
 
-  onCancel()
-  {
+  onCancel() {
     this.contactComposeCanvas.close();
   }
 
@@ -291,6 +312,8 @@ export class ContactsComponent implements OnInit {
       (response: any) => {
         this.notifService.showSuccess('Accounts Deleted Successfully.');
         this.getContacts()
+        this.selectedContact = null;
+        this.router.navigate(['contacts'])
       },
       (error) => {
         console.error(error);
@@ -299,8 +322,7 @@ export class ContactsComponent implements OnInit {
     );
   };
 
-  selectContact(contact:any)
-  {
+  selectContact(contact: any) {
     this.selectedContact = contact;
     this.router.navigate(['contacts', contact.id])
     this.getActiveContact(contact.id);

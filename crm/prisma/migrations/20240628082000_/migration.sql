@@ -1,7 +1,3 @@
--- DropIndex
-DROP INDEX "Contact_email_key";
--- AlterTable
-ALTER TABLE "Contact" ADD COLUMN     "visitId" TEXT;
 -- CreateEnum
 CREATE TYPE "DealStatus" AS ENUM ('OPPORTUNITY', 'CLOSE_WON', 'CLOSE_LOSS');
 
