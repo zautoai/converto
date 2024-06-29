@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -32,8 +32,10 @@ export type ChartOptions = {
   templateUrl: './channel-impression.component.html',
   styleUrls: ['./channel-impression.component.scss']
 })
-export class ChannelImpressionComponent {
+export class ChannelImpressionComponent implements OnChanges{
   @ViewChild("chart") chart: ChartComponent | undefined;
+  @Input() pipelineValue :any;
+  isNull : boolean = true;
   public chartOptions: ChartOptions;
 
   constructor() {
@@ -138,5 +140,35 @@ export class ChannelImpressionComponent {
         }
       }
     };
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['pipelineValue'] && changes['pipelineValue'].currentValue) {
+      this.isNull =true
+      this.updateChartOptions();
+    }
+  }
+
+  updateChartOptions() {
+    this.chartOptions = {
+      ...this.chartOptions,
+      series: [
+        {
+          name: "Channels",
+          type: "column",
+          data: this.pipelineValue?.column || [],
+          color: "#444444",
+        },
+        {
+          name: "Pipeline Value",
+          type: "line",
+          data: this.pipelineValue?.line || [],
+          color: '#DDDDDD'
+        },
+      ],
+      labels: this.pipelineValue?.labels || [],
+    };
+    if(this.pipelineValue?.column?.length > 0 || this.pipelineValue?.line?.length > 0){
+      this.isNull = false;
+    }
   }
 }

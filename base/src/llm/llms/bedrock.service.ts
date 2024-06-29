@@ -12,7 +12,7 @@ export class BedrockService {
         this.logger.log('BedrockRuntimeClient initialized.');
     }
 
-    async invokeBedrockModel(prompt,) {
+    async invokeBedrockModel(prompt) {
         const bedrock = new BedrockRuntime({
             credentials: {
                 accessKeyId: process.env.AWS_ACCESS_KEY,

@@ -20,6 +20,7 @@ export class DashboardService extends BaseService implements OnModuleInit {
   }
 
   onModuleInit() {
+    this.getPipelineValueGenerator('f3b3d555-1cfa-441d-aef9-be62696d3422', 'this_year')
   }
 
   async changeDashboardData(orgId: string, dashboardDataDto: DashboardDataDto) {
@@ -504,19 +505,18 @@ export class DashboardService extends BaseService implements OnModuleInit {
     try {
       const top5 = await this.getTop5Name(orgId, date)
       const top5Names = top5.map(entry => entry.source);
-      const uniqueVisitosrBySource = await this.getUniqueVistorBySource(orgId, date, top5Names)
-      const firstTouchPoint = await this.calculateFirstTouchPoint(top5, uniqueVisitosrBySource)
+      const uniqueVisitorsBySource = await this.getUniqueVistorBySource(orgId, date, top5Names)
+      const firstTouchPoint = await this.calculateFirstTouchPoint(top5, uniqueVisitorsBySource)
       const contactVisitIds = await this.contactService.getContactsVisitIds(orgId, date.current.start, date.current.end)
       const visitLastTouchPoint = await this.getLastTouchPoint(orgId, date, contactVisitIds)
       const lastTouchPoint = await this.calculateLastTouchPoint(top5, visitLastTouchPoint)
-      console.log(top5Names,firstTouchPoint,lastTouchPoint);
-      
+      console.log(top5Names, firstTouchPoint, lastTouchPoint);
       const response = {
         firstTouchPointValues: [],
         lastTouchPointValues: [],
         labels: []
       };
-      
+
       top5Names.forEach(name => {
         const firstTouch = firstTouchPoint.find(entry => entry.source === name);
         const lastTouch = lastTouchPoint.find(entry => entry.source === name);
@@ -529,7 +529,7 @@ export class DashboardService extends BaseService implements OnModuleInit {
         success: true,
         message: 'Channel enhancement metrics fetched successfully',
         data: response
-      }      
+      }
     } catch (err) {
       console.log(err);
     }
@@ -571,6 +571,7 @@ export class DashboardService extends BaseService implements OnModuleInit {
         }
         else {
           others += uniqueVisitorsBySource[source].size;
+          delete uniqueVisitorsBySource[source];
         }
       }
       if (others) {
@@ -680,6 +681,38 @@ export class DashboardService extends BaseService implements OnModuleInit {
   }
 
   async getPipelineValueGenerator(orgId: string, dateFilter: string, start?: string, end?: string) {
+    const date = getDate(dateFilter, { start, end })
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const top5 = await this.getTop5Name(orgId, date)
+      const top5Names = top5.map(entry => entry.source);
+      const uniqueVisitorsBySource = await this.getUniqueVistorBySource(orgId, date, top5Names)
+      const dashboardData = await prisma.dashboard.findFirst();
+      const { averageDealSize } = dashboardData;
+      const pipelineValueBySource = await this.getPipelineValueBySource(uniqueVisitorsBySource, averageDealSize)
+      const result = {
+        column: top5Names.map(name => uniqueVisitorsBySource[name]),
+        line: top5Names.map(name => pipelineValueBySource[name]),
+        labels: top5Names
+      };
+      return {
+        code: 200,
+        success: true,
+        message: 'Pipeline value fetched successfully',
+        data: result
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
 
+  async getPipelineValueBySource(uniqueVisitorsBySource: any, averageDealSize: any) {
+    const result = {}
+    for (const source in uniqueVisitorsBySource) {
+      result[source] = uniqueVisitorsBySource[source] * averageDealSize
+    }
+    return result;
   }
 }

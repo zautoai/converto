@@ -30,6 +30,7 @@ export class ZautoDashboardComponent implements OnInit{
   intentScores: any = [];
   predictiveLeadScores: any = [];
   channelMetrics: any = {};
+  pipelineValue: any = [];
   displayDateFilter: any = this.dateFilterFormator(DateFilter);
   selectedDateFilter: any = DateFilter.THIS_MONTH;
   startDate: string = '';
@@ -64,6 +65,7 @@ export class ZautoDashboardComponent implements OnInit{
     this.getIntentScore(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined);
     this.getPredictiveLeadScores(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined);
     this.getChannelMetrics(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined);
+    this.getPipelineValueGenerator(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined);
   }
 
   getIntentScore(dateFilter: string, range?: { start: string, end: string }) {
@@ -92,6 +94,15 @@ export class ZautoDashboardComponent implements OnInit{
       this.channelMetrics = res.data;      
     });
   }
+
+  getPipelineValueGenerator(dateFilter: string, range?: { start: string, end: string }) {
+    const params = range
+      ? `dateFilter=${dateFilter}&start=${range.start}&end=${range.end}`
+      : `dateFilter=${dateFilter}`;
+    this.restService.get(API.main.dashboard, `pipeline-value-generator?${params}`).subscribe((res: any) => {
+        this.pipelineValue = res.data;
+      });
+  }
   
   onDateFilterChange() {
     if (this.selectedDateFilter !== DateFilter.BETWEEN) {
@@ -104,5 +115,7 @@ export class ZautoDashboardComponent implements OnInit{
       this.getDashboardData();
     }
   }
+
+  
 }
 

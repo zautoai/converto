@@ -1,4 +1,5 @@
 <div class="chart-container">
+  @if (!isNull) {
     <apx-chart
       [series]="chartOptions.series"
       [chart]="chartOptions.chart"
@@ -11,5 +12,15 @@
       [plotOptions]="chartOptions.plotOptions"
       [tooltip]="chartOptions.tooltip">
     </apx-chart>
+  }@else {
+    <div style="height: 245px;">
+      <div class="mt-5 mb-5" style="text-align: center;font-size: 16px;font-weight: normal;">
+        CHANNELS IMPRESSIONS & PIPELINE VALUE GENERATED
+      </div>
+      <div class="mt-5 text-center">
+        No Data Found
+      </div>
+    </div>
+  }
   </div>
   
