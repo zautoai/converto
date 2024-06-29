@@ -264,7 +264,7 @@ export class SiteService extends BaseService {
       await this.closeConnection(orgId)
     }
   }
-
+  
   async processURL(serviceParams: ServiceParams<{ site: any, agent: any, attempt?: number }>) {
     const { orgId, data: { site, agent, attempt = 0 } } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);

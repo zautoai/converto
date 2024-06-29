@@ -15,7 +15,8 @@ export class ZautoChatCompletionMessage {
 
 export const LLM_PROVIDERS = {
     OPENAI: LLMNames.OPENAI,
-    MISTRAL: LLMNames.MISTRAL
+    MISTRAL: LLMNames.MISTRAL,
+    COHERE: LLMNames.COHERE
 }
 
 export class AgentFile {

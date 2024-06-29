@@ -5,6 +5,7 @@ import { AxiosError } from 'axios';
 import { ZautoChatCompletionMessage, AgentConfig, UserMessage } from "./llm.models";
 import { HttpService } from "@nestjs/axios";
 import { CohereClient } from 'cohere-ai';
+import { LLMModels } from "../llm.contants";
 
 
 @Injectable()
@@ -18,7 +19,10 @@ export class CohereAIService implements LLMServiceIntf {
     constructor(private readonly httpService: HttpService) {}
 
     chat(chatHistory: ZautoChatCompletionMessage[], prompt?: string) {
-        throw new Error("Method not implemented.");
+        if(prompt){
+            chatHistory.push({role:'SYSTEM',content:prompt});
+        }
+        return this.getLLMOutput(chatHistory, LLMModels.COHER_COMMAND_R_PLUS);
     }
     async getLLMOutput(chatHistory: ZautoChatCompletionMessage[], model: string) {
         console.log("Preparing the Req: ", new Date())
@@ -78,7 +82,7 @@ export class CohereAIService implements LLMServiceIntf {
         throw new Error("Method not implemented.");
     }
     isContentFlagged(content: string) {
-        throw new Error("Method not implemented.");
+        return false
     }
 
     chatHistoryFormat(chatHistory) {

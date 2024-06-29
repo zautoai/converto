@@ -259,7 +259,7 @@ export class CTASelectorService extends BaseService implements OnModuleInit {
     let result = await this.llmService.sendDirect(
       promptMesssage,
       LLMNames.COHERE,
-      LLMModels.COHER_COMMAND_R,
+      LLMModels.COHER_COMMAND_R_PLUS,
     );
 
     if (result.content && result.content.includes('```json')) {

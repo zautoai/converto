@@ -95,6 +95,6 @@ export class CalendarObsorverService implements OnModuleInit{
         const promptMesssage = [
             {role: 'system', content: prompt}
         ];
-        return await this.llmService.sendDirect(promptMesssage, LLMNames.COHERE, LLMModels.COHER_COMMAND_R);
+        return await this.llmService.sendDirect(promptMesssage, LLMNames.COHERE, LLMModels.COHER_COMMAND_R_PLUS);
     }
 }

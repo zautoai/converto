@@ -228,7 +228,7 @@ export class OrganizationsService extends BaseService {
   async createDashboardData(orgId:string){
     const prisma = await this.getPrismaClient(orgId)
     try{
-      await prisma.dashboard.create({});
+      await prisma.dashboard.create({data:{averageDealSize:0}});
     } catch(error){
       console.log(error);
     } finally{
