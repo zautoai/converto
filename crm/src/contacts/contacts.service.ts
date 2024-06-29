@@ -3,6 +3,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { AccountsService } from 'src/accounts/accounts.service';
 import { FilterDto } from 'src/common/dtos/filter.dto';
@@ -31,7 +32,7 @@ export class ContactsService {
 
   async getContacts(orgId: string, filterDto: FilterDto) {
     const { page, limit, sort, searchTerm } = filterDto;
-    
+
     const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
     try {
@@ -256,7 +257,7 @@ export class ContactsService {
         { _defaultFields: {}, _customFields: {} },
       );
 
-      const updatedContact=await prisma.contact.update({
+      const updatedContact = await prisma.contact.update({
         where: { id },
         data: {
           ..._defaultFields,
@@ -633,11 +634,11 @@ export class ContactsService {
   }
 
   async getContactsByDate(orgId: string, startDate: string, endDate: string, filterDto?: FilterDto) {
-    const { page = 1, limit = 10 } = filterDto 
-  
+    const { page = 1, limit = 10 } = filterDto
+
     const skip = (page - 1) * limit;
     const prisma = await this.prismaClientManager.getClient(orgId);
-  
+
     try {
       const contacts = await prisma.contact.findMany({
         where: {
@@ -656,12 +657,12 @@ export class ContactsService {
           account: true
         }
       });
-  
+
       const transformedContacts = contacts.map((contact) => ({
         ...contact,
         contactTag: contact.contactTag.map((ct) => ct.tag),
       }));
-  
+
       const total = await prisma.contact.count({
         where: {
           createdAt: {
@@ -670,7 +671,7 @@ export class ContactsService {
           }
         }
       });
-  
+
       return {
         code: 200,
         success: true,
@@ -687,8 +688,8 @@ export class ContactsService {
       await this.prismaClientManager.disconnectClient(orgId);
     }
   }
-  
-  
+
+
   async handleAccountContactMap(orgId: string, contact: any) {
     if (!contact.organizationName) {
       return
@@ -720,7 +721,7 @@ export class ContactsService {
     }
   }
 
-  async getContactCount(orgId: string, startDate: string, endDate: string){
+  async getContactCount(orgId: string, startDate: string, endDate: string) {
     const prisma = await this.prismaClientManager.getClient(orgId);
     try {
       const contactCount = await prisma.contact.count({
@@ -732,6 +733,33 @@ export class ContactsService {
         }
       });
       return contactCount;
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.prismaClientManager.disconnectClient(orgId)
+    }
+  }
+
+  async getContactsVisitIds(orgId:string, startDate: string, endDate:string){
+    const prisma = await this.prismaClientManager.getClient(orgId);
+    try {
+      const contacts = await prisma.contact.findMany({
+        where: {
+          createdAt: {
+            gte: new Date(startDate),
+            lte: new Date(endDate)
+          },
+          visitId: {
+            not: null
+          }
+        },
+        select: {
+          visitId: true
+        }
+      });
+      const visitIds = contacts.map(contact => contact.visitId);
+      return visitIds;
     } catch (error) {
       throw error
     } finally {

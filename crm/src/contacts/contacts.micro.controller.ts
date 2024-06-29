@@ -123,4 +123,13 @@ export class ContactMicroserviceController {
       return error.response || error;
     }
   }
+
+  @MessagePattern({ cmd: 'GET_CONTACTS_VISIT_IDS' })
+  async get_contacts_visit_ids(data: { orgId: string, startDate: string, endDate: string }) {
+    try {
+      return await this.contactsService.getContactsVisitIds(data.orgId, data.startDate, data.endDate);
+    } catch (error) {
+      return error.response || error;
+    }
+  }
 }

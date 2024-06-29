@@ -131,4 +131,16 @@ export class ContactService extends BaseService {
       return error;
     }
   }
+
+  async getContactsVisitIds(orgId: string, startDate :string, endDate: string) {
+    try{
+      return this.CRMClient.send(
+        {cmd: 'GET_CONTACTS_VISIT_IDS'},
+        {orgId, startDate, endDate}
+      ).toPromise();
+    }catch(error){
+      this.logger.error(`Error while fetching contact visit ids: ${error.message}`);
+      return error;
+    }
+  }
 }

@@ -500,7 +500,183 @@ export class DashboardService extends BaseService implements OnModuleInit {
   }
 
   async getChannelEnhancementMetrics(orgId: string, dateFilter: string, start?: string, end?: string) {
+    const date = getDate(dateFilter, { start, end })
+    try {
+      const top5 = await this.getTop5Name(orgId, date)
+      const top5Names = top5.map(entry => entry.source);
+      const uniqueVisitosrBySource = await this.getUniqueVistorBySource(orgId, date, top5Names)
+      const firstTouchPoint = await this.calculateFirstTouchPoint(top5, uniqueVisitosrBySource)
+      const contactVisitIds = await this.contactService.getContactsVisitIds(orgId, date.current.start, date.current.end)
+      const visitLastTouchPoint = await this.getLastTouchPoint(orgId, date, contactVisitIds)
+      const lastTouchPoint = await this.calculateLastTouchPoint(top5, visitLastTouchPoint)
+      console.log(top5Names,firstTouchPoint,lastTouchPoint);
+      
+      const response = {
+        firstTouchPointValues: [],
+        lastTouchPointValues: [],
+        labels: []
+      };
+      
+      top5Names.forEach(name => {
+        const firstTouch = firstTouchPoint.find(entry => entry.source === name);
+        const lastTouch = lastTouchPoint.find(entry => entry.source === name);
+        response.labels.push(name);
+        response.firstTouchPointValues.push(firstTouch ? parseFloat(firstTouch.firstTouchPoint) : 0);
+        response.lastTouchPointValues.push(lastTouch ? parseFloat(lastTouch.lastTouchPoint) : 0);
+      });
+      return {
+        code: 200,
+        success: true,
+        message: 'Channel enhancement metrics fetched successfully',
+        data: response
+      }      
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
+  async getUniqueVistorBySource(orgId: string, date: any, top5Names: any) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const visits = await prisma.visit.findMany({
+        where: {
+          createdAt: {
+            gte: date.current.start,
+            lte: date.current.end
+          }
+        },
+        select: {
+          visitorId: true,
+          source: true
+        }
+      });
+
+      // Group by source and count unique visitorId values
+      const uniqueVisitorsBySource = visits.reduce((acc, visit) => {
+        const source = visit.source;
+        const visitorId = visit.visitorId;
+
+        if (!acc[source]) {
+          acc[source] = new Set(); // Using a Set to ensure uniqueness
+        }
+
+        acc[source].add(visitorId);
+        return acc;
+      }, {});
+
+      let others = 0;
+      for (const source in uniqueVisitorsBySource) {
+        if (top5Names.includes(source)) {
+          uniqueVisitorsBySource[source] = uniqueVisitorsBySource[source].size;
+        }
+        else {
+          others += uniqueVisitorsBySource[source].size;
+        }
+      }
+      if (others) {
+        uniqueVisitorsBySource['others'] = others;
+      }
+      return uniqueVisitorsBySource;
+    } catch (err) {
+      console.log(err);
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async getTop5Name(orgId: string, date: any) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const results = await prisma.visit.groupBy({
+        by: ['source'],
+        _count: {
+          _all: true,
+        },
+        where: {
+          createdAt: {
+            gte: date.current.start,
+            lte: date.current.end,
+          },
+        },
+      });
+
+      // Sort results by count in descending order
+      results.sort((a, b) => b._count._all - a._count._all);
+
+      // Get the top 4 entries
+      const top5 = results.slice(0, 4);
+
+      // Calculate the total count for "others"
+      const othersCount = results.slice(4).reduce((sum, entry) => sum + entry._count._all, 0);
+
+      // Add the "others" entry if there are more than 4 entries
+      if (results.length > 4) {
+        top5.push({
+          _count: { _all: othersCount },
+          source: 'others',
+        });
+      }
+
+      return top5;
+    } catch (err) {
+      console.log(err);
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async getLastTouchPoint(orgId: string, date: any, visitIds: any) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const visits = await prisma.visit.findMany({
+        where: {
+          id: { in: visitIds },
+          createdAt: {
+            gte: date.current.start,
+            lte: date.current.end
+          }
+        },
+        select: {
+          source: true
+        }
+      })
+      const result = {}
+      for (const visit of visits) {
+        result[visit.source] = (result[visit.source] || 0) + 1
+      }
+      return result;
+    } catch (err) {
+      console.log(err);
+    } finally {
+      await prisma.$disconnect();
+    }
+  }
+
+  async calculateFirstTouchPoint(top5Names: any, uniqueVisitorsBySource: any) {
+    const result = []
+    for (const source of top5Names) {
+      const totalVisit = source._count._all;
+      const uniqueVisit = uniqueVisitorsBySource[source.source];
+      const firstTouchPoint = ((uniqueVisit / totalVisit) * 100) || 0;
+      result.push({
+        source: source.source,
+        firstTouchPoint: firstTouchPoint.toFixed(2)
+      });
+    }
+    return result;
+  }
+
+  async calculateLastTouchPoint(top5Names: any, visitIds: any) {
+    const result = []
+    for (const source of top5Names) {
+      const totalVisit = source._count._all;
+      const lastTouchPoint = ((visitIds[source.source] / totalVisit) * 100) || 0;
+      result.push({
+        source: source.source,
+        lastTouchPoint: lastTouchPoint.toFixed(2)
+      });
+    }
+    return result
   }
 
   async getPipelineValueGenerator(orgId: string, dateFilter: string, start?: string, end?: string) {

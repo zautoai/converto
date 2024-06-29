@@ -33,8 +33,6 @@ export class DashCardComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedDateFilter'] || changes['startDate'] || changes['endDate']) {
-      console.log(this.selectedDateFilter);
-
       if (this.selectedDateFilter === DateFilter.BETWEEN && (!this.startDate || !this.endDate)) return
       this.getBottomWidget(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined)
       this.getTopWidget(this.selectedDateFilter, this.selectedDateFilter === DateFilter.BETWEEN ? { start: this.startDate, end: this.endDate } : undefined);

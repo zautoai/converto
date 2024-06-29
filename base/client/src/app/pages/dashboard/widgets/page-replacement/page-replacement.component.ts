@@ -56,9 +56,7 @@ export class PageReplacementComponent implements OnInit, OnChanges{
     ? `dateFilter=${dateFilter}&start=${range.start}&end=${range.end}` 
     : `dateFilter=${dateFilter}`;
     this.restService.get(API.main.dashboard,`page-enhancement-metrics?${params}`).subscribe((res:any)=>{
-      this.dataSource.data = res.data;
-      console.log(res.data);
-      
+      this.dataSource.data = res.data;      
     })
   }
 }

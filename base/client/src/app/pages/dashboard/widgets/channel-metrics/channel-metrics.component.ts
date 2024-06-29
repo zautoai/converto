@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -27,8 +27,10 @@ export type ChartOptions = {
   templateUrl: './channel-metrics.component.html',
   styleUrls: ['./channel-metrics.component.scss']
 })
-export class ChannelMetricsComponent {
+export class ChannelMetricsComponent implements OnChanges {
+  @Input() channelMetrics: any;
   @ViewChild("chart") chart!: ChartComponent;
+  isNull: boolean = true;
   public chartOptions: Partial<ChartOptions>;
 
   constructor() {
@@ -36,13 +38,13 @@ export class ChannelMetricsComponent {
       series: [
         {
           name: "First Touch",
-          data: [60, 30, 57, 69, 40],
-          color: "#444444" // Set the color for First Touch
+          data: [],
+          color: "#444444"
         },
         {
           name: "Last Touch",
-          data: [40, 55, 78, 50, 80],
-          color: "#DDDDDD" // Set the color for Last Touch
+          data: [],
+          color: "#DDDDDD"
         },
       ],
       chart: {
@@ -78,10 +80,10 @@ export class ChannelMetricsComponent {
         colors: ["#fff"],
       },
       xaxis: {
-        categories: ["Google", "LinkedIn", "Facebook", "Instagram", "Others"],
+        categories: [],
         labels: {
           style: {
-            fontSize: '10px', // Increase the font size of x-axis categories
+            fontSize: '10px',
           }
         }
       },
@@ -90,9 +92,45 @@ export class ChannelMetricsComponent {
         y: {
           formatter: function (val) {
             return val + "%";
-                    },
+          },
         },
       },
     };
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['channelMetrics'] && changes['channelMetrics'].currentValue) {
+      this.isNull=true
+      this.updateChartOptions();
+    }
+  }
+
+  updateChartOptions(): void {
+    this.chartOptions = {
+      ...this.chartOptions,
+      series: [
+        {
+          name: "First Touch",
+          data: this.channelMetrics.firstTouchPointValues,
+          color: "#444444"
+        },
+        {
+          name: "Last Touch",
+          data: this.channelMetrics.lastTouchPointValues,
+          color: "#DDDDDD"
+        },
+      ],
+      xaxis: {
+        categories: this.channelMetrics.labels,
+        labels: {
+          style: {
+            fontSize: '10px',
+          }
+        }
+      }
+    };
+    if(this.channelMetrics?.firstTouchPointValues?.length > 0 || this.channelMetrics?.lastTouchPointValues?.length > 0){
+      this.isNull = false;
+    }
   }
 }

@@ -1,14 +1,20 @@
 <div class="container-box">
     <div class="container-title" style="font-size: 15px;">CHANNEL ENHANCEMENT METRICS</div>
-    <div id="chart" *ngIf="chartOptions && chartOptions.series && chartOptions.chart && chartOptions.dataLabels && chartOptions.plotOptions && chartOptions.xaxis && chartOptions.stroke">
-      <apx-chart
-        [series]="chartOptions.series"
-        [chart]="chartOptions.chart"
-        [dataLabels]="chartOptions.dataLabels"
-        [plotOptions]="chartOptions.plotOptions"
-        [xaxis]="chartOptions.xaxis"
-        [stroke]="chartOptions.stroke"
-      ></apx-chart>
-    </div>
+    @if (!isNull) {
+      <div id="chart" *ngIf="chartOptions && chartOptions.series && chartOptions.chart && chartOptions.dataLabels && chartOptions.plotOptions && chartOptions.xaxis && chartOptions.stroke">
+        <apx-chart
+          [series]="chartOptions.series"
+          [chart]="chartOptions.chart"
+          [dataLabels]="chartOptions.dataLabels"
+          [plotOptions]="chartOptions.plotOptions"
+          [xaxis]="chartOptions.xaxis"
+          [stroke]="chartOptions.stroke"
+        ></apx-chart>
+      </div>
+    }@else {
+        <div class="mt-5 text-center">
+          No Data Found
+        </div>
+    }
   </div>
   

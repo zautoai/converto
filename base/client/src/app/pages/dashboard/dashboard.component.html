@@ -35,7 +35,7 @@
   <app-dash-card [selectedDateFilter]="selectedDateFilter" [startDate]="startDate" [endDate]="endDate"></app-dash-card>
   <app-channel-impression></app-channel-impression>
   <app-page-replacement [selectedDateFilter]="selectedDateFilter" [startDate]="startDate" [endDate]="endDate"></app-page-replacement>
-  <app-channel-metrics></app-channel-metrics>
+  <app-channel-metrics [channelMetrics]="channelMetrics"></app-channel-metrics>
   <div class="row">
     <div class="col-6">
       <app-predictive-lead [predictiveLeadScores]="predictiveLeadScores"></app-predictive-lead>
