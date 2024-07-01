@@ -613,8 +613,8 @@ export class AgentService extends BaseService {
         // Extract the protocol and domain from HOST_URL
         const url = new URL(host);
         const protocol = url.protocol; // will include the trailing ':'
-        const baseHost = url.host; // will include hostname and port if any
-
+        let baseHost = url.host.split('.').slice(-2).join('.'); // will include hostname and port if any
+        
         // Construct the full URL with orgId as subdomain
         const fullHost = `${protocol}//${orgId}.${baseHost}`
       
