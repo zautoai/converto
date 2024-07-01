@@ -24,7 +24,7 @@ WORKDIR /usr/src/app
 RUN apt-get update -y && apt-get install -y openssl curl
 
 
-# Define arguments for environment variables.
+# Define arguments for environment variables
 ARG CRM_ACCESS_TOKEN
 ARG CRM_API_PORT
 ARG CRM_BASE_URL
