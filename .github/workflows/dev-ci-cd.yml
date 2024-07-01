@@ -78,6 +78,9 @@ jobs:
           UPLOADS_FOLDER=${{ secrets.UPLOADS_FOLDER }}
           VERIFICATION_EXPIRES_IN=${{ secrets.VERIFICATION_EXPIRES_IN }}
           ZAUTO_API_BASE_URL=${{ secrets.ZAUTO_API_BASE_URL }}
+          AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
+          
 
     - name: Build and push Docker image for crm
       if: contains(github.event.head_commit.message, 'crm')
