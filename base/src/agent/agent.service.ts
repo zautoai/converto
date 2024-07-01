@@ -616,7 +616,7 @@ export class AgentService extends BaseService {
         const baseHost = url.host; // will include hostname and port if any
 
         // Construct the full URL with orgId as subdomain
-        const fullHost = `${protocol}//${orgId}.${baseHost}`
+        const fullHost = `https//${orgId}.${baseHost}`
       
       // const agent = await this.prisma.agent.findUnique({where:{id:agentId}}); 
       // if(!agent)
