@@ -19,7 +19,7 @@ import { StaticFileService } from 'src/common/services/static.service';
 
 @Controller('api/users')
 @ApiTags('Users')
-@Roles(SYSTEM_CONST.SUPERUSER_ROLE)
+@Roles(SYSTEM_CONST.SUPERUSER_ROLE,SYSTEM_CONST.ADMIN_ROLE)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class UsersController {
