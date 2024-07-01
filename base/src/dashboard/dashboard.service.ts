@@ -9,7 +9,7 @@ import { DashboardDataDto } from './dto/dashboardData.dto';
 import { getDate } from 'src/common/helpers/date.helper';
 import { DateFilter } from 'src/common/enums/enums';
 @Injectable()
-export class DashboardService extends BaseService implements OnModuleInit {
+export class DashboardService extends BaseService {
 
   constructor(
     private readonly contactsService: ContactsService,
@@ -19,9 +19,6 @@ export class DashboardService extends BaseService implements OnModuleInit {
     super()
   }
 
-  onModuleInit() {
-    this.getPipelineValueGenerator('f3b3d555-1cfa-441d-aef9-be62696d3422', 'this_year')
-  }
 
   async changeDashboardData(orgId: string, dashboardDataDto: DashboardDataDto) {
     const prisma = await this.getPrismaClient(orgId)
