@@ -33,7 +33,7 @@
                 rootElement.id = "zauto_root";
                 document.body.appendChild(rootElement);
     
-                fetch(`http://${url.host}/api/agents/widget/standalone/${botId}.js`, {
+                fetch(`https://${url.host}/api/agents/widget/standalone/${botId}.js`, {
                     headers: {
                         'x-tenant-id': tenantId
                     }
