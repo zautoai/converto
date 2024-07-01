@@ -20,8 +20,8 @@ export class LlmService implements LLMServiceIntf{
     }
 
     async sendDirect(message: ZautoChatCompletionMessage[], llmProvider: string, model: string) {
-        const llmService = this.llmProvider.getLLM(LLMNames.COHERE);
-        return await llmService.getLLMOutput(message, LLMModels.COHER_COMMAND_R_PLUS);
+        const llmService = this.llmProvider.getLLM(LLMNames.AWS);
+        return await llmService.getLLMOutput(message, LLMModels.AWS_CLAUDE_3_SONNET);
     }
 
     async getLLMOutput(message: ZautoChatCompletionMessage[], model: string) {

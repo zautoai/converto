@@ -1,49 +1,36 @@
 import { Injectable } from "@nestjs/common";
 import { LLMServiceIntf } from "../llm.interface";
-import { catchError, firstValueFrom } from 'rxjs';
-import { AxiosError } from 'axios';
 import { ZautoChatCompletionMessage, AgentConfig, UserMessage } from "./llm.models";
-import { HttpService } from "@nestjs/axios";
-import { CohereClient } from 'cohere-ai';
 import { LLMModels } from "../llm.contants";
-
+import { BedrockService } from "./bedrock.service";
 
 @Injectable()
-export class CohereAIService implements LLMServiceIntf {
-    
-    private cohere_key = process.env.COHERE_API_KEY;
-    private cohereClient = new CohereClient({
-        token: this.cohere_key
-    });
+export class AwsService implements LLMServiceIntf {
 
-    constructor(private readonly httpService: HttpService) {}
+
+    constructor(
+        private bedrockService:BedrockService
+    ){
+
+    }
 
     async chat(chatHistory: ZautoChatCompletionMessage[], prompt?: string) {
         if(prompt){
-            chatHistory.push({role:'SYSTEM',content:prompt});
+            chatHistory.push({
+                role: "system",
+                content: prompt
+            });
         }
-        return await this.getLLMOutput(chatHistory, LLMModels.COHER_COMMAND_R_PLUS);
+        const message = JSON.stringify(chatHistory)
+        const response =  await this.bedrockService.invokeBedrockModel(message,LLMModels.AWS_CLAUDE_3_SONNET)
+        return {content:response}
     }
+    
     async getLLMOutput(chatHistory: ZautoChatCompletionMessage[], model: string) {
         console.log("Preparing the Req: ", new Date())
-        const messages = this.chatHistoryFormat(chatHistory.slice(0, -1));
-        const message = chatHistory[chatHistory.length - 1].content;
-
-        console.log("Request is: ", chatHistory)
-
-        const chatCompletion = await this.cohereClient.chat({ 
-            message: message,
-            model: model,
-            chatHistory: messages,
-            temperature:0.7,
-            // maxTokens: 1000,
-            // seed: 1337,
-            promptTruncation: 'OFF'
-        });
-        const reply = {role:'assistant',content:chatCompletion.text};
-        const outputTokens = reply.content.length/4;
-        console.log('Output Tokens: '+outputTokens)
-        return reply;
+        const message = JSON.stringify(chatHistory)
+        const response =  await this.bedrockService.invokeBedrockModel(message,LLMModels.AWS_CLAUDE_3_SONNET)
+        return {content:response}
     }
     uploadFile(filePath: string) {
         throw new Error("Method not implemented.");
@@ -82,16 +69,6 @@ export class CohereAIService implements LLMServiceIntf {
         throw new Error("Method not implemented.");
     }
     isContentFlagged(content: string) {
-        return false
+        throw new Error("Method not implemented.");
     }
-
-    chatHistoryFormat(chatHistory) {
-        return chatHistory.map(item => {
-            return {
-                role: item.role === 'user' ? 'USER' : 'SYSTEM' ,
-                message: item.content
-            };
-        });
-    }
-
 }

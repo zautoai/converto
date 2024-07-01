@@ -3,6 +3,7 @@ export enum LLMNames {
     MISTRAL = 'mistral',
     COHERE = 'cohere',
     CLAUDE = 'claude',
+    AWS = 'aws'
 }
 
 export enum LLMModels {
@@ -30,4 +31,6 @@ export enum LLMModels {
     CLAUDE_2_1 = "claude-2.1",
     CLAUDE_2_0 = "claude-2.0",
     CLAUDE_INSTANT_1_2 = "claude-instant-1.2",
+
+    AWS_CLAUDE_3_SONNET = 'anthropic.claude-3-sonnet-20240229-v1:0'
 }

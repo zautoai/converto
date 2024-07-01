@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { LlmService } from 'src/llm/llm.service';
 import Redis, { Redis as RedisClient } from 'ioredis';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CTA_SELECTOR_PROMPT } from 'src/common/templates/cta-selector.template';
+import { CTA_SELECTOR_PROMPT } from 'src/common/templates/claude/cta-selector.template';
 import { PAGE_SELECTOR_PROMPT } from 'src/common/templates/page-selector.template';
 import { CTAType } from 'src/common/enums/enums';
 import { STARTER_GENERATOR_PROMPT } from 'src/common/templates/starter-generator.template';
@@ -262,10 +262,13 @@ export class CTASelectorService extends BaseService implements OnModuleInit {
       LLMModels.COHER_COMMAND_R_PLUS,
     );
 
-    if (result.content && result.content.includes('```json')) {
+    try{
+      if (result.content && result.content.includes('```json')) {
       starterList = this.extractJsonFromMarkdown(result.content);
     } else {
       starterList = JSON.parse(result.content);
+    }}catch(e){
+      console.log(e);
     }
     this.redisPublisher.publish(
       'ctaselected',
