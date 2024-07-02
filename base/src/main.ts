@@ -35,12 +35,6 @@ async function bootstrap() {
     //Validator
     app.useGlobalPipes(new ValidationPipe({whitelist: true, transform: true}));
   
-    app.enableCors({
-      origin: true, // Replace with your frontend's origin
-      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-      credentials: true,
-    });
-  
     //Swagger Docs
     const config = new DocumentBuilder()
     .setTitle('ZautoAI API')
