@@ -109,10 +109,10 @@ export class LoginPageComponent implements OnInit {
           }
           const baseDomain = domainParts.join('.');
           const newDomain = `${user.orgId}.${baseDomain}${currentPort}`;
+          console.log(`Redirect URL : ${protocol}//${newDomain}/auth/login`);
 
           if (currentDomain !== newDomain) {
             // Redirect with the token in URL parameters
-            console.log(`Redirect URL : ${protocol}//${newDomain}/auth/login`);
             
             const url = new URL(`${protocol}//${newDomain}/auth/login`);
             url.searchParams.append('authToken', authToken);

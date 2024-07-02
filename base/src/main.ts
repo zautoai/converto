@@ -36,7 +36,13 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe({whitelist: true, transform: true}));
   
     app.enableCors({
-      origin: '*', // Replace with your frontend's origin
+      origin: (origin, callback) => {
+        if (origin && (origin.match(/^https:\/\/.*\.converto\.biz$/) || origin.match(/^http:\/\/.*\.converto\.biz$/))) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true,
     });
