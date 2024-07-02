@@ -37,16 +37,19 @@ async function bootstrap() {
   
     app.enableCors({
       origin: (origin, callback) => {
-        if (origin && (origin.match(/^https:\/\/.*\.converto\.biz$/) || origin.match(/^http:\/\/.*\.converto\.biz$/))) {
+        const allowedOrigins = [
+          /^https:\/\/.*\.converto\.biz$/,
+          /^http:\/\/.*\.converto\.biz$/
+        ];
+        if (!origin || allowedOrigins.some(regex => regex.test(origin))) {
           callback(null, true);
         } else {
           callback(new Error('Not allowed by CORS'));
         }
       },
-      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
       credentials: true,
     });
-  
     //Swagger Docs
     const config = new DocumentBuilder()
     .setTitle('ZautoAI API')
