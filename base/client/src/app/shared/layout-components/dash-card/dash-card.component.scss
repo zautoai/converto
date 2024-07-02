@@ -32,16 +32,23 @@
 }
 
 .card-title {
+    font-family: 'Mulish', sans-serif;
     font-size: 18px;
+    font-weight: 700;
+    font-style: normal;
+    letter-spacing: normal;
+    word-spacing: 0px;   
     margin-bottom: 8px;
 }
 
 .card-text {
+    font-family: 'Mulish', sans-serif;
     font-size: 14px;
     color: #6c757d;
 }
 
 .number-font {
+    font-family: 'Mulish', sans-serif;
     font-size: 24px;
     font-weight: 700;
 }
@@ -75,7 +82,7 @@
 
 .widget-icon {
     position: absolute;
-    top: 10px;
+    top: 21px;
     right: 10px;
     font-size: 24px; /* Adjust size as needed */
 }

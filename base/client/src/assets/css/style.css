@@ -12641,8 +12641,8 @@ a.chip:hover {
     display: none;
     text-align: center;
     z-index: 99999;
-    height: 50px;
-    width: 50px;
+    height: 40px;
+    width: 40px;
     border-radius: 4px;
     background-repeat: no-repeat;
     background-position: center;
@@ -12653,8 +12653,8 @@ a.chip:hover {
 }
 
 #back-to-top i {
-    padding-top: 15px;
-    font-size: 16px;
+    padding-top: 12px;
+    font-size:14px;
 }
 
 #back-to-top:hover {
@@ -32482,7 +32482,7 @@ body.rtl {
 }
 
 .rtl #back-to-top {
-    left: 20px;
+    left: 16px;
     right: inherit;
 }
 

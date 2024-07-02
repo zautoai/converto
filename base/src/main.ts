@@ -36,20 +36,11 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe({whitelist: true, transform: true}));
   
     app.enableCors({
-      origin: (origin, callback) => {
-        const allowedOrigins = [
-          /^https:\/\/.*\.converto\.biz$/,
-          /^http:\/\/.*\.converto\.biz$/
-        ];
-        if (!origin || allowedOrigins.some(regex => regex.test(origin))) {
-          callback(null, true);
-        } else {
-          callback(new Error('Not allowed by CORS'));
-        }
-      },
-      methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+      origin: '*', // Replace with your frontend's origin
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true,
     });
+  
     //Swagger Docs
     const config = new DocumentBuilder()
     .setTitle('ZautoAI API')

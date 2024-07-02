@@ -39,7 +39,7 @@ export class ChannelMetricsComponent implements OnChanges {
         {
           name: "First Touch",
           data: [],
-          color: "#444444"
+          color: "#444444",
         },
         {
           name: "Last Touch",
@@ -67,7 +67,8 @@ export class ChannelMetricsComponent implements OnChanges {
         enabled: true,
         offsetX: -6,
         style: {
-          fontSize: "12px",
+          fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
+          fontSize: '14px',
           colors: ["#fff"],
         },
         formatter: function (val) {
@@ -83,7 +84,8 @@ export class ChannelMetricsComponent implements OnChanges {
         categories: [],
         labels: {
           style: {
-            fontSize: '10px',
+            fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
+            fontSize: '12px',
           }
         }
       },
@@ -100,7 +102,7 @@ export class ChannelMetricsComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['channelMetrics'] && changes['channelMetrics'].currentValue) {
-      this.isNull=true
+      this.isNull = true
       this.updateChartOptions();
     }
   }
@@ -111,26 +113,35 @@ export class ChannelMetricsComponent implements OnChanges {
       series: [
         {
           name: "First Touch",
-          data: this.channelMetrics.firstTouchPointValues,
+          data: this.channelMetrics?.firstTouchPointValues,
           color: "#444444"
         },
         {
           name: "Last Touch",
-          data: this.channelMetrics.lastTouchPointValues,
+          data: this.channelMetrics?.lastTouchPointValues,
           color: "#DDDDDD"
         },
       ],
       xaxis: {
-        categories: this.channelMetrics.labels,
+        categories: this.channelMetrics?.labels ? this.titleCase(this.channelMetrics?.labels) : [],
         labels: {
           style: {
-            fontSize: '10px',
+            fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
+            fontSize: '12px',
           }
         }
       }
     };
-    if(this.channelMetrics?.firstTouchPointValues?.length > 0 || this.channelMetrics?.lastTouchPointValues?.length > 0){
+    if (this.channelMetrics?.firstTouchPointValues?.length > 0 || this.channelMetrics?.lastTouchPointValues?.length > 0) {
       this.isNull = false;
     }
   }
+  titleCase(labels: string[]): string[] {
+    return labels.map(label => {
+      return label.toLowerCase().replace(/\b\w/g, firstChar => firstChar.toUpperCase());
+    });
+  }
 }
+
+
+

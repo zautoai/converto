@@ -1,12 +1,12 @@
 <div class="box-container">
-    <h2 class="box-title">PAGE ENHANCEMENT METRICS</h2>
+    <h2 class="box-title">PAGE ENGAGEMENT METRICS</h2>
     @if (dataSource.data.length !== 0) {
       <div class="table-container">
         <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
           <!-- Pages Column -->
           <ng-container matColumnDef="pages">
-            <th mat-header-cell *matHeaderCellDef>PAGES</th>
-            <td mat-cell *matCellDef="let element"> {{element.pages}} </td>
+            <th class="custom-table-head" mat-header-cell *matHeaderCellDef>PAGES</th>
+            <td class="custom-table-row" mat-cell *matCellDef="let element"> {{element.pages}} </td>
           </ng-container>
     
           <!-- Visits Column -->

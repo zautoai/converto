@@ -152,7 +152,7 @@ export class DashboardService extends BaseService {
       const currentCPL = await this.calculateCPL(orgId, date.current.start, date.current.end);
 
       let result = [
-        { title: 'Total PVG', subtitle: this.getSubtitle(dateFilter), currentValue: '$' + (currentPVG?.toFixed(2) || '0') },
+        { title: 'Total PV', subtitle: this.getSubtitle(dateFilter), currentValue: '$' + (currentPVG?.toFixed(2) || '0') },
         { title: 'Total CAC', subtitle: this.getSubtitle(dateFilter), currentValue: '$' + (currentCAC?.toFixed(2) || '0') },
         { title: 'Total CPL', subtitle: this.getSubtitle(dateFilter), currentValue: '$' + (currentCPL?.toFixed(2) || '0') }
       ];

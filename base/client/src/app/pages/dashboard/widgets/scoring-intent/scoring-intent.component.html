@@ -1,25 +1,21 @@
 <div class="container-box">
-  <div id="chart">
-    @if(!isNull){
-      <apx-chart
+  <div id="chart-container-box">
+    <apx-chart
+      *ngIf="!isNull"
       [series]="chartOptions.series"
-        [chart]="chartOptions.chart"
-        [title]="chartOptions.title"
-        [colors]="chartOptions.colors"
-        [labels]="chartOptions.labels"
-        [dataLabels]="chartOptions.dataLabels"
-        [responsive]="chartOptions.responsive"
-      ></apx-chart>
-    }
-    @else {
-      <div style="height: 245px;text-align: center;">
-        <div class="mt-3 mb-5" style="text-align: center;font-size: 16px;font-weight: normal;">
-          INTENT SCORING
-        </div>
-        <div class="mt-5">
-          No Data Found
-        </div>
+      [chart]="chartOptions.chart"
+      [title]="chartOptions.title"
+      [colors]="chartOptions.colors"
+      [labels]="chartOptions.labels"
+      [dataLabels]="chartOptions.dataLabels"
+      [responsive]="chartOptions.responsive"
+      [legend]="chartOptions.legend"
+    ></apx-chart>
+    <div *ngIf="isNull" style="height: 245px; text-align: center;">
+      <div class="mt-3 mb-5" style="font-family: 'Mulish', sans-serif; font-size: 18px; line-height: 27px; font-weight: 700; font-style: normal; letter-spacing: normal; word-spacing: 0px;">
+        INTENT SCORING
       </div>
-    }
+      <div class="mt-5">No Data Found</div>
+    </div>
   </div>
 </div>

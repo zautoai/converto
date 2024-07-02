@@ -11,11 +11,11 @@
       <div class="card bg-gradient-light position-relative shadow">
         <div class="card-body">
           <h3 class="card-title text-dark">{{ widget.title }}</h3>
-          <p class="card-text text-muted">{{ widget.subtitle }}</p>
+          <p class="card-text text-muted">{{ widget.subtitle  }}</p>
           <div class="current-value-container">
             <h3 class="number-font text-dark">{{ widget.currentValue }}</h3>
           </div>
-          <p class="card-text text-muted past-month">{{ widget.pastPeriod }}</p>
+          <p class="card-text text-muted past-month">{{ widget.pastPeriod  }}</p>
         </div>
       </div>
     </div>
@@ -23,15 +23,15 @@
     <div class="widget larger" *ngFor="let widget of bottomWidgets">
       <div class="card bg-gradient-light position-relative shadow">
         <div class="card-body">
-          <h3 class="card-title text-dark">{{ widget.title }}</h3>
-          <p class="card-text text-muted">{{ widget.subtitle }}</p>
+          <h3 class="card-title text-dark">{{ widget.title | titlecase }}</h3>
+          <p class="card-text text-muted">{{ widget.subtitle | titlecase }}</p>
           <div class="current-value-container">
-            <h3 class="number-font text-dark">{{ widget.currentValue }}</h3>
+            <h3 class="number-font text-dark">{{ widget.currentValue  }}</h3>
           </div>
           <p class="card-text text-muted change-text">
             <span class="text-{{ widget.color }}">{{ widget.change }}</span>
           </p>
-          <p class="card-text text-muted past-month">{{ widget.pastPeriod }}</p>
+          <p class="card-text text-muted past-month">{{ widget.pastPeriod | titlecase }}</p>
           <i class="fe fe-{{ widget.icon }} widget-icon"></i>
         </div>
       </div>

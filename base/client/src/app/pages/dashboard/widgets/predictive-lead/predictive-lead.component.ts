@@ -28,10 +28,10 @@ export type ChartOptions = {
   templateUrl: './predictive-lead.component.html',
   styleUrls: ['./predictive-lead.component.scss']
 })
-export class PredictiveLeadComponent implements OnChanges{
+export class PredictiveLeadComponent implements OnChanges {
   @Input() predictiveLeadScores: any;
   @ViewChild("chart") chart: ChartComponent | undefined;
-  isNull : boolean = false;
+  isNull: boolean = false;
   public chartOptions: ChartOptions;
 
   constructor() {
@@ -50,19 +50,17 @@ export class PredictiveLeadComponent implements OnChanges{
             chart: {
               width: 200,
             },
-            legend: {
-              position: "bottom",
-            },
           },
         },
       ],
       title: {
         text: "PREDICTIVE LEAD SCORING",
-        align: 'center',
+        offsetX : 15,
         style: {
-          fontSize: '16px',
-          fontWeight: 'normal' // Adjust font size if needed
-        }
+          fontSize: '18px',
+          fontWeight: 'bolder',
+          fontFamily: 'Mulish, sans-serif',
+        },
       },
       dataLabels: {
         enabled: true,
@@ -77,7 +75,7 @@ export class PredictiveLeadComponent implements OnChanges{
         },
         formatter: function (val: number) {
           return Number(val).toFixed(1) + "%";
-        }
+        },
       },
       plotOptions: {
         pie: {
@@ -88,22 +86,35 @@ export class PredictiveLeadComponent implements OnChanges{
         }
       },
       legend: {
-        show: false // Disable the built-in legend
-      }
+        position: 'right',
+        offsetY: 75, // Adjust this to center vertically
+        offsetX: -30, // Adjust this to fine-tune the horizontal position
+        horizontalAlign: 'center',
+        markers: {
+          width: 10,
+          height: 10,
+          radius: 5,
+        },
+        itemMargin: {
+          horizontal: 5,
+          vertical: 2
+        }
+      },
     };
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(changes['predictiveLeadScores'] && changes['predictiveLeadScores'].currentValue) {
+    if (changes['predictiveLeadScores'] && changes['predictiveLeadScores'].currentValue) {
       this.updateChartOptions();
     }
   }
 
-  updateChartOptions(): void {   
+  updateChartOptions(): void {
     this.isNull = this.predictiveLeadScores.every((score: number) => score === 0);
     if (this.isNull) {
       this.chartOptions.series = [];
     } else {
       this.chartOptions.series = this.predictiveLeadScores;
-    }  }
+    }
+  }
 }

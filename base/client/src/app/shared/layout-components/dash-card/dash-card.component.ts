@@ -44,7 +44,7 @@ export class DashCardComponent implements OnInit, OnChanges {
   showLoader: boolean = false;
 
   topWidgets: Widget[] = [
-    { title: 'Total PVG', subtitle: '', currentValue: '$ 0', pastPeriod: '' },
+    { title: 'Total PV', subtitle: '', currentValue: '$ 0', pastPeriod: '' },
     { title: 'Total CAC', subtitle: '', currentValue: '$ 0', pastPeriod: '' },
     { title: 'Total CPL', subtitle: '', currentValue: '$ 0', pastPeriod: '' }
   ]

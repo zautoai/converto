@@ -62,17 +62,19 @@ export class ChannelImpressionComponent implements OnChanges{
         width: [0, 4],
       },
       title: {
-        text: "CHANNELS IMPRESSIONS & PIPELINE VALUE GENERATED",
+        text: "CHANNELS IMPRESSIONS & PIPELINE VALUE ",
         align: 'center',
         style: {
-          fontSize: '14px', // Adjust the font size of the title
-          fontWeight: 'semibold', // Remove bold styling
+          fontSize: '18px', // Adjust the font size of the title
+          fontWeight: 'bold', // Adjust the font weight of the title
+          fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
         },
       },
       dataLabels: {
         enabled: true,
         enabledOnSeries: [1],
         style: {
+          fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
           fontSize: '12px', // Adjust the font size of data labels
         },
         formatter: function (value: number) {
@@ -84,6 +86,7 @@ export class ChannelImpressionComponent implements OnChanges{
         type: "category",
         labels: {
           style: {
+            fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
             fontSize: '14px', // Adjust the font size of x-axis labels
           },
         },
@@ -93,12 +96,14 @@ export class ChannelImpressionComponent implements OnChanges{
           title: {
             text: "Impression",
             style: {
+              fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
               fontSize: '14px', // Adjust the font size of y-axis title
             },
           },
           labels: {
             style: {
-              fontSize: '12px', // Adjust the font size of y-axis labels
+              fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
+              fontSize: '14px', // Adjust the font size of y-axis labels
             },
             formatter: function (value: number) {
               return `${value}`;
@@ -110,11 +115,13 @@ export class ChannelImpressionComponent implements OnChanges{
           title: {
             text: "Pipeline Value",
             style: {
+              fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
               fontSize: '14px', // Adjust the font size of y-axis title
             },
           },
           labels: {
             style: {
+              fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
               fontSize: '12px', // Adjust the font size of y-axis labels
             },
             formatter: function (value: number) {
@@ -130,6 +137,7 @@ export class ChannelImpressionComponent implements OnChanges{
         shared: true,
         intersect: false,
         style: {
+          fontFamily: 'Mulish, sans-serif', // Adjust the font family of the title
           fontSize: '12px', // Adjust the font size of the tooltip
         },
       },
@@ -140,6 +148,7 @@ export class ChannelImpressionComponent implements OnChanges{
         }
       }
     };
+
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['pipelineValue'] && changes['pipelineValue'].currentValue) {
@@ -165,10 +174,17 @@ export class ChannelImpressionComponent implements OnChanges{
           color: '#DDDDDD'
         },
       ],
-      labels: this.pipelineValue?.labels || [],
+      labels: this.pipelineValue?.labels ? this.titleCase(this.pipelineValue?.labels) : [],
     };
     if(this.pipelineValue?.column?.length > 0 || this.pipelineValue?.line?.length > 0){
       this.isNull = false;
     }
   }
+
+  titleCase(labels: string[]): string[] {
+    return labels.map(label => {
+      return label.toLowerCase().replace(/\b\w/g, firstChar => firstChar.toUpperCase());
+    });
+  }
+  
 }

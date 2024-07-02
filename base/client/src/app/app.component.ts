@@ -7,7 +7,7 @@ import { fromEvent } from 'rxjs';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'zautoai';
+  title = 'Converto';
 
   ngOnInit() {
     fromEvent(window, 'load').subscribe(() => document.querySelector('#glb-loader')?.classList.remove('loaderShow'));

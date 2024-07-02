@@ -6,7 +6,8 @@ import {
   ApexResponsive,
   ApexChart,
   ApexTitleSubtitle,
-  ApexDataLabels
+  ApexDataLabels,
+  ApexLegend
 } from 'ng-apexcharts';
 
 export type ChartOptions = {
@@ -17,6 +18,7 @@ export type ChartOptions = {
   title: ApexTitleSubtitle;
   colors: string[];
   dataLabels: ApexDataLabels;
+  legend: ApexLegend;
 };
 
 @Component({
@@ -35,7 +37,7 @@ export class ScoringIntentComponent implements OnChanges {
       series: [],
       chart: {
         type: 'donut',
-        height: 250, // Set the chart's height directly
+        height: 270,
         toolbar: {
           show: false
         }
@@ -57,18 +59,19 @@ export class ScoringIntentComponent implements OnChanges {
       ],
       title: {
         text: 'INTENT SCORING',
-        align: 'center', // Align the title to the left
+        offsetX:100,
         style: {
-          fontSize: '16px',
-          fontWeight: 'normal'
+          fontSize: '18px',
+          fontWeight: 'bold',
+          fontFamily: 'Mulish, sans-serif',
         }
       },
       dataLabels: {
         enabled: true,
         style: {
           fontSize: '12px',
-          fontFamily: 'Helvetica, Arial, sans-serif',
           fontWeight: 'normal',
+          fontFamily: 'Mulish, sans-serif',
           colors: ['#000']
         },
         dropShadow: {
@@ -76,6 +79,21 @@ export class ScoringIntentComponent implements OnChanges {
         },
         formatter: function (val: number) {
           return Number(val).toFixed(1) + "%";
+        }
+      },
+      legend: {
+        position: 'right',
+        offsetY: 80, // Adjust this to center vertically
+        offsetX: 0, // Adjust this to fine-tune the horizontal position
+        horizontalAlign: 'center',
+        markers: {
+          width: 10,
+          height: 10,
+          radius: 5,
+        },
+        itemMargin: {
+          horizontal: 5,
+          vertical: 2
         }
       }
     };

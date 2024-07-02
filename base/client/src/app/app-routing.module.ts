@@ -26,6 +26,7 @@ const routes: Routes = [
   },
   {
     path: 'auth',
+    title:'Login',
     redirectTo: '/auth/login',
     pathMatch: 'full'
   },
