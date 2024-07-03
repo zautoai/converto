@@ -33,8 +33,22 @@
                         *ngIf="data?.potentialLevel.toUpperCase() == 'UNKNOWN'">{{data?.potentialLevel}}</span>
                 </div>
             </div>
-          </div>
-        <div class="d-flex justify-content-between mb-2">
+        </div>
+        <div class="d-flex justify-content-end mb-2">
+            <!-- If not loading -->
+            <div style="width: 50%;" *ngIf="!isGenerateSummaryLoading" (click)="generateSummary(data)"
+                class="d-flex flex-row align-items-center justify-content-center btn btn-dark p-0">
+                <i class="fa fa-refresh ms-2 me-2"></i>
+                <p class="m-0 me-2">Generate Summary</p>
+            </div>
+
+            <!-- If loading -->
+            <div style="width: 50%;opacity: 0.5;cursor: not-allowed;" *ngIf="isGenerateSummaryLoading"
+                class="d-flex flex-row align-items-center justify-content-center btn btn-dark p-0">
+                <i class="fa fa-refresh ms-2 me-2 fa-spin"></i>
+                <p class="m-0 me-2">Generating...</p>
+            </div>
+
         </div>
         <div ngbAccordion [closeOthers]="false" class="custom-accordion">
             <!-- summary -->
@@ -63,19 +77,19 @@
                                     <tr>
                                         <td class="text-truncate">
                                             <span><b>Name</b></span><br>
-                                            {{data?.Lead?.name || '---'}}
+                                            {{data?.contacts?.fullName || data?.contacts?.firstName || '---'}}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="text-truncate">
                                             <span><b>Email</b></span><br>
-                                            {{data?.Lead?.email || '---'}}
+                                            {{data?.contacts?.email || '---'}}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="text-truncate">
                                             <span><b>Phone</b></span><br>
-                                            {{data?.Lead?.phone || '---'}}
+                                            {{data?.contacts?.phone || '---'}}
                                         </td>
                                     </tr>
                                     <tr *ngIf="data?.visitor">

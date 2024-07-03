@@ -16,6 +16,7 @@ export class SummaryContainerComponent {
   @Input() data:any = null;
 
   isUserSummaryLoading: boolean = false;
+  isGenerateSummaryLoading: boolean = false;
   private convSummarySubscription!: Subscription;
 
   constructor(
@@ -54,6 +55,18 @@ export class SummaryContainerComponent {
   jsonParser(jsonString: string) {
     const object = JSON.parse(jsonString);
     return object;
+  }
+
+  generateSummary(conversation:any ){
+    this.isGenerateSummaryLoading = true;
+    this.restService.patch(API.main.conversation, `generate-summary/${conversation.id}`,{})
+    .subscribe((response:any)=>{
+      this.isGenerateSummaryLoading = false;
+      this.getSummary(conversation.id);
+    },(error)=>{
+      this.isGenerateSummaryLoading = false;
+      console.log(error);
+    });
   }
 
 }

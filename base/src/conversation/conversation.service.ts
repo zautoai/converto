@@ -8,13 +8,15 @@ import { ZautoChatCompletionMessage } from 'src/llm/llms/llm.models';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { CreateMessageDto } from './dto/crete-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
-import { ConversationStatus } from './entities/conversation.entity';
+import { ConversationStatus, Sentimental } from './entities/conversation.entity';
 import { MessageMediaType } from './entities/conversation.enums';
+import { SUMMARIZER_PROMPT } from 'src/common/templates/claude/summarizer.prompt.template';
+import { LlmService } from 'src/llm/llm.service';
 
 @Injectable()
 export class ConversationService extends BaseService {
 
-  constructor(private summarizer: SummarizerService, private contactsService: ContactsService) {
+  constructor(private summarizer: SummarizerService, private contactsService: ContactsService,private readonly llmService: LlmService) {
     super();
   }
 
@@ -68,28 +70,36 @@ export class ConversationService extends BaseService {
     const { page, limit } = paginationDto;
     const skip = (page - 1) * limit;
     const prisma = await this.getPrismaClient(orgId);
+
     try {
-      const roleData = await prisma.conversation.findMany({ skip, take: limit });
+      const roleData: any = await prisma.conversation.findMany({ skip, take: limit, include: { visitor: true, visit: true, campaign: true } });
       const total = await prisma.conversation.count();
+
+      // Fetch and append contact data for each conversation
+      for (const conversation of roleData) {
+        const contacts = await this.contactsService.getContactsByConversation(orgId, conversation.id);
+        conversation.contacts = contacts;
+      }
+
       return {
         data: roleData,
         page: page,
-        total: total
+        total: total,
       };
     } catch (error) {
-      throw error
+      throw error;
     } finally {
-      prisma.$disconnect()
+      prisma.$disconnect();
       await this.closeConnection(orgId);
     }
   }
 
-  async updateSummary(conversation: any) {
+  async updateSummary(orgId: string, conversation: any, agent: any) {
     try {
-      const _conv = await this.summarizer.getSummary(conversation);
-      conversation.summary = _conv.summary;
-      conversation.sentimental = _conv.sentimental;
-      conversation.suggestions = _conv.suggestions
+      const _conv = await this.summarizer.getSummary(orgId, conversation, agent);
+      // conversation.summary = _conv.summary;
+      // conversation.sentimental = _conv.sentimental;
+      // conversation.suggestions = _conv.suggestions
     } catch (error) {
     }
 
@@ -99,7 +109,7 @@ export class ConversationService extends BaseService {
   async findOne(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     try {
-      let existingConversation = await prisma.conversation.findUnique({
+      let existingConversation: any = await prisma.conversation.findUnique({
         where: { id },
         include: {
           messages: {
@@ -119,6 +129,8 @@ export class ConversationService extends BaseService {
         }
       });
       if (existingConversation) {
+        const contacts = await this.contactsService.getContactsByConversation(orgId, existingConversation.id);
+        existingConversation.contacts = contacts;
         return existingConversation;
       } else throw new NotFoundException(`Conversation with id ${id} not found.`);
     } catch (error) {
@@ -132,7 +144,7 @@ export class ConversationService extends BaseService {
   async findOneWithSummary(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     try {
-      let existingConversation = await prisma.conversation.findUnique({
+      let existingConversation: any = await prisma.conversation.findUnique({
         where: { id },
         include: {
           messages: {
@@ -149,11 +161,14 @@ export class ConversationService extends BaseService {
           }
         }
       });
+      const agent = await prisma.agent.findFirst()
       if (existingConversation) {
         const lastMessageOn = existingConversation.messages[existingConversation.messages.length - 1]?.modifiedAt.getTime();
         if (!existingConversation.summaryUpdatedAt || lastMessageOn && lastMessageOn > existingConversation.summaryUpdatedAt.getTime()) {
-          existingConversation = await this.updateSummary(existingConversation);
+          existingConversation = await this.updateSummary(orgId, existingConversation, agent);
         }
+        const contacts = await this.contactsService.getContactsByConversation(orgId, existingConversation.id);
+        existingConversation.contacts = contacts;
         return existingConversation;
       } else throw new NotFoundException(`Conversation with id ${id} not found.`);
     } catch (error) {
@@ -167,7 +182,7 @@ export class ConversationService extends BaseService {
   async findOneNoSummay(orgId: string, id: string) {
     const prisma = await this.getPrismaClient(orgId);
     try {
-      let existingConversation = await prisma.conversation.findUnique({
+      let existingConversation: any = await prisma.conversation.findUnique({
         where: { id },
         include: {
           messages: {
@@ -187,6 +202,8 @@ export class ConversationService extends BaseService {
         }
       });
       if (existingConversation) {
+        const contacts = await this.contactsService.getContactsByConversation(orgId, existingConversation.id);
+        existingConversation.contacts = contacts;
         return existingConversation;
       } else throw new NotFoundException(`Conversation with id ${id} not found.`);
     } catch (error) {
@@ -582,4 +599,102 @@ export class ConversationService extends BaseService {
       await this.closeConnection(orgId);
     }
   }
+
+  async generateSummary(orgId: string, id: string) {
+    const prisma = await this.getPrismaClient(orgId);
+    try {
+      const conversation = await this.findOne(orgId, id);
+      const agent = await prisma.agent.findFirst();
+      let summarizerPrompt = SUMMARIZER_PROMPT;
+      const customerName = conversation.contacts?.fullName ? conversation.contacts?.fullName : 'Anonymous Customer';
+      const messages = []
+      for (let message of conversation.messages) {
+        messages.push({
+          role: message.role == 'assistant' ? agent?.displayName : customerName,
+          content: message.content
+        });
+      }
+      const content = `BDR Name: ${agent?.name}
+            Customer Name: ${customerName}
+            Here is the chat conversation:
+            ${JSON.stringify(messages)}`;
+
+      const promptMesssage = [
+        { role: 'system', content: summarizerPrompt },
+        { role: 'user', content: content }
+      ];
+      const result = await this.llmService.chat(promptMesssage);
+
+      let summaryJson = undefined
+      if (result.content.includes('```json')) {
+          summaryJson = this.extractJsonFromMarkdown(result.content);
+      } else {
+          summaryJson = JSON.parse(result.content);
+      }
+
+      if (summaryJson) {
+        let taskList = '';
+        if (Array.isArray(summaryJson.taskList)) {
+          for (let [index, task] of summaryJson.taskList.entries()) {
+            if (task.startsWith(`${index + 1}`))
+              taskList += `${task}\n`;
+            else taskList += `${index + 1}. ${task}\n`;
+          }
+        } else {
+          taskList = summaryJson.taskList;
+        }
+
+        let summaryList = '';
+
+        if (Array.isArray(summaryJson.summary)) {
+          for (let [index, summary] of summaryJson.summary.entries()) {
+            if (summary.startsWith(`${index + 1}`))
+              summaryList += `${summary}\n`;
+            else summaryList += `${index + 1}. ${summary}\n`;
+          }
+        } else {
+          summaryList = summaryJson.summary;
+        }
+
+        return await prisma.conversation.update({
+          where: { id: conversation.id },
+          data: {
+            summary: summaryList,
+            sentimental: Sentimental[summaryJson.sentimental.toUpperCase()],
+            taskList: taskList,
+            potentialLevel: summaryJson.potentialLevel.toUpperCase(),
+            summaryUpdatedAt: new Date()
+          }
+        });
+      }
+    } catch (error) {
+      throw error
+    } finally {
+      prisma.$disconnect()
+      await this.closeConnection(orgId);
+    }
+  }
+
+  extractJsonFromMarkdown(mdContent: string) {
+    // Regular expression to match a JSON block within Markdown
+    const jsonRegex = /```json([\s\S]*?)```/;
+
+    // Extract JSON string
+    const match = mdContent.match(jsonRegex);
+
+    if (match && match[1]) {
+        // Clean up whitespace and parse JSON
+        try {
+            const jsonString = match[1].trim();
+            return JSON.parse(jsonString);
+        } catch (e) {
+            console.error('Failed to parse JSON:', e);
+            return null;
+        }
+    } else {
+        console.error('No JSON content found');
+        return null;
+    }
+}
+
 }

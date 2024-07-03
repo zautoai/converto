@@ -11,7 +11,7 @@ export class LlmService implements LLMServiceIntf{
     constructor(private llmProvider: LlmProvider) {}
 
     async chat(chatHistory: ZautoChatCompletionMessage[], options?: any) {
-        const llmService = this.llmProvider.getLLM(LLM_PROVIDERS.COHERE);
+        const llmService = this.llmProvider.getLLM(LLM_PROVIDERS.AWS);
         if(options && options.prompt) {
             return await llmService.chat(chatHistory, options.prompt);
         } else {

@@ -126,4 +126,19 @@ export class ConversationController {
     const orgId = request.orgId;
     return await this.conversationService.updateMessage({orgId,data:{id,updateMessageDto}});
   }
+
+  @Patch('/generate-summary/:id')
+  @Roles(SYSTEM_CONST.ADMIN_ROLE, SYSTEM_CONST.SUPERUSER_ROLE)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async generateSummary(@Param('id') id: string, @Req() request: ZautoRequest) {
+    if(request.user && request.user.orgId)
+    {
+      const orgId = request.user.orgId;
+      return await this.conversationService.generateSummary(orgId, id);
+    }
+    else
+    {
+      throw new UnauthorizedException('You are not authorized to access this resource')
+    }
+  }
 }

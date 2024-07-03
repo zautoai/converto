@@ -77,8 +77,6 @@ export class conversationcomponent implements OnInit, AfterViewInit {
 
     this.getAllCampaigns();
     this.getConversations();
-
-
     this.registerEvents();
   }
   ngAfterViewInit(): void {
@@ -162,7 +160,7 @@ export class conversationcomponent implements OnInit, AfterViewInit {
       const endpoint = API.main.conversation + `?${queryParams}`;
       this.restService.getAll(endpoint)
         .subscribe((response: any) => {
-          this.convList = updateDataList(response, this.convList, this.newConversation);
+          this.convList = updateDataList(response, this.convList, this.newConversation);          
         }, (error) => {
           console.log(error);
         });
@@ -179,6 +177,8 @@ export class conversationcomponent implements OnInit, AfterViewInit {
   selectConvo(conversation: any) {
 
     this.selectedConvo = conversation;
+    console.log(this.selectedConvo);
+    
     const queryParams = this.route.snapshot.queryParams;
     this.router.navigate(['/conversations', conversation.id], { queryParams: queryParams });
 
