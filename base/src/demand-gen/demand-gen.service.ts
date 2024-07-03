@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { generateUniqueId, parseURLParams } from 'src/common/helpers/demand-gen.utils';
 import { extractJsonFromMarkdown } from 'src/common/helpers/extractJson.helper';
 import { BaseService } from 'src/common/services/base.service';
-import { DEMAND_GENT_CAMPAIGN_FINDR_PROMPT } from 'src/common/templates/demand-gen.template';
+import { DEMAND_GENT_CAMPAIGN_FINDR_PROMPT } from 'src/common/templates/claude/demand-gen.template';
 import { LlmService } from 'src/llm/llm.service';
 import { CreateDemandGenDto } from './dto/create-demand-gen.dto';
 

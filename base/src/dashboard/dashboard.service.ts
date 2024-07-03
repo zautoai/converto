@@ -249,9 +249,16 @@ export class DashboardService extends BaseService {
       if (!dashboardData) {
         return 0;
       }
-      const { averageDealSize, leadConversionRate } = dashboardData
-      const totalLeads = await this.getContactCount(orgId, startOfMonthISO, endOfMonthISO);
-      const pipelineValue = totalLeads * averageDealSize * leadConversionRate;
+      const { averageDealSize } = dashboardData;
+      const visitors = await prisma.visitor.count({
+        where: {
+          createdAt: {
+            gte: startOfMonthISO,
+            lte: endOfMonthISO,
+          },
+        },
+      });
+      const pipelineValue = visitors * averageDealSize;
       return pipelineValue
     } catch (error) {
 

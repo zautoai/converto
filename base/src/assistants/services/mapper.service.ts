@@ -1,6 +1,6 @@
 import { Injectable,OnModuleInit } from '@nestjs/common';
 import { extractJsonFromMarkdown } from 'src/common/helpers/extractJson.helper';
-import { MAPPER_TEMPLATE } from 'src/common/templates/mapper-prompt.template';
+import { MAPPER_TEMPLATE } from 'src/common/templates/claude/mapper-prompt.template';
 import { LLMModels, LLMNames } from 'src/llm/llm.contants';
 import { LlmService } from 'src/llm/llm.service';
 

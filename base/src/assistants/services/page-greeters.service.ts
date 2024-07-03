@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LlmService } from 'src/llm/llm.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { GREETER_PROPMT } from 'src/common/templates/page-greeter.template';
+import { GREETER_PROPMT } from 'src/common/templates/claude/page-greeter.template';
 import { WebScraperService } from 'src/common/services/web-scraper.service';
 
 @Injectable()

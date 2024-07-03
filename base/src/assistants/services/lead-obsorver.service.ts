@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import Redis, { Redis as RedisClient } from 'ioredis';
 import { AgentService } from 'src/agent/agent.service';
-import { LEAD_OBSERVER_PROMPT_TEMPLATE } from 'src/common/templates/lead-obsorver-prompt.template';
+import { LEAD_OBSERVER_PROMPT_TEMPLATE } from 'src/common/templates/claude/lead-obsorver-prompt.template';
 import { LLMModels, LLMNames } from 'src/llm/llm.contants';
 import { LlmService } from 'src/llm/llm.service';
 import { ContactService } from 'src/microservices/crm_service/contact.service';

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAgentPromptDto } from './dto/create-agent-prompt.dto';
 import { UpdateAgentPromptDto } from './dto/update-agent-prompt.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ASSISTANT_PROMPT_TEMPLATE } from 'src/common/templates/agent-prompt.template';
+import { ASSISTANT_PROMPT_TEMPLATE } from 'src/common/templates/claude/agent-prompt.template';
 import { ConversationType } from 'src/common/enums/enums';
 import { LlmService } from 'src/llm/llm.service';
 import { BaseService } from 'src/common/services/base.service';

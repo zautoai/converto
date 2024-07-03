@@ -14,7 +14,7 @@ import Redis, { Redis as RedisClient } from 'ioredis';
 import { PageGreeterService } from "src/assistants/services/page-greeters.service";
 import { CTACreatorService } from "src/assistants/services/cta-creator";
 import { SiteService } from "src/site/site.service";
-import { AVATAR_HELPER_PROMPT } from "src/common/templates/agent-prompt.template";
+import { AVATAR_HELPER_PROMPT } from "src/common/templates/claude/agent-prompt.template";
 import { ChromaDBService } from "src/chroma/chroma-dbservice/chroma-db.service";
 import { BaseService } from "src/common/services/base.service";
 import { ServiceParams } from "src/common/models/service-param.model";

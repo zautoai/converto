@@ -1,6 +1,6 @@
-import { AVATAR_HELPER_PROMPT } from "src/common/templates/agent-prompt.template";
-import { CTA_CREATOR_PROMPT } from "src/common/templates/cta-creator.template";
-import { GREETER_PROPMT } from "src/common/templates/page-greeter.template";
+import { AVATAR_HELPER_PROMPT } from "src/common/templates/claude/agent-prompt.template";
+import { CTA_CREATOR_PROMPT } from "src/common/templates/claude/cta-creator.template";
+import { GREETER_PROPMT } from "src/common/templates/claude/page-greeter.template";
 
 
 

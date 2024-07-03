@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import Redis, { Redis as RedisClient } from 'ioredis';
-import { STARTER_GENERATOR_PROMPT } from "src/common/templates/starter-generator.template";
+import { STARTER_GENERATOR_PROMPT } from "src/common/templates/claude/starter-generator.template";
 import { LLMModels, LLMNames } from "src/llm/llm.contants";
 import { LlmService } from "src/llm/llm.service";
 import { PrismaService } from "src/prisma/prisma.service";

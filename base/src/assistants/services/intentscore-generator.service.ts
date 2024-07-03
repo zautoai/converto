@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { extractJsonFromMarkdown } from "src/common/helpers/extractJson.helper";
-import { INTENT_SCORE_PROMPT } from "src/common/templates/intentscore.prompt";
+import { INTENT_SCORE_PROMPT } from "src/common/templates/claude/intentscore.prompt";
 import { LLMModels, LLMNames } from "src/llm/llm.contants";
 import { LlmService } from "src/llm/llm.service";
 

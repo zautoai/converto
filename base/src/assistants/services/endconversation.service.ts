@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import Redis, { Redis as RedisClient } from 'ioredis';
-import { CATEGORISER_PROMPT } from "src/common/templates/categoriser-prompt.template";
-import { SUMMARIZER_PROMPT } from "src/common/templates/summarizer.prompt.template";
+import { CATEGORISER_PROMPT } from "src/common/templates/claude/categoriser-prompt.template";
+import { SUMMARIZER_PROMPT } from "src/common/templates/claude/summarizer.prompt.template";
 import { Sentimental } from "src/conversation/entities/conversation.entity";
 import { LlmService } from "src/llm/llm.service";
 import { PrismaService } from "src/prisma/prisma.service";

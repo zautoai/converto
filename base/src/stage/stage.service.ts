@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateStageDto } from './dto/create-stage.dto';
 import { UpdateStageDto } from './dto/update-stage.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { AGENT_STAGES } from 'src/common/templates/agent-prompt.template';
+import { AGENT_STAGES } from 'src/common/templates/claude/agent-prompt.template';
 import { AgentPromptService } from 'src/agent-prompt/agent-prompt.service';
 import { ServiceParams } from 'src/common/models/service-param.model';
 import { BaseService } from 'src/common/services/base.service';

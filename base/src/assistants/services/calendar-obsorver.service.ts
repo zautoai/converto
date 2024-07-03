@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { LlmService } from 'src/llm/llm.service';
 import Redis, { Redis as RedisClient } from 'ioredis';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CALENDAR_OBSORVER_PROMPT_TEMPLATE } from 'src/common/templates/calendar-obsorver.template';
+import { CALENDAR_OBSORVER_PROMPT_TEMPLATE } from 'src/common/templates/claude/calendar-obsorver.template';
 import { LLMModels, LLMNames } from 'src/llm/llm.contants';
 
 @Injectable()

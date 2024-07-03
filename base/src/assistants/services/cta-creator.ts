@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ServiceParams } from 'src/common/models/service-param.model';
 import { BaseService } from 'src/common/services/base.service';
 import { WebScraperService } from 'src/common/services/web-scraper.service';
-import { CTA_CREATOR_PROMPT } from 'src/common/templates/cta-creator.template';
+import { CTA_CREATOR_PROMPT } from 'src/common/templates/claude/cta-creator.template';
 import { LLMModels, LLMNames } from 'src/llm/llm.contants';
 import { LlmService } from 'src/llm/llm.service';
 ;
