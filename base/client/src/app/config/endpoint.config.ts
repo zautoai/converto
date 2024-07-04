@@ -35,6 +35,7 @@ export const API = {
     launchAvatar: 'api/agents/launchAvatar',
     usage: 'api/account/usage',
     orgSmtpConfig: 'api/organization/smtpconfig',
+    organization:'api/organizations',
     cta: 'api/cta',
     oauth: 'api/oauth',
     oauthStateToken: 'api/oauth/state',

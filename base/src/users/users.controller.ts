@@ -29,7 +29,7 @@ export class UsersController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto, @Req() request: ZautoRequest) {
     const orgId = request.user.orgId;
-    return await this.usersService.create(orgId, createUserDto);
+    return await this.usersService.create(orgId, createUserDto,true);
   }
 
   @Get()

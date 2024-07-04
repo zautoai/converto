@@ -10,6 +10,7 @@ import { AvatarService } from 'src/app/shared/services/avatar.service';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
 import { markFormGroupAsDirty } from 'src/app/components/advanced-inputs/input.util';
 import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
+import { environment } from 'src/environments/environment.dev';
 
 @Component({
   selector: 'app-login-page',
@@ -56,10 +57,9 @@ export class LoginPageComponent implements OnInit {
         localStorage.setItem('token', authToken);
         this.continueLoginTasks();
       }
-
       const token = querys.get('token');
       if (token) {
-        this.restService.get(API.main.register + "/verify", "")
+        this.restService.get(API.main.register + "/verify", `?token=${token}`)
           .subscribe((response) => {
             this.errorModal.modalTitle = 'Email Account Verified';
             this.errorModal.modalMessage = "Email Account Verified!";
@@ -69,6 +69,7 @@ export class LoginPageComponent implements OnInit {
           });
       }
     });
+
   }
 
   onLogin() {

@@ -8,6 +8,7 @@ import { UpdateProfilePicDto } from './dto/profile-pic-update.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { StaticFileService } from 'src/common/services/static.service';
 import { BaseService } from 'src/common/services/base.service';
+import { OrganizationsService } from 'src/organizations/organizations.service';
 
 
 export const roundsOfHashing = 10;
@@ -18,6 +19,7 @@ export class UsersService extends BaseService {
   constructor(
     private rolesService: RolesService,
     private readonly staticFileService: StaticFileService,
+    private readonly organizationService: OrganizationsService
   ) {
     super();
   }
@@ -42,9 +44,18 @@ export class UsersService extends BaseService {
           let defaultRole = await this.rolesService.findOneByName(orgId, SYSTEM_CONST.DEFALT_ROLE);
           createUserDto.roleId = defaultRole.id;
         }
+        if(verified){
+          createUserDto.orgId = orgId
+          const existingAdminUser = await this.organizationService.findOrgByEmail(createUserDto.email)
+          if (existingAdminUser) {
+            throw new ConflictException(`User with ${createUserDto.email} already exists as an admin.`)
+          }
+          const currentOrg = await this.organizationService.findOne(orgId);
+          const updateOrg = await this.organizationService.update(orgId,{emails:[...currentOrg.emails,createUserDto.email]})
+        }
         const userData = await prisma.user.create({ data: { ...createUserDto, verified } });
         delete userData.password;
-
+       
         return userData;
       } else {
         throw new ConflictException(`User with ${createUserDto.email} already exists.`)

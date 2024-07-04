@@ -143,6 +143,7 @@ export class OrganizationsService extends BaseService {
       if (org) {
         try {
           await this.schemaManagerService.delete(org.id);
+          await this.schemaManager.delete(org.id)
         }
         catch (e) {
           throw e

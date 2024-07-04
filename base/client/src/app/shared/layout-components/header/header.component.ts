@@ -12,6 +12,7 @@ import { API } from 'src/app/config/endpoint.config';
 import { NotificationService } from '../../services/notification.service';
 import { GLOBAL_IMAGES } from 'src/app/config/image.config';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AdvancedModalsComponent } from 'src/app/components/advanced-modals/advanced-modals/advanced-modals.component';
 
 @Component({
   selector: 'app-header',
@@ -59,6 +60,8 @@ export class HeaderComponent implements OnInit {
   @ViewChild('changeProfileModal') changeProfileModal: ElementRef | undefined;
   @ViewChild('changePasswordModal') changePasswordModal: ElementRef | undefined;
   @ViewChild('dashboardSettingModal') dashboardSettingModal: ElementRef | undefined;
+  @ViewChild(AdvancedModalsComponent) deleteModal!: AdvancedModalsComponent;
+
 
   constructor(
     private layoutService: LayoutService,
@@ -323,6 +326,20 @@ export class HeaderComponent implements OnInit {
     return url;
   }
 
+  deleteAccount(){
+    this.deleteModal.open()
+  }
+
+  confirmDelete(){
+    this.restService.delete(API.main.organization,"")
+    .subscribe((response: any) => {
+      this.closeModal();
+      this.notifService.showSuccess("Account deleted successfully.");
+      this.signout();
+    }, (error) => {
+      console.log(error);
+    });
+  }
 
   get averageDealSize(): FormControl {
     return this.dashboardSettingForm.get('averageDealSize') as FormControl;

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Response, HttpCode, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Response, HttpCode, Query, Req, UnauthorizedException } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -11,6 +11,7 @@ import { Organization } from './entities/organization.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ResponseDTO } from 'src/common/dto/response.dto';
 import { MessagePattern } from '@nestjs/microservices';
+import { ZautoRequest } from 'src/common/models/request.model';
 
 @ApiTags('Organisations')
 @ApiBearerAuth()
@@ -57,13 +58,18 @@ export class OrganizationsController {
     return await this.organizationsService.update(id, updateOrganizationDto);
   }
 
-  @Delete(':id')
-  @Roles(SYSTEM_CONST.SUPERUSER_ROLE)
+  @Delete()
+  @Roles(SYSTEM_CONST.SUPERUSER_ROLE,SYSTEM_CONST.ADMIN_ROLE)
   @UseGuards(JwtAuthGuard,RolesGuard)
   @ApiNoContentResponse()
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
-    return await this.organizationsService.remove(id);
+  async remove(@Req() request: ZautoRequest){
+    if(request.user && request.user.orgId){
+      return await this.organizationsService.remove(request.user.orgId);
+    }
+    else{
+      throw new UnauthorizedException('You are not authorized to access this resource')
+    }
   }
 
   

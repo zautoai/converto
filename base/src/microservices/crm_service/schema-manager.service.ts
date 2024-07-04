@@ -22,7 +22,7 @@ export class SchemaManagerService {
     async delete(orgId: string) {
         try
         {
-            return this.CRMClient.send({cmd: 'DELETE_SCHEMA'}, {orgId, name}).toPromise();
+            return this.CRMClient.send({cmd: 'DELETE_SCHEMA'}, {orgId}).toPromise();
         }
         catch (error)
         {

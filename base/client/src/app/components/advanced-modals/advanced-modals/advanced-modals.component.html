@@ -1,9 +1,13 @@
 <ng-template #contentModal let-modal>
   @switch (modalType) {
   @case ('delete') {
-
+    <div class="modal-header border-bottom-1" style="background-color: #F5F5F5;">
+      <span class=" text-center w-100">
+        <h1 class="modal-title fs-5 ">{{ modalTitle }}</h1>
+      </span>
+    </div>
   <div class="modal-body p-4 text-center" style="background-color: #F5F5F5;">
-    <h5 class="mb-0">Are you sure you want to delete?</h5>
+    <h5 class="mb-0">{{modalMessage}}</h5>
   </div>
   <div class="modal-footer flex-nowrap p-0 ">
     <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0 border-end" (click)="onConfirm()" [disabled]="isLoading"
