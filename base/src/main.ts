@@ -36,7 +36,7 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe({whitelist: true, transform: true}));
   
     app.enableCors({
-      origin: '*', // Replace with your frontend's origin
+      origin: '*',
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true,
     });
