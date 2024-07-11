@@ -448,18 +448,51 @@ enum IcpCategory {
 }
 
 model IcpScore {
-  id        String      @id @default(uuid())
-  contactId String
-  score     Int
-  category  IcpCategory
-  icpId     String
+  id         String      @id @default(uuid())
+  contactId  String
+  score      Int
+  category   IcpCategory
+  icpId      String
+  createdAt  DateTime    @default(now())
+  modifiedAt DateTime    @updatedAt
 }
 
 model Dashboard {
-  id                 String @id @default(uuid())
-  averageDealSize    Int    @default(0)
-  leadConversionRate Int    @default(0)
-  leadRetentionRate  Int    @default(0)
-  marketingCost      Int    @default(0)
-  salesCost          Int    @default(0)
+  id                 String   @id @default(uuid())
+  averageDealSize    Int      @default(0)
+  leadConversionRate Int      @default(0)
+  leadRetentionRate  Int      @default(0)
+  marketingCost      Int      @default(0)
+  salesCost          Int      @default(0)
+  createdAt          DateTime @default(now())
+  modifiedAt         DateTime @updatedAt
+}
+
+enum AiUsageType {
+  AVATAR_HELPER
+  ASSISTANT
+  CALENDAR_OBSERVER
+  CATEGORIZER
+  CTA_GENERATOR
+  CTA_SELECTOR
+  CRM_MAPPER
+  DEMAND_GEN_CAMPAIGN_FINDER
+  ICP_SCORE_GENERATOR
+  INTENT_SCORE_GENERATOR
+  LEAD_OBSERVER
+  OTHERS
+  PAGE_GREETER
+  PAGE_SELECTOR
+  STARTER_GENERATOR
+  SUMMARIZER
+}
+
+model Usage {
+  id          String      @id @default(uuid())
+  taskName    AiUsageType @default(OTHERS)
+  inputToken  Int
+  outputToken Int
+  modelName   String
+  createdAt   DateTime    @default(now())
+  modifiedAt  DateTime    @updatedAt
 }

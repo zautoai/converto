@@ -469,6 +469,9 @@ export class ConversationService extends BaseService {
     const { orgId, data: createMessageDto } = serviceParams;
     const prisma = await this.getPrismaClient(orgId);
     try {
+      if(!createMessageDto.role){
+        createMessageDto.role = 'assistant'
+      }
       const message = await prisma.zautoMessage.create({ data: createMessageDto });
       const count = await prisma.zautoMessage.count({ where: { convId: createMessageDto.convId, type: 'TEXT' } });
       if (count > 3) {
