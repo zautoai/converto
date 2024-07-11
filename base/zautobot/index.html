@@ -28,7 +28,7 @@
             const searchParams = url.searchParams;
             const botId = searchParams.get('botid');
             const tenantId = url.hostname.split('.')[0]; // Assuming subdomain is the tenant ID
-    
+
             if (botId) {
                 rootElement.id = "zauto_root";
                 document.body.appendChild(rootElement);
