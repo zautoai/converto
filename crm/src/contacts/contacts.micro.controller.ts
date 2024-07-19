@@ -8,7 +8,7 @@ import { CreateContactDto } from './dto/create-contacts.dto';
 @Controller()
 export class ContactMicroserviceController {
   constructor(private contactsService: ContactsService) { }
-
+  
   @MessagePattern({ cmd: 'GET_CONTACTS' })
   async get_contacts(data: { orgId: string; filterDto: FilterDto }) {
     try {
