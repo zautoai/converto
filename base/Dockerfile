@@ -75,6 +75,7 @@ ARG VERIFICATION_EXPIRES_IN
 ARG ZAUTO_API_BASE_URL
 ARG AWS_ACCESS_KEY
 ARG AWS_SECRET_KEY
+ARG DENSE_ENDPOINT
 
 # Set environment variables from arguments
 ENV APOLLO_API_KEY=${APOLLO_API_KEY}
@@ -127,7 +128,7 @@ ENV VERIFICATION_EXPIRES_IN=${VERIFICATION_EXPIRES_IN}
 ENV ZAUTO_API_BASE_URL=${ZAUTO_API_BASE_URL}
 ENV AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
 ENV AWS_SECRET_KEY=${AWS_SECRET_KEY}
-
+ENV DENSE_ENDPOINT=${DENSE_ENDPOINT}
 # Only copy over the built elements from the dist folder from the previous stage
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist ./
