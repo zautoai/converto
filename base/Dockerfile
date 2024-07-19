@@ -24,7 +24,7 @@ WORKDIR /usr/src/app
 # Install openssl and curl
 RUN apt-get update -y && apt-get install -y openssl curl
 
-# Define arguments for environment variables.
+# Define arguments for environment variables
 ARG APOLLO_API_KEY
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_REGION
