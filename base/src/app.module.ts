@@ -50,6 +50,7 @@ import { SegmentsModule } from './segments/segments.module';
 import { SegmentCategoryModule } from './segment-category/segment-category.module';
 import { IcpModule } from './icp/icp.module';
 import { IntentScoringModule } from './intent-scoring/intent-scoring.module';
+import { NodeMailModule } from './node-mail/node-mail.module';
 
 @Module({
   imports: [
@@ -117,6 +118,7 @@ import { IntentScoringModule } from './intent-scoring/intent-scoring.module';
     SegmentCategoryModule,
     IcpModule,
     IntentScoringModule,
+  NodeMailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
