@@ -10,7 +10,7 @@ export class NodeMailController {
 
   @Post('contact')
   @ApiOperation({ summary: 'Submit  website contact form (no auth required)' })
-  @ApiResponse({ status: 201, description: 'Contact message accepted and email queued/sent.' })
+  @ApiResponse({ status: 201, description: 'Contact message accepted  and email queued/sent.' })
   async submit(@Body() dto: ContactRequestDto) {
     return await this.nodeMailService.submit(dto);
   }
