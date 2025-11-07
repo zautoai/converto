@@ -3,7 +3,7 @@ FROM node:23.10.0 AS builder
 WORKDIR /usr/src/app 
 
 # Copy the package.json and package-lock.json (if available)
-COPY package*.json ./
+COPY .nprmc package*.json ./
 
 # Install all dependencies
 RUN npm i --legacy-peer-deps
