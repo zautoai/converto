@@ -5,6 +5,8 @@ WORKDIR /usr/src/app
 # Copy the package.json and package-lock.json (if available)
 COPY .nprmc package*.json ./
 
+RUN npm install -g npm@11.6.2
+
 # Install all dependencies
 RUN npm i --legacy-peer-deps
 
