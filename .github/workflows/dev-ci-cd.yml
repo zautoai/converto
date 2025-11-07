@@ -46,18 +46,16 @@ jobs:
         if: steps.changes.outputs.base == 'true' || steps.changes.outputs.crm == 'true'
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GHCR (GITHUB_TOKEN)
+      - name: Log in to GitHub Container Registry
         if: steps.changes.outputs.base == 'true' || steps.changes.outputs.crm == 'true'
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      # Build base image (NO secrets at build time unless truly required)
+      # Build base image (secrets passed at runtime via compose, NOT at build time)
       - name: Build & push base
         if: steps.changes.outputs.base == 'true'
         uses: docker/build-push-action@v6
+        env:
+          DOCKER_BUILDKIT: 1
         with:
           context: ./base
           file: ./base/Dockerfile
@@ -65,9 +63,6 @@ jobs:
           tags: |
             ${{ env.IMAGE_BASE }}
             ${{ env.IMAGE_BASE }}-${{ github.sha }}
-          # Prefer reproducible installs; if you must relax peers:
-          # build-args: |
-          #   NPM_FLAGS=--legacy-peer-deps
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -75,6 +70,8 @@ jobs:
       - name: Build & push crm
         if: steps.changes.outputs.crm == 'true'
         uses: docker/build-push-action@v6
+        env:
+          DOCKER_BUILDKIT: 1
         with:
           context: ./crm
           file: ./crm/Dockerfile
@@ -167,12 +164,11 @@ jobs:
           target: "/home/dbserver/converto/"
 
       # Use a PAT to pull from GHCR on the remote host
-      # Create org/repo secret GHCR_PAT with scope: read:packages (or write:packages if you also push there)
       - name: Deploy on server
         uses: appleboy/ssh-action@v1
         env:
-          GHCR_USER: ${{ secrets.GHCR_USER }}   # e.g. "monesh"
-          GHCR_PAT:  ${{ secrets.GHCR_PAT }}    # PAT with read:packages (+ SSO enabled for org)
+          GHCR_USER: ${{ secrets.GHCR_USER }}
+          GHCR_PAT:  ${{ secrets.GHCR_PAT }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -182,7 +178,6 @@ jobs:
             set -euxo pipefail
             cd /home/dbserver/converto
             docker login ghcr.io -u "$GHCR_USER" -p "$GHCR_PAT"
-            # Ensure compose picks up .env for images & secrets
             docker compose pull || docker-compose pull
             docker compose up -d || docker-compose up -d
             docker image prune -a -f
