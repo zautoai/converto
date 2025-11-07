@@ -3,7 +3,7 @@ FROM node:23.10.0 AS builder
 WORKDIR /usr/src/app 
 
 # Copy the package.json and package-lock.json (if available)
-COPY .nprmc package*.json ./
+COPY  package*.json ./
 
 RUN npm install -g npm@11.6.2
 
