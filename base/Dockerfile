@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install all dependencies
-RUN npm install
+RUN npm ci --legacy-peer-deps
 
 # Copy the rest of your source code
 COPY . .
@@ -15,7 +15,7 @@ RUN npx prisma generate
 
 # Build your application.
 RUN npm run build:dev
-RUN npm install -g npx --force
+
 
 # Production stage
 FROM node:20-slim
