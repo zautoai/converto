@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20 AS builder
+FROM node:23.10.0 AS builder
 WORKDIR /usr/src/app 
 
 # Copy the package.json and package-lock.json (if available)
