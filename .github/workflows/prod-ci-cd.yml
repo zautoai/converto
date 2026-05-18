@@ -1,0 +1,238 @@
+name: Build & Deploy (Prod)
+
+on:
+  push:
+    branches: [ prod ]
+    paths:
+      - 'base/**'
+      - 'crm/**'
+
+# Required for GHCR push/pull with the built-in token, and for AWS OIDC
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+# Avoid overlapping prod deploys
+concurrency:
+  group: converto-prod
+  cancel-in-progress: false
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Only build what's actually changed
+      - name: Detect changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            base:
+              - 'base/**'
+            crm:
+              - 'crm/**'
+
+      - name: Set up QEMU (multi-arch, optional)
+        if: steps.changes.outputs.base == 'true' || steps.changes.outputs.crm == 'true'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        if: steps.changes.outputs.base == 'true' || steps.changes.outputs.crm == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR with GITHUB_TOKEN
+        if: steps.changes.outputs.base == 'true' || steps.changes.outputs.crm == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ---------- base ----------
+      - name: Build & push prod base image
+        if: steps.changes.outputs.base == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./base
+          file: ./base/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/zautoai/converto:prod-base
+            ghcr.io/zautoai/converto:prod-base-${{ github.sha }}
+          build-args: |
+            APOLLO_API_KEY=${{ secrets.APOLLO_API_KEY }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            CHROMA_AUTH_CREDENTIALS=${{ secrets.CHROMA_AUTH_CREDENTIALS }}
+            CHROMA_AUTH_PROVIDER=${{ secrets.CHROMA_AUTH_PROVIDER }}
+            CHROMA_URL=${{ secrets.CHROMA_URL }}
+            CHUNCK_SIZE=${{ secrets.CHUNCK_SIZE }}
+            CLAUDE_API_KEY=${{ secrets.CLAUDE_API_KEY }}
+            COHERE_API_KEY=${{ secrets.COHERE_API_KEY }}
+            CONVERTO_EMAIL=${{ secrets.CONVERTO_EMAIL }}
+            CONVERTO_TRAIN_BUCKET_NAME=${{ secrets.CONVERTO_TRAIN_BUCKET_NAME }}
+            COVERTO_PIC_BUCKET_NAME=${{ secrets.COVERTO_PIC_BUCKET_NAME }}
+            CRYPTO_ENCRYPTION_SECRET=${{ secrets.CRYPTO_ENCRYPTION_SECRET }}
+            DATABASE_URL=${{ secrets.DATABASE_URL_BASE }}
+            EMBEDDING_PROVIDER=${{ secrets.EMBEDDING_PROVIDER }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            HOST_PORT=${{ secrets.HOST_PORT }}
+            HOST_URL=${{ secrets.HOST_URL }}
+            IP_DATA_KEY=${{ secrets.IP_DATA_KEY }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            LLM_PROVIDER=${{ secrets.LLM_PROVIDER }}
+            MAX_SMTP_CONNECTIONS=${{ secrets.MAX_SMTP_CONNECTIONS }}
+            MAX_TOTAL_FILE_SIZE=${{ secrets.MAX_TOTAL_FILE_SIZE }}
+            NODE_ENV=${{ secrets.NODE_ENV }}   # fixed from NODE_secrets
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            OPENAI_ASSISTANT_DEFAULT_MODEL=${{ secrets.OPENAI_ASSISTANT_DEFAULT_MODEL }}
+            OPEN_AI_EMBEDDING_MODEL=${{ secrets.OPEN_AI_EMBEDDING_MODEL }}
+            OPEN_AI_MODEL=${{ secrets.OPEN_AI_MODEL }}
+            QUICK_MAIL_VALIDATOR_API=${{ secrets.QUICK_MAIL_VALIDATOR_API }}
+            REDIS_IP=${{ secrets.REDIS_IP }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            REDIS_PORT=${{ secrets.REDIS_PORT }}
+            SENDGRID_KEY=${{ secrets.SENDGRID_KEY }}
+            SIGNUP_ALERT_MAIL=${{ secrets.SIGNUP_ALERT_MAIL }}
+            SUPER_USER_EMAIL=${{ secrets.SUPER_USER_EMAIL }}
+            SUPER_USER=${{ secrets.SUPER_USER }}
+            SUPER_USER_PASSWORD=${{ secrets.SUPER_USER_PASSWORD }}
+            TRAINING_CONTENT_PATH=${{ secrets.TRAINING_CONTENT_PATH }}
+            UPLOADS_FOLDER=${{ secrets.UPLOADS_FOLDER }}
+            VERIFICATION_EXPIRES_IN=${{ secrets.VERIFICATION_EXPIRES_IN }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ---------- crm ----------
+      - name: Build & push prod crm image
+        if: steps.changes.outputs.crm == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./crm
+          file: ./crm/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/zautoai/converto:prod-crm
+            ghcr.io/zautoai/converto:prod-crm-${{ github.sha }}
+          build-args: |
+            REDIS_IP=${{ secrets.REDIS_IP }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            REDIS_PORT=${{ secrets.REDIS_PORT }}
+            CRM_HOST=${{ secrets.CRM_HOST }}
+            CRM_HOST_PORT=${{ secrets.CRM_HOST_PORT }}
+            CRM_JWT_SECRET=${{ secrets.CRM_JWT_SECRET }}
+            CRM_HUBSPOT_CLIENT_ID=${{ secrets.CRM_HUBSPOT_CLIENT_ID }}
+            CRM_HUBSPOT_CLIENT_SECRET=${{ secrets.CRM_HUBSPOT_CLIENT_SECRET }}
+            CRM_HUBSPOT_REDIRECT_URI=${{ secrets.CRM_HUBSPOT_REDIRECT_URI }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-base:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - uses: actions/checkout@v5
+
+      # Use GitHub→AWS OIDC; stop storing AWS keys in secrets if possible.
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_PROD }}   # e.g., arn:aws:iam::123456789012:role/GitHubActionsProd
+          aws-region: ${{ secrets.DEPLOY_AWS_REGION }}
+
+      - name: Inject Redis Password into base compose
+        run: sed -i -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets.REDIS_PASSWORD }}|g" docker-compose-base.yml
+
+      - name: Show updated base compose
+        run: cat docker-compose-base.yml
+
+      # Deploy via SSM. We pass the ephemeral GITHUB_TOKEN down for a one-time GHCR login on the instance.
+      - name: Deploy Base via SSM
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Role,Values=Prod-Base" \
+            --comment "Converto prod base deploy" \
+            --parameters 'commands=[
+              "set -euxo pipefail",
+              "export GITHUB_ACTOR='"$GITHUB_ACTOR"'" ,
+              "export GITHUB_TOKEN='"$GITHUB_TOKEN"'" ,
+              "docker login ghcr.io -u \"$GITHUB_ACTOR\" -p \"$GITHUB_TOKEN\"",
+              "cd /home/ubuntu/base",
+              "docker compose -f docker-compose-base.yml pull || docker-compose -f docker-compose-base.yml pull",
+              "docker compose -f docker-compose-base.yml up -d || docker-compose -f docker-compose-base.yml up -d",
+              "docker image prune -a -f"
+            ]' >/dev/null
+
+      - name: Health check Base via SSM
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Role,Values=Prod-Base" \
+            --comment "Converto prod base health check" \
+            --parameters 'commands=[
+              "set -euxo pipefail",
+              "curl --fail --silent --show-error --max-time 5 http://localhost:3000/health"
+            ]' >/dev/null
+
+  deploy-crm:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_PROD }}
+          aws-region: ${{ secrets.DEPLOY_AWS_REGION }}
+
+      - name: Inject Redis Password into CRM compose
+        run: sed -i -e "s|REDIS_PASSWORD_PLACEHOLDER|${{ secrets.REDIS_PASSWORD }}|g" docker-compose-crm.yml
+
+      - name: Show updated CRM compose
+        run: cat docker-compose-crm.yml
+
+      - name: Deploy CRM via SSM
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Role,Values=Prod-CRM" \
+            --comment "Converto prod CRM deploy" \
+            --parameters 'commands=[
+              "set -euxo pipefail",
+              "export GITHUB_ACTOR='"$GITHUB_ACTOR"'" ,
+              "export GITHUB_TOKEN='"$GITHUB_TOKEN"'" ,
+              "docker login ghcr.io -u \"$GITHUB_ACTOR\" -p \"$GITHUB_TOKEN\"",
+              "cd /home/ubuntu/crm",
+              "docker compose -f docker-compose-crm.yml pull || docker-compose -f docker-compose-crm.yml pull",
+              "docker compose -f docker-compose-crm.yml up -d || docker-compose -f docker-compose-crm.yml up -d",
+              "docker image prune -a -f"
+            ]' >/dev/null
+
+      - name: Health check CRM via SSM
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=tag:Role,Values=Prod-CRM" \
+            --comment "Converto prod CRM health check" \
+            --parameters 'commands=[
+              "set -euxo pipefail",
+              "curl --fail --silent --show-error --max-time 5 http://localhost:3001/api/v1/ping"
+            ]' >/dev/null
+
+  deployment-success:
+    runs-on: ubuntu-latest
+    needs: [deploy-base, deploy-crm]
+    steps:
+      - run: echo "Deployment completed successfully! 🎉"
